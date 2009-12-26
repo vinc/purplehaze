@@ -1,0 +1,8 @@
+For compiling PurpleHaze type
+
+	make clean
+	make
+	
+And then for playing type
+
+	./purplehaze
