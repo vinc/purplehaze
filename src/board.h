@@ -18,6 +18,7 @@
 #include <string>
 
 #include "common.h"
+#include "zobrist.h"
 
 #ifndef BOARD_H
 #define BOARD_H

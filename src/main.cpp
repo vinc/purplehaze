@@ -23,16 +23,10 @@
 #include <string>
 
 #include "piece.h"
-#include "move.h"
-#include "zobrist.h"
 #include "board.h"
-#include "attack.h"
-#include "movegen.h"
-#include "search.h"
-#include "eval.h"
-#include "xboard.h"
 #include "init.h"
-#include "transposition.h"
+#include "xboard.h"
+
 
 using namespace std;
 
@@ -40,7 +34,7 @@ Board board;
 Pieces white_pieces(WHITE);
 Pieces black_pieces(BLACK);
 
-Transpositions tt;
+//Transpositions tt;
 
 int perft_moves_counter = 0;
 int perft_captures_counter = 0;
@@ -62,6 +56,8 @@ void display_search(int score, int nodes, int time, int i, int n, int ply, Piece
 	cout << " (" << int((calculated_nodes / 1000) / elapsed_time) << "Knps)" << endl;
 }
 
+/*
+// Should leave main.cpp
 int perft(Pieces* ptr_player, Pieces* ptr_opponent, int depth) {
 	int ret = 0;
 	bool is_illegal = false;
@@ -149,7 +145,10 @@ int perft(Pieces* ptr_player, Pieces* ptr_opponent, int depth) {
 	}
 	return ret;
 }
+*/
 
+/*
+// Should leave main.cpp
 void divide(Pieces* ptr_player, Pieces* ptr_opponent, int depth) {
 	Moves moves = movegen(board, *ptr_player);
 	int nb_nodes = 0;
@@ -227,6 +226,7 @@ void divide(Pieces* ptr_player, Pieces* ptr_opponent, int depth) {
 	cout << "Moves: " << nb_moves << endl;
 	moves.clear();
 }
+*/
 
 int main() {
 	cout << "PurpleHaze 1.0 Copyright (C) 2009 Vincent Ollivier" << endl;
@@ -299,23 +299,17 @@ int main() {
 			xboard_loop();
 			return 0;
 		}
-		
+
+		/*
 		else if (cmd == "divide") {
 			int depth;
 			cin >> depth;
-			///*
 			Pieces* ptr_player = &white_pieces;
 			Pieces* ptr_opponent = &black_pieces;
-			//*/
-
-			 /*
-			Pieces* ptr_player = &black_pieces;
-			Pieces* ptr_opponent = &white_pieces;
-			//*/
-			 
 			divide(ptr_player, ptr_opponent, depth);
-			
 		}
+		*/
+		
 		else if (cmd == "setboard") {
 			//init_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
@@ -346,18 +340,12 @@ int main() {
 			
 			board.print();
 		}
+		/*
 		else if (cmd == "perft") {
-			/*
-			Pieces* ptr_player = &black_pieces;
-			Pieces* ptr_opponent = &white_pieces;
-			//*/
-			///*
 			Pieces* ptr_player = &white_pieces;
 			Pieces* ptr_opponent = &black_pieces;
-			//*/
 			int calculated_nodes = 0, nb_captures = 0, nb_castles = 0, nb_checks = 0, nb_checkmates = 0, nb_en_passant = 0, nb_promotions = 0;
-			int total_nodes = 0, total_captures = 0, total_castles = 0, total_checks = 0, total_checkmates = 0, total_en_passant = 0, total_promotions = 0;
-			
+			int total_nodes = 0, total_captures = 0, total_castles = 0, total_checks = 0, total_checkmates = 0, total_en_passant = 0, total_promotions = 0;			
 			int wide = 13;
 			cout << setw(wide) << "Depth";
 			cout << setw(wide) << "Nodes";
@@ -369,9 +357,7 @@ int main() {
 			cout << setw(wide) << "Checkmates";
 			cout << setw(wide) << "Time";
 			cout << endl;
-			
 			for (int depth = 1; depth < 10; ++depth) {
-				
 				clock_t starting_time = clock();
 				int nodes = perft_moves_counter;
 				int captures = perft_captures_counter;
@@ -413,6 +399,9 @@ int main() {
 	
 			}	
 		}
+		*/
+
+		/*
 		else if (cmd == "test") {
 			//init_board("1k3q2/8/5r2/4n2b/4p1p1/1r1R1K2/8/8 w - -");
 			init_board("7n/3P2P1/5K2/8/8/8/1k1p4/4R3 w - -");
@@ -425,6 +414,7 @@ int main() {
 			}
 			
 		}
+		*/
 		cout << endl << "> ";
 		cin >> cmd;
 	}	

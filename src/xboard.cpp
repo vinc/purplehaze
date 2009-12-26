@@ -37,7 +37,8 @@
 
 using namespace std;
 
-extern Transpositions tt;
+//extern Transpositions tt;
+Transpositions tt;
 
 Book book;
 int thinking_time = MAX_THINKING_TIME;

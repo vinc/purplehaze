@@ -16,6 +16,7 @@
 */
 
 #include "common.h"
+#include "move.h"
 
 #ifndef ZOBRIST_H
 #define ZOBRIST_H
