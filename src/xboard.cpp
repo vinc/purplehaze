@@ -34,6 +34,7 @@
 #include "attack.h"
 #include "transposition.h"
 #include "book.h"
+#include "init.h"
 
 using namespace std;
 
@@ -67,7 +68,10 @@ void print_principal_variation(Move& variation_move, int depth) {
 	//cout << "-" << variation_move;
 }
 
-Move* xboard_play(Pieces* ptr_player, Pieces* ptr_opponent, SearchAlgo algo, int depth) {
+/** Find the best move to play with the given algo
+  * on the given depth. */
+Move* find_move_to_play(Pieces* ptr_player, Pieces* ptr_opponent, SearchAlgo algo, int depth) {
+	// Debug informations
 	int wide = 10;
 	if (debug) {
 		board.print();
@@ -78,20 +82,15 @@ Move* xboard_play(Pieces* ptr_player, Pieces* ptr_opponent, SearchAlgo algo, int
 		cout << endl;
 	}
 
+	// Initialize the search variables
 	int alpha = -INF, beta = +INF, score = -INF;
-	
-	int is_in_check;
-	Piece* ptr_king_player = ptr_player->get_ptr_king();
-	Square s = ptr_king_player->get_position();
-	Color c = (ptr_king_player->get_color() == WHITE) ? BLACK : WHITE;
-	Pieces attackers = is_attacked_by(board, s, c);
-	is_in_check = (attackers.size() == 0) ? false : true;
-	
+
 	/*
-	if (is_in_check) {
+	//TODO Check extension in the root search?
+	if (is_in_check(board, ptr_player)) {
 		++depth;
 	}
-	*/
+	//*/
 
 	std::clock_t start = std::clock();
 	
@@ -124,9 +123,8 @@ Move* xboard_play(Pieces* ptr_player, Pieces* ptr_opponent, SearchAlgo algo, int
 			make_move(board, *ptr_move);
 		
 			// Test if the move is legal
-			s = ptr_king_player->get_position();
-			attackers = is_attacked_by(board, s, c);
-			if (attackers.size() == 0) {
+			bool is_legal_move = !is_in_check(board, ptr_player);
+			if (is_legal_move) {
 				legal_move_found = true;
 			
 				// Test if we have captured the king
@@ -135,7 +133,8 @@ Move* xboard_play(Pieces* ptr_player, Pieces* ptr_opponent, SearchAlgo algo, int
 					//unmake_move(board, *ptr_move); // We have to play the move chosed in root
 					return ptr_best_move;
 				}
-			
+
+				// Compute the score of this move
 				switch (algo) {
 					case NEGAMAX: 
 						score = -negamax_search(board, *ptr_opponent, *ptr_player, ply); 
@@ -148,24 +147,21 @@ Move* xboard_play(Pieces* ptr_player, Pieces* ptr_opponent, SearchAlgo algo, int
 						break;
 				}
 			}
+			
 			//Hash key = board.zobrist.get_key();
 		
 			unmake_move(board, *ptr_move);
-			
-		
-			if (attackers.size() == 0 && score > alpha) {
-				
+
+			// If we have got a new best move, save it
+			if (is_legal_move && score > alpha) {
 				ptr_best_move = ptr_move;
-				
+
 				#ifdef TRANSPOSITIONS_TABLE	
 				tt.save(board.zobrist.get_key(), score, alpha, beta, depth, *ptr_best_move);
 				#endif
 				
 				alpha = score;
-				
-				//cout << "*";
-				//cout << " " << score << " " << *ptr_move << endl;
-				
+
 				if (debug) {
 					cout << setw(wide) << ply;
 					cout << setw(wide) << setprecision(3) << double(clock() - start)/CLOCKS_PER_SEC;;
@@ -183,35 +179,23 @@ Move* xboard_play(Pieces* ptr_player, Pieces* ptr_opponent, SearchAlgo algo, int
 					if (abs(score) > mating_value) {
 						cout << " M" << ply + mating_value - abs(score);
 					}
-					
-				
 					cout << endl;
 				}
-				//cout << key << endl;
-		
 			}
-			else {
-				//cout << " ";
-			}
-			//cout << " " << score << " " << *ptr_move << " " << ptr_move->get_score() << endl;
 		}
-		/*
-		if (ptr_best_move) {
-			ptr_best_move->set_score(ply);
-		}
-		*/
 	}
 	
 	if (legal_move_found && ptr_best_move) {
 		#ifdef TRANSPOSITIONS_TABLE	
 		tt.save(board.zobrist.get_key(), score, alpha, beta, depth, *ptr_best_move);
 		#endif
-		make_move(board, *ptr_best_move);
 	}
 	return ptr_best_move;
 }
 
-int play_move(string cmd) {
+/** Parse the given move and play it on the board.
+  * Return true if the move have been played */
+bool parse_and_play_move(string cmd) {		
 	int f = (int(cmd[1]) - 49) * 16 + int(cmd[0]) - 97;
 	int t = (int(cmd[3]) - 49) * 16 + int(cmd[2]) - 97;
 	Square from = Square(f);
@@ -219,7 +203,7 @@ int play_move(string cmd) {
 	Piece* ptr_piece = board.get_ptr_piece(from);
 	Piece* ptr_capture = board.get_ptr_piece(to);
 
-	if (!ptr_piece) return 0;
+	if (!ptr_piece) return false;
 	
 	// Castling
 	if ((from == E1 && to == G1) ||
@@ -306,42 +290,49 @@ int play_move(string cmd) {
 			make_move(board, m);
 		}
 	}
-	return 1;
+	return true;
 }
 
+/** Initialize the board and the engine,
+  * parse commands from xboard,
+  * print commands to xboard. */
 void xboard_loop() {
 	SearchAlgo algo = PVS;
 	int depth = MAX_DEPTH;
-	
+
+	// By default engine play black
 	Pieces* ptr_engine = &black_pieces;
 	Pieces* ptr_xboard = &white_pieces;
-	Color engine_color = BLACK; //TODO: this should temporary fixe the bug color
-
-	//cout << "Eval: " << eval(board, *ptr_engine, *ptr_xboard) << endl;
-	
-	//static const boost::regex move_notation("([a-h][1-8][a-h][1-8]([kbrq])?)");
-	//boost::cmatch move_xboard;
+	Color engine_color = BLACK; //TODO: this should temporary fixe the color bug
 	
 	string cmd;
 	bool new_game = false;
 	int nb_moves = 0, nb_time = 0;
+
+	// Print a newline to acknowledge xboard mode
 	cout << endl;
+
+	// Parse command from xboard
 	cin >> cmd;
 	while (cmd != "quit") {
 		//TODO: ptr_engine lose his color in the end of the game... Why?
+
 		
-		if (cmd == "new") {
+		if (cmd == "new") { // Begin a new game
 			new_game = true;
+			// Put the pieces on the board and initialize it
+			init_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 		}
-		else if (cmd == "level") {
-			cin >> nb_moves;
-			cin >> nb_time;
-			thinking_time = (nb_time * 60) / nb_moves;
+		else if (cmd == "level") { // Define the game level
+			cin >> nb_moves; // Number of moves
+			cin >> nb_time; // By lenght of time
+			thinking_time = (nb_time * 60) / nb_moves; 
 		}
-		else if (cmd == "print") {
+		else if (cmd == "print") { // Print the board
 			board.print();
 		}
-		else if (new_game && cmd == "go") {
+		else if (new_game && cmd == "go") { // Begin the game
+			// Engine is asked to play white
 			ptr_engine = &white_pieces;
 			ptr_xboard = &black_pieces;
 			engine_color = WHITE;
@@ -349,23 +340,26 @@ void xboard_loop() {
 			#ifdef OPENING_BOOK
 			cmd = book.get_move();
 			if (!cmd.empty()) {
-				play_move(cmd);
+				parse_and_play_move(cmd);
 				book.add_move(cmd);
 				cout << "move " << cmd << endl;
 			}
 			else {			
 			#endif
+				// Search for a move to play
 				Move* ptr_engine_move;
-				ptr_engine_move = xboard_play(ptr_engine, ptr_xboard, algo, depth);
-				if (ptr_engine_move) {
-					cout << "move " << *ptr_engine_move << endl;
+				ptr_engine_move = find_move_to_play(ptr_engine, ptr_xboard, algo, depth);
+
+				if (ptr_engine_move) { // If we have find one
+					make_move(board, *ptr_engine_move); // We play it
+					cout << "move " << *ptr_engine_move << endl; // And we display it
 				}
 			#ifdef OPENING_BOOK
 			}
 			#endif
 			
 		}
-		else if (
+		else if ( // Parse a move
 			cmd.size() >= 4 &&
 			cmd.size() <= 5 &&
 			int(cmd[0]) >= 97 && int(cmd[0]) <= 104 &&
@@ -375,36 +369,40 @@ void xboard_loop() {
 			) {
 							
 			// Xboard's move
-			if (play_move(cmd)) {
+			if (parse_and_play_move(cmd)) {			
 				
-				book.add_move(cmd);
 				
 				#ifdef OPENING_BOOK
+				// Add the move played by xboard to the current line
+				book.add_move(cmd);
+
+				// Search in the book for an answer to it
 				cmd = book.get_move();
 				if (!cmd.empty()) {
-					play_move(cmd);
+					parse_and_play_move(cmd);
 					book.add_move(cmd);
 					cout << "move " << cmd << endl;
 				}
-				else {			
+				
+				// If we do not find one, the we have to compute it
+				else {	
 				#endif
+					// Search for a move to play
 					Move* ptr_engine_move;
-					ptr_engine_move = xboard_play(ptr_engine, ptr_xboard, algo, depth);
-					if (ptr_engine_move) {
-						cout << "move " << *ptr_engine_move << endl;
+					ptr_engine_move = find_move_to_play(ptr_engine, ptr_xboard, algo, depth);
+
+					if (ptr_engine_move) { // If we have find one
+						make_move(board, *ptr_engine_move); // We play it
+						cout << "move " << *ptr_engine_move << endl; // And we display it
 					}
-					else {
-						Piece* ptr_king_engine = ptr_engine->get_ptr_king();
-						Square s = ptr_king_engine->get_position();
-						Color c = (ptr_king_engine->get_color() == WHITE) ? BLACK : WHITE;
-						Pieces attackers = is_attacked_by(board, s, c);
-						if (attackers.size() == 0) {
-							// Stalemate
-							cout << "1/2-1/2 {Stalemate}" << endl;
-						}
-						else {
-							// Checkmate
+					else { // If we do not have a move to play
+						if (is_in_check(board, ptr_engine)) { // And if we are in check
+							// This is a Checkmate
 							cout << ((engine_color == WHITE) ? "0-1 {White lose}" : "1-0 {Black lose}") << endl;
+						}
+						else { // If we are not in check
+							// This is a Stalemate
+							cout << "1/2-1/2 {Stalemate}" << endl;
 						}
 					}
 				#ifdef OPENING_BOOK

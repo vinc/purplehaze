@@ -210,3 +210,11 @@ int eval(Board& board, Pieces& player, Pieces& opponent) {
 	//else return -score;
 	return score;
 }
+
+bool is_in_check(Board& board, Pieces* ptr_pieces_player) {
+	Piece* ptr_king_player = ptr_pieces_player->get_ptr_king();
+	Square s = ptr_king_player->get_position();
+	Color c = (ptr_king_player->get_color() == WHITE) ? BLACK : WHITE;
+	Pieces attackers = is_attacked_by(board, s, c);
+	return (attackers.size() == 0) ? false : true;
+}

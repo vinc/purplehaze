@@ -144,5 +144,5 @@ const int BONUS_RANDOM_MAX = 3;
 
 int static_exchange_evaluation(Board board, Square square, Color player_color);
 int eval(Board& board, Pieces& player, Pieces& opponent);
-
+bool is_in_check(Board& board, Pieces* ptr_pieces_player);
 #endif /* !EVAL_H */

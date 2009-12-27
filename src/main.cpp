@@ -24,9 +24,7 @@
 
 #include "piece.h"
 #include "board.h"
-#include "init.h"
 #include "xboard.h"
-
 
 using namespace std;
 
@@ -36,6 +34,7 @@ Pieces black_pieces(BLACK);
 
 //Transpositions tt;
 
+/*
 int perft_moves_counter = 0;
 int perft_captures_counter = 0;
 int perft_en_passant_counter = 0;
@@ -55,6 +54,7 @@ void display_search(int score, int nodes, int time, int i, int n, int ply, Piece
 	cout << calculated_nodes << " nodes";
 	cout << " (" << int((calculated_nodes / 1000) / elapsed_time) << "Knps)" << endl;
 }
+*/
 
 /*
 // Should leave main.cpp
@@ -233,70 +233,33 @@ int main() {
 	cout <<	"This program comes with ABSOLUTELY NO WARRANTY; for details type 'show w'." << endl;
 	cout <<	"This is free software, and you are welcome to redistribute it" << endl;
 	cout <<	"under certain conditions; type 'show c' for details." << endl;
-	
+
+	// Parse commands from CLI
 	string cmd;
 	cout << endl << "> ";
 	cin >> cmd;
 	while (cmd != "quit") {
+		// Display help
 		if (cmd == "help") {
-			cout << "bench" << endl;
+			//cout << "bench" << endl;
+			//cout << "divide" << endl;
 			cout << "help" << endl;
-			cout << endl;
+			cout << "setboard" << endl;
+			//cout << "perft" << endl;
 			cout << "xboard" << endl;
-			cout << "new" << endl;
-			cout << "level MOVES TIME" << endl;
-			cout << "go" << endl;
-			cout << "MOVE" << endl;
-			cout << "move MOVE" << endl;
+			cout << "	new" << endl;
+			cout << "	level MOVES TIME" << endl;
+			cout << "	go" << endl;
+			cout << "	MOVE" << endl;
+			cout << "	move MOVE" << endl;
 			cout << endl;
-			cout << "bench" << endl;
 		}
+		// Go to xboard mode
 		else if (cmd == "xboard") {
-			// Starting position
-			init_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-
-			// Purplehaze #1 (avoid f7)
-			//init_board("8/8/5P2/8/6P1/1p1k4/3P2P1/K7 w - - 0 60");
 			
-			// Kaufman #1 (Nf6+)
-			//init_board("1rbq1rk1/p1b1nppp/1p2p3/8/1B1pN3/P2B4/1P3PPP/2RQ1R1K w - - 0 1 ");
-
-			// Kaufman #3 (avoid Rd1)
-			//init_board("3r2k1/1p3ppp/2pq4/p1n5/P6P/1P6/1PB2QP1/1K2R3 w - - 0 1 ");
-
-			// Kaufman #16 (b3b4)
-			//init_board("8/4p3/p2p4/2pP4/2P1P3/1P4k1/1P1K4/8 w - - 0 1");
-			
-			// Kaufman #21 (c4b5)
-			//init_board("8/2k5/4p3/1nb2p2/2K5/8/6B1/8 w - - 0 1");
-
-			// Kaufman #22 (Ba7)
-			//init_board("1B1b4/7K/1p6/1k6/8/8/8/8 w - - 0 1 ");
-			
-			//init_board("8/6p1/5p2/7K/4kP1P/8/8/8 w - - 0 1");
-				
-			// White win in 2 moves
-			//init_board("8/1k6/5R2/6R1/8/8/3K4/8 w - - 0 1");
-
-			// Black win in 2 moves
-			//init_board("8/1K6/5r2/6r1/8/8/3k4/8 w - - 0 1");
-
-			// Test SSE
-			//init_board("3qk3/b7/4n3/8/3p4/5N2/1BN5/2KQ4 w - - 0 1");
-			
-			// M2
-			//init_board("8/6P1/8/k1K5/8/8/8/8 w - - 0 1");
-			
-			// M3
-			//init_board("8/4P1n1/8/R5P1/8/8/P1K5/k7 w - - 0 1");
-			
-			// Rh8!
-			//init_board("R7/P4k2/8/8/8/8/r7/6K1 w - - 0 1");
-			
-			//board.print();			
-			
-			cout << endl;
+			// Go to xboard mode
 			xboard_loop();
+			
 			return 0;
 		}
 
@@ -309,11 +272,9 @@ int main() {
 			divide(ptr_player, ptr_opponent, depth);
 		}
 		*/
-		
-		else if (cmd == "setboard") {
-			//init_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
-			///*
+		/*
+		else if (cmd == "setboard") {
 			string piece_placement, side_to_move, castling_ability, en_passant_target_square, reversible_halfmove_counter, fullmove_counter;
 			string fen;
 			
@@ -332,14 +293,10 @@ int main() {
 			fen.append(fullmove_counter);
 
 			init_board(fen.c_str());
-			/*
-			//init_board("K1k5/8/8/8/5pP1/8/4P3/8 b - g3 0 1");
-			board.set_en_passant(G3);
-			board.get_ptr_piece(G4)->inc_nb_moves();
-			//*/
-			
 			board.print();
 		}
+		//*/
+		
 		/*
 		else if (cmd == "perft") {
 			Pieces* ptr_player = &white_pieces;
