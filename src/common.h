@@ -25,8 +25,8 @@ using namespace std;
 
 //#define RANDOM_EVAL 1
 #define OPENING_BOOK 1
-#define CHECK_EXTENSION 1
-#define QUIESCENCE_SEARCH 1
+//#define CHECK_EXTENSION 1
+//#define QUIESCENCE_SEARCH 1
 //#define SEE 1
 //#define TRANSPOSITIONS_TABLE 1
 //#define LATE_MOVE_REDUCTION 1
