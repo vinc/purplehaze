@@ -43,7 +43,12 @@ Transpositions tt;
 
 Book book;
 int thinking_time = MAX_THINKING_TIME;
-bool debug = true;
+
+#ifdef DEBUG
+bool root_search_debug = true;
+#else
+bool root_search_debug = false;
+#endif
 
 void print_principal_variation(Move& variation_move, int depth) {
 	cout << " " << variation_move.get_san_notation();
@@ -73,7 +78,7 @@ void print_principal_variation(Move& variation_move, int depth) {
 Move* find_move_to_play(Pieces* ptr_player, Pieces* ptr_opponent, SearchAlgo algo, int depth) {
 	// Debug informations
 	int wide = 10;
-	if (debug) {
+	if (root_search_debug) {
 		board.print();
 		cout << setw(wide) << "depth";
 		cout << setw(wide) << "time";
@@ -162,7 +167,7 @@ Move* find_move_to_play(Pieces* ptr_player, Pieces* ptr_opponent, SearchAlgo alg
 				
 				alpha = score;
 
-				if (debug) {
+				if (root_search_debug) {
 					cout << setw(wide) << ply;
 					cout << setw(wide) << setprecision(3) << double(clock() - start)/CLOCKS_PER_SEC;;
 					cout << setw(wide) << score;

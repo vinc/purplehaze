@@ -23,6 +23,7 @@
 
 using namespace std;
 
+#define DEBUG 1
 //#define RANDOM_EVAL 1
 #define OPENING_BOOK 1
 //#define CHECK_EXTENSION 1
@@ -31,6 +32,7 @@ using namespace std;
 //#define TRANSPOSITIONS_TABLE 1
 //#define LATE_MOVE_REDUCTION 1
 //#define NULL_MOVE_PRUNING 1
+
 
 /*
  * Generic datas
