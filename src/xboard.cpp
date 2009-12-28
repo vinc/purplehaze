@@ -311,7 +311,7 @@ void xboard_loop() {
 	Color engine_color = BLACK; //TODO: this should temporary fixe the color bug
 	
 	string cmd;
-	bool new_game = false;
+	bool game_initialized = false, new_game = false;
 	int nb_moves = 0, nb_time = 0;
 
 	// Print a newline to acknowledge xboard mode
@@ -324,9 +324,42 @@ void xboard_loop() {
 
 		
 		if (cmd == "new") { // Begin a new game
+			game_initialized = true;
 			new_game = true;
+
+			//TODO Reset the board
+			
 			// Put the pieces on the board and initialize it
 			init_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+
+			// Engine play black
+			ptr_engine = &black_pieces;
+			ptr_xboard = &white_pieces;
+			engine_color = BLACK; //TODO: this should temporary fixe the color bug
+		}
+		if (cmd == "setboard") { // Set pieces on the board
+			game_initialized = true;
+
+			// Get FEN
+			string fen;
+			getline(cin, fen);
+			fen.erase(0, 1); // Remove the first whitespace
+
+			// Put the pieces on the board and initialize it
+			init_board(fen.c_str());
+
+			engine_color = (board.get_turn_color() == WHITE ? BLACK : WHITE);
+			switch (engine_color) {
+				default:
+				case WHITE:
+					ptr_engine = &white_pieces;
+					ptr_xboard = &black_pieces;
+					break;
+				case BLACK:
+					ptr_engine = &black_pieces;
+					ptr_xboard = &white_pieces;
+					break;
+			}
 		}
 		else if (cmd == "level") { // Define the game level
 			cin >> nb_moves; // Number of moves
@@ -336,15 +369,24 @@ void xboard_loop() {
 		else if (cmd == "print") { // Print the board
 			board.print();
 		}
-		else if (new_game && cmd == "go") { // Begin the game
-			// Engine is asked to play white
-			ptr_engine = &white_pieces;
-			ptr_xboard = &black_pieces;
-			engine_color = WHITE;
+		else if (/*game_initialized &&*/ cmd == "go") { // Begin the game
+			// Engine play the color that is on the move
+			engine_color = board.get_turn_color();
+			switch (engine_color) {
+				default:
+				case WHITE:
+					ptr_engine = &white_pieces;
+					ptr_xboard = &black_pieces;
+					break;
+				case BLACK:
+					ptr_engine = &black_pieces;
+					ptr_xboard = &white_pieces;
+					break;
+			}
 
 			#ifdef OPENING_BOOK
 			cmd = book.get_move();
-			if (!cmd.empty()) {
+			if (new_game && !cmd.empty()) {
 				parse_and_play_move(cmd);
 				book.add_move(cmd);
 				cout << "move " << cmd << endl;
