@@ -46,7 +46,8 @@ class Board
 		int get_file(Square s) const;
 		int get_rank(Square s) const;
 		Color get_turn_color() const;		
-		void set_turn_color(Color c);		
+		void set_turn_color(Color c);
+		void change_turn_color();
 		bool is_off_the_board(Square s) const {return s & 0x88;}
 		bool is_dark(Square s) const;
 		void print() const;

@@ -76,9 +76,10 @@ int quiescence_search(Board& board, Pieces& player, Pieces& opponent, int alpha,
 			if (debug) board.print();
 			int see = -static_exchange_evaluation(board, s, c);
 			//cout << "Zobrist key after SEE " << board.zobrist.get_key() << endl;	
-
-			if (see < 0) {
-				if (debug) cout << "The move worth it!" << endl;
+			//cout << "SEE: " << see << endl;
+			if (see > 0) {
+				if (debug) cout << "The move does not worth it!" << endl;
+				unmake_move(board, *ptr_move);
 				continue;
 			}
 			#endif
@@ -488,7 +489,8 @@ int principal_variation_search(Board& board, Pieces& player, Pieces& opponent, i
 				if (score >= beta) {
 					unmake_move(board, *ptr_move);
 					#ifdef TRANSPOSITIONS_TABLE			
-					tt.save(board.zobrist.get_key(), score, alpha, beta, depth, *ptr_move);
+					//TODO false the results
+					//tt.save(board.zobrist.get_key(), score, alpha, beta, depth, *ptr_move);
 					#endif
 					//cout << "Fail-hard beta cutoff: alpha=" << alpha << " score=" << score << " beta=" << beta << endl;
 					

@@ -23,6 +23,8 @@
 #include <cstdio>
 #include <ctime>
 
+#include <signal.h>
+
 #include "piece.h"
 #include "move.h"
 #include "zobrist.h"
@@ -314,6 +316,8 @@ void xboard_loop() {
 	bool game_initialized = false, new_game = false;
 	int nb_moves = 0, nb_time = 0;
 
+	signal(SIGINT, SIG_IGN);
+	
 	// Print a newline to acknowledge xboard mode
 	cout << endl;
 

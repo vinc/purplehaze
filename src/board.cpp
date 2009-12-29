@@ -95,6 +95,10 @@ Color Board::get_turn_color() const {
 
 void Board::set_turn_color(Color c) {
 	turn_color = c;
+}
+
+void Board::change_turn_color() {
+	turn_color = (turn_color == WHITE ? BLACK : WHITE);
 }	
 
 /*

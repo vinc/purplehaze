@@ -301,7 +301,9 @@ void make_move(Board& board, Move& move) {
 	if (move.get_type() != UNDEF_MOVE_TYPE) {
 	
 		bool is_repetition = true; // for the 50 repetitions
-	
+
+		board.change_turn_color();
+		
 		//cout << "DEBUG: Zobrist before making " << move << " = \t" << board.zobrist << endl;
 		board.zobrist.add_move(move);
 		//cout << "DEBUG: Zobrist after making " << move << " = \t" << board.zobrist << endl;
@@ -372,7 +374,9 @@ void unmake_move(Board& board, Move& move) {
 	
 	// If it is not a null move
 	if (move.get_type() != UNDEF_MOVE_TYPE) {
-	
+
+		board.change_turn_color();
+		
 		//cout << "DEBUG: Zobrist before unmaking " << move << " = \t" << board.zobrist << endl;
 		board.zobrist.sub_move(move);
 		//cout << "DEBUG: Zobrist after unmaking " << move << " = \t" << board.zobrist << endl;

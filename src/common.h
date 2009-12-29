@@ -23,15 +23,16 @@
 
 using namespace std;
 
-#define DEBUG 1
+//#define DEBUG 1
+//#define SAN_OUTPUT 1
 //#define RANDOM_EVAL 1
 #define OPENING_BOOK 1
-//#define CHECK_EXTENSION 1
-//#define QUIESCENCE_SEARCH 1
+#define CHECK_EXTENSION 1
+#define QUIESCENCE_SEARCH 1
 //#define SEE 1
-//#define TRANSPOSITIONS_TABLE 1
-//#define LATE_MOVE_REDUCTION 1
-//#define NULL_MOVE_PRUNING 1
+#define TRANSPOSITIONS_TABLE 1
+#define LATE_MOVE_REDUCTION 1
+#define NULL_MOVE_PRUNING 1
 
 
 /*
@@ -158,6 +159,6 @@ enum Bound { ACCURATE, LOWER, UPPER, UNDEF_BOUND };
 //TODO compare 1048576 and 1000000
 
 //const int TT_SIZE = 1000000;
-const int TT_SIZE = 1024*1024;
+const int TT_SIZE = 1024*1024*2;
 
 #endif /* !COMMON_H */

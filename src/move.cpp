@@ -36,6 +36,9 @@ using namespace std;
 extern Board board;
 
 ostream& operator<<(ostream& out, const Move& move) {
+	#ifdef SAN_OUTPUT
+	return out << move.get_san_notation();
+	#else
 	/*
 	switch (move.get_ptr_piece()->get_type()) {
 		case KNIGHT: out << 'N'; break;
@@ -57,6 +60,7 @@ ostream& operator<<(ostream& out, const Move& move) {
 		default: break;
 	}
     return out;
+	#endif
 }
 
 Move::Move() {

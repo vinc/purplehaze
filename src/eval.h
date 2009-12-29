@@ -138,7 +138,7 @@ const int FLIP[BOARD_SIZE] = {
 */
 };
 
-const int BONUS_CASTLE = 100;
+const int BONUS_CASTLE = 50;
 const int BONUS_RANDOM_MAX = 3;
 
 

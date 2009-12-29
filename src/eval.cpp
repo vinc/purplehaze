@@ -27,45 +27,33 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <algorithm>
 
 int static_exchange_evaluation(Board board, Square square, Color opponent_color) {
-	bool debug = false;
-
 	Color player_color = (opponent_color == WHITE) ? BLACK : WHITE;
-	//cout << "Player's color: " << player_color << " Opponent's color: " << opponent_color << endl;
-	int value = 0, see_value = 0;
+	int value = 0;
 	Pieces attackers = is_attacked_by(board, square, opponent_color);
-	if (attackers.size() == 0) {
-		// The square isn't attacked anymore by this side
-		return 0;
-	}
+	
+	// If the square is attacked on this side we go on
+	if (attackers.size()) {
 
-	attackers.sort();
-	if (debug) cout << "Attackers : ";
-	for (attackers.iterator = attackers.begin(); attackers.iterator != attackers.end(); ++attackers.iterator) {
-		Piece* ptr_piece = attackers.get_ptr_piece();
-		if (debug) cout << " " << ptr_piece << "(" << *ptr_piece << ")";
-	}
-	
-	
-	Piece* ptr_attacker = attackers.get_ptr_smallest();
-	Piece* ptr_captured_piece = board.get_ptr_piece(square); //TODO wrong piece returned
-	if (ptr_attacker && ptr_captured_piece) {
-		Move capture(ptr_attacker, ptr_attacker->get_position(), square, ptr_captured_piece);
-		make_move(board, capture);
-		if (debug) cout << endl << "Board after SEE capture " << capture.get_san_notation();
-		if (debug) cout << " " << *ptr_attacker << " -> " << *ptr_captured_piece;
-		if (debug) board.print();
-		see_value = -static_exchange_evaluation(board, square, player_color);
-		if (see_value >= 0) {
-			// Do not make captures if they lose material
-			value = ptr_captured_piece->get_value() + see_value;
-			if (debug) cout << "Value: " << value << ", SEE value: " << see_value << endl;
+		attackers.sort();
+		
+		Piece* ptr_attacker = attackers.get_ptr_smallest();
+		Piece* ptr_captured_piece = board.get_ptr_piece(square); //TODO wrong piece returned
+		if (ptr_attacker && ptr_captured_piece) {
+			Move capture(ptr_attacker, ptr_attacker->get_position(), square, ptr_captured_piece);
+			make_move(board, capture);
+			/*
+			see_value = -static_exchange_evaluation(board, square, player_color);
+			if (see_value >= 0) {
+				// Do not make captures if they lose material
+				value = ptr_captured_piece->get_value() + see_value;
+			}
+			*/
+			value = max(0, ptr_captured_piece->get_value() - static_exchange_evaluation(board, square, player_color));
+			unmake_move(board, capture);
 		}
-		unmake_move(board, capture);
-		if (debug) cout << endl << "Board after take back SEE capture " << capture.get_san_notation();
-		if (debug) cout << " " << *ptr_attacker << " -> " << *ptr_captured_piece;
-		if (debug) board.print();
 	}
 	return value;
 }
