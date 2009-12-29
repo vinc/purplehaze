@@ -138,9 +138,15 @@ const int FLIP[BOARD_SIZE] = {
 */
 };
 
+const int KNIGHT_ADJ[9] = { -20, -16, -12, -8, -4,  0,  4,  8, 12};
+const int ROOK_ADJ[9] =   {  15,  12,   9,  6,  3,  0, -3, -6, -9};
+
+
 const int BONUS_CASTLE = 50;
 const int BONUS_RANDOM_MAX = 3;
-
+const int BONUS_BISHOP_PAIR = 20;
+const int MALUS_NO_PAWN = -30;
+const int MALUS_QUEEN_OPENING = -5;
 
 int static_exchange_evaluation(Board board, Square square, Color player_color);
 int eval(Board& board, Pieces& player, Pieces& opponent);

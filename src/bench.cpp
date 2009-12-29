@@ -26,6 +26,7 @@
 #include "attack.h"
 #include "bench.h"
 #include "init.h"
+#include "eval.h"
 
 using namespace std;
 
@@ -52,7 +53,9 @@ void display_search(int score, int nodes, int time, int i, int n, int ply, Piece
 int perft(Pieces* ptr_player, Pieces* ptr_opponent, int depth) {
 	int ret = 0;
 	bool is_illegal = false;
-		
+
+	eval(board, *ptr_player, *ptr_opponent);
+	
 	if (!is_illegal && depth > 0) {
 		Moves moves = movegen(board, *ptr_player);
 		

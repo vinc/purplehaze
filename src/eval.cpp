@@ -118,7 +118,9 @@ int eval_bonus_position(Piece* ptr_piece) {
 int eval(Board& board, Pieces& player, Pieces& opponent) {
 	//int score = rand() % 100;
 	int score = 0, score_pieces_player = 0, score_pieces_opponent = 0;
-	int nb_pieces_player = 0, nb_pieces_opponent = 0;
+	int nb_pieces_player = 0, nb_rook_player = 0, nb_bishop_player = 0, nb_knight_player = 0, nb_pawn_player = 0;
+	int nb_pieces_opponent = 0, nb_rook_opponent = 0, nb_bishop_opponent = 0, nb_knight_opponent = 0, nb_pawn_opponent = 0;
+	
 	Piece* ptr_piece;
 	Color color_bishop_player = UNDEF_COLOR, color_bishop_opponent = UNDEF_COLOR;
 	
@@ -127,15 +129,37 @@ int eval(Board& board, Pieces& player, Pieces& opponent) {
 		if (!board.is_off_the_board(ptr_piece->get_position())) {
 			score_pieces_player += ptr_piece->get_value();
 			++nb_pieces_player;
-			if (ptr_piece->get_type() == BISHOP) {
-				color_bishop_player = (board.is_dark(ptr_piece->get_position()) ? BLACK : WHITE);
+			switch (ptr_piece->get_type()) {
+				case QUEEN:
+					if (board.positions_history.size() < 5 && ptr_piece->get_nb_moves() > 0) {
+						score += MALUS_QUEEN_OPENING * (5-board.positions_history.size()/2);
+					}
+					break;
+				case ROOK:
+					++nb_rook_player;
+					break;
+					
+				case BISHOP:
+					color_bishop_player = (board.is_dark(ptr_piece->get_position()) ? BLACK : WHITE);
+					++nb_bishop_player;
+					break;
+				case KNIGHT:
+					++nb_knight_player;
+					break;
+				case PAWN:
+					++nb_pawn_player;
+					break;
+				default:
+					break;
 			}
 			score += eval_bonus_position(ptr_piece);
 		}
+		/*
 		else if (ptr_piece->get_type() == KING) {
 			// If our king is outside, we just lost the game!
 			//return -INF;
 		}
+		*/
 	}
 	score += score_pieces_player;
 	
@@ -144,15 +168,36 @@ int eval(Board& board, Pieces& player, Pieces& opponent) {
 		if (!board.is_off_the_board(ptr_piece->get_position())) {
 			score_pieces_opponent += ptr_piece->get_value();
 			++nb_pieces_opponent;
-			if (ptr_piece->get_type() == BISHOP) {
-				color_bishop_opponent = (board.is_dark(ptr_piece->get_position()) ? BLACK : WHITE);
+			switch (ptr_piece->get_type()) {
+				case QUEEN:
+					if (board.positions_history.size() < 10 && ptr_piece->get_nb_moves() > 0) {
+						score -= MALUS_QUEEN_OPENING * (5-board.positions_history.size()/2);
+					}
+					break;				
+				case ROOK:
+					++nb_rook_opponent;
+					break;
+				case BISHOP:
+					color_bishop_opponent = (board.is_dark(ptr_piece->get_position()) ? BLACK : WHITE);
+					++nb_bishop_opponent;
+					break;
+				case KNIGHT:
+					++nb_knight_opponent;
+					break;
+				case PAWN:
+					++nb_pawn_opponent;
+					break;
+				default:
+					break;
 			}
 			score -= eval_bonus_position(ptr_piece);
 		}
+		/*
 		else if (ptr_piece->get_type() == KING) {
 			// If their king is outside, we just win the game!
 			//return INF;
 		}
+		*/
 	}
 	score -= score_pieces_opponent;
 	
@@ -188,8 +233,29 @@ int eval(Board& board, Pieces& player, Pieces& opponent) {
 		score -= BONUS_CASTLE;
 	}
 
-	// Add a little random variation
+	// Bonus for bishop pair
+	if (nb_bishop_player == 2) {
+		score += BONUS_BISHOP_PAIR;
+	}
+	if (nb_bishop_opponent == 2) {
+		score += BONUS_BISHOP_PAIR;
+	}
+
+	// Malus for having no pawn
+	if (nb_pawn_player == 0) {
+		score -= MALUS_NO_PAWN;
+	}
+	if (nb_pawn_opponent == 0) {
+		score -= MALUS_NO_PAWN;
+	}
+
+	score += KNIGHT_ADJ[nb_pawn_player]*nb_knight_player;
+	score -= KNIGHT_ADJ[nb_pawn_opponent]*nb_knight_opponent;
+	score += ROOK_ADJ[nb_pawn_player]*nb_rook_player;
+	score -= ROOK_ADJ[nb_pawn_opponent]*nb_rook_opponent;
+	
 	#ifdef RANDOM_EVAL
+	// Add a little random variation
 	srand(time(NULL));
 	score += rand() % BONUS_RANDOM_MAX;
 	#endif
