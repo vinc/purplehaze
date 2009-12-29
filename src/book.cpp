@@ -177,14 +177,18 @@ void Book::add_move(string move) {
 
 string Book::get_move() const {
 	string move;
+	bool move_found = false;
 	for (int i = 0; i < (int) lines.size(); ++i) {
-		for (int j = 0; j < (int) lines[i].size(); ++j) {
-			if (j == (int) current_line.size()) {
-				move = lines[i][j];
-				break;
-			}
-			else if (lines[i][j] != current_line[j]) {
-				break;
+		if (!move_found) {
+			for (int j = 0; j < (int) lines[i].size(); ++j) {
+				if (j == (int) current_line.size()) {
+					move = lines[i][j];
+					move_found = true;
+					break;
+				}
+				else if (lines[i][j] != current_line[j]) {
+					break;
+				}
 			}
 		}
 	}

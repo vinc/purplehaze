@@ -338,7 +338,7 @@ int principal_variation_search(Board& board, Pieces& player, Pieces& opponent, i
 
 	// Threefold repetition
 	list<Hash>::iterator it = board.positions_history.begin();
-	int nb_repetitions = 0;
+	int nb_repetitions = 1;
 	Hash current_position = *it;
 	bool side_to_move = false;
 	for (++it; it != board.positions_history.end(); ++it) {
