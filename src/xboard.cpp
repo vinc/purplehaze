@@ -103,7 +103,7 @@ Move* find_move_to_play(Pieces* ptr_player, Pieces* ptr_opponent, SearchAlgo alg
 	
 	bool legal_move_found = false;
 	Move* ptr_best_move = 0;
-	Moves moves = movegen(board, *ptr_player);
+	Moves moves = movegen(board, *ptr_player, false);
 	
 	for (int ply = 1; ply < depth; ++ply) {
 		

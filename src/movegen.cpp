@@ -25,12 +25,12 @@
 /*
  * Move generator for Knight and King
  */
-void movegen_leapers(Board& board, Moves& moves, Piece* ptr_piece, const MoveOrientation direction[], const int nb_moves) {
+void movegen_leapers(Board& board, Moves& moves, Piece* ptr_piece, const MoveOrientation direction[], const int nb_moves, bool capture_only) {
 	Square from = ptr_piece->get_position(), to;
 	Color color = ptr_piece->get_color();
 	for (int i = 0; i < nb_moves; ++i) {
 		to = Square(from + direction[i]);
-		if (!board.is_off_the_board(to) && !board.get_ptr_piece(to)) {
+		if (!capture_only && !board.is_off_the_board(to) && !board.get_ptr_piece(to)) {
 			Move m(ptr_piece, from, to);
 			moves.insert(m, BACK);
 		}
@@ -41,14 +41,16 @@ void movegen_leapers(Board& board, Moves& moves, Piece* ptr_piece, const MoveOri
 /*
  * Move generator for Bishop, Rook and Queen
  */
-void movegen_sliders(Board& board, Moves& moves, Piece* ptr_piece, const MoveOrientation direction[], const int nb_moves) {
+void movegen_sliders(Board& board, Moves& moves, Piece* ptr_piece, const MoveOrientation direction[], const int nb_moves, bool capture_only) {
 	Square from = ptr_piece->get_position(), to;
 	Color color = ptr_piece->get_color();
 	for (int i = 0; i < nb_moves; ++i) {
 		to = Square(from + direction[i]);
 		while (!board.is_off_the_board(to) && !board.get_ptr_piece(to)) {
-			Move m(ptr_piece, from, to);
-			moves.insert(m, BACK);
+			if (!capture_only) {
+				Move m(ptr_piece, from, to);
+				moves.insert(m, BACK);
+			}
 			to = Square(to + direction[i]);
 		}
 		movegen_capture(board, moves, ptr_piece, color, from, to);
@@ -90,8 +92,9 @@ void movegen_capture(Board& board, Moves& moves, Piece* ptr_piece, Color color, 
 /*
  * Generate a collection of all pseudo-moves and captures for a collection of pieces
  */				
-Moves movegen(Board& board, Pieces& pieces) {
+Moves movegen(Board& board, Pieces& pieces, bool capture_only) {
 	Moves moves;
+	//capture_only = false;
 	for (pieces.iterator = pieces.begin(); pieces.iterator != pieces.end(); pieces.iterator++) {
 		Piece* ptr_piece = pieces.get_ptr_piece();
 		Square from = ptr_piece->get_position(), to;
@@ -100,38 +103,40 @@ Moves movegen(Board& board, Pieces& pieces) {
 			switch (ptr_piece->get_type()) {
 				case PAWN:
 					// Standard Move
-					to = (color == WHITE) ? Square(from + UP) : Square(from + DOWN);
-					if (!board.is_off_the_board(to) && !board.get_ptr_piece(to)) {
+					if (!capture_only) {
+						to = (color == WHITE) ? Square(from + UP) : Square(from + DOWN);
+						if (!board.is_off_the_board(to) && !board.get_ptr_piece(to)) {
 						
-						// Promotion
-						if ((color == WHITE && board.get_rank(to) == 7) 
-							 || (color == BLACK && board.get_rank(to) == 0)) {
-							Move knight(ptr_piece, from, to, KNIGHT);
-							moves.insert(knight, FRONT);
-							Move bishop(ptr_piece, from, to, BISHOP);
-							moves.insert(bishop, FRONT);
-							Move rook(ptr_piece, from, to, ROOK);
-							moves.insert(rook, FRONT);
-							Move queen(ptr_piece, from, to, QUEEN);
-							moves.insert(queen, FRONT);
-						}
-						else {
-							Move m(ptr_piece, from, to);
-							moves.insert(m, BACK);
-						}
-				
-						// First move rule
-						Square ep = to;
-						if ((color == WHITE && board.get_rank(from) == 1) 
-						 || (color == BLACK && board.get_rank(from) == 6)) {
-							to = (color == WHITE) ? Square(to + UP) : Square(to + DOWN);
-							if (!board.is_off_the_board(to) && !board.get_ptr_piece(to)) {
-								// true for en passant
-								//cout << "ep: " << ep << endl;
-								Move m(ptr_piece, from, to, ep);
+							// Promotion
+							if ((color == WHITE && board.get_rank(to) == 7) 
+								 || (color == BLACK && board.get_rank(to) == 0)) {
+								Move knight(ptr_piece, from, to, KNIGHT);
+								moves.insert(knight, FRONT);
+								Move bishop(ptr_piece, from, to, BISHOP);
+								moves.insert(bishop, FRONT);
+								Move rook(ptr_piece, from, to, ROOK);
+								moves.insert(rook, FRONT);
+								Move queen(ptr_piece, from, to, QUEEN);
+								moves.insert(queen, FRONT);
+							}
+							else {
+								Move m(ptr_piece, from, to);
 								moves.insert(m, BACK);
+							}
+				
+							// First move rule
+							Square ep = to;
+							if ((color == WHITE && board.get_rank(from) == 1) 
+							 || (color == BLACK && board.get_rank(from) == 6)) {
+								to = (color == WHITE) ? Square(to + UP) : Square(to + DOWN);
+								if (!board.is_off_the_board(to) && !board.get_ptr_piece(to)) {
+									// true for en passant
+									//cout << "ep: " << ep << endl;
+									Move m(ptr_piece, from, to, ep);
+									moves.insert(m, BACK);
 								
-								//TODO flag the pawn as vulnerable to en passant
+									//TODO flag the pawn as vulnerable to en passant
+								}
 							}
 						}
 					}
@@ -145,32 +150,34 @@ Moves movegen(Board& board, Pieces& pieces) {
 					movegen_capture(board, moves, ptr_piece, color, from, to);
 					
 					// En passant
-					if ((color == WHITE && board.get_rank(from) == 4) || (color == BLACK && board.get_rank(from) == 3)) {
-						Piece* ptr_right = board.get_ptr_piece(Square(from + RIGHT));
-						if (ptr_right
-							&& ptr_right->get_type() == PAWN
-							&& ptr_right->get_color() != color
-							&& ptr_right->get_nb_moves() == 1) {
-							//board.print();
-							to = (color == WHITE) ? Square(from + UP_RIGHT) : Square(from + DOWN_RIGHT);
-							//cout << "board: " << board.get_en_passant() << " to: " << to << endl;
-							if (board.get_en_passant() == to) {
-								Move m(ptr_piece, from, to, ptr_right, EN_PASSANT);
-								moves.insert(m, FRONT);	
+					if (!capture_only) {
+						if ((color == WHITE && board.get_rank(from) == 4) || (color == BLACK && board.get_rank(from) == 3)) {
+							Piece* ptr_right = board.get_ptr_piece(Square(from + RIGHT));
+							if (ptr_right
+								&& ptr_right->get_type() == PAWN
+								&& ptr_right->get_color() != color
+								&& ptr_right->get_nb_moves() == 1) {
+								//board.print();
+								to = (color == WHITE) ? Square(from + UP_RIGHT) : Square(from + DOWN_RIGHT);
+								//cout << "board: " << board.get_en_passant() << " to: " << to << endl;
+								if (board.get_en_passant() == to) {
+									Move m(ptr_piece, from, to, ptr_right, EN_PASSANT);
+									moves.insert(m, FRONT);	
+								}
 							}
-						}
 												
-						Piece* ptr_left = board.get_ptr_piece(Square(from + LEFT));
-						if(ptr_left
-							&& ptr_left->get_type() == PAWN
-							&& ptr_left->get_color() != color
-							&& ptr_left->get_nb_moves() == 1) {
-							//board.print();
-							to = (color == WHITE) ? Square(from + UP_LEFT) : Square(from + DOWN_LEFT);
-							//cout << "board: " << board.get_en_passant() << " to: " << to << endl;
-							if (board.get_en_passant() == to) {
-								Move m(ptr_piece, from, to, ptr_left, EN_PASSANT);
-								moves.insert(m, FRONT);
+							Piece* ptr_left = board.get_ptr_piece(Square(from + LEFT));
+							if(ptr_left
+								&& ptr_left->get_type() == PAWN
+								&& ptr_left->get_color() != color
+								&& ptr_left->get_nb_moves() == 1) {
+								//board.print();
+								to = (color == WHITE) ? Square(from + UP_LEFT) : Square(from + DOWN_LEFT);
+								//cout << "board: " << board.get_en_passant() << " to: " << to << endl;
+								if (board.get_en_passant() == to) {
+									Move m(ptr_piece, from, to, ptr_left, EN_PASSANT);
+									moves.insert(m, FRONT);
+								}
 							}
 						}
 					}
@@ -178,7 +185,7 @@ Moves movegen(Board& board, Pieces& pieces) {
 					break;
 					
 				case KNIGHT:
-					movegen_leapers(board, moves, ptr_piece, KNIGHT_MOVES, NB_KNIGHT_MOVES);
+					movegen_leapers(board, moves, ptr_piece, KNIGHT_MOVES, NB_KNIGHT_MOVES, capture_only);
 					break;
 					
 				case KING:
@@ -188,101 +195,103 @@ Moves movegen(Board& board, Pieces& pieces) {
 						return mates;
 					}
 					
-					movegen_leapers(board, moves, ptr_piece, KING_MOVES, NB_KING_MOVES);
+					movegen_leapers(board, moves, ptr_piece, KING_MOVES, NB_KING_MOVES, capture_only);
 					
 					
 					// Castle
-					Piece* ptr_rook;
-					switch (color) {
-						case WHITE:
-							if (ptr_piece->get_nb_moves() == 0 &&
-								is_attacked_by(board, E1, BLACK).size() == 0
-								){
+					if (!capture_only) {
+						Piece* ptr_rook;
+						switch (color) {
+							case WHITE:
+								if (ptr_piece->get_nb_moves() == 0 &&
+									is_attacked_by(board, E1, BLACK).size() == 0
+									){
 								
-								// King castle
-								ptr_rook = board.get_ptr_piece(H1);
-								if (ptr_rook &&
-									ptr_rook->get_type() == ROOK &&
-									ptr_rook->get_nb_moves() == 0 &&
-									!board.get_ptr_piece(F1) &&
-									is_attacked_by(board, F1, BLACK).size() == 0 &&
-									!board.get_ptr_piece(G1) &&
-									is_attacked_by(board, G1, BLACK).size() == 0
-									) {
-									Move m(ptr_piece, E1, G1, ptr_rook, CASTLE);
-									moves.insert(m, FRONT);
-								}
+									// King castle
+									ptr_rook = board.get_ptr_piece(H1);
+									if (ptr_rook &&
+										ptr_rook->get_type() == ROOK &&
+										ptr_rook->get_nb_moves() == 0 &&
+										!board.get_ptr_piece(F1) &&
+										is_attacked_by(board, F1, BLACK).size() == 0 &&
+										!board.get_ptr_piece(G1) &&
+										is_attacked_by(board, G1, BLACK).size() == 0
+										) {
+										Move m(ptr_piece, E1, G1, ptr_rook, CASTLE);
+										moves.insert(m, FRONT);
+									}
 								
-								// Queen castle
-								ptr_rook = board.get_ptr_piece(A1);
-								if (ptr_rook &&
-									ptr_rook->get_type() == ROOK &&
-									ptr_rook->get_nb_moves() == 0 &&
-									!board.get_ptr_piece(D1) &&
-									is_attacked_by(board, D1, BLACK).size() == 0 &&
-									!board.get_ptr_piece(C1) &&
-									is_attacked_by(board, C1, BLACK).size() == 0 &&
-									!board.get_ptr_piece(B1)
+									// Queen castle
+									ptr_rook = board.get_ptr_piece(A1);
+									if (ptr_rook &&
+										ptr_rook->get_type() == ROOK &&
+										ptr_rook->get_nb_moves() == 0 &&
+										!board.get_ptr_piece(D1) &&
+										is_attacked_by(board, D1, BLACK).size() == 0 &&
+										!board.get_ptr_piece(C1) &&
+										is_attacked_by(board, C1, BLACK).size() == 0 &&
+										!board.get_ptr_piece(B1)
 									
-									) {
-									Move m(ptr_piece, E1, C1, ptr_rook, CASTLE);
-									moves.insert(m, FRONT);
+										) {
+										Move m(ptr_piece, E1, C1, ptr_rook, CASTLE);
+										moves.insert(m, FRONT);
+									}
 								}
-							}
-							break;
-						case BLACK:
-							if (ptr_piece->get_nb_moves() == 0 &&
-								is_attacked_by(board, E8, WHITE).size() == 0
-								){
+								break;
+							case BLACK:
+								if (ptr_piece->get_nb_moves() == 0 &&
+									is_attacked_by(board, E8, WHITE).size() == 0
+									){
 								
-								// King castle
-								ptr_rook = board.get_ptr_piece(H8);
-								if (ptr_rook &&
-									ptr_rook->get_type() == ROOK &&
-									ptr_rook->get_nb_moves() == 0 &&
-									!board.get_ptr_piece(F8) &&
-									is_attacked_by(board, F8, WHITE).size() == 0 &&
-									!board.get_ptr_piece(G8) &&
-									is_attacked_by(board, G8, WHITE).size() == 0
-									) {
-									Move m(ptr_piece, E8, G8, ptr_rook, CASTLE);
-									moves.insert(m, FRONT);
-								}
+									// King castle
+									ptr_rook = board.get_ptr_piece(H8);
+									if (ptr_rook &&
+										ptr_rook->get_type() == ROOK &&
+										ptr_rook->get_nb_moves() == 0 &&
+										!board.get_ptr_piece(F8) &&
+										is_attacked_by(board, F8, WHITE).size() == 0 &&
+										!board.get_ptr_piece(G8) &&
+										is_attacked_by(board, G8, WHITE).size() == 0
+										) {
+										Move m(ptr_piece, E8, G8, ptr_rook, CASTLE);
+										moves.insert(m, FRONT);
+									}
 								
-								// Queen castle
-								ptr_rook = board.get_ptr_piece(A8);
-								if (ptr_rook &&
-									ptr_rook->get_type() == ROOK &&
-									ptr_rook->get_nb_moves() == 0 &&
-									!board.get_ptr_piece(D8) &&
-									is_attacked_by(board, D8, WHITE).size() == 0 &&
-									!board.get_ptr_piece(C8) &&
-									is_attacked_by(board, C8, WHITE).size() == 0 &&
-									!board.get_ptr_piece(B8)
-									) {
-									Move m(ptr_piece, E8, C8, ptr_rook, CASTLE);
-									moves.insert(m, FRONT);
+									// Queen castle
+									ptr_rook = board.get_ptr_piece(A8);
+									if (ptr_rook &&
+										ptr_rook->get_type() == ROOK &&
+										ptr_rook->get_nb_moves() == 0 &&
+										!board.get_ptr_piece(D8) &&
+										is_attacked_by(board, D8, WHITE).size() == 0 &&
+										!board.get_ptr_piece(C8) &&
+										is_attacked_by(board, C8, WHITE).size() == 0 &&
+										!board.get_ptr_piece(B8)
+										) {
+										Move m(ptr_piece, E8, C8, ptr_rook, CASTLE);
+										moves.insert(m, FRONT);
+									}
 								}
-							}
-							break;
-						default:
-							cout << "Error!";
-							break;
+								break;
+							default:
+								cout << "Error!";
+								break;
+						}
 					}
 					//*/
 					
 					break;
 					
 				case BISHOP:
-					movegen_sliders(board, moves, ptr_piece, BISHOP_MOVES, NB_BISHOP_MOVES);
+					movegen_sliders(board, moves, ptr_piece, BISHOP_MOVES, NB_BISHOP_MOVES, capture_only);
 					break;
 					
 				case ROOK:
-					movegen_sliders(board, moves, ptr_piece, ROOK_MOVES, NB_ROOK_MOVES);
+					movegen_sliders(board, moves, ptr_piece, ROOK_MOVES, NB_ROOK_MOVES, capture_only);
 					break;
 					
 				case QUEEN:
-					movegen_sliders(board, moves, ptr_piece, QUEEN_MOVES, NB_QUEEN_MOVES);
+					movegen_sliders(board, moves, ptr_piece, QUEEN_MOVES, NB_QUEEN_MOVES, capture_only);
 					break;
 					
 				case UNDEF_PIECE_TYPE:

@@ -30,6 +30,8 @@
 
 using namespace std;
 
+bool bench_eval = false;
+
 int perft_moves_counter = 0;
 int perft_captures_counter = 0;
 int perft_en_passant_counter = 0;
@@ -54,10 +56,10 @@ int perft(Pieces* ptr_player, Pieces* ptr_opponent, int depth) {
 	int ret = 0;
 	bool is_illegal = false;
 
-	eval(board, *ptr_player, *ptr_opponent);
+	if (bench_eval) eval(board, *ptr_player, *ptr_opponent);
 	
 	if (!is_illegal && depth > 0) {
-		Moves moves = movegen(board, *ptr_player);
+		Moves moves = movegen(board, *ptr_player, false);
 		
 		if (moves.size() == 0) {
 			++perft_checkmates_counter;
@@ -141,7 +143,7 @@ int perft(Pieces* ptr_player, Pieces* ptr_opponent, int depth) {
 }
 
 void divide(Pieces* ptr_player, Pieces* ptr_opponent, int depth) {
-	Moves moves = movegen(board, *ptr_player);
+	Moves moves = movegen(board, *ptr_player, false);
 	int nb_nodes = 0;
 	int nb_moves = 0;
 	bool legal_move_exist = false;
@@ -221,7 +223,7 @@ void divide(Pieces* ptr_player, Pieces* ptr_opponent, int depth) {
 void print_perft(Pieces* ptr_player, Pieces* ptr_opponent) {
 	// Put the pieces on the board and initialize it
 	init_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-
+	//init_board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
 
 	int calculated_nodes = 0, nb_captures = 0, nb_castles = 0, nb_checks = 0, nb_checkmates = 0, nb_en_passant = 0, nb_promotions = 0;
 	int total_nodes = 0, total_captures = 0, total_castles = 0, total_checks = 0, total_checkmates = 0, total_en_passant = 0, total_promotions = 0;			

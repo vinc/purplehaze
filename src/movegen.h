@@ -20,11 +20,11 @@
 
 using namespace std;
 
-void movegen_leapers(Board& board, Moves& moves, Piece* ptr_piece, const MoveOrientation direction[], const int nb_moves);
-void movegen_sliders(Board& board, Moves& moves, Piece* ptr_piece, const MoveOrientation direction[], const int nb_moves);
+void movegen_leapers(Board& board, Moves& moves, Piece* ptr_piece, const MoveOrientation direction[], const int nb_moves, bool capture_only);
+void movegen_sliders(Board& board, Moves& moves, Piece* ptr_piece, const MoveOrientation direction[], const int nb_moves, bool capture_only);
 void movegen_capture(Board& board, Moves& moves, Piece* ptr_piece, Color color, Square from, Square to);
 
-Moves movegen(Board& board, Pieces& pieces);
+Moves movegen(Board& board, Pieces& pieces, bool capture_only);
 
 void make_move(Board& board, Move& move);
 void unmake_move(Board& board, Move& move);

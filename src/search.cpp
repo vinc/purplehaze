@@ -45,7 +45,7 @@ int quiescence_search(Board& board, Pieces& player, Pieces& opponent, int alpha,
 	}
 	
 	//TODO: replace with a captures only generator
-	Moves moves = movegen(board, player);
+	Moves moves = movegen(board, player, true);
 	
 	//moves.order(/*board,*/ 0);
 	
@@ -134,7 +134,7 @@ int negamax_search(Board& board, Pieces& player, Pieces& opponent, int depth) {
 
 	int score, max = -INF; // Do we initialize it to -INF or leave it w/o being init?
 	bool legal_move_found = false;
-	Moves moves = movegen(board, player);
+	Moves moves = movegen(board, player, false);
 	for (moves.iterator = moves.begin(); moves.iterator != moves.end(); ++moves.iterator) {
 		Move* ptr_move = moves.get_ptr_move();
 		
@@ -252,7 +252,7 @@ int alphabeta_search(Board& board, Pieces& player, Pieces& opponent, int alpha, 
 	int score; // Do we initialize it to -INF or leave it w/o being init?
 	bool legal_move_found = false;
 	
-	Moves moves = movegen(board, player);
+	Moves moves = movegen(board, player, false);
 	/*
 	if (ptr_best_move) {
 		moves.find(*ptr_best_move)
@@ -429,7 +429,7 @@ int principal_variation_search(Board& board, Pieces& player, Pieces& opponent, i
 	bool legal_move_found = false;
 	
 	int best_score = -INF;
-	Moves moves = movegen(board, player);
+	Moves moves = movegen(board, player, false);
 
 	moves.order(/*board,*/ ptr_best_move);	
 	

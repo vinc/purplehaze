@@ -120,6 +120,9 @@ int eval(Board& board, Pieces& player, Pieces& opponent) {
 	int score = 0, score_pieces_player = 0, score_pieces_opponent = 0;
 	int nb_pieces_player = 0, nb_rook_player = 0, nb_bishop_player = 0, nb_knight_player = 0, nb_pawn_player = 0;
 	int nb_pieces_opponent = 0, nb_rook_opponent = 0, nb_bishop_opponent = 0, nb_knight_opponent = 0, nb_pawn_opponent = 0;
+
+	int file_pawn_player[8] = {0};
+	int file_pawn_opponent[8] = {0};
 	
 	Piece* ptr_piece;
 	Color color_bishop_player = UNDEF_COLOR, color_bishop_opponent = UNDEF_COLOR;
@@ -131,14 +134,13 @@ int eval(Board& board, Pieces& player, Pieces& opponent) {
 			++nb_pieces_player;
 			switch (ptr_piece->get_type()) {
 				case QUEEN:
-					if (board.positions_history.size() < 5 && ptr_piece->get_nb_moves() > 0) {
+					if (board.positions_history.size() < 10 && ptr_piece->get_nb_moves() > 0) {
 						score += MALUS_QUEEN_OPENING * (5-board.positions_history.size()/2);
 					}
 					break;
 				case ROOK:
 					++nb_rook_player;
 					break;
-					
 				case BISHOP:
 					color_bishop_player = (board.is_dark(ptr_piece->get_position()) ? BLACK : WHITE);
 					++nb_bishop_player;
@@ -148,6 +150,7 @@ int eval(Board& board, Pieces& player, Pieces& opponent) {
 					break;
 				case PAWN:
 					++nb_pawn_player;
+					++file_pawn_player[board.get_file(ptr_piece->get_position())];
 					break;
 				default:
 					break;
@@ -186,6 +189,7 @@ int eval(Board& board, Pieces& player, Pieces& opponent) {
 					break;
 				case PAWN:
 					++nb_pawn_opponent;
+					++file_pawn_opponent[board.get_file(ptr_piece->get_position())];
 					break;
 				default:
 					break;
@@ -234,25 +238,34 @@ int eval(Board& board, Pieces& player, Pieces& opponent) {
 	}
 
 	// Bonus for bishop pair
-	if (nb_bishop_player == 2) {
+	if (nb_bishop_player > 1) {
 		score += BONUS_BISHOP_PAIR;
 	}
-	if (nb_bishop_opponent == 2) {
-		score += BONUS_BISHOP_PAIR;
+	if (nb_bishop_opponent > 1) {
+		score -= BONUS_BISHOP_PAIR;
 	}
 
 	// Malus for having no pawn
 	if (nb_pawn_player == 0) {
-		score -= MALUS_NO_PAWN;
+		score += MALUS_NO_PAWN;
 	}
 	if (nb_pawn_opponent == 0) {
 		score -= MALUS_NO_PAWN;
 	}
 
+	// The knight value decrease with the number of pawn
 	score += KNIGHT_ADJ[nb_pawn_player]*nb_knight_player;
 	score -= KNIGHT_ADJ[nb_pawn_opponent]*nb_knight_opponent;
+
+	// The rook value increase with the number of pawn
 	score += ROOK_ADJ[nb_pawn_player]*nb_rook_player;
 	score -= ROOK_ADJ[nb_pawn_opponent]*nb_rook_opponent;
+
+	// Malus for more than two pawns by file
+	for (int i = 0; i < 8; ++i) {
+		score += MALUS_MULTI_PAWN[file_pawn_player[i]];
+		score -= MALUS_MULTI_PAWN[file_pawn_player[i]];
+	}
 	
 	#ifdef RANDOM_EVAL
 	// Add a little random variation

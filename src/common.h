@@ -23,7 +23,7 @@
 
 using namespace std;
 
-//#define DEBUG 1
+#define DEBUG 1
 //#define SAN_OUTPUT 1
 //#define RANDOM_EVAL 1
 #define OPENING_BOOK 1
