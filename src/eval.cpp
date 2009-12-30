@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <algorithm>
+#include <vector>
 
 int static_exchange_evaluation(Board board, Square square, Color opponent_color) {
 	Color player_color = (opponent_color == WHITE) ? BLACK : WHITE;
@@ -115,17 +116,63 @@ int eval_bonus_position(Piece* ptr_piece) {
 	return score;
 }
 
+/** A pawn is isolated if there is no pawn of the same color
+  * on the neighboor files on his back */
+bool is_isolated_pawn(Board& board, Piece* ptr_piece) {	
+	Color color = ptr_piece->get_color();
+	MoveOrientation direction = (color == WHITE ? DOWN : UP);
+	for (Square position = ptr_piece->get_position(); !board.is_off_the_board(position); position = Square(position + direction)) {
+		Piece* left_neighboor = board.get_ptr_piece(Square(position + LEFT));
+		Piece* right_neighboor = board.get_ptr_piece(Square(position + RIGHT));
+		if (left_neighboor && left_neighboor->get_type() == PAWN && left_neighboor->get_color() == color) {
+			return false;
+		}
+		else if (right_neighboor && right_neighboor->get_type() == PAWN && right_neighboor->get_color() == color) {
+			return false;
+		}
+	}
+	return true;
+}
+
+/** A pawn is passed if there is no pawn of the opposite color
+  * in front of him nor on the neighboor files */
+bool is_passed_pawn(Board& board, Piece* ptr_piece) {	
+	Color color = ptr_piece->get_color();
+	MoveOrientation direction = (color == WHITE ? UP : DOWN);
+	for (Square position = Square(direction + ptr_piece->get_position()); !board.is_off_the_board(position); position = Square(position + direction)) {
+		Piece* front_neighboor = board.get_ptr_piece(position);
+		Piece* left_neighboor = board.get_ptr_piece(Square(position + LEFT));
+		Piece* right_neighboor = board.get_ptr_piece(Square(position + RIGHT));
+		if (front_neighboor && front_neighboor->get_type() == PAWN && front_neighboor->get_color() != color) {
+			return false;
+		}
+		else if (left_neighboor && left_neighboor->get_type() == PAWN && left_neighboor->get_color() != color) {
+			return false;
+		}
+		else if (right_neighboor && right_neighboor->get_type() == PAWN && right_neighboor->get_color() != color) {
+			return false;
+		}
+	}
+	return true;
+}
+
 int eval(Board& board, Pieces& player, Pieces& opponent) {
 	//int score = rand() % 100;
+	Color color_player = player.get_color();
+	
 	int score = 0, score_pieces_player = 0, score_pieces_opponent = 0;
 	int nb_pieces_player = 0, nb_rook_player = 0, nb_bishop_player = 0, nb_knight_player = 0, nb_pawn_player = 0;
 	int nb_pieces_opponent = 0, nb_rook_opponent = 0, nb_bishop_opponent = 0, nb_knight_opponent = 0, nb_pawn_opponent = 0;
 
 	int file_pawn_player[8] = {0};
 	int file_pawn_opponent[8] = {0};
+
+	vector<Piece*> pawns_player;
+	vector<Piece*> pawns_opponent;
 	
 	Piece* ptr_piece;
 	Color color_bishop_player = UNDEF_COLOR, color_bishop_opponent = UNDEF_COLOR;
+	Square position;
 	
 	for (player.iterator = player.begin(); player.iterator != player.end(); player.iterator++) {
 		ptr_piece = player.get_ptr_piece();
@@ -135,9 +182,11 @@ int eval(Board& board, Pieces& player, Pieces& opponent) {
 			switch (ptr_piece->get_type()) {
 				case QUEEN:
 					if (board.positions_history.size() < 10 && ptr_piece->get_nb_moves() > 0) {
-						score += MALUS_QUEEN_OPENING * (5-board.positions_history.size()/2);
+						// The more the queen is moved 
+						// and the sooner in the game
+						// the bigger the malus is.
+						score += MALUS_QUEEN_OPENING * (5 - board.positions_history.size() / 2) * ptr_piece->get_nb_moves();
 					}
-					break;
 				case ROOK:
 					++nb_rook_player;
 					break;
@@ -150,7 +199,9 @@ int eval(Board& board, Pieces& player, Pieces& opponent) {
 					break;
 				case PAWN:
 					++nb_pawn_player;
-					++file_pawn_player[board.get_file(ptr_piece->get_position())];
+					position = ptr_piece->get_position();
+					++file_pawn_player[board.get_file(position)];
+					pawns_player.push_back(ptr_piece);
 					break;
 				default:
 					break;
@@ -174,7 +225,10 @@ int eval(Board& board, Pieces& player, Pieces& opponent) {
 			switch (ptr_piece->get_type()) {
 				case QUEEN:
 					if (board.positions_history.size() < 10 && ptr_piece->get_nb_moves() > 0) {
-						score -= MALUS_QUEEN_OPENING * (5-board.positions_history.size()/2);
+						// The more the queen is moved 
+						// and the sooner in the game
+						// the bigger the malus is.
+						score -= MALUS_QUEEN_OPENING * (5 - board.positions_history.size() / 2) * ptr_piece->get_nb_moves();
 					}
 					break;				
 				case ROOK:
@@ -189,7 +243,9 @@ int eval(Board& board, Pieces& player, Pieces& opponent) {
 					break;
 				case PAWN:
 					++nb_pawn_opponent;
-					++file_pawn_opponent[board.get_file(ptr_piece->get_position())];
+					position = ptr_piece->get_position();
+					++file_pawn_opponent[board.get_file(position)];
+					pawns_opponent.push_back(ptr_piece);
 					break;
 				default:
 					break;
@@ -264,8 +320,48 @@ int eval(Board& board, Pieces& player, Pieces& opponent) {
 	// Malus for more than two pawns by file
 	for (int i = 0; i < 8; ++i) {
 		score += MALUS_MULTI_PAWN[file_pawn_player[i]];
-		score -= MALUS_MULTI_PAWN[file_pawn_player[i]];
+		score -= MALUS_MULTI_PAWN[file_pawn_opponent[i]];
 	}
+	// Malus if a player's pawn is isolated
+	for (int i = 0; i < (int) pawns_player.size(); ++i) {
+		if (is_isolated_pawn(board, pawns_player[i])) {
+			Square pawn_position = pawns_player[i]->get_position();
+			int bonus = (color_player == WHITE ? WEAK_PAWN_PCSQ[pawn_position] : WEAK_PAWN_PCSQ[FLIP[pawn_position]]);
+			if (file_pawn_opponent[board.get_file(pawn_position)] > 0) {
+				// If the file is half-open, the penality increase
+				bonus *= 3;
+			}
+			score += bonus;		
+		}
+	}
+	
+	// Bonus if an opponent's pawn is isolated
+	for (int i = 0; i < (int) pawns_opponent.size(); ++i) {
+		if (is_isolated_pawn(board, pawns_opponent[i])) {
+			Square pawn_position = pawns_opponent[i]->get_position();
+			int bonus = (color_player == WHITE ? WEAK_PAWN_PCSQ[pawn_position] : WEAK_PAWN_PCSQ[FLIP[pawn_position]]);
+			if (file_pawn_player[board.get_file(pawn_position)] > 0) {
+				// If the file is half-open, the bonus increase
+				bonus *= 3;
+			}
+			score -= bonus;		
+		}
+	}
+	
+	// Bonus if a player's pawn is passed
+	for (int i = 0; i < (int) pawns_player.size(); ++i) {
+		if (is_passed_pawn(board, pawns_player[i])) {
+			score += (color_player == WHITE ? PASSED_PAWN_PCSQ[pawns_player[i]->get_position()] : PASSED_PAWN_PCSQ[FLIP[pawns_player[i]->get_position()]]);		
+		}
+	}
+	
+	// Malus if an opponent's pawn is passed
+	for (int i = 0; i < (int) pawns_opponent.size(); ++i) {
+		if (is_passed_pawn(board, pawns_opponent[i])) {
+			score -= (color_player == WHITE ? PASSED_PAWN_PCSQ[pawns_opponent[i]->get_position()] : PASSED_PAWN_PCSQ[FLIP[pawns_opponent[i]->get_position()]]);		
+		}
+	}
+	//*/
 	
 	#ifdef RANDOM_EVAL
 	// Add a little random variation
@@ -277,6 +373,8 @@ int eval(Board& board, Pieces& player, Pieces& opponent) {
 	//else return -score;
 	return score;
 }
+
+
 
 bool is_in_check(Board& board, Pieces* ptr_pieces_player) {
 	Piece* ptr_king_player = ptr_pieces_player->get_ptr_king();

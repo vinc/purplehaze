@@ -30,7 +30,7 @@
 
 using namespace std;
 
-bool bench_eval = false;
+bool bench_eval = true;
 
 int perft_moves_counter = 0;
 int perft_captures_counter = 0;
