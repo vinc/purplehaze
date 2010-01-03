@@ -22,3 +22,4 @@ extern Board board;
 int perft(Pieces* ptr_player, Pieces* ptr_opponent, int depth);
 void print_perft(Pieces* ptr_player, Pieces* ptr_opponent);
 void divide(Pieces* ptr_player, Pieces* ptr_opponent, int depth);
+void print_perft_fen(Pieces& white_pieces, Pieces& black_pieces, int max_depth);

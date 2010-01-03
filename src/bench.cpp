@@ -30,7 +30,7 @@
 
 using namespace std;
 
-bool bench_eval = true;
+bool bench_eval = false;
 
 int perft_moves_counter = 0;
 int perft_captures_counter = 0;
@@ -222,8 +222,16 @@ void divide(Pieces* ptr_player, Pieces* ptr_opponent, int depth) {
 
 void print_perft(Pieces* ptr_player, Pieces* ptr_opponent) {
 	// Put the pieces on the board and initialize it
-	init_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	//init_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	//init_board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
+	//init_board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
+	//init_board("8/7p/p5pb/4k3/P1pPn3/8/P5PP/1rB2RK1 b - d3 0 28"); // Problem here
+	//init_board("rnbqkb1r/ppppp1pp/7n/4Pp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 3");
+	//init_board("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
+	init_board("r3k3/8/8/8/8/8/8/4K3 w q - 0 1");
+	//init_board("");
+	//init_board("");
+	
 
 	int calculated_nodes = 0, nb_captures = 0, nb_castles = 0, nb_checks = 0, nb_checkmates = 0, nb_en_passant = 0, nb_promotions = 0;
 	int total_nodes = 0, total_captures = 0, total_castles = 0, total_checks = 0, total_checkmates = 0, total_en_passant = 0, total_promotions = 0;			
@@ -277,5 +285,61 @@ void print_perft(Pieces* ptr_player, Pieces* ptr_opponent) {
 		cout << setw(wide) << nb_checks;
 		cout << setw(wide) << nb_checkmates;
 		cout << setw(wide) << setprecision(4) << elapsed_time << endl;
+	}
+}
+
+void print_perft_fen(Pieces& white_pieces, Pieces& black_pieces, int max_depth) {
+	string fen;
+	getline(cin, fen);
+	fen.erase(0, 1); // Remove the first whitespace
+
+	// Put the pieces on the board and initialize it
+	init_board(fen.c_str());
+	
+	Pieces* ptr_player = &white_pieces;
+	Pieces* ptr_opponent = &black_pieces;
+	
+	if (board.get_turn_color() == BLACK) {
+		ptr_player = &black_pieces;
+		ptr_opponent = &white_pieces;
+	}
+
+	
+	
+	int calculated_nodes = 0, nb_captures = 0, nb_castles = 0, nb_checks = 0, nb_checkmates = 0, nb_en_passant = 0, nb_promotions = 0;
+	int total_nodes = 0, total_captures = 0, total_castles = 0, total_checks = 0, total_checkmates = 0, total_en_passant = 0, total_promotions = 0;			
+	//int wide = 13;
+
+	for (int depth = 1; depth < max_depth; ++depth) {
+		//clock_t starting_time = clock();
+		int nodes = perft_moves_counter;
+		int captures = perft_captures_counter;
+		int en_passant = perft_en_passant_counter;
+		int castles = perft_castles_counter;
+		int promotions = perft_promotions_counter;
+		int checks = perft_checks_counter;
+		int checkmates = perft_checkmates_counter;
+		
+		perft(ptr_player, ptr_opponent, depth);
+		
+		//float elapsed_time = float(clock() - starting_time)/CLOCKS_PER_SEC;
+		calculated_nodes = perft_moves_counter - nodes - total_nodes;
+		nb_captures = perft_captures_counter - captures - total_captures;
+		nb_en_passant = perft_en_passant_counter - en_passant - total_en_passant;
+		nb_castles = perft_castles_counter - castles - total_castles;
+		nb_promotions = perft_promotions_counter - promotions - total_promotions;
+		nb_checks = perft_checks_counter - checks - total_checks;
+		nb_checkmates = perft_checkmates_counter - checkmates - total_checkmates;
+		
+		total_nodes += calculated_nodes;
+		total_captures += nb_captures;
+		total_en_passant += nb_en_passant;
+		total_castles += nb_castles;
+		total_promotions += nb_promotions;
+		total_checks += nb_checks;
+		total_checkmates += nb_checkmates;
+		
+
+		cout << "D" << depth << " " <<calculated_nodes << " ;" << endl;
 	}
 }

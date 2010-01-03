@@ -20,10 +20,11 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <assert.h>
 
 using namespace std;
 
-#define DEBUG 1
+//#define DEBUG 1
 //#define SAN_OUTPUT 1
 //#define RANDOM_EVAL 1
 #define OPENING_BOOK 1
@@ -87,7 +88,7 @@ enum PieceValue {
 	UNDEF_PIECE_VALUE = 0,
 	PAWN_VALUE = 100, 
 	KNIGHT_VALUE = 320, 
-	BISHOP_VALUE = 330, 
+	BISHOP_VALUE = 333, 
 	ROOK_VALUE = 510, 
 	QUEEN_VALUE = 880, 
 	KING_VALUE = 20000	

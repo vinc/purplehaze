@@ -33,8 +33,8 @@ Board::Board()	{
 	turn_color = WHITE;
 	en_passant = OUT;
 	nb_repetitions = 0;
-	black_can_castle = true;
-	white_can_castle = true;
+	black_have_castled = false;
+	white_have_castled = false;
 	int i;
 	for (i = 0; i < BOARD_SIZE; ++i)
 		board[i] = 0;
@@ -162,11 +162,11 @@ void Board::print() const {
 	cout << "       a   b   c   d   e   f   g   h  " << endl << endl;
 }
 
-void Board::have_castled(Color c, bool b) {
-	(c == WHITE) ? white_can_castle = !b : black_can_castle = !b;
+void Board::set_castling_right(Color c, bool b) {
+	(c == WHITE) ? white_have_castled = !b : black_have_castled = !b;
 }
-bool Board::can_castle(Color c) {
-	return (c == WHITE) ? white_can_castle : black_can_castle;
+bool Board::have_castled(Color c) {
+	return (c == WHITE) ? white_have_castled : black_have_castled;
 }
 
 

@@ -149,11 +149,11 @@ void init_board(const char* f) {
 				break;
 		}
 		if (white_can_castle) {
-			board.have_castled(WHITE, false);			
+			board.set_castling_right(WHITE, true);			
 			if (fen_debug) cout << "FEN: white can castle" << endl;
 		}
 		if (black_can_castle) {
-			board.have_castled(BLACK, false);
+			board.set_castling_right(BLACK, true);
 			if (fen_debug) cout << "FEN: black can castle" << endl;
 		}
 	}

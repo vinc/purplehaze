@@ -107,9 +107,12 @@ int main() {
 		
 		
 		else if (cmd == "perft") {
-			Pieces* ptr_player = &white_pieces;
-			Pieces* ptr_opponent = &black_pieces;
-			print_perft(ptr_player, ptr_opponent);
+			//Pieces* ptr_player = &white_pieces;
+			//Pieces* ptr_opponent = &black_pieces;
+			//print_perft(ptr_player, ptr_opponent);
+			int depth = 0;
+			cin >> depth;
+			print_perft_fen(white_pieces, black_pieces, depth + 1);
 		}
 		
 

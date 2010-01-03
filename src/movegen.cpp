@@ -349,7 +349,7 @@ void make_move(Board& board, Move& move) {
 				move.get_ptr_captured_piece()->inc_nb_moves();
 				Color color;
 				color = (move.get_ptr_piece()->get_color() == WHITE) ? WHITE : BLACK;
-				board.have_castled(color, true);
+				board.set_castling_right(color, false);
 				break;
 			default:
 				break;
@@ -422,7 +422,7 @@ void unmake_move(Board& board, Move& move) {
 				move.get_ptr_captured_piece()->dec_nb_moves();
 				Color color;
 				color = (move.get_ptr_piece()->get_color() == WHITE) ? WHITE : BLACK;
-				board.have_castled(color, false);
+				board.set_castling_right(color, true);
 				break;
 			default:
 				break;

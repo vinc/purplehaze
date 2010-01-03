@@ -18,6 +18,8 @@
 #ifndef EVAL_H
 #define EVAL_H
 
+#include <vector>
+
 const int PAWN_PCSQ[BOARD_SIZE] = {
       0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
      -6,  -4,   1,   1,   1,   1,  -4,  -6,   0,   0,   0,   0,   0,   0,   0,   0,
@@ -164,14 +166,51 @@ const int ROOK_ADJ[9] =   {  15,  12,   9,  6,  3,  0, -3, -6, -9};
 
 
 const int BONUS_CASTLE = 100;
+const int BONUS_KING_SHIELD = 30;
 const int BONUS_RANDOM_MAX = 3;
 const int BONUS_BISHOP_PAIR = 30;
 const int MALUS_NO_PAWN = -30;
-const int MALUS_QUEEN_OPENING = -5;
+
+const int MALUS_KING_BREAKING_CASTLE_RIGHT = -0;
+
+const int MALUS_QUEEN_EARLY_MOVE = -20;
+
+const int BONUS_ROOK_OPEN_FILE = 30;
+const int BONUS_ROOK_SEVENTH_RANK = 5;
 
 const int MALUS_MULTI_PAWN[7] = {0, 0, -25, -60, -100, -100, -100};
 
+const int NB_TYPE = 6;
+const int NB_FILE = 8;
+const int NB_RANK = 8;
+
+class Evaluation
+{
+	public:
+		int nb_pieces[NB_TYPE];
+		int nb_pieces_file[NB_TYPE][NB_FILE];
+		int nb_pieces_rank[NB_TYPE][NB_RANK];
+		Pieces& pieces;
+		vector<Piece*> pawns;
+		Color color, color_single_bishop;
+		int lazy_score;
+		int material_score;
+		int positional_score;
+		
+		Evaluation(Pieces& p);
+		void pre_build(Board& board);
+		void build(Board& board);
+		int get_lazy_eval();
+		int king_eval(Board& board);
+		int queens_eval(Board& board);
+		int rooks_eval(Board& board, Evaluation opponent);
+		int bishops_eval(Board& board);
+		int knights_eval(Board& board);
+		int pawns_eval(Board& board, Evaluation opponent);
+};
+
 int static_exchange_evaluation(Board board, Square square, Color player_color);
-int eval(Board& board, Pieces& player, Pieces& opponent);
+int eval(Board& board, Pieces& engine, Pieces& opponent);
 bool is_in_check(Board& board, Pieces* ptr_pieces_player);
+
 #endif /* !EVAL_H */

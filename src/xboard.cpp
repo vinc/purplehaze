@@ -106,6 +106,10 @@ Move* find_move_to_play(Pieces* ptr_player, Pieces* ptr_opponent, SearchAlgo alg
 	Moves moves = movegen(board, *ptr_player, false);
 	
 	for (int ply = 1; ply < depth; ++ply) {
+		// Stop searching if end of thinking time
+		if (((std::clock() - start) / CLOCKS_PER_SEC) > thinking_time)  {
+			break;
+		}
 		
 		//moves.sort();
 		if (ptr_best_move) {
@@ -126,7 +130,7 @@ Move* find_move_to_play(Pieces* ptr_player, Pieces* ptr_opponent, SearchAlgo alg
 			}
 
 			Move* ptr_move = moves.get_ptr_move();
-			
+
 			make_move(board, *ptr_move);
 		
 			// Test if the move is legal
@@ -154,6 +158,8 @@ Move* find_move_to_play(Pieces* ptr_player, Pieces* ptr_opponent, SearchAlgo alg
 						break;
 				}
 			}
+
+			//cout << ptr_move->get_san_notation() << " : " << score << endl;
 			
 			//Hash key = board.zobrist.get_key();
 		

@@ -28,8 +28,8 @@ class Board
 	private:
 		Piece* board[BOARD_SIZE];
 		Color turn_color;
-		bool black_can_castle;
-		bool white_can_castle;
+		bool black_have_castled;
+		bool white_have_castled;
 		Square en_passant;
 		int nb_repetitions;
 	public:
@@ -52,8 +52,8 @@ class Board
 		bool is_dark(Square s) const;
 		void print() const;
 		static string square_to_string(Square s);
-		void have_castled(Color c, bool b);
-		bool can_castle(Color c);
+		void set_castling_right(Color c, bool b); //TODO change to set_castle(...)
+		bool have_castled(Color c); //TODO change to have_castled(...)
 		Square get_en_passant() const;
 		void set_en_passant(Square ep);
 		void inc_repetitions();
