@@ -35,10 +35,17 @@ Board::Board()	{
 	nb_repetitions = 0;
 	black_have_castled = false;
 	white_have_castled = false;
-	int i;
-	for (i = 0; i < BOARD_SIZE; ++i)
+	for (int i = 0; i < BOARD_SIZE; ++i) {
 		board[i] = 0;
+	}
 
+	#ifdef KILLER_HEURISTIC
+	for (int i = 0; i < 2; ++i) {
+		for (int depth = 0; depth < MAX_DEPTH; ++depth) {
+			killer_moves[i][depth] = 0;
+		}
+	}
+	#endif
 }
 
 Piece* Board::get_ptr_piece(Square s) const {
@@ -65,6 +72,7 @@ Pieces Board::get_pieces() const {
 	return pieces;
 }
 
+/*
 Square Board::get_square_above(Square s) const {
 	return Square(s + 0x10);
 }
@@ -92,7 +100,8 @@ int Board::get_rank(Square s) const {
 Color Board::get_turn_color() const {
 	return turn_color;
 }
-
+*/
+/*
 void Board::set_turn_color(Color c) {
 	turn_color = c;
 }
@@ -100,7 +109,7 @@ void Board::set_turn_color(Color c) {
 void Board::change_turn_color() {
 	turn_color = (turn_color == WHITE ? BLACK : WHITE);
 }	
-
+*/
 /*
 // Inlined
 bool Board::is_off_the_board(Square s) const {
@@ -169,15 +178,16 @@ bool Board::have_castled(Color c) {
 	return (c == WHITE) ? white_have_castled : black_have_castled;
 }
 
-
+/*
 Square Board::get_en_passant() const {
 	return en_passant;
 }
+*/
 
 void Board::set_en_passant(Square ep) {
 	en_passant = ep;
 }
-
+/*
 void Board::inc_repetitions() {
 	++nb_repetitions;
 }
@@ -189,11 +199,43 @@ void Board::dec_repetitions() {
 void Board::reset_repetitions() {
 	nb_repetitions = 0;
 }
+*/
 
 void Board::set_repetitions(int r) {
 	nb_repetitions = r;
 }
-
+/*
 int Board::get_repetitions() const {
 	return nb_repetitions;
 }
+*/
+/*
+int Board::get_distance(Square a, Square b) const {
+	return 
+}
+
+MoveOrientation Board::get_direction(Square a, Square b) const {
+	return 
+}
+*/
+
+#ifdef KILLER_HEURISTIC
+void Board::put_killer_move(Move* ptr_move, int depth) {
+	if (ptr_move->get_type() != CAPTURE) {
+		if (!killer_moves[0][depth]) {
+			killer_moves[0][depth] = ptr_move;
+		}
+		else if (*killer_moves[0][depth] != *ptr_move) {
+			killer_moves[1][depth] = killer_moves[0][depth];
+			killer_moves[0][depth] = ptr_move;
+		}
+	}
+}
+bool Board::is_first_killer_move(Move* ptr_move, int depth) const {
+	return (killer_moves[0][depth] && *killer_moves[0][depth] == *ptr_move);
+}
+bool Board::is_second_killer_move(Move* ptr_move, int depth) const {
+	return (killer_moves[1][depth] && *killer_moves[1][depth] == *ptr_move);
+}
+
+#endif

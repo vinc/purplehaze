@@ -26,19 +26,18 @@ class Transposition
 {
 	private:
 		Hash zobrist;
-		int value;
-		Bound bound;
-		int depth;
 		Move best_move;
-
+		unsigned char value;
+		unsigned char depth;
+		Bound bound;
 	public:
 		Transposition();
 		Transposition(Hash h, int v, Bound b, int d, Move& bm);
-		int get_value() const;
-		Bound get_bound() const;
-		int get_depth() const;
-		Hash get_zobrist() const;
-		Move get_best_move() const;
+		int get_value() const {return value;};
+		Bound get_bound() const {return bound;};
+		int get_depth() const {return depth;};
+		Hash get_zobrist() const {return zobrist;};
+		Move get_best_move() const {return best_move;};
 };
 
 /*
@@ -65,6 +64,7 @@ class Transpositions
 		Transpositions();
 		Transposition* lookup(Hash hash);
 		void save(Hash h, int value, int alpha, int beta, int depth, Move& best_move);
+		void save(Hash h, int value, Bound bound, int depth, Move& best_move);
 };
 
 

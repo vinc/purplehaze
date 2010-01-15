@@ -28,6 +28,7 @@
 using namespace std;
 
 extern Transpositions tt;
+extern int calculated_nodes;
 
 /****************************************************************
  *                                                              *
@@ -35,67 +36,81 @@ extern Transpositions tt;
  *                                                              *
  ****************************************************************/
 
-int quiescence_search(Board& board, Pieces& player, Pieces& opponent, int alpha, int beta) {
-	int score, stand_pat = eval(board, player, opponent);
+short quiescence_search(Board& board, Pieces& player, Pieces& opponent, short alpha, short beta, unsigned char depth) {
+	short score, stand_pat = eval(board, player, opponent);
+	
+	++calculated_nodes;
+	
+	// If we have gone too deep
+	if (depth < -MAX_DEPTH) return stand_pat;
+	
+	// Beta cut-off
 	if (stand_pat >= beta) {
 		return beta;
 	}
+	
+	#ifdef DELTA_PRUNING
+	// Delta pruning
+	short delta = QUEEN_VALUE;
+	if (is_promoting_pawn(board)) delta += QUEEN_VALUE - 200;
+	if (stand_pat < alpha - delta) {
+		return alpha;
+	}
+	#endif
+	
+	// Stand pat give a new alpha
 	if (alpha < stand_pat) {
 		alpha = stand_pat;
 	}
 	
-	//TODO: replace with a captures only generator
 	Moves moves = movegen(board, player, true);
 	
-	//moves.order(/*board,*/ 0);
+	moves.order(/*board,*/ 0/*, 0*/);
 	
 	for (moves.iterator = moves.begin(); moves.iterator != moves.end(); ++moves.iterator) {
 		Move* ptr_move = moves.get_ptr_move();
 		
-		if (ptr_move->get_type() == CAPTURE){
-			//TODO add en passant in the condition?
-			
-			#ifdef SEE
-			Square s = ptr_move->get_to();
-			Color c = ptr_move->get_ptr_piece()->get_color();
+		// Skip this move if it is not a capture
+		//TODO add en passant in the condition?
+		if (ptr_move->get_type() != CAPTURE) continue;
 
-			bool debug = false;
-			//cout << "QS: " << *ptr_move;
-			if (debug) cout << endl << "Requesting SEE for square " << static_cast<char>(97 + (s & 7)) << 1 + (s >> 4);
-			if (debug) cout << "(" << *ptr_move << ", " << *ptr_move->get_ptr_piece() << ", " << *ptr_move->get_ptr_captured_piece() << ")" << endl;	
-			if (debug) cout << "Board before QS capture:" << endl;
-			if (debug) board.print();
-			#endif
-			
-			make_move(board, *ptr_move);
-				
-			
-			#ifdef SEE
-			//cout << "Zobrist key before SEE " << board.zobrist.get_key() << endl;
-			if (debug) cout << "Board after QS capture:" << endl;
-			if (debug) board.print();
-			int see = -static_exchange_evaluation(board, s, c);
-			//cout << "Zobrist key after SEE " << board.zobrist.get_key() << endl;	
-			//cout << "SEE: " << see << endl;
-			if (see > 0) {
-				if (debug) cout << "The move does not worth it!" << endl;
-				unmake_move(board, *ptr_move);
-				continue;
-			}
-			#endif
-				
-			score = -quiescence_search(board, opponent, player, -beta, -alpha);
+		#ifdef SEE
+		Square capture_square = ptr_move->get_to();
+		Color capture_color = ptr_move->get_ptr_piece()->get_color();
+		#endif
 		
-			if (score >= beta) {
-				unmake_move(board, *ptr_move);
-				return beta;
-			}
-			if (score > alpha) {
-				alpha = score;
-			}
-				
+		make_move(board, *ptr_move);	
+		
+		// Skip this move if it is not a legal one
+		Piece* ptr_king_player = player.get_ptr_king();
+		Square s = ptr_king_player->get_position();
+		Color c = (ptr_king_player->get_color() == WHITE) ? BLACK : WHITE;
+		Pieces attackers = is_attacked_by(board, s, c);
+		bool is_in_check = (attackers.size() == 0) ? false : true;
+		if (is_in_check) {
 			unmake_move(board, *ptr_move);
+			continue;
 		}
+		
+		#ifdef SEE
+		short see = -static_exchange_evaluation(board, capture_square, capture_color);
+		if (see > 0) {
+			unmake_move(board, *ptr_move);
+			continue;
+		}
+		#endif
+			
+		score = -quiescence_search(board, opponent, player, -beta, -alpha, depth - 1);
+	
+		if (score >= beta) {
+			unmake_move(board, *ptr_move);
+			return beta;
+		}
+		else if (score > alpha) {
+			alpha = score;
+		}
+			
+		unmake_move(board, *ptr_move);
     }
     return alpha;
 }
@@ -106,8 +121,8 @@ int quiescence_search(Board& board, Pieces& player, Pieces& opponent, int alpha,
  *                                                              *
  ****************************************************************/
 
-int negamax_search(Board& board, Pieces& player, Pieces& opponent, int depth) {
-	int is_in_check;
+short negamax_search(Board& board, Pieces& player, Pieces& opponent, unsigned char depth) {
+	bool is_in_check;
 	Piece* ptr_king_player = player.get_ptr_king();
 	Square s = ptr_king_player->get_position();
 	Color c = (ptr_king_player->get_color() == WHITE) ? BLACK : WHITE;
@@ -132,7 +147,7 @@ int negamax_search(Board& board, Pieces& player, Pieces& opponent, int depth) {
 	}		
 
 
-	int score, max = -INF; // Do we initialize it to -INF or leave it w/o being init?
+	short score, max = -INF; // Do we initialize it to -INF or leave it w/o being init?
 	bool legal_move_found = false;
 	Moves moves = movegen(board, player, false);
 	for (moves.iterator = moves.begin(); moves.iterator != moves.end(); ++moves.iterator) {
@@ -190,8 +205,8 @@ int negamax_search(Board& board, Pieces& player, Pieces& opponent, int depth) {
  *                                                              *
  ****************************************************************/
 
-int alphabeta_search(Board& board, Pieces& player, Pieces& opponent, int alpha, int beta, int depth) {
-	int is_in_check;
+short alphabeta_search(Board& board, Pieces& player, Pieces& opponent, short alpha, short beta, unsigned char depth) {
+	bool is_in_check;
 	Piece* ptr_king_player = player.get_ptr_king();
 	Square s = ptr_king_player->get_position();
 	Color c = (ptr_king_player->get_color() == WHITE) ? BLACK : WHITE;
@@ -208,7 +223,7 @@ int alphabeta_search(Board& board, Pieces& player, Pieces& opponent, int alpha, 
 	
 	if (depth == 0) {
 		#ifdef QUIESCENCE_SEARCH
-		return quiescence_search(board, player, opponent, alpha, beta);
+		return quiescence_search(board, player, opponent, alpha, beta, 0);
 		#else
 		return eval(board, player, opponent);
 		#endif
@@ -234,7 +249,7 @@ int alphabeta_search(Board& board, Pieces& player, Pieces& opponent, int alpha, 
 			case UPPER:
 				beta = (beta < ptr_trans->get_value() ? beta : ptr_trans->get_value());
 				break;
-			case ACCURATE:
+			case EXACT:
 				alpha = ptr_trans->get_value();
 				beta = alpha;
 				break;
@@ -249,7 +264,7 @@ int alphabeta_search(Board& board, Pieces& player, Pieces& opponent, int alpha, 
 	}
 	#endif
 
-	int score; // Do we initialize it to -INF or leave it w/o being init?
+	short score; // Do we initialize it to -INF or leave it w/o being init?
 	bool legal_move_found = false;
 	
 	Moves moves = movegen(board, player, false);
@@ -313,7 +328,7 @@ int alphabeta_search(Board& board, Pieces& player, Pieces& opponent, int alpha, 
 
 	#ifdef TRANSPOSITIONS_TABLE
 	// Save to transposition table
-	int value = alpha; // ?
+	short value = alpha; // ?
 	tt.save(board.zobrist.get_key(), value, alpha, beta, depth, *ptr_best_move);
 	#endif
 
@@ -328,8 +343,12 @@ int alphabeta_search(Board& board, Pieces& player, Pieces& opponent, int alpha, 
  *                                                              *
  ****************************************************************/
 
-int principal_variation_search(Board& board, Pieces& player, Pieces& opponent, int alpha, int beta, int depth, bool null_move_pruning) {
-	int score = -INF, old_alpha = alpha; // Do we initialize it to -INF or leave it w/o being init?
+short principal_variation_search(Board& board, Pieces& player, Pieces& opponent, short alpha, short beta, unsigned char depth/*, int ply*/, bool null_move_pruning) {
+	assert(0 <= depth && depth < MAX_DEPTH);
+	
+	short score = -INF, old_alpha = alpha; // Do we initialize it to -INF or leave it w/o being init?
+	
+	++calculated_nodes;
 	
 	// 50 repetitions
 	if (board.get_repetitions() >= 100) {
@@ -338,7 +357,7 @@ int principal_variation_search(Board& board, Pieces& player, Pieces& opponent, i
 
 	// Threefold repetition
 	list<Hash>::iterator it = board.positions_history.begin();
-	int nb_repetitions = 1;
+	unsigned char nb_repetitions = 1;
 	Hash current_position = *it;
 	bool side_to_move = false;
 	for (++it; it != board.positions_history.end(); ++it) {
@@ -366,9 +385,9 @@ int principal_variation_search(Board& board, Pieces& player, Pieces& opponent, i
 	#endif
 	
 	// Quiescence Search
-	if (depth <= 0) {
+	if (depth == 0) {
 		#ifdef QUIESCENCE_SEARCH
-		return quiescence_search(board, player, opponent, alpha, beta);
+		return quiescence_search(board, player, opponent, alpha, beta, 0);
 		#else
 		return eval(board, player, opponent);
 		#endif
@@ -379,32 +398,58 @@ int principal_variation_search(Board& board, Pieces& player, Pieces& opponent, i
 	#ifdef TRANSPOSITIONS_TABLE
 	// Look in the transposition table before searching
 	Transposition* ptr_trans = tt.lookup(board.zobrist.get_key());
-	if (ptr_trans && ptr_trans->get_depth() >= depth) {
-		//cout << "Entry in TT found!" << endl;
-		switch (ptr_trans->get_bound()) {
-			case LOWER:
-				alpha = (alpha > ptr_trans->get_value() ? alpha : ptr_trans->get_value());
-				//cout << "LOWER" << endl;
-				break;
-			case UPPER:
-				beta = (beta < ptr_trans->get_value() ? beta : ptr_trans->get_value());
-				//cout << "UPPER" << endl;
-				break;
-			case ACCURATE:
-				alpha = ptr_trans->get_value();
-				beta = alpha;
-				//cout << "ACCURATE" << endl;
-				break;
-			default: break;
+	// If we have been through this position before
+	if (ptr_trans) {
+		// And if the depth is okay
+		if (ptr_trans->get_depth() > depth) { 
+			// FIXME ">=" in place of ">" improve time but leed to wrong results
+			
+			/*
+			//cout << "Entry in TT found!" << endl;
+			switch (ptr_trans->get_bound()) {
+				case LOWER:
+					alpha = (alpha > ptr_trans->get_value() ? alpha : ptr_trans->get_value());
+					//cout << "LOWER" << endl;
+					break;
+				case UPPER:
+					beta = (beta < ptr_trans->get_value() ? beta : ptr_trans->get_value());
+					//cout << "UPPER" << endl;
+					break;
+				case EXACT:
+					alpha = ptr_trans->get_value();
+					beta = alpha;
+					//cout << "EXACT" << endl;
+					break;
+				default: break;
+			}
+			if (alpha >= beta) {
+				// tt cause a cutoff
+				//cout << "Cutoff!" << endl;
+			
+				return ptr_trans->get_value();
+			}
+			*/
+			int trans_score = ptr_trans->get_value();
+			switch (ptr_trans->get_bound()) {
+				case EXACT:
+					return (trans_score > beta ? beta : trans_score);
+					break;
+				case UPPER:
+					return (trans_score < alpha ? alpha : trans_score);
+					//return alpha;
+					break;
+				case LOWER:
+					return (trans_score > beta ? beta : trans_score);
+					break;
+				default:
+					break;
+			}
 		}
-		if (alpha >= beta) {
-			// tt cause a cutoff
-			//cout << "Cutoff!" << endl;
-			return ptr_trans->get_value();
-		}
-		//ptr_best_move = &ptr_trans->get_best_move();
+
+		// If the previous information didn't produce a cutoff,
+		// we still can use the best move
 		Move best_move = ptr_trans->get_best_move();
-		ptr_best_move = &best_move;
+		if (best_move.get_ptr_piece()) ptr_best_move = &best_move;
 		
 	}
 	#endif
@@ -415,7 +460,7 @@ int principal_variation_search(Board& board, Pieces& player, Pieces& opponent, i
 		//Move null_move(0, OUT, OUT, UNDEF_MOVE_TYPE);
 		//make_move(board, null_move);
 		// Null move search with minimal window around beta
-		score = -principal_variation_search(board, opponent, player, -beta, -beta + 1, depth - REDUCED_DEPTH - 1, false);
+		score = -principal_variation_search(board, opponent, player, -beta, -beta + 1, depth - REDUCED_DEPTH - 1/*, ply + 1*/, false);
 		//unmake_move(board, null_move);
 		if (score >= beta) { // Cutoff in case of fail-high
 			return score;
@@ -424,14 +469,14 @@ int principal_variation_search(Board& board, Pieces& player, Pieces& opponent, i
 	#endif
 	
 	bool is_principal_variation = true;
-	int moves_searched = 0;
+	unsigned char moves_searched = 0;
 	
 	bool legal_move_found = false;
 	
-	int best_score = -INF;
+	short best_score = -INF;
 	Moves moves = movegen(board, player, false);
 
-	moves.order(/*board,*/ ptr_best_move);	
+	moves.order(/*board,*/ ptr_best_move/*, ply*/);	
 	
 	for (moves.iterator = moves.begin(); moves.iterator != moves.end(); ++moves.iterator) {
 		Move* ptr_move = moves.get_ptr_move();
@@ -464,7 +509,8 @@ int principal_variation_search(Board& board, Pieces& player, Pieces& opponent, i
 			
 				if (moves_searched >= 4 
 					&& depth > 3
-					&& !is_still_in_check
+					&& !is_still_in_check // Imposible here
+					&& !is_in_check // ?
 					&& !is_giving_check
 					&& ptr_move->get_type() != CAPTURE
 					&& ptr_move->get_type() != EN_PASSANT
@@ -476,7 +522,7 @@ int principal_variation_search(Board& board, Pieces& player, Pieces& opponent, i
 				#endif
 		
 					score = -principal_variation_search(board, opponent, player, -alpha - 1, -alpha, depth - 1, null_move_pruning);
-					if (score > alpha && score < beta) { // Re-search
+					if (alpha < score && score < beta) { // Re-search
 						score = -principal_variation_search(board, opponent, player, -beta, -alpha, depth - 1, null_move_pruning); 
 					}
 			
@@ -489,9 +535,15 @@ int principal_variation_search(Board& board, Pieces& player, Pieces& opponent, i
 				if (score >= beta) {
 					unmake_move(board, *ptr_move);
 					#ifdef TRANSPOSITIONS_TABLE			
-					//TODO false the results
-					//tt.save(board.zobrist.get_key(), score, alpha, beta, depth, *ptr_move);
+					//TODO false the results, mate score?
+					//if (TT_STORE_CUTOFF) tt.save(board.zobrist.get_key(), score, alpha, beta, depth, *ptr_move);
+					if (TT_STORE_CUTOFF) tt.save(board.zobrist.get_key(), score, LOWER, depth, *ptr_move);
 					#endif
+
+					#ifdef KILLER_HEURISTIC
+					board.put_killer_move(ptr_move, board.ply);
+					#endif
+					
 					//cout << "Fail-hard beta cutoff: alpha=" << alpha << " score=" << score << " beta=" << beta << endl;
 					
 					moves.clear();
@@ -499,7 +551,7 @@ int principal_variation_search(Board& board, Pieces& player, Pieces& opponent, i
 					//return score; // Fail-soft
 				}
 				
-				old_alpha = alpha;
+				old_alpha = alpha; // FIXME realy?
 				alpha = score; // alpha acts like max in MiniMax
 				best_score = score;
 				ptr_best_move = ptr_move;			
@@ -526,9 +578,18 @@ int principal_variation_search(Board& board, Pieces& player, Pieces& opponent, i
 	}
 
 	#ifdef TRANSPOSITIONS_TABLE	
+	/*
 	if (ptr_best_move) {
 		tt.save(board.zobrist.get_key(), best_score, old_alpha, beta, depth, *ptr_best_move);
 		//cout << "End loop: alpha=" << alpha << " score=" << score << " beta=" << beta << " old_alpha=" << old_alpha << endl;
+	}
+	*/
+	if (old_alpha <= alpha) {
+		Move none(0, OUT, OUT);
+		tt.save(board.zobrist.get_key(), alpha, UPPER, depth, none);
+	}
+	else {
+		tt.save(board.zobrist.get_key(), alpha, EXACT, depth, *ptr_best_move);
 	}
 	#endif
 	

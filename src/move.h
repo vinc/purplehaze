@@ -78,18 +78,21 @@ class Move
 	
 	private:
 		Piece* ptr_piece;
-		Square from;
-		Square to;
 		Piece* ptr_captured_piece;
+		unsigned char nb_repetitions; // From 0 to 50, used to save board.repetition
+		unsigned char score;
 		MoveType type;
 		PieceType promotion;
 		Square en_passant;
-		int nb_repetitions;
-		int score;
+		Square from;
+		Square to;
+		
 	public:
+		/*
 		static int moves_counter;
 		static int captures_counter;
 		static int castles_counter;
+		*/
 		Move();
 		~Move();
 		Move(Piece* p, Square a, Square b);
@@ -101,20 +104,22 @@ class Move
 		Move(Piece* p, Square a, Square b, Piece* c, PieceType promote);
 		Move(Piece* p, Square a, Square b, Piece* c, MoveType t);
 		Move(Piece* p, Square a, Square b, Piece* c, MoveType t, PieceType promote);
-		bool operator<(const Move &move) const;
-		bool operator==(const Move &move) const;
-		MoveType get_type() const;
-		Piece* get_ptr_piece() const;
-		Piece* get_ptr_captured_piece() const;
-		PieceType get_promotion() const;
-		Square get_from() const;
-		Square get_to() const;
+		//Move& operator=( Move& move);
+		bool operator<(const Move& move) const;
+		bool operator==(const Move& move) const;
+		bool operator!=(const Move& move) const {return (*this == move ? false : true);};		
+		MoveType get_type() const {return type;};
+		Piece* get_ptr_piece() const {return ptr_piece;};
+		Piece* get_ptr_captured_piece() const {return ptr_captured_piece;};
+		PieceType get_promotion() const {return promotion;};
+		Square get_from() const {return from;};
+		Square get_to() const {return to;};
 		string get_xboard_notation();
-		Square get_en_passant() const;
+		Square get_en_passant() const {return en_passant;};
 		void set_en_passant(Square ep);
-		void set_repetitions(int r);
-		int get_repetitions() const;
-		int get_score() const;
+		void set_repetitions(unsigned char r);
+		unsigned char get_repetitions() const {return nb_repetitions;};
+		unsigned char get_score() const {return score;};
 		void set_score(int s);
 		const char* get_san_notation() const;
 };
@@ -137,7 +142,7 @@ class Moves
 		void clear();
 		void sort();
 		void unique();
-		void order(/*Board& board,*/ Move* ptr_best_move);
+		void order(/*Board& board,*/ Move* ptr_best_move/*, int ply*/);
 };
 
 #endif /* !MOVE_H */

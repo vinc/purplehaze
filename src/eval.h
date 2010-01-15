@@ -171,7 +171,7 @@ const int BONUS_RANDOM_MAX = 3;
 const int BONUS_BISHOP_PAIR = 30;
 const int MALUS_NO_PAWN = -30;
 
-const int MALUS_KING_BREAKING_CASTLE_RIGHT = -0;
+const int MALUS_KING_BREAKING_CASTLE_RIGHT = -40;
 
 const int MALUS_QUEEN_EARLY_MOVE = -20;
 
@@ -212,5 +212,6 @@ class Evaluation
 int static_exchange_evaluation(Board board, Square square, Color player_color);
 int eval(Board& board, Pieces& engine, Pieces& opponent);
 bool is_in_check(Board& board, Pieces* ptr_pieces_player);
+bool is_promoting_pawn(Board& board);
 
 #endif /* !EVAL_H */

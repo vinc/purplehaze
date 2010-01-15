@@ -28,24 +28,25 @@ class Piece
 	friend ostream& operator<<(ostream& out, const Piece& piece);
 	
 	private:
+		unsigned char nb_moves;
 		Color color;
 		PieceType type;
 		Square position;
-		int nb_moves;
+		
 	public:
 		Piece();
 		Piece(Color c, PieceType t);
 		Piece(Color c, PieceType t, Square s);
 		bool operator<(const Piece &piece) const;
-		Color get_color() const;
-		PieceType get_type() const;
+		Color get_color() const {return color;};
+		PieceType get_type() const {return type;};
 		void set_type(PieceType t);
 		PieceValue get_value() const;
-		Square get_position() const;
+		Square get_position() const {return position;};
 		void set_position(Square s);
-		int get_nb_moves() const;
-		void inc_nb_moves();
-		void dec_nb_moves();
+		unsigned char get_nb_moves() const {return nb_moves;};
+		void inc_nb_moves() {++nb_moves;};
+		void dec_nb_moves() {--nb_moves;};
 		char* to_string(char* ptr_buf);
 };
 
@@ -57,16 +58,16 @@ class Pieces
 	public:
 		Pieces();
 		Pieces(Color c);
-		Color get_color() const;
+		Color get_color() const {return color;};
 		void insert(Piece& piece, Position position);
 		Piece* get_ptr_piece();
 		Piece* get_ptr_king();
 		Piece* get_ptr_smallest();
 		//typedef std::set<Piece*>::iterator iterator;
 		list<Piece>::iterator iterator;
-		list<Piece>::iterator begin();
-		list<Piece>::iterator end();
-		int size();
-		void clear();
-		void sort();
+		list<Piece>::iterator begin() {return pieces.begin();};
+		list<Piece>::iterator end() {return pieces.end();};
+		int size() {return pieces.size();};
+		void clear() {return pieces.clear();};
+		void sort() {return pieces.sort();};
 };

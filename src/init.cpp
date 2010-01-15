@@ -37,7 +37,14 @@ bool fen_debug = false;
   */
 void init_board(const char* f) {
 	string fen(f);
+	assert(fen.length() > 0);
 	string::const_iterator it;
+	
+	//cout << "Cleaning the board..." << endl;
+	board = Board();
+	white_pieces.clear();
+	black_pieces.clear();
+	//cout << "The board is clean!" << endl;
 	
 	if (fen_debug) cout << "FEN: parsing: " << fen << endl;
 	// Parse the FEN for discovering pieces
@@ -152,9 +159,17 @@ void init_board(const char* f) {
 			board.set_castling_right(WHITE, true);			
 			if (fen_debug) cout << "FEN: white can castle" << endl;
 		}
+		else if (white_pieces.get_ptr_king()->get_nb_moves() == 0) {
+			// Fix a bug when the king have castle but still have his move counter at 0
+			white_pieces.get_ptr_king()->inc_nb_moves();
+		}
 		if (black_can_castle) {
 			board.set_castling_right(BLACK, true);
 			if (fen_debug) cout << "FEN: black can castle" << endl;
+		}
+		else if (black_pieces.get_ptr_king()->get_nb_moves() == 0) {
+			// Fix a bug when the king have castle but still have his move counter at 0
+			black_pieces.get_ptr_king()->inc_nb_moves();
 		}
 	}
 	++it;

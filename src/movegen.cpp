@@ -376,6 +376,7 @@ void make_move(Board& board, Move& move) {
 
 		// History
 		board.positions_history.push_front(board.zobrist.get_key());
+		board.ply++;
 	}
 }
 
@@ -443,5 +444,6 @@ void unmake_move(Board& board, Move& move) {
 
 		// History
 		board.positions_history.pop_front();
+		board.ply--;
 	}
 }

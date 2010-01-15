@@ -24,15 +24,15 @@ using namespace std;
 Transposition::Transposition() {
 	zobrist = 0;
 	value = 0;
-	bound = UNDEF_BOUND;
 	depth = 0;
+	bound = UNDEF_BOUND;
 }
 
 Transposition::Transposition(Hash h, int v, Bound b, int d, Move& bm) : 
-	zobrist(h), value(v), bound(b), depth(d), best_move(bm) {
+	zobrist(h), best_move(bm), value(v), depth(d), bound(b) {
 	//TODO
 }
-
+/*
 int Transposition::get_value() const {
 	return value;
 }
@@ -52,14 +52,21 @@ Hash Transposition::get_zobrist() const {
 Move Transposition::get_best_move() const {
 	return best_move;
 }
+*/
 
 Transpositions::Transpositions() {
 	//TODO
+	//for (int i = 0; i < TT_SIZE; ++i) tt[i] = 0;
 }
 
 Transposition* Transpositions::lookup(Hash hash) {
 	Transposition* ptr_trans = &tt[hash % TT_SIZE];
-	if (ptr_trans->get_zobrist() == hash) {
+
+	//cout << "TT: " << sizeof(*ptr_trans) << endl; 
+	// Return 56 if move is a ref, 24 for a pointer
+	// But the use of the pointer slow done very much
+
+	if (ptr_trans /* ? added for test in 1.0.7 */ && ptr_trans->get_zobrist() == hash) {
 		return ptr_trans;
 	}
 	else {
@@ -76,8 +83,22 @@ void Transpositions::save(Hash hash, int value, int alpha, int beta, int depth, 
 		bound = LOWER;
 	}
 	else {
-		bound = ACCURATE;
+		bound = EXACT;
 	}
+	
+	if (value > +INF - 100) value = +INF;
+	else if (value < -INF + 100) value = -INF;
+
+	Transposition trans(hash, value, bound, depth, best_move);
+	
+	// Always replace strategie
+	tt[hash % TT_SIZE] = trans;
+}
+
+void Transpositions::save(Hash hash, int value, Bound bound, int depth, Move& best_move) {
+	if (value > +INF - 100) value = +INF;
+	else if (value < -INF + 100) value = -INF;
+
 	Transposition trans(hash, value, bound, depth, best_move);
 	
 	// Always replace strategie

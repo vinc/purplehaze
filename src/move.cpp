@@ -69,7 +69,7 @@ Move::Move() {
 	ptr_captured_piece = 0;
 	from = OUT;
 	to = OUT;
-	Move::moves_counter++;
+//	Move::moves_counter++;
 	en_passant = OUT;
 	promotion = UNDEF_PIECE_TYPE;
 	nb_repetitions = 0;
@@ -79,91 +79,97 @@ Move::Move() {
 Move::Move(Piece* p, Square a, Square b) : ptr_piece(p), from(a), to(b) {
 	type = MOVE;
 	ptr_captured_piece = 0;
-	Move::moves_counter++;
+//	Move::moves_counter++;
 	en_passant = OUT;
 	promotion = UNDEF_PIECE_TYPE;
 	nb_repetitions = 0;
 	score = 0;
 }
 
-Move::Move(Piece* p, Square a, Square b, PieceType promote) : ptr_piece(p), from(a), to(b), promotion(promote) {
+Move::Move(Piece* p, Square a, Square b, PieceType promote) : ptr_piece(p), promotion(promote), from(a), to(b) {
 	type = MOVE;
 	ptr_captured_piece = 0;
-	Move::moves_counter++;
+//	Move::moves_counter++;
 	en_passant = OUT;
 	nb_repetitions = 0;
 	score = 0;
 }
 
-Move::Move(Piece* p, Square a, Square b, Square ep) : ptr_piece(p), from(a), to(b), en_passant(ep) {
+Move::Move(Piece* p, Square a, Square b, Square ep) : ptr_piece(p), en_passant(ep), from(a), to(b) {
 	type = MOVE;
 	ptr_captured_piece = 0;
-	Move::moves_counter++;
+//	Move::moves_counter++;
 	promotion = UNDEF_PIECE_TYPE;
 	nb_repetitions = 0;
 	score = 0;
 }
 
-Move::Move(Piece* p, Square a, Square b, MoveType t) : ptr_piece(p), from(a), to(b), type(t) {
+Move::Move(Piece* p, Square a, Square b, MoveType t) : ptr_piece(p), type(t), from(a), to(b) {
 	ptr_captured_piece = 0;
-	Move::moves_counter++;
+//	Move::moves_counter++;
 	en_passant = OUT;
 	promotion = UNDEF_PIECE_TYPE;
 	nb_repetitions = 0;
 	score = 0;
 }
 
-Move::Move(Piece* p, Square a, Square b, MoveType t, PieceType promote) : ptr_piece(p), from(a), to(b), type(t), promotion(promote) {
+Move::Move(Piece* p, Square a, Square b, MoveType t, PieceType promote) : ptr_piece(p), type(t), promotion(promote), from(a), to(b) {
 	ptr_captured_piece = 0;
-	Move::moves_counter++;
+//	Move::moves_counter++;
 	en_passant = OUT;
 	nb_repetitions = 0;
 	score = 0;
 }
 
-Move::Move(Piece* p, Square a, Square b, Piece* c) : ptr_piece(p), from(a), to(b), ptr_captured_piece(c) {
+Move::Move(Piece* p, Square a, Square b, Piece* c) : ptr_piece(p), ptr_captured_piece(c), from(a), to(b) {
 	type = (ptr_captured_piece ? CAPTURE : MOVE);
-	Move::moves_counter++;
-	if (type == CAPTURE) Move::captures_counter++;
+//	Move::moves_counter++;
+//	if (type == CAPTURE) Move::captures_counter++;
 	en_passant = OUT;
 	promotion = UNDEF_PIECE_TYPE;
 	nb_repetitions = 0;
 	score = 0;
 }
 
-Move::Move(Piece* p, Square a, Square b, Piece* c, PieceType promote) : ptr_piece(p), from(a), to(b), ptr_captured_piece(c), promotion(promote) {
+Move::Move(Piece* p, Square a, Square b, Piece* c, PieceType promote) : ptr_piece(p), ptr_captured_piece(c), promotion(promote), from(a), to(b) {
 	type = (ptr_captured_piece ? CAPTURE : MOVE);
-	Move::moves_counter++;
-	if (type == CAPTURE) Move::captures_counter++;
+//	Move::moves_counter++;
+//	if (type == CAPTURE) Move::captures_counter++;
 	en_passant = OUT;
 	nb_repetitions = 0;
 	score = 0;
 }
 
-Move::Move(Piece* p, Square a, Square b, Piece* c, MoveType t) : ptr_piece(p), from(a), to(b), ptr_captured_piece(c), type(t) {
-	Move::moves_counter++;
-	if (type == CAPTURE) Move::captures_counter++;
-	else if (type == CASTLE) Move::castles_counter++;
+Move::Move(Piece* p, Square a, Square b, Piece* c, MoveType t) : ptr_piece(p), ptr_captured_piece(c), type(t), from(a), to(b) {
+//	Move::moves_counter++;
+//	if (type == CAPTURE) Move::captures_counter++;
+//	else if (type == CASTLE) Move::castles_counter++;
 	en_passant = OUT;
 	promotion = UNDEF_PIECE_TYPE;
 	nb_repetitions = 0;
 	score = 0;
 }
 
-Move::Move(Piece* p, Square a, Square b, Piece* c, MoveType t, PieceType promote) : ptr_piece(p), from(a), to(b), ptr_captured_piece(c), type(t), promotion(promote) {
-	Move::moves_counter++;
-	if (type == CAPTURE) Move::captures_counter++;
-	else if (type == CASTLE) Move::castles_counter++;
+Move::Move(Piece* p, Square a, Square b, Piece* c, MoveType t, PieceType promote) : ptr_piece(p), ptr_captured_piece(c), type(t), promotion(promote), from(a), to(b) {
+//	Move::moves_counter++;
+//	if (type == CAPTURE) Move::captures_counter++;
+//	else if (type == CASTLE) Move::castles_counter++;
 	en_passant = OUT;
 	nb_repetitions = 0;
 	score = 0;
 }
 
 Move::~Move() {}
-
+/*
 int Move::moves_counter = 0;
 int Move::captures_counter = 0;
 int Move::castles_counter = 0;
+*/
+/*
+Move& Move::operator=( Move& move) {
+	return *this;
+}
+*/
 
 bool Move::operator<(const Move &move) const {
 	/*	
@@ -189,6 +195,7 @@ bool Move::operator==(const Move &move) const {
 		&& this->promotion == move.promotion;
 }
 
+/*
 MoveType Move::get_type() const {
 	return type;
 }
@@ -200,7 +207,8 @@ Piece* Move::get_ptr_piece() const {
 Piece* Move::get_ptr_captured_piece() const {
 	return ptr_captured_piece;
 }
-
+*/
+/*
 PieceType Move::get_promotion() const {
 	return promotion;
 }
@@ -212,7 +220,7 @@ Square Move::get_from() const {
 Square Move::get_to() const {
 	return to;
 }
-
+*/
 string Move::get_xboard_notation() {
 	string res = "";
 	res += Board::square_to_string(from);
@@ -220,19 +228,20 @@ string Move::get_xboard_notation() {
 	return res;
 }
 
-
+/*
 Square Move::get_en_passant() const {
 	return en_passant;
 }
+*/
 
 void Move::set_en_passant(Square ep) {
 	en_passant = ep;
 }
 
-void Move::set_repetitions(int r) {
+void Move::set_repetitions(unsigned char r) {
 	nb_repetitions = r;
 }
-
+/*
 int Move::get_repetitions() const {
 	return nb_repetitions;
 }
@@ -240,13 +249,13 @@ int Move::get_repetitions() const {
 int Move::get_score() const {
 	return score;
 }
-
+*/
 void Move::set_score(int s) {
 	score = s;
 }
 
 const char* Move::get_san_notation() const {
-	string san;
+	string san = "";
 	switch (ptr_piece->get_type()) {
 		case KNIGHT: san.append("N"); break;
 		case BISHOP: san.append("B"); break;
@@ -255,7 +264,7 @@ const char* Move::get_san_notation() const {
 		case KING: san.append("K"); break;
 		default: break;
 	}
-	stringstream str_from;
+	stringstream str_from("");
 	Pieces attackers = is_attacked_by(board, to, ptr_piece->get_color());
 	switch (type) {
 		case CAPTURE:
@@ -285,7 +294,7 @@ const char* Move::get_san_notation() const {
 		default:
 			break;
 	}
-	stringstream str_to;
+	stringstream str_to("");
 	str_to << static_cast<char>(97 + (to & 7)) << 1 + (to >> 4);
 	san.append(str_to.str());
 	switch (promotion) {
@@ -353,34 +362,51 @@ void Moves::unique() {
 	moves.unique();
 }
 
-void Moves::order(/*Board& board, */Move* ptr_best_move) {
+extern Board board;
+void Moves::order(/*Board& board,*/ Move* ptr_best_move/*, int ply*/) {
 	list<Move>::iterator it;
 	for (it = moves.begin(); it != moves.end(); ++it) {
 		Move* ptr_move = &*it;
 		//cout << *ptr_move << "(" << ptr_move->get_san_notation() << ") " << ptr_move->get_score();
 		//Square s = ptr_move->get_to();
 		//Color c = ptr_move->get_ptr_piece()->get_color();
-
+		int score = 0, mvvlva = 0;
 		if (ptr_best_move && *ptr_best_move == *ptr_move) {
-			// Max score for the best move
-			ptr_move->set_score(SCORE_BEST_MOVE);
-			//cout << *ptr_move << " is the best move according to order()" << endl;
+			score = SCORE_BEST_MOVE;
 		}
+		#ifdef KILLER_HEURISTIC
+		else if (board.is_first_killer_move(ptr_move, board.ply)) {
+			score = SCORE_KILLER_MOVE;
+		}
+		else if (board.is_second_killer_move(ptr_move, board.ply)) {
+			score = SCORE_KILLER_MOVE - 1;
+		}
+		#endif
 		else if (ptr_move->get_type() == CAPTURE) {
-			/*if (-static_exchange_evaluation(board, s, c) > 0) {
-				ptr_move->set_value(SCORE_KILLER_MOVE);
-			}
-			else {*/
-				ptr_move->set_score(SCORE_CAPTURE_MOVE);
-			//}
+			score = SCORE_CAPTURE_MOVE;
+			#ifdef MVV_LVA
+			mvvlva = ptr_move->get_ptr_captured_piece()->get_value() / ptr_move->get_ptr_piece()->get_value();
+			//mvvlva = ptr_move->get_ptr_captured_piece()->get_value() - ptr_move->get_ptr_piece()->get_value();
+			//mvvlva = ptr_move->get_ptr_captured_piece()->get_value() - 5 * ptr_move->get_ptr_piece()->get_value() / 10;
+			// TODO find out which is the best and bug free.
+			#endif
 		}
 		else {
-			ptr_move->set_score(SCORE_NORMAL_MOVE);
+			score = SCORE_NORMAL_MOVE;
 		}
 
+		score *= 10;
+
+		#ifdef MVV_LVA
+		score += mvvlva;
+		#endif
+		
 		if (ptr_move->get_promotion() != UNDEF_PIECE_TYPE) {
-			ptr_move->set_score(ptr_move->get_score() + SCORE_PROMOTION_MOVE);
+			score += SCORE_PROMOTION_MOVE * 10;
 		}
+
+		ptr_move->set_score(score);
+		
 		//cout << " " << ptr_move->get_score() << endl;
 	}
 	moves.sort();

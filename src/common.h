@@ -24,23 +24,28 @@
 
 using namespace std;
 
-//#define DEBUG 1
+#define DEBUG 1
 //#define SAN_OUTPUT 1
 //#define RANDOM_EVAL 1
 #define OPENING_BOOK 1
 #define CHECK_EXTENSION 1
 #define QUIESCENCE_SEARCH 1
+#define DELTA_PRUNING 1 // Work well for a very little improvement
+//#define MVV_LVA
 //#define SEE 1
+//#define KILLER_HEURISTIC // FIXME Bad for perf
 #define TRANSPOSITIONS_TABLE 1
-#define LATE_MOVE_REDUCTION 1
-#define NULL_MOVE_PRUNING 1
+//#define NULL_MOVE_PRUNING 1 // Increase size of tree
+//#define LATE_MOVE_REDUCTION 1 // FIXME Have a serious bug. FIXME Not anymore?
+
+
 
 
 /*
  * Generic datas
  */
 
-const int INF = 99999;
+const short INF = 29999;
 
 const int ASCII_1 = int('1');
 const int ASCII_8 = int('8');
@@ -91,7 +96,7 @@ enum PieceValue {
 	BISHOP_VALUE = 333, 
 	ROOK_VALUE = 510, 
 	QUEEN_VALUE = 880, 
-	KING_VALUE = 20000	
+	KING_VALUE = 10000	
 };
 
 /*
@@ -129,8 +134,8 @@ enum Position { UNDEF_POSITION, FRONT, BACK };
 enum MoveScore { 
 	SCORE_NORMAL_MOVE = 0,
 	SCORE_CAPTURE_MOVE = 1,	
-	SCORE_PROMOTION_MOVE = 2, 
-	SCORE_KILLER_MOVE = 3, 
+	SCORE_PROMOTION_MOVE = 2,
+	SCORE_KILLER_MOVE = 4, 
 	SCORE_BEST_MOVE = 6 
 };
 
@@ -142,7 +147,7 @@ enum SearchAlgo { UNDEF_ALGO, NEGAMAX, ALPHABETA, PVS };
 
 const int MAX_DEPTH = 100;
 const int MAX_THINKING_TIME = 60;
-const int REDUCED_DEPTH = 2; // Null move pruning
+const int REDUCED_DEPTH = 3; // Null move pruning
 
 /*
  * Datas for Zobrist
@@ -155,11 +160,12 @@ typedef uint64_t Hash;
  * Datas for Transposition
  */
 
-enum Bound { ACCURATE, LOWER, UPPER, UNDEF_BOUND };
+enum Bound { EXACT, LOWER, UPPER, UNDEF_BOUND };
 
 //TODO compare 1048576 and 1000000
 
 //const int TT_SIZE = 1000000;
 const int TT_SIZE = 1024*1024*2;
+const bool TT_STORE_CUTOFF = true;
 
 #endif /* !COMMON_H */

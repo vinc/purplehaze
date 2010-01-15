@@ -679,3 +679,28 @@ int eval(Board& board, Pieces& player_pieces, Pieces& opponent_pieces) {
 	
 	return score;
 }
+
+
+bool is_promoting_pawn(Board& board) {
+	Square s;
+	Color c = board.get_turn_color();
+	switch (c) {
+		case WHITE:
+			s = A7;
+			break;
+		case BLACK:
+			s = A2;
+			break;
+		default:
+			s = OUT;
+			break;
+	}	
+	while (!board.is_off_the_board(s)) {
+		Piece* ptr_piece = board.get_ptr_piece(s);
+		if (ptr_piece && ptr_piece->get_color() == c && ptr_piece->get_type() == PAWN) {
+			return true;
+		}
+		s = board.get_square_right(s);
+	}
+	return false;
+}

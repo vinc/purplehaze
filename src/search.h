@@ -20,9 +20,9 @@
 #ifndef SEARCH_H
 #define SEARCH_H
 
-int quiescence_search(Board& board, Pieces& player, Pieces& opponent, int alpha, int beta);
-int negamax_search(Board& board, Pieces& player, Pieces& opponent, int depth);
-int alphabeta_search(Board& board, Pieces& player, Pieces& opponent, int alpha, int beta, int depth);
-int principal_variation_search(Board& board, Pieces& player, Pieces& opponent, int alpha, int beta, int depth, bool null_move_pruning);
+short quiescence_search(Board& board, Pieces& player, Pieces& opponent, short alpha, short beta);
+short negamax_search(Board& board, Pieces& player, Pieces& opponent, unsigned char depth/*, int ply*/);
+short alphabeta_search(Board& board, Pieces& player, Pieces& opponent, short alpha, short beta, unsigned char depth/*, int ply*/);
+short principal_variation_search(Board& board, Pieces& player, Pieces& opponent, short alpha, short beta, unsigned char depth/*, int ply*/, bool null_move_pruning);
 
 #endif /* !SEARCH_H */

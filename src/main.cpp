@@ -26,6 +26,7 @@
 #include "board.h"
 #include "xboard.h"
 #include "bench.h"
+#include "transposition.h"
 
 using namespace std;
 
@@ -41,7 +42,47 @@ int main() {
 	cout <<	"This program comes with ABSOLUTELY NO WARRANTY; for details type 'show w'." << endl;
 	cout <<	"This is free software, and you are welcome to redistribute it" << endl;
 	cout <<	"under certain conditions; type 'show c' for details." << endl;
+	/*
+	cout << endl;
+	cout << "Size of Move: " << sizeof(Move) << endl;
+	cout << "Size of Piece: " << sizeof(Piece) << endl;
+	cout << "Size of Board: " << sizeof(Board) << endl;
+	cout << "Size of Hash: " << sizeof(Hash) << endl;
+	cout << "Size of Zobrist: " << sizeof(Zobrist) << endl;
+	cout << "Size of Transposition: " << sizeof(Transposition) << endl;
+	*/
 
+	cout << endl;
+	cout << "Compiled with the following options: ";
+	#ifdef OPENING_BOOK
+	cout << "OB, ";
+	#endif
+	#ifdef CHECK_EXTENSION
+	cout << "CE, ";
+	#endif
+	#ifdef QUIESCENCE_SEARCH
+	cout << "QS, ";
+	#endif
+	#ifdef DELTA_PRUNING
+	cout << "DP, ";
+	#endif
+	#ifdef MVV_LVA
+	cout << "MVV-LVA, ";
+	#endif
+	#ifdef KILLER_HEURISTIC
+	cout << "KE, ";
+	#endif
+	#ifdef TRANSPOSITIONS_TABLE
+	cout << "TT(CO=" << TT_STORE_CUTOFF << "), ";
+	#endif
+	#ifdef NULL_MOVE_PRUNING
+	cout << "NMP(R=" << REDUCED_DEPTH << "), ";
+	#endif
+	#ifdef LATE_MOVE_REDUCTION
+	cout << "LMR, ";
+	#endif
+	cout << "PVS, IT" << endl;
+	
 	// Parse commands from CLI
 	string cmd;
 	cout << endl << "> ";
@@ -70,16 +111,6 @@ int main() {
 			
 			return 0;
 		}
-
-		
-		else if (cmd == "divide") {
-			int depth;
-			cin >> depth;
-			Pieces* ptr_player = &white_pieces;
-			Pieces* ptr_opponent = &black_pieces;
-			divide(ptr_player, ptr_opponent, depth);
-		}
-		
 
 		/*
 		else if (cmd == "setboard") {
@@ -112,7 +143,18 @@ int main() {
 			//print_perft(ptr_player, ptr_opponent);
 			int depth = 0;
 			cin >> depth;
-			print_perft_fen(white_pieces, black_pieces, depth + 1);
+			if (depth) {
+				print_perft_fen(white_pieces, black_pieces, depth + 1);
+			}
+			else {
+				print_perft(&white_pieces, &black_pieces);
+			}
+		}
+		else if (cmd == "divide") {
+			int depth = 0;
+			cin >> depth;
+			divide(white_pieces, black_pieces, depth);
+
 		}
 		
 

@@ -60,7 +60,7 @@ bool Piece::operator<(const Piece &piece) const {
 bool Piece::operator<(const Piece &piece) const {
 	return this->get_value() > piece.get_value();
 }
-
+/*
 Color Piece::get_color() const {
 	return color;
 }
@@ -68,7 +68,7 @@ Color Piece::get_color() const {
 PieceType Piece::get_type() const {
 	return type;
 }
-
+*/
 void Piece::set_type(PieceType t) {
 	type = t;
 }
@@ -85,25 +85,26 @@ PieceValue Piece::get_value() const {
 	}
 	return UNDEF_PIECE_VALUE;
 }
-
+/*
 Square Piece::get_position() const {
 	return position;
 }
-
+*/
 void Piece::set_position(Square s) {
 	position = s;
 }
-
+/*
 int Piece::get_nb_moves() const {
 	return nb_moves;
 }
+
 void Piece::inc_nb_moves() {
 	++nb_moves;
 }
 void Piece::dec_nb_moves() {
 	--nb_moves;
 }
-
+*/
 char* Piece::to_string(char* ptr_buf) {
 	char str[4];
 	if (color == BLACK)
@@ -135,9 +136,11 @@ Pieces::Pieces() {
 
 Pieces::Pieces(Color c) : color(c) {}
 
+/*
 Color Pieces::get_color() const {
 	return color;
 }
+*/
 
 void Pieces::insert(Piece& piece, Position position) {
 	switch (position) {
@@ -162,6 +165,7 @@ Piece* Pieces::get_ptr_smallest() {
 	Piece* ptr_smallest = &pieces.back();
 	return ptr_smallest;
 }
+/*
 list<Piece>::iterator Pieces::begin() {
 	return pieces.begin();
 }
@@ -181,3 +185,4 @@ void Pieces::clear() {
 void Pieces::sort() {
 	pieces.sort();
 }
+*/
