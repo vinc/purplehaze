@@ -231,6 +231,7 @@ void Board::put_killer_move(Move* ptr_move, int depth) {
 		}
 	}
 }
+
 bool Board::is_first_killer_move(Move* ptr_move, int depth) const {
 	return (killer_moves[0][depth] && *killer_moves[0][depth] == *ptr_move);
 }

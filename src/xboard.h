@@ -22,5 +22,5 @@ extern Pieces white_pieces;
 extern Pieces black_pieces;
 
 void print_principal_variation(Move& variation_move, int depth);
-Move* xboard_play(Piece* ptr_player, Piece* ptr_opponent, SearchAlgo algo, int depth);
+Move& xboard_play(Piece* ptr_player, Piece* ptr_opponent, SearchAlgo algo, int depth);
 void xboard_loop();

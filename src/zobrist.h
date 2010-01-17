@@ -15,6 +15,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <boost/random.hpp>
+
 #include "common.h"
 #include "move.h"
 
@@ -32,6 +34,7 @@ class Zobrist
 		Hash side_to_move_is_black;
 		Hash castling_rights[4];
 		Hash en_passant_square[BOARD_SIZE];
+		boost::mt19937 generator;
 	public:
 		Zobrist();
 		void set_piece(Color c, PieceType pt, Square s);

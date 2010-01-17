@@ -35,7 +35,7 @@ using namespace std;
 
 extern Board board;
 
-ostream& operator<<(ostream& out, const Move& move) {
+ostream& operator<<(ostream& out, const Move move) {
 	#ifdef SAN_OUTPUT
 	return out << move.get_san_notation();
 	#else
@@ -69,7 +69,6 @@ Move::Move() {
 	ptr_captured_piece = 0;
 	from = OUT;
 	to = OUT;
-//	Move::moves_counter++;
 	en_passant = OUT;
 	promotion = UNDEF_PIECE_TYPE;
 	nb_repetitions = 0;
@@ -159,7 +158,7 @@ Move::Move(Piece* p, Square a, Square b, Piece* c, MoveType t, PieceType promote
 	score = 0;
 }
 
-Move::~Move() {}
+//Move::~Move() {}
 /*
 int Move::moves_counter = 0;
 int Move::captures_counter = 0;
@@ -238,7 +237,7 @@ void Move::set_en_passant(Square ep) {
 	en_passant = ep;
 }
 
-void Move::set_repetitions(unsigned char r) {
+void Move::set_repetitions(unsigned int r) {
 	nb_repetitions = r;
 }
 /*
@@ -254,7 +253,8 @@ void Move::set_score(int s) {
 	score = s;
 }
 
-const char* Move::get_san_notation() const {
+//const char* Move::get_san_notation() const {
+string Move::get_san_notation() const {
 	string san = "";
 	switch (ptr_piece->get_type()) {
 		case KNIGHT: san.append("N"); break;
@@ -304,7 +304,8 @@ const char* Move::get_san_notation() const {
 		case QUEEN: san.append("=Q"); break;
 		default: break;
 	}
-	return san.c_str();
+	//return san.c_str();
+	return san;
 }
 
 /****************************************************************
@@ -316,7 +317,7 @@ const char* Move::get_san_notation() const {
 
 Moves::Moves() {}
 
-Moves::~Moves() {}
+//Moves::~Moves() {}
 /*
 Moves::Moves(Moves& moves) {
 	
@@ -367,35 +368,46 @@ void Moves::order(/*Board& board,*/ Move* ptr_best_move/*, int ply*/) {
 	list<Move>::iterator it;
 	for (it = moves.begin(); it != moves.end(); ++it) {
 		Move* ptr_move = &*it;
+
+		/*
+		
 		//cout << *ptr_move << "(" << ptr_move->get_san_notation() << ") " << ptr_move->get_score();
 		//Square s = ptr_move->get_to();
 		//Color c = ptr_move->get_ptr_piece()->get_color();
 		int score = 0, mvvlva = 0;
 		if (ptr_best_move && *ptr_best_move == *ptr_move) {
-			score = SCORE_BEST_MOVE;
+			score = SCORE_BEST_MOVE * 2; // Must be more than PxQ score
+			//cout << "The best move is fixed to " << ptr_best_move->get_san_notation() << endl;
 		}
 		#ifdef KILLER_HEURISTIC
 		else if (board.is_first_killer_move(ptr_move, board.ply)) {
-			score = SCORE_KILLER_MOVE;
+			score = SCORE_NORMAL_MOVE + 2;
 		}
 		else if (board.is_second_killer_move(ptr_move, board.ply)) {
-			score = SCORE_KILLER_MOVE - 1;
+			score = SCORE_NORMAL_MOVE + 1;
 		}
 		#endif
 		else if (ptr_move->get_type() == CAPTURE) {
 			score = SCORE_CAPTURE_MOVE;
+
+			//cout << "A piece with a value of " << ptr_move->get_ptr_piece()->get_value();
+			//cout << " is capturing a piece with a value of " << ptr_move->get_ptr_captured_piece()->get_value() << endl;
+			
 			#ifdef MVV_LVA
-			mvvlva = ptr_move->get_ptr_captured_piece()->get_value() / ptr_move->get_ptr_piece()->get_value();
-			//mvvlva = ptr_move->get_ptr_captured_piece()->get_value() - ptr_move->get_ptr_piece()->get_value();
+			score = SCORE_NORMAL_MOVE + 1;
+			//mvvlva = ptr_move->get_ptr_captured_piece()->get_value() / ptr_move->get_ptr_piece()->get_value();
+			mvvlva = ptr_move->get_ptr_captured_piece()->get_value() - ptr_move->get_ptr_piece()->get_value();
 			//mvvlva = ptr_move->get_ptr_captured_piece()->get_value() - 5 * ptr_move->get_ptr_piece()->get_value() / 10;
 			// TODO find out which is the best and bug free.
+
+			//cout << "This give us a MVV/LVA of " << mvvlva << endl;
 			#endif
 		}
 		else {
 			score = SCORE_NORMAL_MOVE;
 		}
 
-		score *= 10;
+		score *= 100;
 
 		#ifdef MVV_LVA
 		score += mvvlva;
@@ -405,10 +417,84 @@ void Moves::order(/*Board& board,*/ Move* ptr_best_move/*, int ply*/) {
 			score += SCORE_PROMOTION_MOVE * 10;
 		}
 
-		ptr_move->set_score(score);
+		//score = (score < 0 ? 0 : score);
+		ptr_move->set_score(max(0, score));
 		
 		//cout << " " << ptr_move->get_score() << endl;
+
+		*/
+
+
+		bool mvv_lva = false;
+		bool losing_capture_before_normal = true;		
+		int score;
+		
+		if (ptr_best_move && *ptr_best_move == *ptr_move) {
+			score = SCORE_BEST_MOVE;
+		}		
+		else if (ptr_move->get_type() == CAPTURE) {
+			score = SCORE_CAPTURE_MOVE;
+		}		
+		else if (ptr_move->get_promotion() != UNDEF_PIECE_TYPE) {
+			score = SCORE_PROMOTION_MOVE;
+		}
+		else {
+			score = SCORE_NORMAL_MOVE;
+		}
+
+		#ifdef MVV_LVA
+		mvv_lva = true;
+		score = score * PAWN_VALUE + QUEEN_VALUE; // More accurate scores needed
+		
+		if (ptr_move->get_type() == CAPTURE) {
+			// We do not want a negative score
+			int minimum = 0;
+			if (losing_capture_before_normal) {
+				// If we want the losing captures before normal moves
+				// But after killer moves
+				minimum = SCORE_NORMAL_MOVE * PAWN_VALUE + QUEEN_VALUE + 1;
+			}
+			// Most Valuable Victim - Least Valuable Aggressor
+			int victim = ptr_move->get_ptr_captured_piece()->get_value();
+			int aggressor = ptr_move->get_ptr_piece()->get_value();
+			score = max(victim - aggressor + 2 * PAWN_VALUE + QUEEN_VALUE, minimum);
+		}
+		#endif
+
+		#ifdef KILLER_HEURISTIC
+		bool is_killer = false;
+		
+		if (board.is_first_killer_move(ptr_move, board.ply)) {
+			score = SCORE_KILLER_MOVE;
+			is_killer = true;			
+		}
+		else if (board.is_second_killer_move(ptr_move, board.ply)) {
+			score = SCORE_KILLER_MOVE - 1;
+			is_killer = true;
+		}
+		
+
+		if (mvv_lva && is_killer) {
+			score += SCORE_NORMAL_MOVE * PAWN_VALUE + QUEEN_VALUE;
+		}
+		#endif
+
+		// Set the score of the move
+		ptr_move->set_score(score);
+		
 	}
+
+	// Order the moves
 	moves.sort();
 }
 
+void Moves::print() {
+	list<Move>::iterator it;
+	for (it = moves.begin(); it != moves.end(); ++it) {
+		Move* ptr_move = &*it;
+		cout << ptr_move->get_san_notation() << " => ";
+		cout << ptr_move->get_score();
+		cout << endl;
+	}
+}
+		

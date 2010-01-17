@@ -74,13 +74,13 @@ const MoveOrientation KING_MOVES[NB_KING_MOVES] = {
 
 class Move
 {
-	friend ostream& operator<<(ostream& out, const Move& move);
+	friend ostream& operator<<(ostream& out, const Move move);
 	
 	private:
 		Piece* ptr_piece;
 		Piece* ptr_captured_piece;
-		unsigned char nb_repetitions; // From 0 to 50, used to save board.repetition
-		unsigned char score;
+		unsigned int nb_repetitions; // From 0 to 50, used to save board.repetition
+		unsigned int score;
 		MoveType type;
 		PieceType promotion;
 		Square en_passant;
@@ -94,7 +94,7 @@ class Move
 		static int castles_counter;
 		*/
 		Move();
-		~Move();
+		//~Move();
 		Move(Piece* p, Square a, Square b);
 		Move(Piece* p, Square a, Square b, PieceType promote);
 		Move(Piece* p, Square a, Square b, Square ep);
@@ -117,11 +117,12 @@ class Move
 		string get_xboard_notation();
 		Square get_en_passant() const {return en_passant;};
 		void set_en_passant(Square ep);
-		void set_repetitions(unsigned char r);
-		unsigned char get_repetitions() const {return nb_repetitions;};
-		unsigned char get_score() const {return score;};
+		void set_repetitions(unsigned int r);
+		unsigned int get_repetitions() const {return nb_repetitions;};
+		unsigned int get_score() const {return score;};
 		void set_score(int s);
-		const char* get_san_notation() const;
+		//const char* get_san_notation() const;
+		string get_san_notation() const;
 };
 
 class Moves
@@ -130,7 +131,7 @@ class Moves
 		list<Move> moves;
 	public:
 		Moves();
-		~Moves();
+		//~Moves();
 		//Moves(Moves& moves);
 		void insert(Move& move, Position position);
 		Move* get_ptr_move();
@@ -143,6 +144,7 @@ class Moves
 		void sort();
 		void unique();
 		void order(/*Board& board,*/ Move* ptr_best_move/*, int ply*/);
+		void print();
 };
 
 #endif /* !MOVE_H */

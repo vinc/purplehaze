@@ -305,145 +305,141 @@ Moves movegen(Board& board, Pieces& pieces, bool capture_only) {
 
 
 void make_move(Board& board, Move& move) {
+	board.ply++;
+	board.change_turn_color();
+	board.zobrist.add_move(move);
 	
-	// If it is not a null move
-	if (move.get_type() != UNDEF_MOVE_TYPE) {
-	
-		bool is_repetition = true; // for the 50 repetitions
+	// If it is a null move we are done here
+	if (move.get_type() == UNDEF_MOVE_TYPE) return;
 
-		board.change_turn_color();
-		
-		//cout << "DEBUG: Zobrist before making " << move << " = \t" << board.zobrist << endl;
-		board.zobrist.add_move(move);
-		//cout << "DEBUG: Zobrist after making " << move << " = \t" << board.zobrist << endl;
 	
-		move.get_ptr_piece()->inc_nb_moves();
-		switch (move.get_type()) {
-			case MOVE:
-				board.set_ptr_piece(move.get_ptr_piece(), move.get_to());
-				if (move.get_ptr_piece()->get_type() == PAWN) {
-					is_repetition = false;
-				}
-				break;
-			case EN_PASSANT:
-				board.set_ptr_piece(move.get_ptr_captured_piece(), OUT);
-				board.set_ptr_piece(move.get_ptr_piece(), move.get_to());
+
+	
+	bool is_repetition = true; // for the 50 repetitions
+
+	move.get_ptr_piece()->inc_nb_moves();
+	switch (move.get_type()) {
+		case MOVE:
+			board.set_ptr_piece(move.get_ptr_piece(), move.get_to());
+			if (move.get_ptr_piece()->get_type() == PAWN) {
 				is_repetition = false;
-				break;
-			case CAPTURE:
-				board.set_ptr_piece(move.get_ptr_captured_piece(), OUT);
-				board.set_ptr_piece(move.get_ptr_piece(), move.get_to());
-				is_repetition = false;
-				break;
-			case CASTLE:
-				board.set_ptr_piece(move.get_ptr_piece(), move.get_to());
-				Square s;
-				switch (move.get_to()) {
-					case G1: s = F1; break;
-					case C1: s = D1; break;
-					case G8: s = F8; break;
-					case C8: s = D8; break;
-					default: s = OUT; break;
-				}
-				board.set_ptr_piece(move.get_ptr_captured_piece(), s);
-				move.get_ptr_captured_piece()->inc_nb_moves();
-				Color color;
-				color = (move.get_ptr_piece()->get_color() == WHITE) ? WHITE : BLACK;
-				board.set_castling_right(color, false);
-				break;
-			default:
-				break;
-		}
-
-		// Promotion
-		if (move.get_promotion() != UNDEF_PIECE_TYPE) {
-			move.get_ptr_piece()->set_type(move.get_promotion());
-		}
-
-		// En passant
-		Square ep_tmp = board.get_en_passant();
-		board.set_en_passant(move.get_en_passant());
-		move.set_en_passant(ep_tmp);
-
-		// 50 repetitions
-		move.set_repetitions(board.get_repetitions()); // Save the current counter
-		if (is_repetition) {
-			board.inc_repetitions();
-		}
-		else {
-			board.reset_repetitions();
-		}
-
-		// History
-		board.positions_history.push_front(board.zobrist.get_key());
-		board.ply++;
+			}
+			break;
+		case EN_PASSANT:
+			board.set_ptr_piece(move.get_ptr_captured_piece(), OUT);
+			board.set_ptr_piece(move.get_ptr_piece(), move.get_to());
+			is_repetition = false;
+			break;
+		case CAPTURE:
+			board.set_ptr_piece(move.get_ptr_captured_piece(), OUT);
+			board.set_ptr_piece(move.get_ptr_piece(), move.get_to());
+			is_repetition = false;
+			break;
+		case CASTLE:
+			board.set_ptr_piece(move.get_ptr_piece(), move.get_to());
+			Square s;
+			switch (move.get_to()) {
+				case G1: s = F1; break;
+				case C1: s = D1; break;
+				case G8: s = F8; break;
+				case C8: s = D8; break;
+				default: s = OUT; break;
+			}
+			board.set_ptr_piece(move.get_ptr_captured_piece(), s);
+			move.get_ptr_captured_piece()->inc_nb_moves();
+			Color color;
+			color = (move.get_ptr_piece()->get_color() == WHITE) ? WHITE : BLACK;
+			board.set_castling_right(color, false);
+			break;
+		default:
+			break;
 	}
+
+	// Promotion
+	if (move.get_promotion() != UNDEF_PIECE_TYPE) {
+		move.get_ptr_piece()->set_type(move.get_promotion());
+	}
+
+	// En passant
+	Square ep_tmp = board.get_en_passant();
+	board.set_en_passant(move.get_en_passant());
+	move.set_en_passant(ep_tmp);
+
+	// 50 repetitions
+	move.set_repetitions(board.get_repetitions()); // Save the current counter
+	if (is_repetition) {
+		board.inc_repetitions();
+	}
+	else {
+		board.reset_repetitions();
+	}
+
+	// History
+	board.positions_history.push_front(board.zobrist.get_key());
+
+	
 }
 
 void unmake_move(Board& board, Move& move) {
+	board.ply--;
+	board.change_turn_color();
+	board.zobrist.sub_move(move);
 	
-	// If it is not a null move
-	if (move.get_type() != UNDEF_MOVE_TYPE) {
+	// If it is a null move we are done here
+	if (move.get_type() == UNDEF_MOVE_TYPE) return;
 
-		board.change_turn_color();
-		
-		//cout << "DEBUG: Zobrist before unmaking " << move << " = \t" << board.zobrist << endl;
-		board.zobrist.sub_move(move);
-		//cout << "DEBUG: Zobrist after unmaking " << move << " = \t" << board.zobrist << endl;
-	
-		move.get_ptr_piece()->dec_nb_moves();
-		board.set_ptr_piece(move.get_ptr_piece(), move.get_from());
-		switch (move.get_type()) {
-			case MOVE:
-				break;
-			case CAPTURE:
-				board.set_ptr_piece(move.get_ptr_captured_piece(), move.get_to());
-				break;
-			case EN_PASSANT:
-				//cout << "before unmake: " << move;
-				//board.print();
-				Square captured_from, tmp;
-				tmp = (move.get_ptr_piece()->get_color() == WHITE) ? Square(move.get_to() + DOWN_LEFT) : Square(move.get_to() + UP_LEFT);
-				captured_from = (move.get_from() == tmp) ? Square(move.get_from() + RIGHT) : Square(move.get_from() + LEFT);			
-				board.set_ptr_piece(move.get_ptr_captured_piece(), captured_from);
-				//cout << "after unmake: " << move;
-				//board.print();
-				break;
-			case CASTLE:
-				Square s;
-				switch (move.get_to()) {
-					case G1: s = H1; break;
-					case C1: s = A1; break;
-					case G8: s = H8; break;
-					case C8: s = A8; break;
-					default: s = OUT; break;
-				}		
-				//move.get_ptr_captured_piece()->set_position(s);
-				board.set_ptr_piece(move.get_ptr_captured_piece(), s);
-				move.get_ptr_captured_piece()->dec_nb_moves();
-				Color color;
-				color = (move.get_ptr_piece()->get_color() == WHITE) ? WHITE : BLACK;
-				board.set_castling_right(color, true);
-				break;
-			default:
-				break;
-		}
-
-		// Promotion
-		if (move.get_promotion() != UNDEF_PIECE_TYPE) {
-			move.get_ptr_piece()->set_type(PAWN);
-		}
-	
-		// En passant
-		Square ep_tmp = move.get_en_passant();
-		move.set_en_passant(board.get_en_passant());
-		board.set_en_passant(ep_tmp);
-	
-		// 50 repetitions
-		board.set_repetitions(move.get_repetitions());
-
-		// History
-		board.positions_history.pop_front();
-		board.ply--;
+	move.get_ptr_piece()->dec_nb_moves();
+	board.set_ptr_piece(move.get_ptr_piece(), move.get_from());
+	switch (move.get_type()) {
+		case MOVE:
+			break;
+		case CAPTURE:
+			board.set_ptr_piece(move.get_ptr_captured_piece(), move.get_to());
+			break;
+		case EN_PASSANT:
+			//cout << "before unmake: " << move;
+			//board.print();
+			Square captured_from, tmp;
+			tmp = (move.get_ptr_piece()->get_color() == WHITE) ? Square(move.get_to() + DOWN_LEFT) : Square(move.get_to() + UP_LEFT);
+			captured_from = (move.get_from() == tmp) ? Square(move.get_from() + RIGHT) : Square(move.get_from() + LEFT);			
+			board.set_ptr_piece(move.get_ptr_captured_piece(), captured_from);
+			//cout << "after unmake: " << move;
+			//board.print();
+			break;
+		case CASTLE:
+			Square s;
+			switch (move.get_to()) {
+				case G1: s = H1; break;
+				case C1: s = A1; break;
+				case G8: s = H8; break;
+				case C8: s = A8; break;
+				default: s = OUT; break;
+			}		
+			//move.get_ptr_captured_piece()->set_position(s);
+			board.set_ptr_piece(move.get_ptr_captured_piece(), s);
+			move.get_ptr_captured_piece()->dec_nb_moves();
+			Color color;
+			color = (move.get_ptr_piece()->get_color() == WHITE) ? WHITE : BLACK;
+			board.set_castling_right(color, true);
+			break;
+		default:
+			break;
 	}
+
+	// Promotion
+	if (move.get_promotion() != UNDEF_PIECE_TYPE) {
+		move.get_ptr_piece()->set_type(PAWN);
+	}
+
+	// En passant
+	Square ep_tmp = move.get_en_passant();
+	move.set_en_passant(board.get_en_passant());
+	board.set_en_passant(ep_tmp);
+
+	// 50 repetitions
+	board.set_repetitions(move.get_repetitions());
+
+	// History
+	board.positions_history.pop_front();
+
 }

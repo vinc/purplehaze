@@ -82,6 +82,9 @@ int main() {
 	cout << "LMR, ";
 	#endif
 	cout << "PVS, IT" << endl;
+
+	
+	srand(1);
 	
 	// Parse commands from CLI
 	string cmd;

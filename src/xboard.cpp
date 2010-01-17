@@ -121,6 +121,8 @@ Move* find_move_to_play(Pieces* ptr_player, Pieces* ptr_opponent, SearchAlgo alg
 	bool no_more_time = false;
 	calculated_nodes = 0;
 	for (int ply = 1; ply < depth; ++ply) {
+		tt.clear_stats();
+
 		// Stop searching if end of thinking time
 		elapsed_time = ((float) std::clock() - start) / CLOCKS_PER_SEC;
 		//calculated_nodes = 0;
@@ -130,9 +132,17 @@ Move* find_move_to_play(Pieces* ptr_player, Pieces* ptr_opponent, SearchAlgo alg
 		}
 
 		//moves.sort();
+
+		//cout << "Moves before ordering:" << endl;
+		//moves.print();
+		
 		if (ptr_best_move) {
 			moves.order(/*board,*/ ptr_best_move);
 		}
+		
+		//cout << "Moves after ordering:" << endl;
+		//moves.print();
+
 		
 		// No aspiration windows for now...
 		alpha = -INF;
@@ -149,7 +159,7 @@ Move* find_move_to_play(Pieces* ptr_player, Pieces* ptr_opponent, SearchAlgo alg
 			last_move_time = elapsed_time;
 			elapsed_time = ((float) std::clock() - start) / CLOCKS_PER_SEC;
 			last_move_time = elapsed_time - last_move_time;
-			next_move_time = elapsed_time + last_move_time;
+			next_move_time = elapsed_time + last_move_time * 1.5;
 
 			if (next_move_time > thinking_time)  {
 				no_more_time = true;
@@ -230,6 +240,20 @@ Move* find_move_to_play(Pieces* ptr_player, Pieces* ptr_opponent, SearchAlgo alg
 						cout << " M" << ply + mating_value - abs(score);
 					}
 					cout << endl;
+
+					/*
+					// Print some stats about the TT
+					cout << setw(4 * wide) << "";
+					cout << tt.replacements_counter << " replacements" << endl;
+					cout << setw(4 * wide) << "";	
+					cout << tt.collisions_counter << " collisions (" << double(tt.collisions_counter) * 100 / double(tt.replacements_counter) << "%)" << endl;
+					cout << setw(4 * wide) << "";
+					cout << tt.hits_counter << " hits (" << double(tt.hits_counter) * 100 / double(tt.lookups_counter) << "%)" << endl;
+					cout << setw(4 * wide) << "";
+					cout << fixed << tt.get_usage() << " % of the TT is used." << endl;
+					cout << endl;
+					//*/
+					
 					cout.flush();					
 				}
 			}
@@ -398,7 +422,8 @@ void xboard_loop() {
 			
 			// Put the pieces on the board and initialize it
 			init_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-
+			tt.clear();
+			
 			// Engine play black
 			ptr_engine = &black_pieces;
 			ptr_xboard = &white_pieces;
@@ -409,6 +434,7 @@ void xboard_loop() {
 			new_game = true;
 			use_book = false;
 			
+			
 			// Get FEN
 			string fen;
 			getline(cin, fen);
@@ -418,6 +444,7 @@ void xboard_loop() {
 			
 			// Put the pieces on the board and initialize it
 			init_board(fen.c_str());
+			tt.clear();
 
 			engine_color = (board.get_turn_color() == WHITE ? BLACK : WHITE);
 			switch (engine_color) {
@@ -479,6 +506,16 @@ void xboard_loop() {
 					make_move(board, *ptr_engine_move); // We play it
 					cout << "move " << *ptr_engine_move << endl; // And we display it
 				}
+				else { // If we do not have a move to play
+					if (is_in_check(board, ptr_engine)) { // And if we are in check
+						// This is a Checkmate
+						cout << ((engine_color == WHITE) ? "0-1 {White lose}" : "1-0 {Black lose}") << endl;
+					}
+					else { // If we are not in check
+						// This is a Stalemate
+						cout << "1/2-1/2 {Stalemate}" << endl;
+					}
+				}
 			#ifdef OPENING_BOOK
 			}
 			#endif
@@ -501,7 +538,7 @@ void xboard_loop() {
 			cout << "Opponent want to play " << cmd << " in : " << endl;
 			board.print();
 			std::cout.rdbuf(cout_sbuf); // restore the original stream buffer 
-			*/
+			//*/
 				
 			// Xboard's move
 			if (parse_and_play_move(cmd)) {			
@@ -512,7 +549,7 @@ void xboard_loop() {
 				cout << "Opponent move is valid so we played it :" << endl;
 				board.print();
 				std::cout.rdbuf(cout_sbuf); // restore the original stream buffer 
-				*/
+				//*/
 				
 				#ifdef OPENING_BOOK
 				// Add the move played by xboard to the current line
@@ -541,7 +578,7 @@ void xboard_loop() {
 						cout << "Engine respond :" << *ptr_engine_move << endl;
 						board.print();
 						std::cout.rdbuf(cout_sbuf); // restore the original stream buffer 
-						*/
+						//*/
 						
 						make_move(board, *ptr_engine_move); // We play it
 						cout << "move " << *ptr_engine_move << endl; // And we display it

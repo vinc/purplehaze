@@ -362,10 +362,10 @@ short principal_variation_search(Board& board, Pieces& player, Pieces& opponent,
 	bool side_to_move = false;
 	for (++it; it != board.positions_history.end(); ++it) {
 		if (side_to_move && current_position == *it) ++nb_repetitions;
-		if (nb_repetitions > 2) break;
+		if (nb_repetitions >= 2) break;
 		side_to_move = !side_to_move;
 	}
-	if (nb_repetitions > 2) {
+	if (nb_repetitions >= 2) {
 		// Repetition detected!
 		return 0;
 	}
@@ -401,7 +401,7 @@ short principal_variation_search(Board& board, Pieces& player, Pieces& opponent,
 	// If we have been through this position before
 	if (ptr_trans) {
 		// And if the depth is okay
-		if (ptr_trans->get_depth() > depth) { 
+		if (ptr_trans->get_depth() >= depth) { 
 			// FIXME ">=" in place of ">" improve time but leed to wrong results
 			
 			/*
@@ -428,11 +428,13 @@ short principal_variation_search(Board& board, Pieces& player, Pieces& opponent,
 			
 				return ptr_trans->get_value();
 			}
-			*/
+			//*/
+			/*
 			int trans_score = ptr_trans->get_value();
 			switch (ptr_trans->get_bound()) {
 				case EXACT:
 					return (trans_score > beta ? beta : trans_score);
+					//return trans_score;
 					break;
 				case UPPER:
 					return (trans_score < alpha ? alpha : trans_score);
@@ -440,16 +442,39 @@ short principal_variation_search(Board& board, Pieces& player, Pieces& opponent,
 					break;
 				case LOWER:
 					return (trans_score > beta ? beta : trans_score);
+					//return beta;
 					break;
 				default:
 					break;
 			}
+			//*/
+
+			
+			int trans_score = ptr_trans->get_value();
+			switch (ptr_trans->get_bound()) {
+				case EXACT:
+					return trans_score;
+					break;
+				case UPPER:
+					if (trans_score < beta) beta = trans_score;
+					break;
+				case LOWER:
+					if (trans_score > alpha) alpha = trans_score;
+					break;
+				default:
+					break;
+			}
+			if (alpha >= beta) return trans_score;
+			//*/
 		}
 
 		// If the previous information didn't produce a cutoff,
 		// we still can use the best move
 		Move best_move = ptr_trans->get_best_move();
-		if (best_move.get_ptr_piece()) ptr_best_move = &best_move;
+		if (best_move.get_type() != UNDEF_MOVE_TYPE) {
+			//cout << "We have got a new best move with " << best_move << endl;
+			ptr_best_move = &best_move;
+		}
 		
 	}
 	#endif
@@ -457,14 +482,25 @@ short principal_variation_search(Board& board, Pieces& player, Pieces& opponent,
 	// Null move pruning
 	#ifdef NULL_MOVE_PRUNING
 	if (!is_in_check && null_move_pruning && depth > 3) {
-		//Move null_move(0, OUT, OUT, UNDEF_MOVE_TYPE);
-		//make_move(board, null_move);
+		// This object change the node count, even if not used...
+		//Move null;
+
+		// This one not...
+		Move* ptr_null_move = new Move(0, OUT, OUT, UNDEF_MOVE_TYPE);
+
+		
+		make_move(board, *ptr_null_move);
 		// Null move search with minimal window around beta
-		score = -principal_variation_search(board, opponent, player, -beta, -beta + 1, depth - REDUCED_DEPTH - 1/*, ply + 1*/, false);
-		//unmake_move(board, null_move);
+		score = -principal_variation_search(board, opponent, player, -beta, -beta + 1, depth - REDUCED_DEPTH - 1, false);
+		unmake_move(board, *ptr_null_move);
+		delete ptr_null_move;
+		
+		
 		if (score >= beta) { // Cutoff in case of fail-high
 			return score;
 		}
+		//score = -INF;
+		//*/
 	}
 	#endif
 	
@@ -493,8 +529,19 @@ short principal_variation_search(Board& board, Pieces& player, Pieces& opponent,
 			// If we have captured the king, we won
 			if (ptr_move->get_ptr_captured_piece() && ptr_move->get_ptr_captured_piece()->get_type() == KING) {
 				unmake_move(board, *ptr_move);
+				score = INF - 100 + depth;
+
+				#ifdef TRANSPOSITIONS_TABLE		
+				if (TT_STORE_CUTOFF/* && !is_principal_variation*/) tt.save(board.zobrist.get_key(), score, EXACT, depth, *ptr_move);
+				#endif
+				
+				#ifdef KILLER_HEURISTIC
+				// Use mate killer?
+				//board.put_killer_move(ptr_move, board.ply);
+				#endif
+					
 				moves.clear();
-				return INF - 100 + depth;
+				return score;
 			}
 			
 			if (is_principal_variation) {
@@ -537,7 +584,7 @@ short principal_variation_search(Board& board, Pieces& player, Pieces& opponent,
 					#ifdef TRANSPOSITIONS_TABLE			
 					//TODO false the results, mate score?
 					//if (TT_STORE_CUTOFF) tt.save(board.zobrist.get_key(), score, alpha, beta, depth, *ptr_move);
-					if (TT_STORE_CUTOFF) tt.save(board.zobrist.get_key(), score, LOWER, depth, *ptr_move);
+					if (TT_STORE_CUTOFF/* && !is_principal_variation*/) tt.save(board.zobrist.get_key(), score, LOWER, depth, *ptr_move);
 					#endif
 
 					#ifdef KILLER_HEURISTIC
@@ -551,7 +598,7 @@ short principal_variation_search(Board& board, Pieces& player, Pieces& opponent,
 					//return score; // Fail-soft
 				}
 				
-				old_alpha = alpha; // FIXME realy?
+				//old_alpha = alpha; // FIXME why should we do this?
 				alpha = score; // alpha acts like max in MiniMax
 				best_score = score;
 				ptr_best_move = ptr_move;			
@@ -584,11 +631,19 @@ short principal_variation_search(Board& board, Pieces& player, Pieces& opponent,
 		//cout << "End loop: alpha=" << alpha << " score=" << score << " beta=" << beta << " old_alpha=" << old_alpha << endl;
 	}
 	*/
-	if (old_alpha <= alpha) {
-		Move none(0, OUT, OUT);
-		tt.save(board.zobrist.get_key(), alpha, UPPER, depth, none);
+	if (old_alpha == alpha) {
+		/*
+		if (ptr_best_move) {
+			tt.save(board.zobrist.get_key(), alpha, UPPER, depth, *ptr_best_move);
+		}
+		else {
+		//*/
+			//Move none(0, OUT, OUT, UNDEF_MOVE_TYPE); // FIXME will prevent retreiving most of the PV...
+			Move none;
+			tt.save(board.zobrist.get_key(), alpha, UPPER, depth, none);
+		//}
 	}
-	else {
+	else if (ptr_best_move) {
 		tt.save(board.zobrist.get_key(), alpha, EXACT, depth, *ptr_best_move);
 	}
 	#endif

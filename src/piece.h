@@ -28,7 +28,7 @@ class Piece
 	friend ostream& operator<<(ostream& out, const Piece& piece);
 	
 	private:
-		unsigned char nb_moves;
+		unsigned int nb_moves;
 		Color color;
 		PieceType type;
 		Square position;
@@ -44,7 +44,7 @@ class Piece
 		PieceValue get_value() const;
 		Square get_position() const {return position;};
 		void set_position(Square s);
-		unsigned char get_nb_moves() const {return nb_moves;};
+		unsigned int get_nb_moves() const {return nb_moves;};
 		void inc_nb_moves() {++nb_moves;};
 		void dec_nb_moves() {--nb_moves;};
 		char* to_string(char* ptr_buf);
@@ -59,7 +59,7 @@ class Pieces
 		Pieces();
 		Pieces(Color c);
 		Color get_color() const {return color;};
-		void insert(Piece& piece, Position position);
+		void insert(Piece piece, Position position);
 		Piece* get_ptr_piece();
 		Piece* get_ptr_king();
 		Piece* get_ptr_smallest();

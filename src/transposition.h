@@ -56,15 +56,26 @@ class Transposition
 class Transpositions
 {
 	private:
-		Transposition tt[TT_SIZE];
+		int size;
+		Transposition tt[TT_SIZE / sizeof(Transposition)];
 		//map<Hash,Transposition> tt;
 		//map<Hash,Transposition>::iterator it;
 		
 	public:
 		Transpositions();
+
+		unsigned int lookups_counter;
+		unsigned int hits_counter;
+		unsigned int collisions_counter;
+		unsigned int replacements_counter;
+		
 		Transposition* lookup(Hash hash);
 		void save(Hash h, int value, int alpha, int beta, int depth, Move& best_move);
 		void save(Hash h, int value, Bound bound, int depth, Move& best_move);
+		void clear_stats();
+		void clear();
+
+		float get_usage() const;
 };
 
 

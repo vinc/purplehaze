@@ -91,9 +91,12 @@ void init_board(const char* f) {
 			}
 			
 			// Put the piece with black or white pieces
+			Piece piece(c, pt, s);
 			switch (c) {
-				case BLACK:	black_pieces.insert(*new Piece(BLACK, pt, s), p); break;
-				case WHITE: white_pieces.insert(*new Piece(WHITE, pt, s), p); break;
+				//case BLACK:	black_pieces.insert(*new Piece(BLACK, pt, s), p); break;
+				//case WHITE: white_pieces.insert(*new Piece(WHITE, pt, s), p); break;
+				case BLACK:	black_pieces.insert(piece, p); break;
+				case WHITE: white_pieces.insert(piece, p); break;
 				default: break;
 			}
 			

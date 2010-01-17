@@ -142,7 +142,7 @@ Color Pieces::get_color() const {
 }
 */
 
-void Pieces::insert(Piece& piece, Position position) {
+void Pieces::insert(Piece piece, Position position) {
 	switch (position) {
 		case FRONT: pieces.push_front(piece); break;
 		case BACK: pieces.push_back(piece); break;

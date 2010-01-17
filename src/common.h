@@ -31,11 +31,11 @@ using namespace std;
 #define CHECK_EXTENSION 1
 #define QUIESCENCE_SEARCH 1
 #define DELTA_PRUNING 1 // Work well for a very little improvement
-//#define MVV_LVA
+#define MVV_LVA
 //#define SEE 1
 //#define KILLER_HEURISTIC // FIXME Bad for perf
 #define TRANSPOSITIONS_TABLE 1
-//#define NULL_MOVE_PRUNING 1 // Increase size of tree
+#define NULL_MOVE_PRUNING 1 // Increase size of tree
 //#define LATE_MOVE_REDUCTION 1 // FIXME Have a serious bug. FIXME Not anymore?
 
 
@@ -132,11 +132,11 @@ enum MoveOrientation {
 enum Position { UNDEF_POSITION, FRONT, BACK };
 
 enum MoveScore { 
-	SCORE_NORMAL_MOVE = 0,
-	SCORE_CAPTURE_MOVE = 1,	
-	SCORE_PROMOTION_MOVE = 2,
-	SCORE_KILLER_MOVE = 4, 
-	SCORE_BEST_MOVE = 6 
+	SCORE_NORMAL_MOVE = 1,
+	SCORE_KILLER_MOVE = 3,	
+	SCORE_PROMOTION_MOVE = 4,
+	SCORE_CAPTURE_MOVE = 6, 
+	SCORE_BEST_MOVE = 10 
 };
 
 /*
@@ -165,7 +165,7 @@ enum Bound { EXACT, LOWER, UPPER, UNDEF_BOUND };
 //TODO compare 1048576 and 1000000
 
 //const int TT_SIZE = 1000000;
-const int TT_SIZE = 1024*1024*2;
+const int TT_SIZE = 1024*1024*128;
 const bool TT_STORE_CUTOFF = true;
 
 #endif /* !COMMON_H */

@@ -14,11 +14,12 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+
 #include "piece.h"
 #include "move.h"
 #include "zobrist.h"
 #include "board.h"
-
 
 using namespace std;
 
@@ -27,18 +28,23 @@ ostream& operator<<(ostream& out, const Zobrist& zobrist) {
     return out;
 }
 
+
 // Generate a random Hash
 Hash Zobrist::gen_hash() {
-	const int rand_max_bit = 15; // Assumes RAND_MAX is 32767
-	Hash h = rand();
-	for (int i = 0; i < 5; ++i) {
-		h <<= rand_max_bit;
-		h += rand();
-	}
+	//const int rand_max_bit = 15; // Assumes RAND_MAX is 32767
+
+	//Hash h = rand() ^ ((Hash)rand() << 15) ^ ((Hash)rand() << 30) ^ ((Hash)rand() << 45) ^ ((Hash)rand() << 60);
+	//Hash h = generator() ^ ((Hash) generator() << 15) ^ ((Hash) generator() << 30) ^ ((Hash) generator() << 45) ^ ((Hash) generator() << 60);
+	//Hash h = generator();
+	Hash h = generator() ^ ((Hash) generator() << 32);
+	//Hash h = rand();
+	//cout << hex << h << dec << endl;
 	return h;
 }
 
 Zobrist::Zobrist() {
+	generator.seed(5489u);
+
 	for (int c = 0; c < 2; ++c) {
 		for (int pt = 0; pt < 6; ++pt) {
 			for (int s = 0; s < BOARD_SIZE; ++s) {
@@ -66,6 +72,12 @@ void Zobrist::set_piece(Color c, PieceType pt, Square s) {
 }
 
 void Zobrist::add_move(Move& m) {
+	// Change side
+	zobrist_key ^= side_to_move_is_black;
+
+	// If it is a null move we are done here
+	if (m.get_type() == UNDEF_MOVE_TYPE) return;
+
 	Color c = m.get_ptr_piece()->get_color();
 	Square to = m.get_to();
 	PieceType pt = m.get_ptr_piece()->get_type();
@@ -116,9 +128,6 @@ void Zobrist::add_move(Move& m) {
 	
 	// Place the piece to his new position
 	zobrist_key ^= piece_square[c][pt][to];
-
-	// Change side
-	zobrist_key ^= side_to_move_is_black;
 
 }
 void Zobrist::sub_move(Move& m) {
