@@ -37,6 +37,7 @@ class Piece
 		Piece();
 		Piece(Color c, PieceType t);
 		Piece(Color c, PieceType t, Square s);
+		~Piece();
 		bool operator<(const Piece &piece) const;
 		Color get_color() const {return color;};
 		PieceType get_type() const {return type;};

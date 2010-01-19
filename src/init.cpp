@@ -139,9 +139,10 @@ void init_board(const char* f) {
 	++it;
 
 	// Parse the FEN for discovering castling abilities
+	bool white_can_castle = false;
+	bool black_can_castle = false;
 	for (; it != fen.end(); ++it) {
-		bool white_can_castle = false;
-		bool black_can_castle = false;
+		
 		//cout << "FEN: parse castle: " << *it << endl;
 		if (*it == ' ') {
 				break; // Exit loop
@@ -158,22 +159,24 @@ void init_board(const char* f) {
 				black_can_castle = true;
 				break;
 		}
-		if (white_can_castle) {
-			board.set_castling_right(WHITE, true);			
-			if (fen_debug) cout << "FEN: white can castle" << endl;
-		}
-		else if (white_pieces.get_ptr_king()->get_nb_moves() == 0) {
-			// Fix a bug when the king have castle but still have his move counter at 0
-			white_pieces.get_ptr_king()->inc_nb_moves();
-		}
-		if (black_can_castle) {
-			board.set_castling_right(BLACK, true);
-			if (fen_debug) cout << "FEN: black can castle" << endl;
-		}
-		else if (black_pieces.get_ptr_king()->get_nb_moves() == 0) {
-			// Fix a bug when the king have castle but still have his move counter at 0
-			black_pieces.get_ptr_king()->inc_nb_moves();
-		}
+	}
+	if (white_can_castle) {
+		board.set_castling_right(WHITE, true);			
+		if (fen_debug) cout << "FEN: white can castle" << endl;
+	}
+	else if (white_pieces.get_ptr_king()->get_nb_moves() == 0) {
+		// Fix a bug when the king have castle but still have his move counter at 0
+		white_pieces.get_ptr_king()->inc_nb_moves();
+		board.set_castling_right(WHITE, false);	
+	}
+	if (black_can_castle) {
+		board.set_castling_right(BLACK, true);
+		if (fen_debug) cout << "FEN: black can castle" << endl;
+	}
+	else if (black_pieces.get_ptr_king()->get_nb_moves() == 0) {
+		// Fix a bug when the king have castle but still have his move counter at 0
+		black_pieces.get_ptr_king()->inc_nb_moves();
+		board.set_castling_right(BLACK, false);
 	}
 	++it;
 	

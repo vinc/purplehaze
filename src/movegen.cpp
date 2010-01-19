@@ -206,7 +206,6 @@ Moves movegen(Board& board, Pieces& pieces, bool capture_only) {
 								if (ptr_piece->get_nb_moves() == 0 &&
 									is_attacked_by(board, E1, BLACK).size() == 0
 									){
-								
 									// King castle
 									ptr_rook = board.get_ptr_piece(H1);
 									if (ptr_rook &&

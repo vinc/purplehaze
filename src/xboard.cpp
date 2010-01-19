@@ -90,7 +90,7 @@ void print_principal_variation(Move& variation_move, int depth, bool first_ply) 
 
 /** Find the best move to play with the given algo
   * on the given depth. */
-Move* find_move_to_play(Pieces* ptr_player, Pieces* ptr_opponent, SearchAlgo algo, int depth) {
+Move find_move_to_play(Pieces* ptr_player, Pieces* ptr_opponent, SearchAlgo algo, int depth) {
 	// Debug informations
 	int wide = 10;
 	if (root_search_debug) {
@@ -135,18 +135,21 @@ Move* find_move_to_play(Pieces* ptr_player, Pieces* ptr_opponent, SearchAlgo alg
 
 		//cout << "Moves before ordering:" << endl;
 		//moves.print();
-		
-		if (ptr_best_move) {
+
+		// Removed condition 18/01
+		//if (ptr_best_move) {
 			moves.order(/*board,*/ ptr_best_move);
-		}
+		//}
 		
 		//cout << "Moves after ordering:" << endl;
 		//moves.print();
 
 		
 		// No aspiration windows for now...
-		alpha = -INF;
-		beta = +INF;
+		//alpha = -INF;
+		//beta = +INF;
+		alpha -= 20;
+		beta += 20;
 		
 		//cout << "Depth " << ply << endl;
 		int i = 0;
@@ -179,7 +182,7 @@ Move* find_move_to_play(Pieces* ptr_player, Pieces* ptr_opponent, SearchAlgo alg
 				if (ptr_move->get_ptr_captured_piece() && ptr_move->get_ptr_captured_piece()->get_type() == KING) {
 					// We won
 					//unmake_move(board, *ptr_move); // We have to play the move chosed in root
-					return ptr_best_move;
+					return *ptr_best_move;
 				}
 
 				// Compute the score of this move
@@ -266,8 +269,10 @@ Move* find_move_to_play(Pieces* ptr_player, Pieces* ptr_opponent, SearchAlgo alg
 		// FIXME make only loosing time
 		//tt.save(board.zobrist.get_key(), alpha, EXACT, depth, *ptr_best_move);
 		#endif
+		return *ptr_best_move;
 	}
-	return ptr_best_move;
+	Move none;
+	return none;
 }
 
 /** Parse the given move and play it on the board.
@@ -464,6 +469,10 @@ void xboard_loop() {
 			cin >> nb_time; // By lenght of time
 			thinking_time = (nb_time * 60.0) / nb_moves; 
 		}
+		else if (cmd == "time") { // Define the game level
+			cin >> nb_time; // Time for a move in 1/100 secs
+			thinking_time = nb_time / 1000.0; 
+		}
 		else if (cmd == "ping") { // Define the game level
 			int n;
 			cin >> n;
@@ -499,9 +508,14 @@ void xboard_loop() {
 			else {			
 			#endif
 				// Search for a move to play
-				Move* ptr_engine_move;
-				ptr_engine_move = find_move_to_play(ptr_engine, ptr_xboard, algo, depth);
-
+				Move* ptr_engine_move = 0;
+				
+				//ptr_engine_move = find_move_to_play(ptr_engine, ptr_xboard, algo, depth);
+				Move engine_move = find_move_to_play(ptr_engine, ptr_xboard, algo, depth);
+				if (engine_move.get_type() != UNDEF_MOVE_TYPE) {
+					ptr_engine_move = &engine_move;
+				}
+				
 				if (ptr_engine_move) { // If we have find one
 					make_move(board, *ptr_engine_move); // We play it
 					cout << "move " << *ptr_engine_move << endl; // And we display it
@@ -567,9 +581,14 @@ void xboard_loop() {
 				else {	
 				#endif
 					// Search for a move to play
-					Move* ptr_engine_move;
-					ptr_engine_move = find_move_to_play(ptr_engine, ptr_xboard, algo, depth);
+					Move* ptr_engine_move = 0;
 
+					//ptr_engine_move = find_move_to_play(ptr_engine, ptr_xboard, algo, depth);
+					Move engine_move = find_move_to_play(ptr_engine, ptr_xboard, algo, depth);
+					if (engine_move.get_type() != UNDEF_MOVE_TYPE) {
+						ptr_engine_move = &engine_move;
+					}
+					
 					if (ptr_engine_move) { // If we have find one
 						
 						// Log to file

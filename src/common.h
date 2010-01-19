@@ -35,10 +35,8 @@ using namespace std;
 //#define SEE 1
 //#define KILLER_HEURISTIC // FIXME Bad for perf
 #define TRANSPOSITIONS_TABLE 1
-#define NULL_MOVE_PRUNING 1 // Increase size of tree
+//#define NULL_MOVE_PRUNING 1 // Increase size of tree
 //#define LATE_MOVE_REDUCTION 1 // FIXME Have a serious bug. FIXME Not anymore?
-
-
 
 
 /*
@@ -165,7 +163,7 @@ enum Bound { EXACT, LOWER, UPPER, UNDEF_BOUND };
 //TODO compare 1048576 and 1000000
 
 //const int TT_SIZE = 1000000;
-const int TT_SIZE = 1024*1024*128;
+const int TT_SIZE = 1024*1024*128; // Transpositions table of 128Mb
 const bool TT_STORE_CUTOFF = true;
 
 #endif /* !COMMON_H */

@@ -61,8 +61,10 @@ class Board
 		bool is_dark(Square s) const;
 		void print() const;
 		static string square_to_string(Square s);
+		
 		void set_castling_right(Color c, bool b); //TODO change to set_castle(...)
 		bool have_castled(Color c); //TODO change to have_castled(...)
+		
 		Square get_en_passant() const {return en_passant;};
 		void set_en_passant(Square ep);
 		

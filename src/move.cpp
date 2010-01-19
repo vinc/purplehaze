@@ -158,7 +158,18 @@ Move::Move(Piece* p, Square a, Square b, Piece* c, MoveType t, PieceType promote
 	score = 0;
 }
 
-//Move::~Move() {}
+Move::~Move() {
+	type = UNDEF_MOVE_TYPE;
+	ptr_piece = 0;
+	ptr_captured_piece = 0;
+	from = OUT;
+	to = OUT;
+	en_passant = OUT;
+	promotion = UNDEF_PIECE_TYPE;
+	nb_repetitions = 0;
+	score = 0;
+}
+
 /*
 int Move::moves_counter = 0;
 int Move::captures_counter = 0;

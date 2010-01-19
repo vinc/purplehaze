@@ -51,6 +51,13 @@ Piece::Piece(Color c, PieceType t, Square s) : color(c), type(t), position(s) {
 	nb_moves = 0;
 }
 
+Piece::~Piece() {
+	position = OUT;
+	color = UNDEF_COLOR;
+	type = UNDEF_PIECE_TYPE;
+	nb_moves = 0;
+}
+	
 /*
 bool Piece::operator<(const Piece &piece) const {
 	return 200 * this->type + this->position < 200 * piece.type + piece.position;

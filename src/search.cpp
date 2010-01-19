@@ -429,7 +429,7 @@ short principal_variation_search(Board& board, Pieces& player, Pieces& opponent,
 				return ptr_trans->get_value();
 			}
 			//*/
-			/*
+			
 			int trans_score = ptr_trans->get_value();
 			switch (ptr_trans->get_bound()) {
 				case EXACT:
@@ -449,7 +449,7 @@ short principal_variation_search(Board& board, Pieces& player, Pieces& opponent,
 			}
 			//*/
 
-			
+			/*
 			int trans_score = ptr_trans->get_value();
 			switch (ptr_trans->get_bound()) {
 				case EXACT:
@@ -483,17 +483,20 @@ short principal_variation_search(Board& board, Pieces& player, Pieces& opponent,
 	#ifdef NULL_MOVE_PRUNING
 	if (!is_in_check && null_move_pruning && depth > 3) {
 		// This object change the node count, even if not used...
-		//Move null;
+		Move null_move;
 
 		// This one not...
-		Move* ptr_null_move = new Move(0, OUT, OUT, UNDEF_MOVE_TYPE);
+		//Move* ptr_null_move = new Move(0, OUT, OUT, UNDEF_MOVE_TYPE);
 
 		
-		make_move(board, *ptr_null_move);
+		make_move(board, null_move);
+		//make_move(board, *ptr_null_move);
+		
 		// Null move search with minimal window around beta
 		score = -principal_variation_search(board, opponent, player, -beta, -beta + 1, depth - REDUCED_DEPTH - 1, false);
-		unmake_move(board, *ptr_null_move);
-		delete ptr_null_move;
+		unmake_move(board, null_move);
+		//unmake_move(board, *ptr_null_move);
+		//delete ptr_null_move;
 		
 		
 		if (score >= beta) { // Cutoff in case of fail-high

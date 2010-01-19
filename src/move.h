@@ -94,7 +94,7 @@ class Move
 		static int castles_counter;
 		*/
 		Move();
-		//~Move();
+		~Move();
 		Move(Piece* p, Square a, Square b);
 		Move(Piece* p, Square a, Square b, PieceType promote);
 		Move(Piece* p, Square a, Square b, Square ep);
