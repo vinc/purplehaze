@@ -337,6 +337,7 @@ Moves::Moves(Moves& moves) {
 
 void Moves::insert(Move& move, Position position) {
 	//moves.insert(move);
+	
 	switch (position) {
 		case FRONT: moves.push_front(move); break;
 		case BACK: moves.push_back(move); break;
@@ -344,10 +345,11 @@ void Moves::insert(Move& move, Position position) {
 	}
 }
 
+/*
 Move* Moves::get_ptr_move() {
-	//Move* ptr_move = new Move(iterator->get_ptr_piece(), iterator->get_from(), iterator->get_to(), iterator->get_ptr_captured_piece());
-	Move* ptr_move = &*iterator;
-	return ptr_move;
+	// FIXME We return a pointer on a move in the list
+	// Maybe this is not a very good idea...
+	return (Move*) &*iterator;
 }
 
 list<Move>::iterator Moves::begin() {
@@ -373,7 +375,7 @@ void Moves::sort() {
 void Moves::unique() {
 	moves.unique();
 }
-
+*/
 extern Board board;
 void Moves::order(/*Board& board,*/ Move* ptr_best_move/*, int ply*/) {
 	list<Move>::iterator it;
@@ -437,14 +439,20 @@ void Moves::order(/*Board& board,*/ Move* ptr_best_move/*, int ply*/) {
 
 
 		bool mvv_lva = false;
-		bool losing_capture_before_normal = true;		
+		bool losing_capture_before_normal = true;
+		bool is_best_move = false;
+		bool is_capture = false;
+		bool is_killer = false;
+		
 		int score;
 		
 		if (ptr_best_move && *ptr_best_move == *ptr_move) {
 			score = SCORE_BEST_MOVE;
+			is_best_move = true;
 		}		
 		else if (ptr_move->get_type() == CAPTURE) {
 			score = SCORE_CAPTURE_MOVE;
+			is_capture = true;
 		}		
 		else if (ptr_move->get_promotion() != UNDEF_PIECE_TYPE) {
 			score = SCORE_PROMOTION_MOVE;
@@ -457,7 +465,7 @@ void Moves::order(/*Board& board,*/ Move* ptr_best_move/*, int ply*/) {
 		mvv_lva = true;
 		score = score * PAWN_VALUE + QUEEN_VALUE; // More accurate scores needed
 		
-		if (ptr_move->get_type() == CAPTURE) {
+		if (!is_best_move && is_capture) {
 			// We do not want a negative score
 			int minimum = 0;
 			if (losing_capture_before_normal) {
@@ -473,13 +481,12 @@ void Moves::order(/*Board& board,*/ Move* ptr_best_move/*, int ply*/) {
 		#endif
 
 		#ifdef KILLER_HEURISTIC
-		bool is_killer = false;
 		
-		if (board.is_first_killer_move(ptr_move, board.ply)) {
+		if (!is_best_move && !is_capture && board.is_first_killer_move(ptr_move, board.ply)) {
 			score = SCORE_KILLER_MOVE;
 			is_killer = true;			
 		}
-		else if (board.is_second_killer_move(ptr_move, board.ply)) {
+		else if (!is_best_move && !is_capture && board.is_second_killer_move(ptr_move, board.ply)) {
 			score = SCORE_KILLER_MOVE - 1;
 			is_killer = true;
 		}

@@ -85,9 +85,15 @@ short quiescence_search(Board& board, Pieces& player, Pieces& opponent, short al
 		Piece* ptr_king_player = player.get_ptr_king();
 		Square s = ptr_king_player->get_position();
 		Color c = (ptr_king_player->get_color() == WHITE) ? BLACK : WHITE;
+		/*
 		Pieces attackers = is_attacked_by(board, s, c);
 		bool is_in_check = (attackers.size() == 0) ? false : true;
 		if (is_in_check) {
+			unmake_move(board, *ptr_move);
+			continue;
+		}
+		*/
+		if (is_attacked(board, s, c)) {
 			unmake_move(board, *ptr_move);
 			continue;
 		}
@@ -126,8 +132,9 @@ short negamax_search(Board& board, Pieces& player, Pieces& opponent, unsigned ch
 	Piece* ptr_king_player = player.get_ptr_king();
 	Square s = ptr_king_player->get_position();
 	Color c = (ptr_king_player->get_color() == WHITE) ? BLACK : WHITE;
-	Pieces attackers = is_attacked_by(board, s, c);
-	is_in_check = (attackers.size() == 0) ? false : true;
+	//Pieces attackers = is_attacked_by(board, s, c);
+	//is_in_check = (attackers.size() == 0) ? false : true;
+	is_in_check = is_attacked(board, s, c);
 	
 	// Check extension
 	/*
@@ -157,8 +164,9 @@ short negamax_search(Board& board, Pieces& player, Pieces& opponent, unsigned ch
 		
 		// Test if the move is legal
 		s = ptr_king_player->get_position();
-		attackers = is_attacked_by(board, s, c);
-		if (attackers.size() == 0) {
+		//attackers = is_attacked_by(board, s, c);
+		//if (attackers.size() == 0) {
+		if (!is_attacked(board, s, c)) {
 			legal_move_found = true;
 		
 			// Test if we have captured the king
@@ -373,8 +381,9 @@ short principal_variation_search(Board& board, Pieces& player, Pieces& opponent,
 	Piece* ptr_king_player = player.get_ptr_king();
 	Square s = ptr_king_player->get_position();
 	Color c = (ptr_king_player->get_color() == WHITE) ? BLACK : WHITE;
-	Pieces attackers = is_attacked_by(board, s, c);
-	bool is_in_check = (attackers.size() == 0) ? false : true;
+	//Pieces attackers = is_attacked_by(board, s, c);
+	//bool is_in_check = (attackers.size() == 0) ? false : true;
+	bool is_in_check = is_attacked(board, s, c);
 	bool is_still_in_check = false;
 	
 	// Check extension
@@ -429,7 +438,7 @@ short principal_variation_search(Board& board, Pieces& player, Pieces& opponent,
 				return ptr_trans->get_value();
 			}
 			//*/
-			
+			/*
 			int trans_score = ptr_trans->get_value();
 			switch (ptr_trans->get_bound()) {
 				case EXACT:
@@ -449,22 +458,25 @@ short principal_variation_search(Board& board, Pieces& player, Pieces& opponent,
 			}
 			//*/
 
-			/*
+			
 			int trans_score = ptr_trans->get_value();
 			switch (ptr_trans->get_bound()) {
 				case EXACT:
 					return trans_score;
 					break;
 				case UPPER:
+					//if (trans_score <= alpha) return trans_score;
 					if (trans_score < beta) beta = trans_score;
 					break;
-				case LOWER:
+				case LOWER: 
+					//if (trans_score >= beta) return trans_score;
 					if (trans_score > alpha) alpha = trans_score;
 					break;
 				default:
 					break;
 			}
 			if (alpha >= beta) return trans_score;
+			
 			//*/
 		}
 
@@ -508,7 +520,7 @@ short principal_variation_search(Board& board, Pieces& player, Pieces& opponent,
 	#endif
 	
 	bool is_principal_variation = true;
-	unsigned char moves_searched = 0;
+	unsigned short moves_searched = 0; // Used for LMR
 	
 	bool legal_move_found = false;
 	
@@ -524,8 +536,9 @@ short principal_variation_search(Board& board, Pieces& player, Pieces& opponent,
 		
 		// Test if the move is legal
 		s = ptr_king_player->get_position();
-		attackers = is_attacked_by(board, s, c);
-		is_still_in_check = (attackers.size() == 0) ? false : true;
+		//attackers = is_attacked_by(board, s, c);
+		//is_still_in_check = (attackers.size() == 0) ? false : true;
+		is_still_in_check = is_attacked(board, s, c);
 		if (!is_still_in_check) {
 			legal_move_found = true;
 		
@@ -554,10 +567,11 @@ short principal_variation_search(Board& board, Pieces& player, Pieces& opponent,
 				// Late move reduction
 				#ifdef LATE_MOVE_REDUCTION
 				s = opponent.get_ptr_king()->get_position();
-				attackers = is_attacked_by(board, s, ptr_king_player->get_color());
-				bool is_giving_check = (attackers.size() == 0) ? false : true;
-			
-				if (moves_searched >= 4 
+				//attackers = is_attacked_by(board, s, ptr_king_player->get_color());
+				//bool is_giving_check = (attackers.size() == 0) ? false : true;
+				bool is_giving_check = is_attacked(board, s, ptr_king_player->get_color());
+				
+				if (moves_searched >= 4
 					&& depth > 3
 					&& !is_still_in_check // Imposible here
 					&& !is_in_check // ?
@@ -570,15 +584,14 @@ short principal_variation_search(Board& board, Pieces& player, Pieces& opponent,
 				}
 				else {
 				#endif
-		
 					score = -principal_variation_search(board, opponent, player, -alpha - 1, -alpha, depth - 1, null_move_pruning);
-					if (alpha < score && score < beta) { // Re-search
-						score = -principal_variation_search(board, opponent, player, -beta, -alpha, depth - 1, null_move_pruning); 
-					}
-			
 				#ifdef LATE_MOVE_REDUCTION
 				}
 				#endif
+
+				if (alpha < score && score < beta) { // Re-search
+					score = -principal_variation_search(board, opponent, player, -beta, -alpha, depth - 1, null_move_pruning); 
+				}
 			
 			}
 			if (score > alpha) {

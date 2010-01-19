@@ -16,6 +16,7 @@
 */
 
 #include <list>
+#include <vector>
 
 #ifndef MOVE_H
 #define MOVE_H
@@ -134,15 +135,15 @@ class Moves
 		//~Moves();
 		//Moves(Moves& moves);
 		void insert(Move& move, Position position);
-		Move* get_ptr_move();
+		Move* get_ptr_move() {return (Move*) &*iterator;};
 		//typedef std::set<Move>::iterator iterator;
 		list<Move>::iterator iterator;
-		list<Move>::iterator begin();
-		list<Move>::iterator end();
-		int size();
-		void clear();
-		void sort();
-		void unique();
+		list<Move>::iterator begin() {return moves.begin();};
+		list<Move>::iterator end() {return moves.end();};
+		int size() {return moves.size();};
+		void clear() {/*moves.clear();*/}; // FIXME Seems useless
+		void sort() {moves.sort();};
+		void unique() {moves.unique();};
 		void order(/*Board& board,*/ Move* ptr_best_move/*, int ply*/);
 		void print();
 };

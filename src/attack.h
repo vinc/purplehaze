@@ -18,3 +18,5 @@
 #include "common.h"
 
 Pieces is_attacked_by(Board& b, Square s, Color c);
+bool is_attacked(Board& b, Square s, Color c);
+

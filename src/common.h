@@ -24,19 +24,19 @@
 
 using namespace std;
 
-#define DEBUG 1
-//#define SAN_OUTPUT 1
-//#define RANDOM_EVAL 1
-#define OPENING_BOOK 1
-#define CHECK_EXTENSION 1
-#define QUIESCENCE_SEARCH 1
-#define DELTA_PRUNING 1 // Work well for a very little improvement
+#define DEBUG
+//#define SAN_OUTPUT
+//#define RANDOM_EVAL
+//#define OPENING_BOOK
+#define CHECK_EXTENSION
+#define QUIESCENCE_SEARCH
+#define DELTA_PRUNING // Work well for a very little improvement
 #define MVV_LVA
-//#define SEE 1
+//#define SEE
 //#define KILLER_HEURISTIC // FIXME Bad for perf
-#define TRANSPOSITIONS_TABLE 1
-//#define NULL_MOVE_PRUNING 1 // Increase size of tree
-//#define LATE_MOVE_REDUCTION 1 // FIXME Have a serious bug. FIXME Not anymore?
+#define TRANSPOSITIONS_TABLE
+#define NULL_MOVE_PRUNING // Increase size of tree
+#define LATE_MOVE_REDUCTION // FIXME Have a serious bug. FIXME Not anymore?
 
 
 /*

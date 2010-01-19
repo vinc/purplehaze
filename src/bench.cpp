@@ -30,7 +30,7 @@
 
 using namespace std;
 
-bool bench_eval = false;
+bool bench_eval = true;
 
 int perft_moves_counter = 0;
 int perft_captures_counter = 0;
@@ -255,8 +255,8 @@ void print_perft(Pieces* ptr_player, Pieces* ptr_opponent) {
 
 	int calculated_nodes = 0, nb_captures = 0, nb_castles = 0, nb_checks = 0, nb_checkmates = 0, nb_en_passant = 0, nb_promotions = 0;
 	int total_nodes = 0, total_captures = 0, total_castles = 0, total_checks = 0, total_checkmates = 0, total_en_passant = 0, total_promotions = 0;			
-	int wide = 13;
-	cout << setw(wide) << "Depth";
+	int wide = 12;
+	cout << setw(5) << "Depth";
 	cout << setw(wide) << "Nodes";
 	cout << setw(wide) << "Captures";
 	cout << setw(wide) << "En passant";
@@ -296,7 +296,7 @@ void print_perft(Pieces* ptr_player, Pieces* ptr_opponent) {
 		total_checkmates += nb_checkmates;
 		
 
-		cout << setw(wide) << depth;
+		cout << setw(5) << depth;
 		cout << setw(wide) << calculated_nodes;
 		cout << setw(wide) << nb_captures;
 		cout << setw(wide) << nb_en_passant;

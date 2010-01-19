@@ -135,21 +135,25 @@ Move find_move_to_play(Pieces* ptr_player, Pieces* ptr_opponent, SearchAlgo algo
 
 		//cout << "Moves before ordering:" << endl;
 		//moves.print();
+		/*
+		if (ptr_best_move) {
+			cout << "We give to move.order() the bm: " << ptr_best_move->get_san_notation() << endl;
+		}
+		*/
 
-		// Removed condition 18/01
-		//if (ptr_best_move) {
-			moves.order(/*board,*/ ptr_best_move);
-		//}
-		
+		moves.order(/*board,*/ ptr_best_move);
+				
 		//cout << "Moves after ordering:" << endl;
 		//moves.print();
 
 		
 		// No aspiration windows for now...
-		//alpha = -INF;
-		//beta = +INF;
-		alpha -= 20;
-		beta += 20;
+		alpha = -INF;
+		beta = +INF;
+		//alpha -= 20;
+		//beta += 20;
+
+		bool is_principal_variation = true;
 		
 		//cout << "Depth " << ply << endl;
 		int i = 0;
@@ -186,17 +190,48 @@ Move find_move_to_play(Pieces* ptr_player, Pieces* ptr_opponent, SearchAlgo algo
 				}
 
 				// Compute the score of this move
-				switch (algo) {
-					case NEGAMAX: 
-						score = -negamax_search(board, *ptr_opponent, *ptr_player, ply); 
-						break;
-					case PVS: 
-						score = -principal_variation_search(board, *ptr_opponent, *ptr_player, -beta, -alpha, ply, true); 
-						break;
-					default: 
-						score = -alphabeta_search(board, *ptr_opponent, *ptr_player, -beta, -alpha, ply); 
-						break;
+				if (is_principal_variation) {
+					switch (algo) {
+						case NEGAMAX: 
+							score = -negamax_search(board, *ptr_opponent, *ptr_player, ply); 
+							break;
+						case PVS: 
+							score = -principal_variation_search(board, *ptr_opponent, *ptr_player, -beta, -alpha, ply, true); 
+							break;
+						default: 
+							score = -alphabeta_search(board, *ptr_opponent, *ptr_player, -beta, -alpha, ply); 
+							break;
+					}
+					
 				}
+				else {
+					switch (algo) {
+						case NEGAMAX: 
+							score = -negamax_search(board, *ptr_opponent, *ptr_player, ply); 
+							break;
+						case PVS: 
+							score = -principal_variation_search(board, *ptr_opponent, *ptr_player, -alpha - 1, -alpha, ply, true); 
+							break;
+						default: 
+							score = -alphabeta_search(board, *ptr_opponent, *ptr_player, -alpha - 1, -alpha, ply); 
+							break;
+					}
+					if (alpha < score && score < beta) { // Re-search
+						//cout << ptr_move->get_san_notation() << " caused a research! alpha=" << alpha << " score=" << score << " beta=" << beta << endl;
+						switch (algo) {
+							case NEGAMAX: 
+								score = -negamax_search(board, *ptr_opponent, *ptr_player, ply); 
+								break;
+							case PVS: 
+								score = -principal_variation_search(board, *ptr_opponent, *ptr_player, -beta, -alpha, ply, true); 
+								break;
+							default: 
+								score = -alphabeta_search(board, *ptr_opponent, *ptr_player, -beta, -alpha, ply); 
+								break;
+						}	
+					}
+				}
+				is_principal_variation = false;
 			}
 
 			//cout << ptr_move->get_san_notation() << " : " << score << endl;
@@ -208,16 +243,20 @@ Move find_move_to_play(Pieces* ptr_player, Pieces* ptr_opponent, SearchAlgo algo
 			// If we have got a new best move, save it
 			if (is_legal_move && score > alpha) {
 				ptr_best_move = ptr_move;
-
+				//cout << "The new bm for " << ply << " is " << ptr_move->get_san_notation() << endl;
 				#ifdef TRANSPOSITIONS_TABLE	
 				//tt.save(board.zobrist.get_key(), score, alpha, beta, depth, *ptr_best_move);
 				if (score >= beta) {
 					// FIXME make only loosing time
-					//if (TT_STORE_CUTOFF) tt.save(board.zobrist.get_key(), score, LOWER, depth, *ptr_move);
+					if (TT_STORE_CUTOFF) tt.save(board.zobrist.get_key(), score, LOWER, depth, *ptr_move);
+					alpha = score;
+					break;
 				}		
 				#endif
 				
 				alpha = score;
+				
+			
 
 				if (root_search_debug) {
 					cout << setw(4) << ply;
@@ -225,7 +264,7 @@ Move find_move_to_play(Pieces* ptr_player, Pieces* ptr_opponent, SearchAlgo algo
 					cout << setw(wide) << setprecision(3) << double(clock() - start)/CLOCKS_PER_SEC;
 
 					if (calculated_nodes >= 1000000) {
-						cout << setw(wide - 1) << calculated_nodes / 1000000 << "M";
+						cout << setw(wide - 1) << setprecision(3) << calculated_nodes / 1000000.0 << "M";
 					}
 					else {
 						cout << setw(wide) << calculated_nodes;
@@ -261,6 +300,20 @@ Move find_move_to_play(Pieces* ptr_player, Pieces* ptr_opponent, SearchAlgo algo
 				}
 			}
 		}
+			
+
+		#ifdef TRANSPOSITIONS_TABLE	
+		/*
+		if (old_alpha == alpha) {
+			Move none;
+			tt.save(board.zobrist.get_key(), alpha, UPPER, depth, none);
+		}
+		*/
+		if (ptr_best_move) {
+			//cout << "The bm for " << ply << " is " << ptr_best_move->get_san_notation() << endl;
+			tt.save(board.zobrist.get_key(), alpha, EXACT, depth, *ptr_best_move);
+		}
+		#endif
 	}
 	
 	if (legal_move_found && ptr_best_move) {

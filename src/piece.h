@@ -20,6 +20,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <list>
+#include <vector>
 
 #include "common.h"
 
