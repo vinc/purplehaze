@@ -210,6 +210,7 @@ class Evaluation
 };
 
 int static_exchange_evaluation(Board board, Square square, Color player_color);
+int fast_eval(Board& board, Pieces& player_pieces, Pieces& opponent_pieces);
 int eval(Board& board, Pieces& engine, Pieces& opponent);
 bool is_in_check(Board& board, Pieces* ptr_pieces_player);
 bool is_promoting_pawn(Board& board);

@@ -33,6 +33,10 @@ class Board
 		Square en_passant;
 		int nb_repetitions;
 
+		#ifdef HISTORY_HEURISTIC
+		unsigned int history_counters[BOARD_SIZE][BOARD_SIZE]; 
+		#endif
+		
 		#ifdef KILLER_HEURISTIC
 		Move* killer_moves[2][MAX_DEPTH];
 		#endif
@@ -73,6 +77,17 @@ class Board
 		void inc_repetitions() {++nb_repetitions;};
 		void dec_repetitions() {--nb_repetitions;};
 		void reset_repetitions() {nb_repetitions = 0;};
+
+		#ifdef HISTORY_HEURISTIC
+		void inc_history(Square from, Square to, int depth) {
+			history_counters[from][to] = depth * depth;
+		};
+
+		int get_history(Square from, Square to) {
+			return history_counters[from][to];
+		};
+		#endif
+		
 		
 		/*
 		int get_distance(Square a, Square b) const;

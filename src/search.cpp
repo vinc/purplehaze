@@ -518,6 +518,21 @@ short principal_variation_search(Board& board, Pieces& player, Pieces& opponent,
 		//*/
 	}
 	#endif
+
+	#ifdef FUTILITY_PRUNING
+	bool futility_pruning = false;
+	int futility_margin[3] = {0, KNIGHT_VALUE, ROOK_VALUE};
+	
+    if (!is_in_check 
+	    && depth < 3 
+	    //&& abs(alpha) < 9000
+	    && alpha > -INF + MAX_DEPTH
+	    && beta < INF - MAX_DEPTH
+		&& fast_eval(board, player, opponent) + futility_margin[depth] <= alpha
+		){
+    	futility_pruning = true;
+	}
+	#endif
 	
 	bool is_principal_variation = true;
 	unsigned short moves_searched = 0; // Used for LMR
@@ -541,11 +556,26 @@ short principal_variation_search(Board& board, Pieces& player, Pieces& opponent,
 		is_still_in_check = is_attacked(board, s, c);
 		if (!is_still_in_check) {
 			legal_move_found = true;
-		
+
+			bool is_giving_check = is_attacked(board, 
+			    						opponent.get_ptr_king()->get_position(),
+			    						ptr_king_player->get_color());
+			
+			#ifdef FUTILITY_PRUNING
+			if (futility_pruning
+			    && ptr_move->get_type() != CAPTURE
+				&& ptr_move->get_promotion() == UNDEF_PIECE_TYPE
+			    && !is_giving_check
+			    ){
+				unmake_move(board, *ptr_move);
+				continue;
+			}
+			#endif
+			
 			// If we have captured the king, we won
 			if (ptr_move->get_ptr_captured_piece() && ptr_move->get_ptr_captured_piece()->get_type() == KING) {
 				unmake_move(board, *ptr_move);
-				score = INF - 100 + depth;
+				score = INF - MAX_DEPTH + depth;
 
 				#ifdef TRANSPOSITIONS_TABLE		
 				if (TT_STORE_CUTOFF/* && !is_principal_variation*/) tt.save(board.zobrist.get_key(), score, EXACT, depth, *ptr_move);
@@ -566,11 +596,6 @@ short principal_variation_search(Board& board, Pieces& player, Pieces& opponent,
 			else {
 				// Late move reduction
 				#ifdef LATE_MOVE_REDUCTION
-				s = opponent.get_ptr_king()->get_position();
-				//attackers = is_attacked_by(board, s, ptr_king_player->get_color());
-				//bool is_giving_check = (attackers.size() == 0) ? false : true;
-				bool is_giving_check = is_attacked(board, s, ptr_king_player->get_color());
-				
 				if (moves_searched >= 4
 					&& depth > 3
 					&& !is_still_in_check // Imposible here
@@ -598,13 +623,15 @@ short principal_variation_search(Board& board, Pieces& player, Pieces& opponent,
 				if (score >= beta) {
 					unmake_move(board, *ptr_move);
 					#ifdef TRANSPOSITIONS_TABLE			
-					//TODO false the results, mate score?
-					//if (TT_STORE_CUTOFF) tt.save(board.zobrist.get_key(), score, alpha, beta, depth, *ptr_move);
 					if (TT_STORE_CUTOFF/* && !is_principal_variation*/) tt.save(board.zobrist.get_key(), score, LOWER, depth, *ptr_move);
 					#endif
 
 					#ifdef KILLER_HEURISTIC
 					board.put_killer_move(ptr_move, board.ply);
+					#endif
+					
+					#ifdef HISTORY_HEURISTIC
+					board.inc_history(ptr_move->get_from(), ptr_move->get_to());
 					#endif
 					
 					//cout << "Fail-hard beta cutoff: alpha=" << alpha << " score=" << score << " beta=" << beta << endl;

@@ -371,6 +371,21 @@ bool is_draw(Board& board, Evaluation player, Evaluation opponent) {
 	}
 }
 
+int fast_eval(Board& board, Pieces& player_pieces, Pieces& opponent_pieces) {
+	int score = 0;
+
+	// Build stats for lazy eval
+	Evaluation player(player_pieces), opponent(opponent_pieces);
+	player.pre_build(board);
+	opponent.pre_build(board);
+	
+	// Lazy eval
+	score += player.get_lazy_eval();
+	score -= opponent.get_lazy_eval();
+
+	return score;
+}
+
 // Main
 int eval(Board& board, Pieces& player_pieces, Pieces& opponent_pieces) {
 	int score = 0;

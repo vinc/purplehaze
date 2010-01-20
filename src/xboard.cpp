@@ -69,9 +69,7 @@ void print_principal_variation(Move& variation_move, int depth, bool first_ply) 
 	if (depth > 0) {
 		make_move(board, variation_move);
 
-		Square s = ptr_king_player->get_position();
-		Pieces attackers = is_attacked_by(board, s, c);
-		if (attackers.size() != 0) {
+		if (is_attacked(board, ptr_king_player->get_position(), c)) {
 			cout << "+";
 		}
 		
@@ -79,9 +77,10 @@ void print_principal_variation(Move& variation_move, int depth, bool first_ply) 
 		if (ptr_trans) {
 			Move m = ptr_trans->get_best_move();
 			if (m.get_ptr_piece()) print_principal_variation(m, depth - 1, false);
+			else cout << " <NULL>";
 		}
 		else {
-			cout << " <HT>";
+			cout << " <EMPTY>";
 		}
 		unmake_move(board, variation_move);
 	}

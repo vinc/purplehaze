@@ -78,8 +78,15 @@ class Move
 	friend ostream& operator<<(ostream& out, const Move move);
 	
 	private:
+		/*
+		 * TODO We could remove the pointers and use only from and to,
+		 * for example :
+		 * Move::get_ptr_piece() {return board.get_ptr_piece(from);};
+		 * Move::get_ptr_capture() {return board.get_ptr_piece(to);};
+		 */
 		Piece* ptr_piece;
 		Piece* ptr_captured_piece;
+
 		unsigned int nb_repetitions; // From 0 to 50, used to save board.repetition
 		unsigned int score;
 		MoveType type;

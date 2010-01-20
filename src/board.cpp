@@ -38,11 +38,19 @@ Board::Board()	{
 	for (int i = 0; i < BOARD_SIZE; ++i) {
 		board[i] = 0;
 	}
-
+	ply = 0;
 	#ifdef KILLER_HEURISTIC
 	for (int i = 0; i < 2; ++i) {
 		for (int depth = 0; depth < MAX_DEPTH; ++depth) {
 			killer_moves[i][depth] = 0;
+		}
+	}
+	#endif
+	
+	#ifdef HISTORY_HEURISTIC
+	for (Square from = A1; from < BOARD_SIZE; ++from) {
+		for (Square to = A1; to < BOARD_SIZE; ++to) {
+			history_counters[from][to] = 0;
 		}
 	}
 	#endif
