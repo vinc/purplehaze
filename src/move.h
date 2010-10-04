@@ -83,6 +83,8 @@ class Move
 		 * for example :
 		 * Move::get_ptr_piece() {return board.get_ptr_piece(from);};
 		 * Move::get_ptr_capture() {return board.get_ptr_piece(to);};
+		 *
+		 * But we'll have to change make_move() and unmake_move()...
 		 */
 		Piece* ptr_piece;
 		Piece* ptr_captured_piece;

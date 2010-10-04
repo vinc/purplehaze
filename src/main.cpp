@@ -42,15 +42,20 @@ int main() {
 	cout <<	"This program comes with ABSOLUTELY NO WARRANTY; for details type 'show w'." << endl;
 	cout <<	"This is free software, and you are welcome to redistribute it" << endl;
 	cout <<	"under certain conditions; type 'show c' for details." << endl;
-	/*
+	
 	cout << endl;
+
+	/*
+	cout << "Size of Square: " << sizeof(Square) << endl;
+	cout << "Size of PieceType: " << sizeof(PieceType) << endl;
+	cout << "Size of MoveType: " << sizeof(MoveType) << endl;
 	cout << "Size of Move: " << sizeof(Move) << endl;
 	cout << "Size of Piece: " << sizeof(Piece) << endl;
 	cout << "Size of Board: " << sizeof(Board) << endl;
 	cout << "Size of Hash: " << sizeof(Hash) << endl;
 	cout << "Size of Zobrist: " << sizeof(Zobrist) << endl;
 	cout << "Size of Transposition: " << sizeof(Transposition) << endl;
-	*/
+	//*/
 
 	cout << endl;
 	cout << "Compiled with the following options: ";

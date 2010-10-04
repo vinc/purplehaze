@@ -31,14 +31,14 @@ using namespace std;
 #define CHECK_EXTENSION
 #define QUIESCENCE_SEARCH
 #define DELTA_PRUNING // Work well for a very little improvement
-#define MVV_LVA
+//#define MVV_LVA
 //#define SEE
-#define KILLER_HEURISTIC // FIXME Bad for perf
+//#define KILLER_HEURISTIC // FIXME Bad for perf
 //#define HISTORY_HEURISTIC
-#define TRANSPOSITIONS_TABLE
-#define NULL_MOVE_PRUNING // Increase size of tree
-#define FUTILITY_PRUNING
-#define LATE_MOVE_REDUCTION // FIXME Have a serious bug. FIXME Not anymore?
+//#define TRANSPOSITIONS_TABLE
+//#define NULL_MOVE_PRUNING // Increase size of tree
+//#define FUTILITY_PRUNING
+//#define LATE_MOVE_REDUCTION // FIXME Have a serious bug. FIXME Not anymore?
 
 
 /*

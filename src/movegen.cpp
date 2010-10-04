@@ -311,10 +311,8 @@ void make_move(Board& board, Move& move) {
 	// If it is a null move we are done here
 	if (move.get_type() == UNDEF_MOVE_TYPE) return;
 
-	
-
-	
-	bool is_repetition = true; // for the 50 repetitions
+	// True if the move does not reset the 50 repetitions counter
+	bool is_repetition = true;
 
 	move.get_ptr_piece()->inc_nb_moves();
 	switch (move.get_type()) {
@@ -344,6 +342,7 @@ void make_move(Board& board, Move& move) {
 				case C8: s = D8; break;
 				default: s = OUT; break;
 			}
+			assert(s != OUT);
 			board.set_ptr_piece(move.get_ptr_captured_piece(), s);
 			move.get_ptr_captured_piece()->inc_nb_moves();
 			Color color;

@@ -1,7 +1,23 @@
 PurpleHaze Chess engine
 
-For latest Information visit:
+This project started during the winter of 2006/2007 as an excuse to learn with a real project how to write object oriented code in Java but the result was deadly slow. Then it stopped during almost two years while I learned about algorithms in chess engine by reading thirty years of (passioning) scientific papers on the subject.
 
-http://purplehaze.elmu.org/
+The project started again from scratch during the summer of 2009 again as an excuse to learn properly a new language. This time it was C++ and the result was much better. It continued on and off until early 2010 when it become clear that it needed a major re-factoring.
+
+The specifications of a new version is partially written but the present version is from a previous one with a lot of bugs and some features not properly working. Therefor it must be considered as a draft. I must add that some algorithms and most of its ideas come from the Computer Chess Club Forums (http://talkchess.com/forum/) and the Chess Programming Wiki (http://chessprogramming.wikispaces.com/).
+
+PurpleHaze's features are:
+* Opening book
+* Check Extension
+* Quiescence Search
+* Delta Pruning
+* Most Valuable Victim / Least Valuable Aggressor
+* Static Exchange Evaluation
+* Killer Heuristic
+* History Heuristic
+* Transposition Table
+* Null Move Pruning
+* Futility Pruning
+* Late Move Reduction
 
 See INSTALL for installation instructions.

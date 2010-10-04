@@ -493,7 +493,7 @@ short principal_variation_search(Board& board, Pieces& player, Pieces& opponent,
 	
 	// Null move pruning
 	#ifdef NULL_MOVE_PRUNING
-	if (!is_in_check && null_move_pruning && depth > 3) {
+	if (!is_in_check && null_move_pruning && depth > REDUCED_DEPTH) {
 		// This object change the node count, even if not used...
 		Move null_move;
 
