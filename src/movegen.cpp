@@ -145,8 +145,12 @@ Moves Game::movegen(bool captures_only) {
     if (current_node().can_castle(c, KING)) {
 	Square from = Square(E1 + A8 * c);
 	Square to = Square(G1 + A8 * c);
+	Square rook = Square(H1 + A8 * c);
 	if (!board.is_empty(Square(F1 + A8 * c)) &&
-	    !board.is_empty(to)) { //&&
+	    !board.is_empty(to) &&
+	    //!board.is_empty(rook) &&
+	    !board.get_piece(rook).get_type() == ROOK &&
+	    !board.get_piece(rook).get_color() == c) { //&&
 	    //!is_attacked_by(from) &&
 	    //!is_attacked_by(Square((F1 + A8 * c))) &&
 	    //!is_attacked_by(to)) {
@@ -156,9 +160,13 @@ Moves Game::movegen(bool captures_only) {
     if (current_node().can_castle(c, QUEEN)) {
 	Square from = Square(E1 + A8 * c);
 	Square to = Square(C1 + A8 * c);
+	Square rook = Square(A1 + A8 * c);
 	if (!board.is_empty(Square(B1 + A8 * c)) &&
 	    !board.is_empty(Square(D1 + A8 * c)) &&
-	    !board.is_empty(to)) { //&&
+	    !board.is_empty(to) &&
+	    //!board.is_empty(rook) &&
+	    !board.get_piece(rook).get_type() == ROOK &&
+	    !board.get_piece(rook).get_color() == c) { //&&
 	    //!is_attacked_by(from) &&
 	    //!is_attacked_by(Square((D1 + A8 * c))) &&
 	    //!is_attacked_by(to)) {
@@ -172,21 +180,41 @@ Moves Game::movegen(bool captures_only) {
 void Game::make_move(Move m) {
     Square orig = m.get_orig();
     Square dest = m.get_dest();
+    Square ep = current_node().get_en_passant();
+    Color c = current_node().get_turn_color();
+    Piece p = board.get_piece(orig);
     Piece capture;
+    
+    new_node(); // From now on, current_node() is refering to the new node
+    
+    // Update castling rights
+    PieceType t = p.get_type();
+    if (current_node().can_castle(c, KING) && (t == KING || t == ROOK)) {
+	current_node().set_castle_right(c, KING, false);
+    }
+    if (current_node().can_castle(c, QUEEN) && (t == KING || t == ROOK)) {
+	current_node().set_castle_right(c, QUEEN, false);
+    }
+    
     if (m.is_capture()) {
 	Square s = dest;
 	if (m.is_en_passant()) {
-	    Square ep = current_node().get_en_passant();
-	    Color c = current_node().get_turn_color();
 	    s = (c == BLACK ? Square(ep + UP) : Square(ep + DOWN));
 	}
 	capture = board.get_piece(s);
+	if (capture.get_type() == ROOK) { // Update opponent's castling rights
+	    if (dest == Square(H1 + A8 * c)) {
+		current_node().set_castle_right(Color(!c), KING, false);
+	    }
+	    else if (dest == Square(A1 + A8 * c)) {
+		    current_node().set_castle_right(Color(!c), QUEEN, false);
+	    }
+	}
 	del_piece(capture);
     }
-    // TODO: get color, and put new_node() here
+
     if (m.is_castle()) {
 	Square rook_orig, rook_dest;
-	Color c = current_node().get_turn_color();
 	switch (m.get_castle_side()) {
 	    case KING:
 		rook_orig = Square(H1 + A8 * c); 
@@ -203,10 +231,9 @@ void Game::make_move(Move m) {
 	board.set_piece(Piece(), rook_orig);
 	board.set_piece(rook, rook_dest);
 	pieces.set_position(rook, rook_dest);
-	//current_node().set_castle_right(c, KING, false);
-	//current_node().set_castle_right(c, QUEEN, false);
     }
-    Piece p = board.get_piece(orig);
+
+    // Move the piece
     board.set_piece(Piece(), orig);
     if (m.is_promotion()) {
 	add_piece(p.get_color(), m.get_promotion_type(), dest);
@@ -216,8 +243,8 @@ void Game::make_move(Move m) {
 	board.set_piece(p, dest);
 	pieces.set_position(p, dest);
     }
-
-    new_node();
+    
+    // Update en passant
     current_node().set_capture(capture);
     if (m.is_double_pawn_push()) {
 	Square ep = Square(orig + (dest - orig) / 2);
