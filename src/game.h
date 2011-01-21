@@ -15,24 +15,42 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <assert.h>
-#include <iostream>
-#include <list>
-#include <vector>
+#ifndef GAME_H
+#define GAME_H
 
-#include "game.h"
+#include <stack>
+#include <string>
 
-using namespace std;
+#include "pieces.h"
+#include "board.h"
+#include "moves.h"
+#include "node.h"
 
-int Game::perft(int depth) {
-    int nodes_count = 0;
-    if (depth == 0) return 1;
-    Moves moves = movegen();
-    for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
-	//cout << *moves.it << endl;
-	make_move(*moves.it);
-	nodes_count += perft(depth - 1);
-	undo_move(*moves.it);
-    }
-    return nodes_count;
-}
+class Game
+{
+    private:
+	stack<Node> tree;
+    public:
+	Pieces pieces;
+	Board board;
+	Game();
+	void add_piece(Color c, PieceType t, Square s);
+	void del_piece(Piece p) {
+	    del_piece(p.get_color(), p.get_type(), p.get_index());
+	};
+	void del_piece(Color c, PieceType t, int i);
+	
+	void new_node();
+	void del_node();
+	Node& current_node() { return tree.top(); };
+
+	void init(string fen);
+
+	Moves movegen(bool captures_only = false);
+	void make_move(Move m);
+	void undo_move(Move m);
+	
+	int perft(int depth);
+};
+
+#endif /* !GAME_H */

@@ -1,0 +1,51 @@
+/* PurpleHaze 2.0.0
+ * Copyright (C) 2007-2011  Vincent Ollivier
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef PIECES_H
+#define PIECES_H
+
+#include "common.h"
+#include "piece.h"
+
+class Pieces
+{
+    private:
+	Square positions[2][7][9];
+	short nb_pieces[2][7];
+	//friend class Game;
+    public:
+	Pieces();
+	Square get_position(Piece p) const {
+	    return positions[p.get_color()][p.get_type()][p.get_index()];
+	};
+	Square get_position(Color c, PieceType t, int i) const { 
+	    return positions[c][t][i];
+	};
+	void set_position(Piece p, Square s) {
+	    positions[p.get_color()][p.get_type()][p.get_index()] = s;
+	};
+	void set_position(Color c, PieceType t, int i, Square s) { 
+	    positions[c][t][i] = s;
+	};
+	short get_nb_pieces(Color c, PieceType t) { return nb_pieces[c][t]; };
+
+	// FIXME? No warning if nb < 0 or nb > 9
+	void inc_nb_pieces(Color c, PieceType t) { nb_pieces[c][t]++; };
+	void dec_nb_pieces(Color c, PieceType t) { nb_pieces[c][t]--; };
+};
+
+#endif /* !PIECESL_H */

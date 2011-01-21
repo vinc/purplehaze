@@ -15,24 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <assert.h>
-#include <iostream>
-#include <list>
-#include <vector>
+//#include <iostream>
+//using namespace std;
 
-#include "game.h"
+#include "node.h"
 
-using namespace std;
+Node::Node() {
+    side_to_move = WHITE;
+    half_move_counter = 0;
+    score = 0;
+    ply = 0;
+    en_passant = OUT;
+    castle_rights = 0; //0xF;
+    //capture = Piece();
+}
 
-int Game::perft(int depth) {
-    int nodes_count = 0;
-    if (depth == 0) return 1;
-    Moves moves = movegen();
-    for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
-	//cout << *moves.it << endl;
-	make_move(*moves.it);
-	nodes_count += perft(depth - 1);
-	undo_move(*moves.it);
-    }
-    return nodes_count;
+bool Node::can_castle(Color c, PieceType t) const {
+    return castle_rights[2 * c + t - QUEEN];
+}
+void Node::set_castle_right(Color c, PieceType t, bool b) {
+    castle_rights.set(2 * c + t - QUEEN, b);
 }

@@ -15,24 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <assert.h>
-#include <iostream>
-#include <list>
-#include <vector>
+#include "pieces.h"
 
-#include "game.h"
+Pieces::Pieces() {
+    /* Unused indexes during the game should not be expected to remain 
+     * equal to OUT, but rather to the value of the previous piece 
+     * occuping this index.
+     *
+     * Great care should be taken when updating the indexes counters 
+     * to remain within 0 and 9 because no verifications are done in
+     * this class.
+     */
 
-using namespace std;
-
-int Game::perft(int depth) {
-    int nodes_count = 0;
-    if (depth == 0) return 1;
-    Moves moves = movegen();
-    for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
-	//cout << *moves.it << endl;
-	make_move(*moves.it);
-	nodes_count += perft(depth - 1);
-	undo_move(*moves.it);
+    for (int i = 0; i < 2; ++i) {
+	for (int j = 0; j < 7; ++j) {
+	    nb_pieces[i][j] = 0;
+	    for (int k = 0; k < 9; ++k) {
+		positions[i][j][k] = OUT;
+	    }
+	}
     }
-    return nodes_count;
 }

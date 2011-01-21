@@ -1,8 +1,8 @@
-For compiling PurpleHaze type
+For compiling PurpleHaze:
 
-	make clean
-	make
-	
-And then for playing type
+    make clean
+    make
 
-	./purplehaze
+For using PurpleHaze:
+
+    ./purplehaze

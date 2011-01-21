@@ -15,24 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <assert.h>
-#include <iostream>
-#include <list>
-#include <vector>
+#include "moves.h"
 
-#include "game.h"
-
-using namespace std;
-
-int Game::perft(int depth) {
-    int nodes_count = 0;
-    if (depth == 0) return 1;
-    Moves moves = movegen();
-    for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
-	//cout << *moves.it << endl;
-	make_move(*moves.it);
-	nodes_count += perft(depth - 1);
-	undo_move(*moves.it);
-    }
-    return nodes_count;
+Moves::Moves() {
+    
 }

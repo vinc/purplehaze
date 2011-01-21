@@ -1,160 +1,89 @@
-/*  PurpleHaze 1.0
-    Copyright (C) 2007-2009  Vincent Ollivier
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-#include <list>
-#include <vector>
+/* PurpleHaze 2.0.0
+ * Copyright (C) 2007-2011  Vincent Ollivier
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #ifndef MOVE_H
 #define MOVE_H
 
-const int NB_ROOK_MOVES = 4;
-const MoveOrientation ROOK_MOVES[NB_ROOK_MOVES] = {
-	UP,
-	RIGHT,
-	DOWN,
-	LEFT
-};
+#include <bitset>
 
-const int NB_BISHOP_MOVES = 4;
-const MoveOrientation BISHOP_MOVES[NB_BISHOP_MOVES] = {
-	UP_RIGHT,
-	DOWN_RIGHT,
-	DOWN_LEFT,
-	UP_LEFT
-};
+#include "common.h"
 
-const int NB_KNIGHT_MOVES = 8;
-const MoveOrientation KNIGHT_MOVES[NB_KNIGHT_MOVES] = {
-	UP_UP_RIGHT, 
-	RIGHT_UP_RIGHT, 
-	RIGHT_DOWN_RIGHT, 
-	DOWN_DOWN_RIGHT, 
-	DOWN_DOWN_LEFT, 
-	LEFT_DOWN_LEFT, 
-	LEFT_UP_LEFT, 
-	UP_UP_LEFT
-};
+using namespace std;
 
-const int NB_QUEEN_MOVES = 8;
-const MoveOrientation QUEEN_MOVES[NB_QUEEN_MOVES] = {
-	UP,
-	UP_RIGHT,
-	RIGHT,
-	DOWN_RIGHT,
-	DOWN,
-	DOWN_LEFT,
-	LEFT,
-	UP_LEFT
-};
-
-const int NB_KING_MOVES = 8;
-const MoveOrientation KING_MOVES[NB_KING_MOVES] = {
-	UP,
-	UP_RIGHT,
-	RIGHT,
-	DOWN_RIGHT,
-	DOWN,
-	DOWN_LEFT,
-	LEFT,
-	UP_LEFT
-};
-
-class Move
-{
-	friend ostream& operator<<(ostream& out, const Move move);
-	
-	private:
-		/*
-		 * TODO We could remove the pointers and use only from and to,
-		 * for example :
-		 * Move::get_ptr_piece() {return board.get_ptr_piece(from);};
-		 * Move::get_ptr_capture() {return board.get_ptr_piece(to);};
-		 *
-		 * But we'll have to change make_move() and unmake_move()...
-		 */
-		Piece* ptr_piece;
-		Piece* ptr_captured_piece;
-
-		unsigned int nb_repetitions; // From 0 to 50, used to save board.repetition
-		unsigned int score;
-		MoveType type;
-		PieceType promotion;
-		Square en_passant;
-		Square from;
-		Square to;
-		
-	public:
-		/*
-		static int moves_counter;
-		static int captures_counter;
-		static int castles_counter;
-		*/
-		Move();
-		~Move();
-		Move(Piece* p, Square a, Square b);
-		Move(Piece* p, Square a, Square b, PieceType promote);
-		Move(Piece* p, Square a, Square b, Square ep);
-		Move(Piece* p, Square a, Square b, MoveType t);
-		Move(Piece* p, Square a, Square b, MoveType t, PieceType promote);
-		Move(Piece* p, Square a, Square b, Piece* c);
-		Move(Piece* p, Square a, Square b, Piece* c, PieceType promote);
-		Move(Piece* p, Square a, Square b, Piece* c, MoveType t);
-		Move(Piece* p, Square a, Square b, Piece* c, MoveType t, PieceType promote);
-		//Move& operator=( Move& move);
-		bool operator<(const Move& move) const;
-		bool operator==(const Move& move) const;
-		bool operator!=(const Move& move) const {return (*this == move ? false : true);};		
-		MoveType get_type() const {return type;};
-		Piece* get_ptr_piece() const {return ptr_piece;};
-		Piece* get_ptr_captured_piece() const {return ptr_captured_piece;};
-		PieceType get_promotion() const {return promotion;};
-		Square get_from() const {return from;};
-		Square get_to() const {return to;};
-		string get_xboard_notation();
-		Square get_en_passant() const {return en_passant;};
-		void set_en_passant(Square ep);
-		void set_repetitions(unsigned int r);
-		unsigned int get_repetitions() const {return nb_repetitions;};
-		unsigned int get_score() const {return score;};
-		void set_score(int s);
-		//const char* get_san_notation() const;
-		string get_san_notation() const;
-};
-
-class Moves
-{
-	private:
-		list<Move> moves;
-	public:
-		Moves();
-		//~Moves();
-		//Moves(Moves& moves);
-		void insert(Move& move, Position position);
-		Move* get_ptr_move() {return (Move*) &*iterator;};
-		//typedef std::set<Move>::iterator iterator;
-		list<Move>::iterator iterator;
-		list<Move>::iterator begin() {return moves.begin();};
-		list<Move>::iterator end() {return moves.end();};
-		int size() {return moves.size();};
-		void clear() {/*moves.clear();*/}; // FIXME Seems useless
-		void sort() {moves.sort();};
-		void unique() {moves.unique();};
-		void order(/*Board& board,*/ Move* ptr_best_move/*, int ply*/);
-		void print();
+class Move {
+    friend ostream& operator<<(ostream& out, const Move move);
+    private:
+	/*
+	 * A move is coded using 16 bits:
+	 *     4 bits for the type
+	 *     3 bits for the destination square rank
+	 *     3 bits for the destination square file 
+	 *     3 bits for the origin square rank
+	 *     3 bits for the origin square file 
+	 */
+	bitset<16> code;
+	Move(bitset<16> c) : code(c) {}
+    public:
+	Move(Square o = A1, Square d = A1, MoveType t = NULL_MOVE);
+	File get_orig_file() const {
+	    return File((code >> 13).to_ulong());
+	};
+	Rank get_orig_rank() const {
+	    return Rank(((code << 3) >> 13).to_ulong());
+	};
+	Square get_orig() const {
+	    //return Square(16 * get_orig_rank() + get_orig_file());
+	    return Square(16 * ((code << 3) >> 13).to_ulong()
+			     + (code >> 13).to_ulong());
+	};
+	File get_dest_file() const {
+	    return File(((code << 6) >> 13).to_ulong());
+	};
+	Rank get_dest_rank() const {
+	    return Rank(((code << 9) >> 13).to_ulong());
+	};
+	Square get_dest() const {
+	    return Square(16 * ((code << 9) >> 13).to_ulong()
+			     + ((code << 6) >> 13).to_ulong());
+	};
+	MoveType get_type() const {
+	    return MoveType(((code << 12) >> 12).to_ulong());
+	};
+	//bool is_capture() { return code[2]; }; // w/o null move
+	bool is_capture() const {
+	    return code[2] && (!is_null());
+	}; 
+	bool is_castle() const {
+	    return !code[3] && !code[2] && code[1];
+	};
+	bool is_promotion() const {
+	    return code[3];
+	};
+	bool is_double_pawn_push() const {
+	    return get_type() == DOUBLE_PAWN_PUSH;
+	};
+	bool is_en_passant() const {
+	    return get_type() == EN_PASSANT;
+	};
+	bool is_null() const {
+	    return get_type() == NULL_MOVE;
+	};
+	PieceType get_promotion_type() const;
+	PieceType get_castle_side() const;
 };
 
 #endif /* !MOVE_H */
