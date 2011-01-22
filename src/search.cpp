@@ -26,12 +26,15 @@ using namespace std;
 
 int Game::perft(int depth) {
     int nodes_count = 0;
+    Color c = current_node().get_turn_color();
     if (depth == 0) return 1;
     Moves moves = movegen();
     for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
 	//cout << *moves.it << endl;
 	make_move(*moves.it);
-	nodes_count += perft(depth - 1);
+	if (!is_check(c)) {
+	    nodes_count += perft(depth - 1);
+	}
 	undo_move(*moves.it);
     }
     return nodes_count;

@@ -19,6 +19,8 @@
 #define GAME_H
 
 #include <stack>
+#include <list>
+#include <bitset>
 #include <string>
 
 #include "pieces.h"
@@ -30,7 +32,10 @@ class Game
 {
     private:
 	stack<Node> tree;
+	bitset<7> attack_array[240];
+	Direction dir_array[240];
     public:
+	list<Move> moves_history; // Temporary
 	Pieces pieces;
 	Board board;
 	Game();
@@ -45,6 +50,18 @@ class Game
 	Node& current_node() { return tree.top(); };
 
 	void init(string fen);
+
+	bool can_attack(PieceType t, Square from, Square to) const {
+	    return bool(attack_array[0x77 + from - to][t]);
+	}
+	Direction get_direction_to(Square from, Square to) const {
+	    return dir_array[0x77 + from - to];
+	}
+
+	bool is_attacked_by(Color c, Square s) const;
+	bool is_check(Color c) const {
+	    return is_attacked_by(Color(!c), pieces.get_position(c, KING, 0));
+	}
 
 	Moves movegen(bool captures_only = false);
 	void make_move(Move m);

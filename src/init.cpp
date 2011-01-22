@@ -36,6 +36,8 @@ void Game::init(string fen) {
     //cout << "Cleaning the board..." << endl;
     board = Board();
     pieces = Pieces();
+    while (!tree.empty()) tree.pop();
+    tree.push(Node());
     
     if (FEN_DEBUG) cout << "FEN: parsing: " << fen << endl;
     // Parse the FEN for discovering pieces
@@ -61,8 +63,8 @@ void Game::init(string fen) {
 	// Non empty square
 	else {
 	    // define a new piece
-	    Color c;
-	    PieceType t;
+	    Color c = WHITE;
+	    PieceType t = EMPTY;
 	    switch (*it) {
 		case 'p': c = BLACK, t = PAWN; break;
 		case 'n': c = BLACK, t = KNIGHT; break;
@@ -76,7 +78,7 @@ void Game::init(string fen) {
 		case 'R': c = WHITE, t = ROOK; break;
 		case 'Q': c = WHITE, t = QUEEN; break;
 		case 'K': c = WHITE, t = KING; break;
-		default: break;
+		default: assert(false);
 	    }
 
 	    add_piece(c, t, s);
@@ -88,7 +90,8 @@ void Game::init(string fen) {
 	    s = Square(s + 1);
 	}
     }
-    ++it;
+    assert(*it == ' ');
+    ++it; // Skip the space separator
 
     // Set the side to move
     switch(*it) {
@@ -104,16 +107,13 @@ void Game::init(string fen) {
 	    assert(!"FEN: could not found the site to move!");
 	    break;
     }
-    ++it; // Skip the space char
-    ++it;
+    ++it; // Pass side to move
+
+    assert(*it == ' ');
+    ++it; // Skip the space separator
 
     // Parse the FEN for discovering castling abilities
-    for (; it != fen.end(); ++it) {
-
-	//cout << "FEN: parse castle: " << *it << endl;
-	if (*it == ' ') {
-	    break; // Exit loop
-	}
+    for (; *it != ' '; ++it) {
 	switch(*it) {
 	    case '-': break;
 	    case 'K': current_node().set_castle_right(WHITE, KING); break;
@@ -122,7 +122,8 @@ void Game::init(string fen) {
 	    case 'q': current_node().set_castle_right(BLACK, QUEEN); break;
 	}
     }
-    ++it;
+    assert(*it == ' ');
+    ++it; // Skip the space separator
 
     // Set the en passant square if any
     if (*it != '-') {
@@ -130,16 +131,21 @@ void Game::init(string fen) {
 	++it;
 	char rank = *it;
 	Square s = Square((rank - '1') * 16 + file - 'a');
-	current_node().set_en_passant(s);
-	if (FEN_DEBUG) {
-	    cout << "FEN: en passant square fixed to ";
-	    cout << static_cast<char>(97 + (s & 7));
-	    cout << 1 + (s >> 4) << endl;
+	if (board.is_out(s)) it = it - 3; // Bugged FEN
+	else {
+	    current_node().set_en_passant(s);
+	    if (FEN_DEBUG) {
+		cout << "FEN: en passant square fixed to ";
+		cout << char(file) << char(rank) << endl;
+	    }
 	}
     }
-    ++it; // Skip the space char
     ++it;
-
+    if (it == fen.end()) return;
+    assert(*it == ' ');
+    ++it; // Skip the space separator
+    
+    /*
     // Parse the FEN for setting the 50 moves counter
     int half_move = 0;
     for (; it != fen.end(); ++it) {
@@ -156,5 +162,6 @@ void Game::init(string fen) {
 	    half_move = half_move * 10 + *it - '0';
 	}
     }
-    ++it;	
+    ++it;
+    */
 }

@@ -18,6 +18,9 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#include <list>
+#include <vector>
+
 static const int BOARD_SIZE = 128;
 
 enum Square {
@@ -105,6 +108,32 @@ enum MoveType : unsigned char {
     BISHOP_PROMOTION_CAPTURE,
     ROOK_PROMOTION_CAPTURE,
     QUEEN_PROMOTION_CAPTURE
+};
+
+// Used in movegen.cpp and attack.cpp
+typedef std::list<Direction> Directions;
+const Directions NO_DIRS = { 
+    NO_DIR
+};
+const Directions KNIGHT_DIRS = {
+    UP_UP_RIGHT, RIGHT_UP_RIGHT, RIGHT_DOWN_RIGHT, DOWN_DOWN_RIGHT, 
+    DOWN_DOWN_LEFT, LEFT_DOWN_LEFT, LEFT_UP_LEFT, UP_UP_LEFT
+};
+const Directions BISHOP_DIRS = {
+    UP_RIGHT, DOWN_RIGHT, DOWN_LEFT, UP_LEFT
+};
+const Directions ROOK_DIRS = {
+    UP, RIGHT, DOWN, LEFT
+};
+const Directions QUEEN_DIRS = {
+    UP, UP_RIGHT, RIGHT, DOWN_RIGHT, DOWN, DOWN_LEFT, LEFT, UP_LEFT
+};
+const Directions KING_DIRS = {
+    UP, UP_RIGHT, RIGHT, DOWN_RIGHT, DOWN, DOWN_LEFT, LEFT, UP_LEFT
+};
+const std::vector<Directions> PIECES_DIRS = {
+    NO_DIRS, NO_DIRS, // Dummy for EMPTY and PAWN
+    KNIGHT_DIRS, BISHOP_DIRS, ROOK_DIRS, QUEEN_DIRS, KING_DIRS
 };
 
 #endif /* !COMMON_H */

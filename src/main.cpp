@@ -21,11 +21,11 @@
 #include <stdio.h>
 #include <time.h>
 
+#include "common.h"
 #include "game.h"
 
 using namespace std;
 
-Game game;
 string version = "PurpleHaze 2.0.0";
 
 string prompt() {
@@ -39,6 +39,8 @@ int main() {
     cout << version << endl;
     cout << endl;
     // Parse commands from CLI
+    Game game;
+    game.init("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     string cmd = prompt();
     while (cmd != "quit" && cmd != "exit") {
 	if (cmd == "xboard") { // Xboard protocol mode
@@ -49,8 +51,7 @@ int main() {
 	    cout << version << endl;
 	}
 	else if (cmd == "perft") {
-	    game.init("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-	    for (int i = 0; ; ++i) {
+	    for (int i = 1; ; ++i) {
 		clock_t start = clock();
 		int perft_result = game.perft(i);
 		double perft_time = double(clock() - start) / CLOCKS_PER_SEC;
@@ -58,6 +59,35 @@ int main() {
 		cout << " (" << perft_time << " secs, ";
 		cout << perft_result / perft_time << " nps)" << endl;
 	    }
+	}
+	else if (cmd == "setboard") {
+	    // Get FEN
+	    string fen;
+	    getline(cin, fen);
+	    fen.erase(0, 1); // Remove the first whitespace
+	    game.init(fen);
+	}
+	else if (cmd == "divide") {
+	    int depth = 0;
+	    cin >> depth;
+	    Color c = game.current_node().get_turn_color();
+	    int nodes_count = 0;
+	    int moves_count = 0;
+	    Moves moves = game.movegen();
+	    for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
+		game.make_move(*moves.it);
+		if (!game.is_check(c)) {
+		    int cnt = game.perft(depth - 1);
+		    nodes_count += cnt;
+		    moves_count++;
+		    cout << *moves.it << " " << cnt << endl;
+		}
+		game.undo_move(*moves.it);
+	    }
+	    cout << endl;
+	    cout << "Moves: " << moves_count << endl;
+	    cout << "Nodes: " << nodes_count << endl;
+
 	}
 	cmd = prompt();
     }	
