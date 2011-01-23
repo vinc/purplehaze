@@ -34,6 +34,8 @@ class Moves
 	list<Move>::iterator it;
 	list<Move>::iterator begin() { return moves.begin(); };
 	list<Move>::iterator end() { return moves.end(); };
+
+	void numeric_sort() { moves.sort(Move::numeric_comp); };
 };
 
 #endif /* !MOVES_H */

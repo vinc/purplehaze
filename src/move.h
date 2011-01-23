@@ -84,6 +84,11 @@ class Move {
 	};
 	PieceType get_promotion_type() const;
 	PieceType get_castle_side() const;
+
+	// Static member function for sorting move in natural order
+	static bool numeric_comp(Move a, Move b) {
+	    return (a.code.to_ulong() < b.code.to_ulong());
+	};
 };
 
 #endif /* !MOVE_H */

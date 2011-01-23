@@ -70,10 +70,12 @@ int main() {
 	else if (cmd == "divide") {
 	    int depth = 0;
 	    cin >> depth;
+	    cout << endl;
 	    Color c = game.current_node().get_turn_color();
 	    int nodes_count = 0;
 	    int moves_count = 0;
 	    Moves moves = game.movegen();
+	    moves.numeric_sort();
 	    for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
 		game.make_move(*moves.it);
 		if (!game.is_check(c)) {
