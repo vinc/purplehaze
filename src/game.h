@@ -68,6 +68,9 @@ class Game
 	void undo_move(Move m);
 	
 	int perft(int depth);
+	
+	// Position's evaluation
+	int eval();
 };
 
 #endif /* !GAME_H */
