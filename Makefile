@@ -9,7 +9,7 @@ EXECUTABLE=purplehaze
 all: $(SOURCES) $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
-	$(CXX) -o $@ $(OBJECTS) #-lprofiler
+	$(CXX) -o $@ $(OBJECTS)
 
 clean:
 	rm -f $(OBJECTS) $(EXECUTABLE)
