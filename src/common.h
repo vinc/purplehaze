@@ -21,7 +21,8 @@
 #include <list>
 #include <vector>
 
-static const int BOARD_SIZE = 128;
+#define BOARD_SIZE    128
+#define INF	    29999
 
 enum Square {
     A1=0x00, B1, C1, D1, E1, F1, G1, H1,

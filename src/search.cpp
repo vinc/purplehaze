@@ -39,3 +39,50 @@ int Game::perft(int depth) {
     }
     return nodes_count;
 }
+
+
+int Game::search(int depth) {
+    if (depth == 0) return eval();
+
+    int score = -INF;
+    int best_score = -INF;
+    Color player = current_node().get_turn_color();
+    Moves moves = movegen();
+    for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
+	Move move = *moves.it;
+	make_move(move);
+	if (!is_check(player)) {
+	    score = -search(depth - 1);
+	    if (score > best_score) {
+		best_score = score;
+	    } 
+	}
+	undo_move(*moves.it);
+    }
+    return best_score;
+}
+
+Move Game::root(int max_depth) {
+    int score = -INF;
+    int best_score = -INF;
+    Move best_move;
+    Color player = current_node().get_turn_color();
+    Moves moves = movegen();
+    for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
+	Move move = *moves.it;
+	make_move(move);
+	if (!is_check(player)) {
+	    score = -search(max_depth - 1);
+	    cout << move << " " << score;
+	    if (score > best_score) {
+		best_score = score;
+		best_move = move;
+		cout << " <- new best move";
+	    } 
+	    cout << endl;
+	}
+	undo_move(*moves.it);
+    }
+    cout << "Best move: " << best_move << endl;
+    return best_move;
+}

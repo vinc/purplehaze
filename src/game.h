@@ -67,7 +67,10 @@ class Game
 	void make_move(Move m);
 	void undo_move(Move m);
 	
+	// Search
 	int perft(int depth);
+	int search(int depth);
+	Move root(int max_depth);
 	
 	// Position's evaluation
 	int eval();

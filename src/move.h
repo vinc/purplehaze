@@ -89,6 +89,13 @@ class Move {
 	static bool numeric_comp(Move a, Move b) {
 	    return (a.code.to_ulong() < b.code.to_ulong());
 	};
+	
+	bool operator==(const Move& other) const {
+	    return this->code == other.code;
+	}
+	bool operator!=(const Move& other) const {
+	    return !(*this == other);
+	}
 };
 
 #endif /* !MOVE_H */
