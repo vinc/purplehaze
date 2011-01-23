@@ -73,6 +73,7 @@ class Game
 	Move root(int max_depth);
 	
 	// Position's evaluation
+	int piece_eval(Color c, PieceType t, int i);
 	int eval();
 };
 

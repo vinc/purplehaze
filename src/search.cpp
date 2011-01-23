@@ -83,6 +83,8 @@ Move Game::root(int max_depth) {
 	}
 	undo_move(*moves.it);
     }
+    cout << endl;
     cout << "Best move: " << best_move << endl;
+    cout << endl;
     return best_move;
 }

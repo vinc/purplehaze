@@ -23,15 +23,45 @@
 
 using namespace std;
 
+int Game::piece_eval(Color c, PieceType t, int i) {
+    Square s = pieces.get_position(c, t, i);
+    const int* pcsq_table;
+    switch (t) {
+	case PAWN:   pcsq_table = PAWN_PCSQ;   break;
+	case KNIGHT: pcsq_table = KNIGHT_PCSQ; break;
+	case BISHOP: pcsq_table = BISHOP_PCSQ; break;
+	case ROOK:   pcsq_table = ROOK_PCSQ;   break;
+	case QUEEN:  pcsq_table = QUEEN_PCSQ;  break;
+	case KING:   pcsq_table = KING_PCSQ;   break;
+	default: assert(false);
+    }
+    switch (c) {
+	case WHITE: return pcsq_table[s];
+	case BLACK: return pcsq_table[FLIP[s]];
+    }	
+}
+
 int Game::eval() {
     int score = 0;
     Color player = current_node().get_turn_color();
     Color opponent = Color(!player);
     
     for (PieceType t = PAWN; t <= KING; t = PieceType(t + 1)) {
-	score += PIECE_VALUE[t] * pieces.get_nb_pieces(player, t);
-	score -= PIECE_VALUE[t] * pieces.get_nb_pieces(opponent, t);
-    }     
+	int n_player = pieces.get_nb_pieces(player, t);
+	int n_opponent = pieces.get_nb_pieces(opponent, t);
+	
+	// Material values
+	score += PIECE_VALUE[t] * n_player;
+	score -= PIECE_VALUE[t] * n_opponent;
+
+	// PCSQ Tables
+	for (int i = 0; i < n_player; ++i) {
+	    score += piece_eval(player, t, i);
+	}
+	for (int i = 0; i < n_opponent; ++i) {
+	    score -= piece_eval(opponent, t, i);
+	}
+    }
 
     return score;
 }
