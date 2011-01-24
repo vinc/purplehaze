@@ -38,7 +38,7 @@ void movegen_pieces(Board& board, Pieces& pieces, Moves& moves,
 		    moves.add(Move(from, to, CAPTURE));
 		    break;
 		}
-		else if (!captures_only) moves.add(Move(from, to));
+		else if (!captures_only) moves.add(Move(from, to, QUIET_MOVE));
 		if (t == KNIGHT || t == KING) break; // Leapers
 		to = Square(to + *it); // Sliders
 	    }
@@ -111,7 +111,7 @@ Moves Game::movegen(bool captures_only) {
 	}
 
 	// Pawn push
-	moves.add(Move(from, to));
+	moves.add(Move(from, to, QUIET_MOVE));
 	
 	// Double pawn push
 	if (board.is_pawn_begin(c, from)) {
