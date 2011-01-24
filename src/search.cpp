@@ -48,16 +48,23 @@ int Game::search(int depth) {
     int best_score = -INF;
     Color player = current_node().get_turn_color();
     Moves moves = movegen();
+    Move best_move;
+    bool legal_move_found = false;
     for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
 	Move move = *moves.it;
 	make_move(move);
 	if (!is_check(player)) {
+	    legal_move_found = true;
 	    score = -search(depth - 1);
 	    if (score > best_score) {
 		best_score = score;
 	    } 
 	}
 	undo_move(*moves.it);
+    }
+    if (!legal_move_found) {
+	if (is_check(player)) return -INF + 100 - depth; // Checkmate
+	else return 0; // Stalemate
     }
     return best_score;
 }
@@ -73,18 +80,18 @@ Move Game::root(int max_depth) {
 	make_move(move);
 	if (!is_check(player)) {
 	    score = -search(max_depth - 1);
-	    //cout << move << " " << score;
+	    cout << move << " " << score;
 	    if (score > best_score) {
 		best_score = score;
 		best_move = move;
-		//cout << " <- new best move";
+		cout << " <- new best move";
 	    } 
-	    //cout << endl;
+	    cout << endl;
 	}
 	undo_move(*moves.it);
     }
-    //cout << endl;
-    //cout << "Best move: " << best_move << endl;
-    //cout << endl;
+    cout << endl;
+    cout << "Best move: " << best_move << endl;
+    cout << endl;
     return best_move;
 }

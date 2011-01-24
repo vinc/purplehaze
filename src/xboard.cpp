@@ -31,9 +31,25 @@ Xboard::Xboard() {
 void Xboard::think() {
     //cout << game.board << endl;
     string move = search_move();
-    if (!force_mode) play_move(move);
-    cout << "move " << move << endl;
-    log << "<move " << move << endl;
+    string output = "";
+    if (move == "LOST") {
+	output = "result ";
+	if (game.current_node().get_turn_color() == WHITE) {
+	    output += "0-1 {Black mates}";
+	}
+	else {
+	    output += "1-0 {White mates}";
+	}
+    }	
+    else if (move == "DRAW") {
+	output = "result 1/2-1/2";
+    }
+    else if (!force_mode) {
+	play_move(move);
+	output = "move " + move;
+    }
+    cout << output << endl;
+    log << output << endl;
 }
 
 void Xboard::loop() {

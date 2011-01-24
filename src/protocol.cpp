@@ -113,10 +113,21 @@ bool Protocol::undo_move() {
 string Protocol::search_move(bool use_san_notation) {
     Move m = game.root(depth);
     if (m.is_null()) {
+	cout << "DEBUG: end of match, eval=";
+	cout << game.eval() << endl;
+	cout << game.board << endl;
+	/*
 	switch (game.eval()) {
 	    case  INF: return  "WIN";
 	    case -INF: return "LOSS"; 
 	    default  : return "DRAW";
+	}
+	*/
+	if (game.is_check(game.current_node().get_turn_color())) {
+	    return "LOST";
+	}
+	else {
+	    return "DRAW";
 	}
     }
     else return m.to_string();
