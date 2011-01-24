@@ -15,32 +15,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-#include "piece.h"
+#ifndef PROTOCOL_H
+#define PROTOCOL_H
 
-using namespace std;
+#include <string>
 
-Piece::Piece(Color c, PieceType t, int i) {
-    code = (i << 4) | (int(t) << 1) | int(c);
-}
+#include "common.h"
+#include "game.h"
 
-ostream& operator<<(ostream& out, const Piece piece) {
-    return (out << piece.to_string());
-}
+class Protocol
+{
+    private:
+	Game game;
+    public:
+	Protocol();
+	
+	void new_game();
 
-string Piece::to_string() const {
-    char t;
-    switch (get_type()) {
-	case PAWN:   t = 'P'; break;
-	case KNIGHT: t = 'N'; break;
-	case BISHOP: t = 'B'; break;
-	case ROOK:   t = 'R'; break;
-	case QUEEN:  t = 'Q'; break;
-	case KING:   t = 'K'; break;
-	default:     t = ' '; break;
-    }
-    if (get_color() == BLACK) {
-	t = char(t + 'A' - 'a'); // Lower case for black pieces
-    }
-    return "" + t;
-}
+	bool set_board(string fen);
+
+	bool play_move(string move);
+
+	bool undo_move(string move);
+
+	string search_move(bool use_san_notation = false);
+
+	Move parse_move(string move);
+};
+
+#endif /* !PROTOCOL_H */

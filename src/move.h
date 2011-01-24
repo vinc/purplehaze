@@ -19,6 +19,7 @@
 #define MOVE_H
 
 #include <bitset>
+#include <string>
 
 #include "common.h"
 
@@ -96,6 +97,7 @@ class Move {
 	bool operator!=(const Move& other) const {
 	    return !(*this == other);
 	}
+	string to_string() const;
 };
 
 #endif /* !MOVE_H */

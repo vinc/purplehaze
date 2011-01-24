@@ -46,12 +46,6 @@ void movegen_pieces(Board& board, Pieces& pieces, Moves& moves,
     }
 }
 
-const Direction PAWN_PUSH_DIRS[2] = { UP, DOWN };
-const Direction PAWN_CAPTURE_DIRS[2][2] = {
-    {UP_LEFT, UP_RIGHT},
-    {DOWN_LEFT, DOWN_RIGHT}
-};
-
 Moves Game::movegen(bool captures_only) {
     Moves moves;
     Color c = current_node().get_turn_color();
@@ -345,4 +339,9 @@ void Game::undo_move(Move m) {
 	board.set_piece(rook, rook_orig);
 	pieces.set_position(rook, rook_orig);
     }
+}
+
+bool Game::is_legal_move(Move m) {
+    // TODO
+    return true;
 }

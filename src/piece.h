@@ -19,6 +19,7 @@
 #define PIECE_H
 
 #include <bitset>
+#include <string>
 
 #include "common.h"
 
@@ -58,6 +59,7 @@ class Piece
 	    bool operator!=(const Piece& other) const {
 		return !(*this == other);
 	    }
+	    string to_string() const;
 };
 
 #endif /* !PIECE_H */

@@ -58,12 +58,17 @@ PieceType Move::get_castle_side() const {
 }
 
 ostream& operator<<(ostream& out, const Move move) {
-    out << char('a' + move.get_orig_file());
-    out << char('1' + move.get_orig_rank());
-    out << char('a' + move.get_dest_file());
-    out << char('1' + move.get_dest_rank());
-    if (move.is_promotion()) {
-	out << Piece(WHITE, move.get_promotion_type());
+    return (out << move.to_string());
+}
+
+string Move::to_string() const {
+    string res = "";
+    res += char('a' + get_orig_file());
+    res += char('1' + get_orig_rank());
+    res += char('a' + get_dest_file());
+    res += char('1' + get_dest_rank());
+    if (is_promotion()) {
+	res += Piece(WHITE, get_promotion_type()).to_string();
     }
-    return out;
+    return res;
 }

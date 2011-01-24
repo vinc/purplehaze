@@ -137,4 +137,12 @@ const std::vector<Directions> PIECES_DIRS = {
     KNIGHT_DIRS, BISHOP_DIRS, ROOK_DIRS, QUEEN_DIRS, KING_DIRS
 };
 
+// Used in movegen.cpp and protocol.cpp
+const Direction PAWN_PUSH_DIRS[2] = { UP, DOWN };
+const Direction PAWN_CAPTURE_DIRS[2][2] = {
+    {UP_LEFT, UP_RIGHT},
+    {DOWN_LEFT, DOWN_RIGHT}
+};
+
+
 #endif /* !COMMON_H */
