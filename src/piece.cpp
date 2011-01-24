@@ -40,7 +40,7 @@ string Piece::to_string() const {
 	default:     t = ' '; break;
     }
     if (get_color() == BLACK) {
-	t = char(t + 'A' - 'a'); // Lower case for black pieces
+	t = char(t + 'a' - 'A'); // Lower case for black pieces
     }
-    return "" + t;
+    return string(1, t);
 }

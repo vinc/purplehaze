@@ -15,7 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <assert.h>
+#include <iostream>
+
 #include "protocol.h"
+
+using namespace std;
 
 Protocol::Protocol() {
     
@@ -29,15 +34,16 @@ bool Protocol::set_board(string fen){
     
     // Load fen
     game.init(fen);
+    cout << game.board << endl;
 
     return true;
 }
 
 Move Protocol::parse_move(string move) {
-    Square from = Square((int(move[0]) - 'a' + 16 * int(move[1]) - '1'));
-    Square to = Square((int(move[2]) - 'a' + 16 * int(move[3]) - '1'));
+    Square from = Square(move[0] - 'a' + 16 * (move[1] - '1'));
+    Square to = Square(move[2] - 'a' + 16 * (move[3] - '1'));
     Color c = game.current_node().get_turn_color();
-    MoveType t;
+    MoveType t = QUIET_MOVE;
 
     if (move.size() == 5) { // Promotion
 	switch (move[4]) {
@@ -49,13 +55,13 @@ Move Protocol::parse_move(string move) {
 	}
     }
     if (game.board.get_piece(from).get_type() == PAWN) {
-	if (game.board.is_empty(to) && 
-	    to != Square(from + PAWN_PUSH_DIRS[c])) {
-		return Move(from, to, EN_PASSANT);
-	}
-	else if (game.board.is_pawn_begin(c, from) &&
+	if (game.board.is_pawn_begin(c, from) &&
 	    to == Square(from + 2 * PAWN_PUSH_DIRS[c])) {
 		return Move(from, to, DOUBLE_PAWN_PUSH);
+	}
+	else if (game.board.is_empty(to) && 
+	    to != Square(from + PAWN_PUSH_DIRS[c])) {
+		return Move(from, to, EN_PASSANT);
 	}
     }
     if (game.board.get_piece(from).get_type() == KING) {
@@ -68,10 +74,10 @@ Move Protocol::parse_move(string move) {
     }
     if (!game.board.is_empty(to)) { // Capture
 	assert((t == QUIET_MOVE) || 
-	       (t >= KNIGHT_PROMOTION && t <= QUEEN_PROMOTION));
+	       (KNIGHT_PROMOTION <= t && t <= QUEEN_PROMOTION));
 	return Move(from, to, MoveType(t + CAPTURE));
     }
-    else return Move(from, to, QUIET_MOVE);
+    else return Move(from, to, t);
 }
 
 bool Protocol::play_move(string move){
