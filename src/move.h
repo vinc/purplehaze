@@ -25,9 +25,11 @@
 
 using namespace std;
 
-class Move {
+class Move
+{
     friend ostream& operator<<(ostream& out, const Move move);
-    private:
+    
+    protected:
 	/*
 	 * A move is coded using 16 bits:
 	 *     4 bits for the type
@@ -37,9 +39,13 @@ class Move {
 	 *     3 bits for the origin square file 
 	 */
 	bitset<16> code;
-	Move(bitset<16> c) : code(c) {}
+	//Move(bitset<16> c) : code(c) {}
+    
     public:
 	Move(Square o = A1, Square d = A1, MoveType t = NULL_MOVE);
+	
+	friend class ExtendedMove;
+	
 	File get_orig_file() const {
 	    return File((code >> 13).to_ulong());
 	};
@@ -98,6 +104,22 @@ class Move {
 	    return !(*this == other);
 	}
 	string to_string() const;
+};
+
+class ExtendedMove : public Move
+{
+    private:
+	//bitset<16> code;
+	//bitset<16> extra;
+	//ExtendedMove(bitset<16> c, bitset<16> e) : code(c), extra(e) {}
+	char score;
+    public:
+	ExtendedMove(Move m, int s = 0) : score(s) { code = m.code; }
+	void set_score(int s) { score = s; };
+	bool operator<(const ExtendedMove& other) const {
+	    return this->score > other.score; // FIXME replace '<' by '>'
+	}
+
 };
 
 #endif /* !MOVE_H */

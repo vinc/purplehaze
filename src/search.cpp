@@ -93,6 +93,7 @@ Move Game::root(int max_depth) {
 	int alpha = -INF;
 	int beta = INF;
 	nodes_count = 0;
+	moves.sort(best_move);
 	for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
 	    Move move = *moves.it;
 	    make_move(move);

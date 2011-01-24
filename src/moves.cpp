@@ -20,3 +20,20 @@
 Moves::Moves() {
     
 }
+
+void Moves::sort(Move bm) { 
+    for (it = begin(); it != end(); ++it) {
+	if (it->get_orig() == bm.get_orig() &&
+	    it->get_dest() == bm.get_dest() &&
+	    it->get_type() == bm.get_type()) {
+	    it->set_score(3); //SCORE_BEST_MOVE;
+	}
+	else if (it->is_capture()) {
+	    it->set_score(2); //SCORE_CAPTURE;
+	}
+	else {
+	    it->set_score(1); // SCORE_QUIET;
+	}
+    }
+    moves.sort();
+}

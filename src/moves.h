@@ -18,24 +18,27 @@
 #ifndef MOVES_H
 #define MOVES_H
 
+#include <algorithm>
 #include <list>
 
 #include "common.h"
 #include "move.h"
-//using namespace std;
+
+using namespace std;
 
 class Moves
 {
     private:
-	list<Move> moves;
+	list<ExtendedMove> moves;
     public:
 	Moves();
 	void add(Move m) { moves.push_back(m); };
-	list<Move>::iterator it;
-	list<Move>::iterator begin() { return moves.begin(); };
-	list<Move>::iterator end() { return moves.end(); };
+	list<ExtendedMove>::iterator it;
+	list<ExtendedMove>::iterator begin() { return moves.begin(); };
+	list<ExtendedMove>::iterator end() { return moves.end(); };
 
 	void numeric_sort() { moves.sort(Move::numeric_comp); };
+	void sort(Move bm);
 };
 
 #endif /* !MOVES_H */

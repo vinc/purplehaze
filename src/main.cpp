@@ -39,6 +39,11 @@ string prompt() {
 int main() {
     cout << version << endl;
     cout << endl;
+
+    cout << "Piece: " << sizeof(Piece) << endl;
+    cout << "Move: " << sizeof(Move) << endl;
+    cout << "ExtendedMove: " << sizeof(ExtendedMove) << endl;
+
     // Parse commands from CLI
     Game game;
     game.init("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
