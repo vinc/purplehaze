@@ -83,19 +83,25 @@ int Game::search(int alpha, int beta, int depth) {
 }
 
 Move Game::root(int max_depth) {
-    int score;
-    int alpha = -INF;
-    int beta = INF;
     Move best_move;
     Color player = current_node().get_turn_color();
     Moves moves = movegen();
     clock_t start = clock();
-    nodes_count = 0;
-    for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
-	Move move = *moves.it;
-	make_move(move);
-	if (!is_check(player)) {
-	    score = -search(-beta, -alpha, max_depth - 1);
+
+    for (int ply = 0; ply < max_depth; ++ply) {
+	int score;
+	int alpha = -INF;
+	int beta = INF;
+	nodes_count = 0;
+	for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
+	    Move move = *moves.it;
+	    make_move(move);
+	    if (is_check(player)) { // Illegal move
+		undo_move(*moves.it);
+		continue;
+	    }
+	    score = -search(-beta, -alpha, ply);
+	    undo_move(*moves.it);
 	    cout << move << " " << score;
 	    if (score > alpha) {
 		alpha = score;
@@ -104,14 +110,13 @@ Move Game::root(int max_depth) {
 	    } 
 	    cout << endl;
 	}
-	undo_move(*moves.it);
+	double perft_time = double(clock() - start) / CLOCKS_PER_SEC;
+	cout << endl;
+	cout << "Best move: " << best_move;
+	cout << " (" << nodes_count << " nodes";
+	cout << ", " << perft_time << " secs";
+	cout << ", " << nodes_count / perft_time << " nps)" << endl;
+	cout << endl;
     }
-    double perft_time = double(clock() - start) / CLOCKS_PER_SEC;
-    cout << endl;
-    cout << "Best move: " << alpha;
-    cout << " (" << nodes_count << " nodes";
-    cout << ", " << perft_time << " secs";
-    cout << ", " << nodes_count / perft_time << " nps)" << endl;
-    cout << endl;
     return best_move;
 }
