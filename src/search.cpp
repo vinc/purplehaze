@@ -78,6 +78,7 @@ Move Game::root(int max_depth) {
     Color player = current_node().get_turn_color();
     Moves moves = movegen();
     clock_t start = clock();
+    nodes_count = 0;
     for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
 	Move move = *moves.it;
 	make_move(move);
@@ -96,7 +97,9 @@ Move Game::root(int max_depth) {
     double perft_time = double(clock() - start) / CLOCKS_PER_SEC;
     cout << endl;
     cout << "Best move: " << best_move;
-    cout << " (" << perft_time << " secs)" << endl;
+    cout << " (" << nodes_count << " nodes";
+    cout << ", " << perft_time << " secs";
+    cout << ", " << nodes_count / perft_time << " nps)" << endl;
     cout << endl;
     return best_move;
 }

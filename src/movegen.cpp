@@ -178,6 +178,8 @@ void Game::make_move(Move m) {
     Piece capture;
     assert(!board.is_out(orig));
     assert(!board.is_out(dest));
+
+    nodes_count++;
     
     //moves_history.push_back(m); // Temporary
 

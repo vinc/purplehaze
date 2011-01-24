@@ -24,6 +24,7 @@ using namespace std;
 
 Game::Game() {
     tree.push(Node());
+    nodes_count = 0;
     
     for (int i = 0; i < 240; ++i) { 
 	dir_array[i] = NO_DIR;
