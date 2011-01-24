@@ -19,6 +19,8 @@
 #include <iostream>
 #include <list>
 #include <vector>
+#include <stdio.h>
+#include <time.h>
 
 #include "game.h"
 
@@ -75,6 +77,7 @@ Move Game::root(int max_depth) {
     Move best_move;
     Color player = current_node().get_turn_color();
     Moves moves = movegen();
+    clock_t start = clock();
     for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
 	Move move = *moves.it;
 	make_move(move);
@@ -90,8 +93,10 @@ Move Game::root(int max_depth) {
 	}
 	undo_move(*moves.it);
     }
+    double perft_time = double(clock() - start) / CLOCKS_PER_SEC;
     cout << endl;
-    cout << "Best move: " << best_move << endl;
+    cout << "Best move: " << best_move;
+    cout << " (" << perft_time << " secs)" << endl;
     cout << endl;
     return best_move;
 }
