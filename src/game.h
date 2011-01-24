@@ -71,7 +71,7 @@ class Game
 	
 	// Search
 	int perft(int depth);
-	int search(int depth);
+	int search(int alpha, int beta, int depth);
 	Move root(int max_depth);
 	
 	// Position's evaluation

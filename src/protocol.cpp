@@ -23,7 +23,7 @@
 using namespace std;
 
 Protocol::Protocol() {
-    depth = 3; 
+    depth = 4; 
 }
 void Protocol::new_game(){
     game = Game();

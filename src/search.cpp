@@ -43,11 +43,11 @@ int Game::perft(int depth) {
 }
 
 
-int Game::search(int depth) {
+int Game::search(int alpha, int beta, int depth) {
     if (depth == 0) return eval();
 
-    int score = -INF;
-    int best_score = -INF;
+    int score; //= -INF;
+    //int best_score = -INF;
     Color player = current_node().get_turn_color();
     Moves moves = movegen();
     Move best_move;
@@ -55,25 +55,37 @@ int Game::search(int depth) {
     for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
 	Move move = *moves.it;
 	make_move(move);
-	if (!is_check(player)) {
-	    legal_move_found = true;
-	    score = -search(depth - 1);
-	    if (score > best_score) {
-		best_score = score;
-	    } 
+
+	if (is_check(player)) { // Illegal move
+	    undo_move(*moves.it);
+	    continue;
 	}
+
+	legal_move_found = true;
+	
+	score = -search(-beta, -alpha, depth - 1);
+	
 	undo_move(*moves.it);
+	
+	if (score >= beta) {
+	    return beta;
+	} 
+	
+	if (score > alpha) {
+	    alpha = score;
+	} 
     }
     if (!legal_move_found) {
 	if (is_check(player)) return -INF + 100 - depth; // Checkmate
 	else return 0; // Stalemate
     }
-    return best_score;
+    return alpha;
 }
 
 Move Game::root(int max_depth) {
-    int score = -INF;
-    int best_score = -INF;
+    int score;
+    int alpha = -INF;
+    int beta = INF;
     Move best_move;
     Color player = current_node().get_turn_color();
     Moves moves = movegen();
@@ -83,10 +95,10 @@ Move Game::root(int max_depth) {
 	Move move = *moves.it;
 	make_move(move);
 	if (!is_check(player)) {
-	    score = -search(max_depth - 1);
+	    score = -search(-beta, -alpha, max_depth - 1);
 	    cout << move << " " << score;
-	    if (score > best_score) {
-		best_score = score;
+	    if (score > alpha) {
+		alpha = score;
 		best_move = move;
 		cout << " <- new best move";
 	    } 
@@ -96,7 +108,7 @@ Move Game::root(int max_depth) {
     }
     double perft_time = double(clock() - start) / CLOCKS_PER_SEC;
     cout << endl;
-    cout << "Best move: " << best_move;
+    cout << "Best move: " << alpha;
     cout << " (" << nodes_count << " nodes";
     cout << ", " << perft_time << " secs";
     cout << ", " << nodes_count / perft_time << " nps)" << endl;

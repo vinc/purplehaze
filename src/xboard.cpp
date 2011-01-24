@@ -71,6 +71,7 @@ void Xboard::loop() {
 	}
 	else if (cmd == "go") {
 	    force_mode = false;
+	    cout << game.board << endl;
 	    think();
 	}
 	else if (cmd == "force") {
