@@ -23,7 +23,7 @@
 
 using namespace std;
 
-#define FEN_DEBUG true
+#define FEN_DEBUG false
 
 /** Initialise the game according to a FEN record.
   * For example the starting position in chess is :

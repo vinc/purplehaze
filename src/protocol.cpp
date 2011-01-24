@@ -23,7 +23,7 @@
 using namespace std;
 
 Protocol::Protocol() {
-    
+    depth = 3; 
 }
 void Protocol::new_game(){
     game = Game();
@@ -34,7 +34,7 @@ bool Protocol::set_board(string fen){
     
     // Load fen
     game.init(fen);
-    cout << game.board << endl;
+    //cout << game.board << endl;
 
     return true;
 }
@@ -42,6 +42,7 @@ bool Protocol::set_board(string fen){
 Move Protocol::parse_move(string move) {
     Square from = Square(move[0] - 'a' + 16 * (move[1] - '1'));
     Square to = Square(move[2] - 'a' + 16 * (move[3] - '1'));
+    if (game.board.is_out(from) || game.board.is_out(to)) return Move();
     Color c = game.current_node().get_turn_color();
     MoveType t = QUIET_MOVE;
 
@@ -72,7 +73,9 @@ Move Protocol::parse_move(string move) {
 	    return Move(from, to, QUEEN_CASTLE);
 	}
     }
-    if (!game.board.is_empty(to)) { // Capture
+
+    // Capture
+    if (!game.board.is_empty(to)) {
 	assert((t == QUIET_MOVE) || 
 	       (KNIGHT_PROMOTION <= t && t <= QUEEN_PROMOTION));
 	return Move(from, to, MoveType(t + CAPTURE));
@@ -80,32 +83,35 @@ Move Protocol::parse_move(string move) {
     else return Move(from, to, t);
 }
 
-bool Protocol::play_move(string move){
+bool Protocol::play_move(string move) {
     // Parse move
     Move m = parse_move(move);
-
+    
     // Test legality
+    if (m.is_null()) return false;
     if (!game.is_legal_move(m)) return false;
     
     // Play move
     game.make_move(m);
+
+    // Put move to history
+    history.push(m);
+
     return true;
 }
 
-bool Protocol::undo_move(string move){
-    // Parse move
-    Move m = parse_move(move);
-
-    // TODO Check if it was the last move
-    //if (game.history.top() != m) return false;
+bool Protocol::undo_move() {
+    if (history.empty()) return false;
+    Move m = history.top(); 
+    history.pop();
 
     // Undo move
     game.undo_move(m);
     return true;
 }
 
-string Protocol::search_move(bool use_san_notation){
-    Move m = game.root(5);
+string Protocol::search_move(bool use_san_notation) {
+    Move m = game.root(depth);
     if (m.is_null()) {
 	switch (game.eval()) {
 	    case  INF: return  "WIN";

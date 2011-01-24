@@ -23,6 +23,7 @@
 
 #include "common.h"
 #include "game.h"
+#include "xboard.h"
 
 using namespace std;
 
@@ -44,7 +45,8 @@ int main() {
     string cmd = prompt();
     while (cmd != "quit" && cmd != "exit") {
 	if (cmd == "xboard") { // Xboard protocol mode
-	    //xboard_loop();
+	    Xboard xboard;
+	    xboard.loop();
 	    return 0;
 	}
 	else if (cmd == "version") {

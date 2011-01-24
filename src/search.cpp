@@ -73,18 +73,18 @@ Move Game::root(int max_depth) {
 	make_move(move);
 	if (!is_check(player)) {
 	    score = -search(max_depth - 1);
-	    cout << move << " " << score;
+	    //cout << move << " " << score;
 	    if (score > best_score) {
 		best_score = score;
 		best_move = move;
-		cout << " <- new best move";
+		//cout << " <- new best move";
 	    } 
-	    cout << endl;
+	    //cout << endl;
 	}
 	undo_move(*moves.it);
     }
-    cout << endl;
-    cout << "Best move: " << best_move << endl;
-    cout << endl;
+    //cout << endl;
+    //cout << "Best move: " << best_move << endl;
+    //cout << endl;
     return best_move;
 }

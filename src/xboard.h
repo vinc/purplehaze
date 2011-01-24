@@ -15,38 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROTOCOL_H
-#define PROTOCOL_H
+#ifndef XBOARD_H
+#define XBOARD_H
 
-#include <string>
-#include <stack>
+#include <iostream>
+#include <fstream>
 
-#include "common.h"
-#include "game.h"
+#include "protocol.h"
 
-class Protocol
+class Xboard : public Protocol
 {
-    protected:
-	Game game;
-	int depth;
-	stack<Move> history;
-
+    private:
+	ofstream log;
+	bool force_mode;
     public:
-	Protocol();
-	
-	void new_game();
-
-	bool set_board(string fen);
-
-	bool play_move(string move);
-
-	bool undo_move();
-
-	string search_move(bool use_san_notation = false);
-
-	Move parse_move(string move);
-
-	void set_depth(int d) { depth = d; };
+	Xboard();
+	~Xboard() { log.close(); } ;
+	void loop();
+	void think();
 };
 
-#endif /* !PROTOCOL_H */
+#endif /* !XBOARD_H */
