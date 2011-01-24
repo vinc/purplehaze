@@ -29,7 +29,7 @@ Xboard::Xboard() {
 }
 
 void Xboard::think() {
-    //cout << game.board << endl;
+    cout << game.board << endl;
     string move = search_move();
     string output = "";
     if (move == "LOST") {

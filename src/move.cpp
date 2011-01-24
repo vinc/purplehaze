@@ -68,7 +68,7 @@ string Move::to_string() const {
     res += char('a' + get_dest_file());
     res += char('1' + get_dest_rank());
     if (is_promotion()) {
-	res += Piece(WHITE, get_promotion_type()).to_string();
+	res += Piece(BLACK, get_promotion_type()).to_string(); // Lower case
     }
     return res;
 }
