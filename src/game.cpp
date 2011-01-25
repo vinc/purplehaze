@@ -19,13 +19,17 @@
 #include <iostream>
 
 #include "game.h"
+#include "zobrist.h"
 
 using namespace std;
 
 Game::Game() {
-    tree.push(Node());
+    Node root_node;
+    root_node.hash() = 0;
+    tree.push(root_node);
     nodes_count = 0;
     
+    // Initialize direction array
     for (int i = 0; i < 240; ++i) { 
 	dir_array[i] = NO_DIR;
     }
@@ -62,6 +66,9 @@ void Game::add_piece(Color c, PieceType t, Square s) {
     pieces.set_position(c, t, i, s);
     board.set_piece(Piece(c, t, i), s);
     pieces.inc_nb_pieces(c, t);
+    
+    // Update Zobrist hash
+    zobrist.update_piece(current_node().hash(), c, t, s);
 }
 
 void Game::del_piece(Color c, PieceType t, int i) {
@@ -79,15 +86,26 @@ void Game::del_piece(Color c, PieceType t, int i) {
 	pieces.set_position(c, t, j, OUT);	   // TODO: not needed
 	board.set_piece(Piece(c, t, i), s);	   // Update board
     }
+    
+    // Update Zobrist hash
+    zobrist.update_piece(current_node().hash(), c, t, emptied);
 }
 
 void Game::new_node() {
+    // Remove the previous en passant square from the Zobrist hash
+    zobrist.update_en_passant(current_node().hash(), 
+			      current_node().get_en_passant());
+    
+    // Take a "snapshot" of the current position
     tree.push(tree.top());
-    tree.top().change_side();
+
+    // Update the position for a new move
     tree.top().inc_ply();
+    tree.top().change_side();
+    zobrist.change_side(current_node().hash());
 }
 
 void Game::del_node() {
-    //cout << "tree.pop()" << endl;
+    // Take back the previous "snapshot"
     tree.pop();
 }

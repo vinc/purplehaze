@@ -22,50 +22,54 @@
 
 #include "common.h"
 #include "pieces.h"
+#include "zobrist.h"
 
 using namespace std;
 
 class Node
 {
     private:
-	    Color side_to_move;
-	    short half_move_counter;
-	    short score;
-	    short ply;
-	    bitset<4> castle_rights;
-	    Square en_passant;
-	    Piece capture; // TODO: do we realy need this?
+	Color side_to_move;
+	short half_move_counter;
+	short score;
+	short ply;
+	bitset<4> castle_rights;
+	Square en_passant;
+	Piece capture;
+	Hash zobrist_hash;
+
     public:
-	    Node();
-	    Color get_turn_color() const {
-	        return side_to_move;
-	    };
-	    void change_side() {
-	        side_to_move = Color(!side_to_move);
-	    };
-	    short get_ply() const {
-	        return ply;
-	    };
-	    void inc_ply() {
-	        ply++;
-	    };
-	    void dec_ply() {
-	        ply--;
-	    };
-	    Square get_en_passant() const {
-	        return en_passant;
-	    };
-	    void set_en_passant(Square ep) {
-	        en_passant = ep;
-	    };
-	    Piece get_capture() const {
-	        return capture;
-	    };
-	    void set_capture(Piece p) {
-	        capture = p;
-	    };
-	    bool can_castle(Color c, PieceType t) const;
-	    void set_castle_right(Color c, PieceType t, bool b = true);
+	Node();
+	Hash& hash() { return zobrist_hash; };
+	Color get_turn_color() const {
+	    return side_to_move;
+	};
+	void change_side() {
+	    side_to_move = Color(!side_to_move);
+	};
+	short get_ply() const {
+	    return ply;
+	};
+	void inc_ply() {
+	    ply++;
+	};
+	void dec_ply() {
+	    ply--;
+	};
+	Square get_en_passant() const {
+	    return en_passant;
+	};
+	void set_en_passant(Square ep) {
+	    en_passant = ep;
+	};
+	Piece get_capture() const {
+	    return capture;
+	};
+	void set_capture(Piece p) {
+	    capture = p;
+	};
+	bool can_castle(Color c, PieceType t) const;
+	void set_castle_right(Color c, PieceType t, bool b = true);
 };
 
 #endif /* !NODE_H */

@@ -190,10 +190,12 @@ void Game::make_move(Move m) {
     if ((current_node().can_castle(c, KING)) && 
 	(t == KING || (t == ROOK && orig == Square(H1 + A8 * c)))) {
 	current_node().set_castle_right(c, KING, false);
+	zobrist.update_castle_right(current_node().hash(), c, KING);
     }
     if ((current_node().can_castle(c, QUEEN)) && 
 	(t == KING || (t == ROOK && orig == Square(A1 + A8 * c)))) {
 	current_node().set_castle_right(c, QUEEN, false);
+	zobrist.update_castle_right(current_node().hash(), c, QUEEN);
     }
     
     if (m.is_capture()) {
@@ -206,31 +208,16 @@ void Game::make_move(Move m) {
 	if (capture.get_type() == ROOK) { // Update opponent's castling rights
 	    if (dest == Square(H1 + A8 * c)) {
 		current_node().set_castle_right(Color(!c), KING, false);
+		zobrist.update_castle_right(current_node().hash(), 
+					 Color(!c), KING);
 	    }
 	    else if (dest == Square(A1 + A8 * c)) {
 		current_node().set_castle_right(Color(!c), QUEEN, false);
+		zobrist.update_castle_right(current_node().hash(), 
+					 Color(!c), QUEEN);
 	    }
 	}
 	del_piece(capture);
-	/*
-	if (!board.is_empty(dest)) { // Temporary
-	    cout << "Assert error!" << endl;
-	    cout << board << endl;
-	    cout << "nb_pieces=";
-	    cout << pieces.get_nb_pieces(Color(!c), capture.get_type());
-	    cout << ", i=" << capture.get_index() << ", pieces' position: ";
-	    for (int i = 0; i < 10; ++i) {
-		cout << hex << pieces.get_position(Color(!c), capture.get_type(), i) << " ";
-	    }
-	    cout << endl;
-	    cout << "Moves: ";
-	    list<Move>::iterator it;
-	    for (it = moves_history.begin(); it != moves_history.end(); it++) {
-		cout << *it << " ";
-	    }
-	    cout << endl;
-	}
-	*/
 	assert(board.is_empty(s));
     }
 
@@ -252,27 +239,21 @@ void Game::make_move(Move m) {
 	board.set_piece(Piece(), rook_orig);
 	board.set_piece(rook, rook_dest);
 	pieces.set_position(rook, rook_dest);
+	zobrist.update_piece(current_node().hash(), c, ROOK, rook_orig);
+	zobrist.update_piece(current_node().hash(), c, ROOK, rook_dest);
     }
 
     // Move the piece
-    board.set_piece(Piece(), orig);
+    board.set_piece(Piece(), orig); // FIXME: duplicate in case of promotion?
     if (m.is_promotion()) {
 	add_piece(p.get_color(), m.get_promotion_type(), dest);
 	del_piece(p);
     }
     else {
-	/*
-	if (!board.is_empty(dest)) {
-	    cout << "Assert error!" << endl;
-	    cout << board << endl;
-	    cout << "move=" << hex << m << endl;
-	    cout << "orig=" << hex << orig << endl;
-	    cout << "dest=" << hex << dest << endl;
-	}
-	assert(board.is_empty(dest));
-	*/
 	board.set_piece(p, dest);
 	pieces.set_position(p, dest);
+	zobrist.update_piece(current_node().hash(), c, t, orig);
+	zobrist.update_piece(current_node().hash(), c, t, dest);
     }
     
     // Update en passant
@@ -280,6 +261,7 @@ void Game::make_move(Move m) {
     if (m.is_double_pawn_push()) {
 	Square ep = Square(orig + (dest - orig) / 2);
 	current_node().set_en_passant(ep);
+	zobrist.update_en_passant(current_node().hash(), ep);
     }
     else {
 	current_node().set_en_passant(OUT);

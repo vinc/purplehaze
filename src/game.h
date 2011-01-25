@@ -31,6 +31,7 @@
 class Game
 {
     private:
+	Zobrist zobrist;
 	stack<Node> tree;
 	bitset<7> attack_array[240];
 	Direction dir_array[240];
@@ -41,10 +42,10 @@ class Game
 	Board board;
 	Game();
 	void add_piece(Color c, PieceType t, Square s);
+	void del_piece(Color c, PieceType t, int i);
 	void del_piece(Piece p) {
 	    del_piece(p.get_color(), p.get_type(), p.get_index());
 	};
-	void del_piece(Color c, PieceType t, int i);
 	
 	void new_node();
 	void del_node();
