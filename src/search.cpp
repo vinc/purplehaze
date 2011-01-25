@@ -51,7 +51,34 @@ int Game::search(int alpha, int beta, int depth) {
     Color player = current_node().get_turn_color();
     Moves moves = movegen();
     Move best_move;
+
+    Transposition* ptr_trans = tt.lookup(current_node().hash());
+    if (ptr_trans && ptr_trans->get_depth() >= depth) { 
+	int trans_score = ptr_trans->get_value();
+	switch (ptr_trans->get_bound()) {
+	    case EXACT:
+		return trans_score;
+		break;
+	    case UPPER:
+		//if (trans_score <= alpha) return trans_score;
+		if (trans_score < beta) beta = trans_score;
+		break;
+	    case LOWER: 
+		//if (trans_score >= beta) return trans_score;
+		if (trans_score > alpha) alpha = trans_score;
+		break;
+	    default:
+		break;
+	}
+	if (alpha >= beta) return trans_score;
+    }
+    if (ptr_trans) {
+	Move bm = ptr_trans->get_best_move();
+	if (!bm.is_null()) best_move = bm;
+    }
+
     bool legal_move_found = false;
+    moves.sort(best_move);
     for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
 	Move move = *moves.it;
 	make_move(move);
@@ -73,12 +100,16 @@ int Game::search(int alpha, int beta, int depth) {
 	
 	if (score > alpha) {
 	    alpha = score;
+	    best_move = move;
 	} 
     }
     if (!legal_move_found) {
 	if (is_check(player)) return -INF + 100 - depth; // Checkmate
 	else return 0; // Stalemate
     }
+
+    tt.save(current_node().hash(), alpha, alpha, beta, depth, best_move);
+
     return alpha;
 }
 
@@ -88,7 +119,7 @@ Move Game::root(int max_depth) {
     Moves moves = movegen();
     clock_t start = clock();
 
-    for (int ply = 0; ply < max_depth; ++ply) {
+    for (int ply = 1; ply < max_depth; ++ply) {
 	int score;
 	int alpha = -INF;
 	int beta = INF;
@@ -101,7 +132,7 @@ Move Game::root(int max_depth) {
 		undo_move(*moves.it);
 		continue;
 	    }
-	    score = -search(-beta, -alpha, ply);
+	    score = -search(-beta, -alpha, ply - 1);
 	    undo_move(*moves.it);
 	    cout << move << " " << score;
 	    if (score > alpha) {
@@ -110,6 +141,9 @@ Move Game::root(int max_depth) {
 		cout << " <- new best move";
 	    } 
 	    cout << endl;
+	    if (!best_move.is_null()) {
+		tt.save(current_node().hash(), alpha, EXACT, ply, best_move);
+	    }
 	}
 	double perft_time = double(clock() - start) / CLOCKS_PER_SEC;
 	cout << endl;

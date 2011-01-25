@@ -19,7 +19,6 @@
 #include <iostream>
 
 #include "game.h"
-#include "zobrist.h"
 
 using namespace std;
 

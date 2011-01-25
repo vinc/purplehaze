@@ -43,6 +43,8 @@ int main() {
     cout << "Piece: " << sizeof(Piece) << endl;
     cout << "Move: " << sizeof(Move) << endl;
     cout << "ExtendedMove: " << sizeof(ExtendedMove) << endl;
+    cout << "Transposition: " << sizeof(Transposition) << endl;
+    cout << endl;
 
     // Parse commands from CLI
     Game game;

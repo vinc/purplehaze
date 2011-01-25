@@ -27,6 +27,8 @@
 #include "board.h"
 #include "moves.h"
 #include "node.h"
+#include "tt.h"
+#include "zobrist.h"
 
 class Game
 {
@@ -40,6 +42,7 @@ class Game
 	//list<Move> moves_history; // Temporary
 	Pieces pieces;
 	Board board;
+	Transpositions tt;
 	Game();
 	void add_piece(Color c, PieceType t, Square s);
 	void del_piece(Color c, PieceType t, int i);
