@@ -110,7 +110,7 @@ bool Protocol::undo_move() {
 }
 
 string Protocol::search_move(bool use_san_notation) {
-    Move m = game.root(depth);
+    Move m = game.root(depth + 1);
     if (m.is_null()) {
 	cout << "DEBUG: end of match, eval=";
 	cout << game.eval() << endl;
