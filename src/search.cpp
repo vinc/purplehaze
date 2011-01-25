@@ -21,10 +21,35 @@
 #include <vector>
 #include <stdio.h>
 #include <time.h>
+#include <iomanip>
 
 #include "game.h"
 
 using namespace std;
+
+#define WIDE 10
+
+void print_search_legend() {
+    cout << setw(4) << "ply";
+    cout << setw(WIDE) << "score";
+    cout << setw(WIDE) << "time";
+    cout << setw(WIDE) << "nodes";
+    cout << setw(WIDE) << " pv";
+    cout << endl;
+}
+
+void print_search(int ply, int score, double time, int nodes) {
+    cout << setw(4) << ply;
+    cout << setw(WIDE) << score;
+    cout << setw(WIDE) << setprecision(3) << time;
+    if (nodes >= 1000000) {
+	cout << setw(WIDE - 1) << setprecision(3) << nodes / 1000000.0 << "M";
+    }
+    else {
+	cout << setw(WIDE) << nodes;
+    }
+    cout << endl;
+}
 
 int Game::perft(int depth) {
     int nodes_count = 0;
@@ -119,6 +144,7 @@ Move Game::root(int max_depth) {
     Moves moves = movegen();
     clock_t start = clock();
 
+    print_search_legend();
     for (int ply = 1; ply < max_depth; ++ply) {
 	int score;
 	int alpha = -INF;
@@ -134,24 +160,18 @@ Move Game::root(int max_depth) {
 	    }
 	    score = -search(-beta, -alpha, ply - 1);
 	    undo_move(*moves.it);
-	    cout << move << " " << score;
 	    if (score > alpha) {
 		alpha = score;
 		best_move = move;
-		cout << " <- new best move";
+		double time = double(clock() - start) / CLOCKS_PER_SEC;
+		print_search(ply, alpha, time, nodes_count);
 	    } 
-	    cout << endl;
 	    if (!best_move.is_null()) {
 		tt.save(current_node().hash(), alpha, EXACT, ply, best_move);
 	    }
 	}
-	double perft_time = double(clock() - start) / CLOCKS_PER_SEC;
-	cout << endl;
-	cout << "Best move: " << best_move;
-	cout << " (" << nodes_count << " nodes";
-	cout << ", " << perft_time << " secs";
-	cout << ", " << nodes_count / perft_time << " nps)" << endl;
-	cout << endl;
+	double time = double(clock() - start) / CLOCKS_PER_SEC;
+	print_search(ply, alpha, time, nodes_count);
     }
     return best_move;
 }
