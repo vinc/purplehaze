@@ -42,7 +42,8 @@ class Move
 	//Move(bitset<16> c) : code(c) {}
     
     public:
-	Move(Square o = A1, Square d = A1, MoveType t = NULL_MOVE);
+	Move() : code(NULL_MOVE) {}
+	Move(Square o, Square d, MoveType t);
 	
 	friend class ExtendedMove;
 	

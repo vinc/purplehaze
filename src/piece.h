@@ -40,7 +40,8 @@ class Piece
 	    bitset<8> code;
 	    //Piece(bitset<8> c) : code(c) {}
     public:
-	    Piece(Color c = WHITE, PieceType t = EMPTY, int i = 0);
+	    Piece() : code(EMPTY) {}
+	    Piece(Color c, PieceType t, int i = 0);
 	    Color get_color() const { 
 	        return Color(int(code[0])); 
 	    };

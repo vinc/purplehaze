@@ -22,9 +22,8 @@
 
 using namespace std;
 
-Protocol::Protocol() {
-    depth = 4; 
-}
+// Protocol::Protocol() {}
+
 void Protocol::new_game(){
     game = Game();
 }

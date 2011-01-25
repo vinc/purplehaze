@@ -32,7 +32,7 @@ class Protocol
 	stack<Move> history;
 
     public:
-	Protocol();
+	Protocol() : depth(5) {}
 	
 	void new_game();
 
