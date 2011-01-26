@@ -23,11 +23,10 @@
 #include "zobrist.h"
 
 //#define TT_SIZE	2048 //1024*1024*128 // Transpositions table of 128Mb
-#define TT_STORE_CUTOFF 1
 
-static const int TT_SIZE = 1024*1024*2;
+static const int TT_SIZE = 1024*1024*128;
 
-enum Bound : unsigned char { EXACT, LOWER, UPPER, UNDEF_BOUND };
+enum Bound : unsigned char { EXACT = 0, LOWER, UPPER, UNDEF_BOUND };
 
 class Transposition
 {
@@ -57,19 +56,31 @@ class Transposition
 class Transpositions
 {
     private:
-	static const int SIZE = (TT_SIZE / sizeof(Transposition));
-	Transposition tt[SIZE];
-	//map<Hash,Transposition> tt;
-	//map<Hash,Transposition>::iterator it;
+	//static const int SIZE = (TT_SIZE / sizeof(Transposition));
+	//Transposition tt[SIZE];
+	const int SIZE;
+	Transposition* tt; // = new Transposition[SIZE];
+	Transposition null_entry;
 
     public:
-	Transpositions(); // {}
-	Transposition* lookup(Hash hash);
+	Transpositions(int n = TT_SIZE) : SIZE(n / sizeof(Transposition)) {
+	    assert((n & (n - 1)) == 0);
+	    tt = new Transposition[SIZE];
+	};
+	~Transpositions() {
+	    delete [] tt;
+	    tt = NULL;
+	};
+	Transposition& lookup(Hash hash);
 	void save(Hash h, int v, int a, int b, int d, Move bm);
-	void save(Hash h, int v, Bound b, int d, Move bm) {
-	    tt[h & SIZE] = Transposition(h, v, b, d, bm);
-	}
+	void save(Hash h, int v, Bound b, int d, Move bm); /* {
+	    tt[h & (SIZE - 1)] = Transposition(h, v, b, d, bm);
+	}*/
 	void clear();
+
+	// Used only for unit testing
+	int size() const { return SIZE; };
+	Transposition& at(int i) const { return tt[i]; };
 };
 
 #endif /* !TT_H */

@@ -25,7 +25,8 @@ using namespace std;
 // Protocol::Protocol() {}
 
 void Protocol::new_game(){
-    game = Game();
+    //game = Game();
+    game.tt.clear();
 }
 
 bool Protocol::set_board(string fen){

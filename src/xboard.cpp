@@ -24,7 +24,6 @@
 using namespace std;
 
 Xboard::Xboard() {
-   log.open("game.log", ios::app); 
    force_mode = true;
 }
 
@@ -54,6 +53,7 @@ void Xboard::think() {
 
 void Xboard::loop() {
     cout << endl; // Acknowledge Xboard mode
+    log.open("game.log", ios::app); 
     log << "DEBUG: PurpleHaze starting" << endl;
     cout << "feature setboard=1" << endl;
     cout << "feature sigint=0" << endl;
@@ -114,4 +114,5 @@ void Xboard::loop() {
     }
     log << ">" << cmd << endl; 
     log << "DEBUG: exiting" << endl; 
+    log.close();
 }

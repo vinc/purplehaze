@@ -44,11 +44,10 @@ int main() {
     cout << "Move: " << sizeof(Move) << endl;
     cout << "ExtendedMove: " << sizeof(ExtendedMove) << endl;
     cout << "Transposition: " << sizeof(Transposition) << endl;
+    //cout << size_t << endl;
     cout << endl;
 
     // Parse commands from CLI
-    Game game;
-    game.init("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     string cmd = prompt();
     while (cmd != "quit" && cmd != "exit") {
 	if (cmd == "xboard") { // Xboard protocol mode
@@ -60,6 +59,8 @@ int main() {
 	    cout << version << endl;
 	}
 	else if (cmd == "perft") {
+	    Game game;
+	    game.init("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	    for (int i = 1; ; ++i) {
 		clock_t start = clock();
 		int perft_result = game.perft(i);
@@ -71,12 +72,15 @@ int main() {
 	}
 	else if (cmd == "setboard") {
 	    // Get FEN
+	    Game game;
 	    string fen;
 	    getline(cin, fen);
 	    fen.erase(0, 1); // Remove the first whitespace
 	    game.init(fen);
 	}
 	else if (cmd == "divide") {
+	    Game game;
+	    game.init("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	    int depth = 0;
 	    cin >> depth;
 	    cout << endl;

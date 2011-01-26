@@ -72,34 +72,39 @@ int Game::search(int alpha, int beta, int depth) {
     if (depth == 0) return eval();
 
     int score; //= -INF;
+    int old_alpha = alpha;
     //int best_score = -INF;
     Color player = current_node().get_turn_color();
     Moves moves = movegen();
     Move best_move;
 
-    Transposition* ptr_trans = tt.lookup(current_node().hash());
-    if (ptr_trans && ptr_trans->get_depth() >= depth) { 
-	int trans_score = ptr_trans->get_value();
-	switch (ptr_trans->get_bound()) {
-	    case EXACT:
-		return trans_score;
-		break;
-	    case UPPER:
-		//if (trans_score <= alpha) return trans_score;
-		if (trans_score < beta) beta = trans_score;
-		break;
-	    case LOWER: 
-		//if (trans_score >= beta) return trans_score;
-		if (trans_score > alpha) alpha = trans_score;
-		break;
-	    default:
-		break;
+    //Transposition* ptr_trans = tt.lookup(current_node().hash());
+    Transposition trans = tt.lookup(current_node().hash());
+    if (trans.get_bound() != UNDEF_BOUND) {
+	if (trans.get_depth() >= depth - 1) {
+	    //cout << "trans" << endl;
+	    int trans_score = trans.get_value();
+	    switch (trans.get_bound()) {
+		case EXACT: return trans_score;
+		case UPPER:
+		    //if (trans_score <= alpha) return trans_score;
+		    if (trans_score < beta) beta = trans_score;
+		    break;
+		case LOWER: 
+		    //if (trans_score >= beta) return trans_score;
+		    if (trans_score > alpha) alpha = trans_score;
+		    break;
+		default: assert(false);
+	    }
+	    if (alpha >= beta) return trans_score;
 	}
-	if (alpha >= beta) return trans_score;
-    }
-    if (ptr_trans) {
-	Move bm = ptr_trans->get_best_move();
-	if (!bm.is_null()) best_move = bm;
+	Move bm = trans.get_best_move();
+	//cout << "Try to get bm from tt... Bound: ";
+	//cout << trans.get_bound() << endl;
+	if (!bm.is_null()) {
+	    //cout << "Got bm from tt: " << bm << endl;
+	    best_move = bm;
+	}
     }
 
     bool legal_move_found = false;
@@ -109,7 +114,7 @@ int Game::search(int alpha, int beta, int depth) {
 	make_move(move);
 
 	if (is_check(player)) { // Illegal move
-	    undo_move(*moves.it);
+	    undo_move(move);
 	    continue;
 	}
 
@@ -117,9 +122,11 @@ int Game::search(int alpha, int beta, int depth) {
 	
 	score = -search(-beta, -alpha, depth - 1);
 	
-	undo_move(*moves.it);
+	undo_move(move);
 	
 	if (score >= beta) {
+	    tt.save(current_node().hash(), score, LOWER, depth, move);
+	    //cout << "Save LOWER!" << endl;
 	    return beta;
 	} 
 	
@@ -133,7 +140,15 @@ int Game::search(int alpha, int beta, int depth) {
 	else return 0; // Stalemate
     }
 
-    tt.save(current_node().hash(), alpha, alpha, beta, depth, best_move);
+    //tt.save(current_node().hash(), alpha, alpha, beta, depth, best_move);
+    if (old_alpha == alpha) {
+	//cout << "Save UPPER!" << endl;
+	tt.save(current_node().hash(), alpha, UPPER, depth, Move());
+    }
+    else if (!best_move.is_null()) {
+	//cout << "Save EXACT!" << endl;
+	tt.save(current_node().hash(), alpha, EXACT, depth, best_move);
+    }
 
     return alpha;
 }
@@ -166,9 +181,9 @@ Move Game::root(int max_depth) {
 		double time = double(clock() - start) / CLOCKS_PER_SEC;
 		print_search(ply, alpha, time, nodes_count);
 	    } 
-	    if (!best_move.is_null()) {
-		tt.save(current_node().hash(), alpha, EXACT, ply, best_move);
-	    }
+	}
+	if (!best_move.is_null()) {
+	    tt.save(current_node().hash(), alpha, EXACT, ply, best_move);
 	}
 	double time = double(clock() - start) / CLOCKS_PER_SEC;
 	print_search(ply, alpha, time, nodes_count);

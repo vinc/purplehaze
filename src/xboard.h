@@ -30,7 +30,6 @@ class Xboard : public Protocol
 	bool force_mode;
     public:
 	Xboard();
-	~Xboard() { log.close(); } ;
 	void loop();
 	void think();
 };
