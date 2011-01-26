@@ -20,9 +20,13 @@
 
 using namespace std;
 
+/*
 Piece::Piece(Color c, PieceType t, int i) {
-    code = (i << 4) | (int(t) << 1) | int(c);
+    //code = (i << 4) | (int(t) << 1) | int(c);
+    cout << "c=" << c << ", t=" << t << ", i=" << i << endl;
+        cout << hex << int(code) << endl;
 }
+*/
 
 ostream& operator<<(ostream& out, const Piece piece) {
     return (out << piece.to_string());

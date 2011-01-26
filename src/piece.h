@@ -37,22 +37,38 @@ class Piece
 	     *
 	     *	   FIXME? No warning given if index is > 4 bits
 	     */
-	    bitset<8> code;
+	    static const int C_MASK = 0x1;
+	    static const int T_MASK = 0x7;
+	    static const int I_MASK = 0xF;
+	    static const int C_SHIFT = 0;
+	    static const int T_SHIFT = 1;
+	    static const int I_SHIFT = 4;
+	    //bitset<8> code;
+	    unsigned char code;
 	    //Piece(bitset<8> c) : code(c) {}
     public:
 	    Piece() : code(EMPTY) {}
-	    Piece(Color c, PieceType t, int i = 0);
+	    Piece(Color c, PieceType t, int i = 0) {
+		code = ((i /*& I_MASK*/) << I_SHIFT) | 
+		       ((t /*& T_MASK*/) << T_SHIFT) |
+		       ((c /*& C_MASK*/) << C_SHIFT);
+	    }
 	    Color get_color() const { 
-	        return Color(int(code[0])); 
+	        return Color((code >> C_SHIFT) & C_MASK); 
 	    };
 	    PieceType get_type() const { 
-	        return PieceType(((code << 4) >> 5).to_ulong()); 
+	        //return PieceType(((code << 4) >> 5).to_ulong()); 
+	        return PieceType((code >> T_SHIFT) & T_MASK); 
+	        //return PieceType((code << 4) >> 5); 
 	    };
 	    int get_index() const { 
-	        return (code >> 4).to_ulong();
+	        return (code >> I_SHIFT) & I_MASK; 
+	        //return (code >> 4).to_ulong();
 	    };
 	    void set_index(int i) { 
-	        (code &= 0x0F) |= (i << 4); 
+	        //(code &= 0x0f) |= (i << 4); 
+		code &= I_MASK;
+		code |= (i << I_SHIFT);
 	    }
 	    bool operator==(const Piece& other) const {
 		return this->code == other.code;

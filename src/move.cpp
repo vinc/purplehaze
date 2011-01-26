@@ -23,14 +23,12 @@
 
 using namespace std;
 
+/*
 Move::Move(Square o, Square d, MoveType t) {
-    assert(o != OUT && d != OUT);   // Not enought space to store OUT square
-    int ff = int(o) & 7;	    // Orig square file
-    int fr = int(o) >> 4;	    // Orig square rank
-    int tf = int(d) & 7;	    // Dest square file
-    int tr = int(d) >> 4;	    // Dest square rank
-    code = (ff << 13) | (fr << 10) | (tf << 7) | (tr << 4) | int(t);
+
 }
+*/
+
 PieceType Move::get_promotion_type() const {
     switch (get_type()) {
 	case KNIGHT_PROMOTION:

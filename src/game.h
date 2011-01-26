@@ -38,7 +38,7 @@ class Game
 	bitset<7> attack_array[240];
 	Direction dir_array[240];
     public:
-	int nodes_count; // Used in search
+	unsigned int nodes_count; // Used in search
 	//list<Move> moves_history; // Temporary
 	Pieces pieces;
 	Board board;

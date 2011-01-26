@@ -192,12 +192,13 @@ Move Game::root(int max_depth) {
     Moves moves = movegen();
     clock_t start = clock();
 
+    nodes_count = 0;
     print_search_legend();
     for (int ply = 1; ply < max_depth; ++ply) {
 	int score;
 	int alpha = -INF;
 	int beta = INF;
-	nodes_count = 0;
+	//nodes_count = 0;
 	moves.sort(best_move);
 	for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
 	    Move move = *moves.it;
