@@ -82,6 +82,14 @@ void Xboard::loop() {
 	    cin >> n;
 	    cout << "pong " << n << endl;
 	}
+	else if (cmd == "time") {
+	    int time = 0;
+	    cin >> time;
+	}
+	else if (cmd == "otime") {
+	    int time = 0;
+	    cin >> time;
+	}
 	else if (cmd == "sd") {
 	    int d = 0;
 	    cin >> d;
