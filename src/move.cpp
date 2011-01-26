@@ -62,6 +62,7 @@ ostream& operator<<(ostream& out, const Move move) {
 }
 
 string Move::to_string() const {
+    if (is_null()) return "#";
     string res = "";
     res += char('a' + get_orig_file());
     res += char('1' + get_orig_rank());

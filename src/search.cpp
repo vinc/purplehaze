@@ -38,8 +38,9 @@ void print_search_legend() {
     cout << endl;
 }
 
-void print_search(int ply, int score, double time, int nodes) {
-    cout << setw(4) << ply;
+void print_search(int ply, int score, double time, int nodes, Move m) {
+    if (ply) cout << setw(4) << ply;
+    else cout << setw(4) << ' ';
     cout << setw(WIDE) << score;
     cout << setw(WIDE) << setprecision(3) << time;
     if (nodes >= 1000000) {
@@ -48,7 +49,9 @@ void print_search(int ply, int score, double time, int nodes) {
     else {
 	cout << setw(WIDE) << nodes;
     }
-    cout << endl;
+    //if (m.is_null()) cout << setw(WIDE) << "#";
+    //else cout << setw(WIDE) << m;
+    cout << setw(WIDE) << m << endl;
 }
 
 int Game::perft(int depth) {
@@ -179,14 +182,14 @@ Move Game::root(int max_depth) {
 		alpha = score;
 		best_move = move;
 		double time = double(clock() - start) / CLOCKS_PER_SEC;
-		print_search(ply, alpha, time, nodes_count);
+		print_search(0, alpha, time, nodes_count, best_move);
 	    } 
 	}
 	if (!best_move.is_null()) {
 	    tt.save(current_node().hash(), alpha, EXACT, ply, best_move);
 	}
 	double time = double(clock() - start) / CLOCKS_PER_SEC;
-	print_search(ply, alpha, time, nodes_count);
+	print_search(ply, alpha, time, nodes_count, best_move);
     }
     return best_move;
 }
