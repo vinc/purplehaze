@@ -75,6 +75,7 @@ class Game
 	
 	// Search
 	int perft(int depth);
+	int quiescence(int alpha, int beta, int depth);
 	int search(int alpha, int beta, int depth);
 	Move root(int max_depth);
 	

@@ -70,9 +70,39 @@ int Game::perft(int depth) {
     return nodes_count;
 }
 
+int Game::quiescence(int alpha, int beta, int depth) {
+    int score;
+    int stand_pat = eval();
+
+    if (depth < -MAX_DEPTH) return stand_pat;
+    if (stand_pat >= beta) return beta; // Beta cut-off
+    if (alpha < stand_pat) alpha = stand_pat; // New alpha
+
+    Moves moves = movegen(true);
+    Color player = current_node().get_turn_color();
+    for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
+	Move move = *moves.it;
+	make_move(move);
+
+	if (is_check(player)) { // Illegal move
+	    undo_move(move);
+	    continue;
+	}
+	
+	score = -quiescence(-beta, -alpha, depth - 1);
+	undo_move(move);
+	if (score >= beta) {
+	    return beta;
+	} 
+	if (score > alpha) {
+	    alpha = score;
+	} 
+    }
+    return alpha;
+}
 
 int Game::search(int alpha, int beta, int depth) {
-    if (depth == 0) return eval();
+    if (depth == 0) return quiescence(alpha, beta, 0);
 
     int score; //= -INF;
     int old_alpha = alpha;
