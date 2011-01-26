@@ -53,24 +53,10 @@ Moves Game::movegen(bool captures_only) {
     
     // Pawns moves
     for (int i = 0; i < pieces.get_nb_pieces(c, PAWN); ++i) {
-	//Direction d = (c == WHITE ? UP : DOWN);
 	Square from = pieces.get_position(c, PAWN, i);
-	
-	/*
-	if (board.get_piece(from).get_color() != c) { // Temporary 
-	    cout << "Assert error!" << endl;
-	    cout << board << endl;
-	    cout << "from=" << hex << from << endl;
-	    cout << "d=" << hex << d << endl;
-	}
-	assert(board.get_piece(from).get_color() == c);
-	assert(board.get_piece(from).get_type() == PAWN);
-	*/
 
 	// Pawn captures
-	//Direction dirs[2] = { Direction(d + LEFT), Direction(d + RIGHT) };
 	for (int i = 0; i < 2; ++i) {
-	    //Square to = Square(from + dirs[i]);
 	    Square to = Square(from + PAWN_CAPTURE_DIRS[c][i]);
 	    if (board.is_out(to)) continue;
 	    if (!board.is_empty(to) && board.get_piece(to).get_color() != c) {
@@ -88,16 +74,9 @@ Moves Game::movegen(bool captures_only) {
 		moves.add(Move(from, to, EN_PASSANT));
 	    }
 	}
-	if (captures_only) continue;
 	
+	if (captures_only) continue;
 	Square to = Square(from + PAWN_PUSH_DIRS[c]);
-	/*
-	if (board.is_out(to)) { // Temporary
-	    cout << "from=" << hex << from << endl;
-	    cout << "to=" << hex << to << endl;
-	    cout << "d=" << hex << d << endl;
-	}
-	*/
 	assert(!board.is_out(to)); // Should never happend
 	if (!board.is_empty(to)) continue;
 	
@@ -137,14 +116,12 @@ Moves Game::movegen(bool captures_only) {
 	Square rook = Square(H1 + A8 * c);
 	if (board.is_empty(Square(F1 + A8 * c)) &&
 	    board.is_empty(to) &&
-	    //!board.is_empty(rook) &&
 	    board.get_piece(rook).get_type() == ROOK &&
 	    board.get_piece(rook).get_color() == c &&
 	    !is_attacked_by(Color(!c), from) &&
 	    !is_attacked_by(Color(!c), Square((F1 + A8 * c))) &&
 	    !is_attacked_by(Color(!c), to)
 	    ) {
-	    //cout << "Add castle king side" << endl;
 	    moves.add(Move(from, to, KING_CASTLE));
 	}
     }
@@ -155,7 +132,6 @@ Moves Game::movegen(bool captures_only) {
 	if (board.is_empty(Square(B1 + A8 * c)) &&
 	    board.is_empty(Square(D1 + A8 * c)) &&
 	    board.is_empty(to) &&
-	    //!board.is_empty(rook) &&
 	    board.get_piece(rook).get_type() == ROOK &&
 	    board.get_piece(rook).get_color() == c &&
 	    !is_attacked_by(Color(!c), from) &&
@@ -180,9 +156,6 @@ void Game::make_move(Move m) {
     assert(!board.is_out(dest));
 
     nodes_count++;
-    
-    //moves_history.push_back(m); // Temporary
-
     new_node(); // From now on, current_node() is refering to the new node
     
     // Update castling rights
@@ -271,9 +244,6 @@ void Game::make_move(Move m) {
 void Game::undo_move(Move m) {
     Square orig = m.get_orig();
     Square dest = m.get_dest();
-    //cout << "o=" << orig << ", d=" << dest << endl;
-
-    //moves_history.pop_back(); // Temporary
     
     // Move back the piece to its origin
     Piece p = board.get_piece(dest);
@@ -289,14 +259,12 @@ void Game::undo_move(Move m) {
     // Restore captured piece
     if (m.is_capture()) {
 	Piece capture = current_node().get_capture();
-	//cout << "Captured piece found: " << capture << endl;
 	Square s = dest;
 	if (m.is_en_passant()) {
 	    Color c = current_node().get_turn_color();
 	    s = (c == WHITE ? Square(dest + UP) : Square(dest + DOWN));
 	    board.set_piece(Piece(), dest);
 	}
-	//cout << "Add " << capture << " to: " << s << endl;
 	add_piece(capture.get_color(), capture.get_type(), s);
     }
     else {
@@ -315,8 +283,7 @@ void Game::undo_move(Move m) {
 		rook_orig = Square(A1 + A8 * c); 
 		rook_dest = Square(D1 + A8 * c); 
 		break;
-	    default:
-		assert(false);
+	    default: assert(false);
 	}
 	Piece rook = board.get_piece(rook_dest);
 	board.set_piece(Piece(), rook_dest);
