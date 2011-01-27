@@ -237,7 +237,7 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 			    move);
 		    return best_score;
 		} 
-		alpha = score;
+		alpha = best_score;
 	    } 
 	    is_principal_variation = false;
 	}
