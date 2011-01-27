@@ -22,7 +22,7 @@
 #include <vector>
 
 #define BOARD_SIZE    128
-#define MAX_DEPTH     299
+#define MAX_DEPTH      64
 #define INF	    29999
 
 enum Square {
