@@ -265,12 +265,9 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 	else return 0; // Stalemate
     }
 
-    //tt.save(current_node().hash(), alpha, alpha, beta, depth, best_move);
-    /*
-    if (old_alpha == alpha) {
-	tt.save(current_node().hash(), alpha, UPPER, depth, Move());
-    }
-    */
+    //if (old_alpha == alpha) {
+    //	tt.save(current_node().hash(), alpha, UPPER, depth, Move());
+    //}
     else if (!best_move.is_null()) { // TODO Should not be null
 	tt.save(current_node().hash(), best_score, EXACT, depth, best_move);
     }
