@@ -237,6 +237,10 @@ void Game::make_move(Move m) {
     else {
 	current_node().set_en_passant(OUT);
     }
+    
+    // Update halfmove counter
+    if (m.is_capture() || t == PAWN) current_node().reset_halfmove();
+    else current_node().inc_halfmove();
 }
 
 void Game::undo_move(Move m) {

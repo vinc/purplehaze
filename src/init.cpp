@@ -144,8 +144,6 @@ void Game::init(string fen) {
     assert(*it == ' ');
     ++it; // Skip the space separator
     
-    cout << *it << endl;
-
     // Parse the FEN for setting the 50 moves counter
     int halfmove = 0;
     for (; it != fen.end(); ++it) {

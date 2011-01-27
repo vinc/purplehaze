@@ -52,6 +52,8 @@ class Tree
 	};
 	void pop() { --tree_top; };
 	Node& top() { return tree[tree_top]; };
+	
+	bool has_repetition_draw();
 };
 
 #endif /* !TREE_H */
