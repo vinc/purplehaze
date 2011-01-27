@@ -48,6 +48,7 @@ class Moves
 	//list<ExtendedMove>::iterator end() { return moves.end(); };
 
 	void numeric_sort() { /*moves.sort(Move::numeric_comp);*/ };
+	void selection_sort();
 	void sort(Move bm);
 };
 

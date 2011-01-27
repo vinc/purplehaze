@@ -37,5 +37,29 @@ void Moves::sort(Move bm) {
 	    moves[i].set_score(1); // SCORE_QUIET;
 	}
     }
-    //moves.sort();
+    selection_sort();
+}
+
+void Moves::selection_sort() {
+    // Algorithm directly taken from Wikipedia
+    int min;
+    // Advance the position through the entire array
+    for (int pos = 0; pos < n; ++pos) {
+    // Find the min element in the unsorted moves[pos .. n-1]
+    // Assume min is the first element
+    min = pos;
+    // Test against all other elements
+    for (int i = pos + 1; i < n; ++i)	{
+	// If this element is less, then it is the new minimum  
+	if (moves[i] < moves[min]) {
+	    // Found a new minimum; remember its index
+	    min = i;
+	}
+    }
+    // min is the index of the minimum element. 
+    // Swap it with the current position
+    ExtendedMove tmp = moves[pos];
+    moves[pos] = moves[min];
+    moves[min] = tmp;
+    }
 }
