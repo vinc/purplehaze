@@ -72,7 +72,7 @@ int Game::perft(int depth) {
     return nodes_count;
 }
 
-int Game::quiescence(int alpha, int beta, int depth) {
+int Game::quiescence_search(int alpha, int beta, int depth) {
     int score;
     int stand_pat = eval();
 
@@ -92,7 +92,7 @@ int Game::quiescence(int alpha, int beta, int depth) {
 	    continue;
 	}
 	
-	score = -quiescence(-beta, -alpha, depth - 1);
+	score = -quiescence_search(-beta, -alpha, depth - 1);
 	undo_move(move);
 	if (score >= beta) {
 	    return beta;
@@ -104,8 +104,8 @@ int Game::quiescence(int alpha, int beta, int depth) {
     return alpha;
 }
 
-int Game::search(int alpha, int beta, int depth) {
-    if (depth == 0) return quiescence(alpha, beta, 0);
+int Game::alphabeta_search(int alpha, int beta, int depth) {
+    if (depth == 0) return quiescence_search(alpha, beta, 0);
 
     int score; //= -INF;
     int old_alpha = alpha;
@@ -158,14 +158,14 @@ int Game::search(int alpha, int beta, int depth) {
 
 	legal_move_found = true;
 	
-	score = -search(-beta, -alpha, depth - 1);
+	score = -alphabeta_search(-beta, -alpha, depth - 1);
 	
 	undo_move(move);
 	
 	if (score >= beta) {
 	    tt.save(current_node().hash(), score, LOWER, depth, move);
 	    //cout << "Save LOWER!" << endl;
-	    return beta;
+	    return beta; // FIXME Should be score
 	} 
 	
 	if (score > alpha) {
@@ -191,6 +191,93 @@ int Game::search(int alpha, int beta, int depth) {
     return alpha;
 }
 
+int Game::principal_variation_search(int alpha, int beta, int depth) {
+    if (depth == 0) return quiescence_search(alpha, beta, 0);
+    //int old_alpha = alpha;
+    int score = -INF;
+    int best_score = -INF;
+    Move best_move;
+    const Transposition& trans = tt.lookup(current_node().hash());
+    if (trans.get_bound() != UNDEF_BOUND) {
+	if (trans.get_depth() >= depth) {
+	    int tr_score = trans.get_value();
+	    switch (trans.get_bound()) {
+		case EXACT: return tr_score;
+		case UPPER: if (tr_score < beta) beta = tr_score; break;
+		case LOWER: if (tr_score > alpha) alpha = tr_score; break;
+		default: assert(false);
+	    }
+	    if (alpha >= beta) return tr_score;
+	}
+	const Move& bm = trans.get_best_move();
+	if (!bm.is_null()) best_move = bm;
+    }
+
+    Color player = current_node().get_turn_color();
+    bool legal_move_found = false;
+    bool is_principal_variation = true;
+    Moves moves = movegen();
+    moves.sort(best_move);
+    for (int i = 0; i < moves.size(); ++i) {
+	const Move& move = moves.at(i);
+	make_move(move);
+
+	if (is_check(player)) { // Illegal move
+	    undo_move(move);
+	    continue;
+	}
+	legal_move_found = true;
+	
+	if (is_principal_variation) {
+	    best_score = -principal_variation_search(-beta, -alpha, depth - 1);
+	    undo_move(move);
+	    if (best_score > alpha) {
+		if (best_score >= beta) {
+		    tt.save(current_node().hash(), best_score, LOWER, depth, 
+			    move);
+		    return best_score;
+		} 
+		alpha = score;
+	    } 
+	    is_principal_variation = false;
+	}
+	else {
+	    score = -principal_variation_search(-alpha - 1, -alpha, depth - 1);
+	    if (alpha < score && score < beta) {
+		score = -principal_variation_search(-beta, -alpha, depth - 1);
+		if (alpha < score) {
+		    alpha = score;
+		}
+	    }		
+	    undo_move(move);
+	    if (score > best_score) {
+		if (score >= beta) {
+		    tt.save(current_node().hash(), score, LOWER, depth, move);
+		    return score;
+		} 
+		best_score = score;
+		best_move = move;
+	    } 
+	}
+    }
+    if (!legal_move_found) {
+	if (is_check(player)) return -INF + 100 - depth; // Checkmate
+	else return 0; // Stalemate
+    }
+
+    //tt.save(current_node().hash(), alpha, alpha, beta, depth, best_move);
+    /*
+    if (old_alpha == alpha) {
+	tt.save(current_node().hash(), alpha, UPPER, depth, Move());
+    }
+    */
+    else if (!best_move.is_null()) { // TODO Should not be null
+	tt.save(current_node().hash(), best_score, EXACT, depth, best_move);
+    }
+
+    return best_score;
+}
+
 Move Game::root(int max_depth) {
     Move best_move;
     Color player = current_node().get_turn_color();
@@ -203,10 +290,7 @@ Move Game::root(int max_depth) {
 	int score;
 	int alpha = -INF;
 	int beta = INF;
-	//nodes_count = 0;
 	moves.sort(best_move);
-	//for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
-	//    Move move = *moves.it;
 	for (int i = 0; i < moves.size(); ++i) {
 	    const Move& move = moves.at(i);
 	    make_move(move);
@@ -214,7 +298,7 @@ Move Game::root(int max_depth) {
 		undo_move(move);
 		continue;
 	    }
-	    score = -search(-beta, -alpha, ply - 1);
+	    score = -principal_variation_search(-beta, -alpha, ply - 1);
 	    undo_move(move);
 	    if (score > alpha) {
 		alpha = score;

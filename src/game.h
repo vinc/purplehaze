@@ -75,8 +75,9 @@ class Game
 	
 	// Search
 	int perft(int depth);
-	int quiescence(int alpha, int beta, int depth);
-	int search(int alpha, int beta, int depth);
+	int quiescence_search(int alpha, int beta, int depth);
+	int alphabeta_search(int alpha, int beta, int depth);
+	int principal_variation_search(int alpha, int beta, int depth);
 	Move root(int max_depth);
 	
 	// Position's evaluation
