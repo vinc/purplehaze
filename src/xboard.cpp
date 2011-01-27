@@ -98,7 +98,7 @@ void Xboard::loop() {
 	    cin >> time;
 	    set_remaining_time(time);
 	}
-	else if (cmd == "otime") {
+	else if (cmd == "otim") {
 	    int time = 0;
 	    cin >> time;
 	}
