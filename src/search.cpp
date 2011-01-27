@@ -193,7 +193,7 @@ int Game::alphabeta_search(int alpha, int beta, int depth) {
 
 int Game::principal_variation_search(int alpha, int beta, int depth) {
     if (depth == 0) return quiescence_search(alpha, beta, 0);
-    //int old_alpha = alpha;
+    int old_alpha = alpha;
     int score = -INF;
     int best_score = -INF;
     Move best_move;
@@ -265,9 +265,9 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 	else return 0; // Stalemate
     }
 
-    //if (old_alpha == alpha) {
-    //	tt.save(current_node().hash(), alpha, UPPER, depth, Move());
-    //}
+    if (old_alpha == alpha) {
+    	tt.save(current_node().hash(), alpha, UPPER, depth, Move());
+    }
     else if (!best_move.is_null()) { // TODO Should not be null
 	tt.save(current_node().hash(), best_score, EXACT, depth, best_move);
     }
