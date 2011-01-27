@@ -113,7 +113,7 @@ enum MoveType : unsigned char {
 };
 
 // Used in movegen.cpp and attack.cpp
-const int NB_DIRS[7] = { 0, 0, 8, 4, 4, 8, 8 };
+const int NB_DIRS[] = { 0, 0, 8, 4, 4, 8, 8 };
 /*
 const Direction NO_DIRS[8] = {
     NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR
@@ -135,7 +135,7 @@ const Direction KING_DIRS[8] = {
     UP, UP_RIGHT, RIGHT, DOWN_RIGHT, DOWN, DOWN_LEFT, LEFT, UP_LEFT
 };
 */
-const Direction PIECES_DIRS[7][8] = {
+const Direction PIECES_DIRS[][8] = {
     {
 	NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR
     },
