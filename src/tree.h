@@ -15,41 +15,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MOVES_H
-#define MOVES_H
+#ifndef TREE_H
+#define TREE_H
 
-#include <algorithm>
-#include <list>
+//#include <stack>
 
-#include "common.h"
-#include "move.h"
+#include "node.h"
 
-using namespace std;
+//using namespace std;
 
-static const int MAX_MOVES = 200; // TODO Find the real value
+static const unsigned int MAX_TREE = 512;
 
-class Moves
+class Tree
 {
     private:
-	ExtendedMove moves[MAX_MOVES];
-	int n;
+    	//stack<Node> tree;
+	Node tree[MAX_TREE];
+	unsigned int tree_top; // Redondant with current_node().get_ply()
     public:
-	Moves() : n(0) {}
-	void add(Move m) { 
-	    //moves.push_back(m);
-	    moves[n] = m;
-	    ++n;
+	Tree() : tree_top(0) {}
+	//Node& top() { return tree.top(); };
+	//void push() { tree.push(tree.top()); };	
+	//void pop() { tree.pop(); };
+	void push() {
+	    tree[tree_top + 1] = tree[tree_top];
+	    ++tree_top;
 	};
-	int size() const { return n; };
-	Move at(int i) const { return moves[i]; };
-	//list<ExtendedMove>::iterator it;
-	
-	//list<ExtendedMove>::iterator begin() { return moves.begin(); };
-	//list<ExtendedMove>::iterator end() { return moves.end(); };
+	void pop() { --tree_top; };
+	Node& top() { return tree[tree_top]; };
 
-	void numeric_sort() { /*moves.sort(Move::numeric_comp);*/ };
-	void selection_sort();
-	void sort(Move bm);
 };
 
-#endif /* !MOVES_H */
+#endif /* !TREE_H */

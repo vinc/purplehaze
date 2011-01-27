@@ -18,8 +18,6 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <stack>
-#include <list>
 #include <bitset>
 #include <string>
 
@@ -28,13 +26,13 @@
 #include "moves.h"
 #include "node.h"
 #include "tt.h"
+#include "tree.h"
 #include "zobrist.h"
 
 class Game
 {
     private:
 	Zobrist zobrist;
-	stack<Node> tree;
 	bitset<7> attack_array[240];
 	Direction dir_array[240];
     public:
@@ -42,6 +40,7 @@ class Game
 	//list<Move> moves_history; // Temporary
 	Pieces pieces;
 	Board board;
+	Tree tree;
 	Transpositions tt;
 	Game();
 	void add_piece(Color c, PieceType t, Square s);

@@ -36,9 +36,8 @@ void Game::init(string fen) {
     //cout << "Cleaning the board..." << endl;
     board = Board();
     pieces = Pieces();
-    while (!tree.empty()) tree.pop();
-    tree.push(Node());
-    
+    tree = Tree();
+
     if (FEN_DEBUG) cout << "FEN: parsing: " << fen << endl;
     // Parse the FEN for discovering pieces
     Square s = A8;

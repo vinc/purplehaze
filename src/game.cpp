@@ -23,9 +23,6 @@
 using namespace std;
 
 Game::Game() {
-    Node root_node;
-    root_node.hash() = 0;
-    tree.push(root_node);
     nodes_count = 0;
     
     // Initialize direction array
@@ -94,11 +91,11 @@ void Game::new_node() {
 			      current_node().get_en_passant());
     
     // Take a "snapshot" of the current position
-    tree.push(tree.top());
+    tree.push();
 
     // Update the position for a new move
-    tree.top().inc_ply();
-    tree.top().change_side();
+    current_node().inc_ply();
+    current_node().change_side();
     zobrist.change_side(current_node().hash());
 }
 
