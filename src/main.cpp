@@ -47,6 +47,9 @@ int main() {
     //cout << size_t << endl;
     cout << endl;
 
+    string default_fen = 
+	"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
     // Parse commands from CLI
     string cmd = prompt();
     while (cmd != "quit" && cmd != "exit") {
@@ -58,9 +61,14 @@ int main() {
 	else if (cmd == "version") {
 	    cout << version << endl;
 	}
+	else if (cmd == "setboard") {
+	    // Get FEN
+	    getline(cin, default_fen);
+	    default_fen.erase(0, 1); // Remove the first whitespace
+	}
 	else if (cmd == "perft") {
 	    Game game;
-	    game.init("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	    game.init(default_fen);
 	    for (int i = 1; ; ++i) {
 		clock_t start = clock();
 		int perft_result = game.perft(i);
@@ -70,20 +78,12 @@ int main() {
 		cout << perft_result / perft_time << " nps)" << endl;
 	    }
 	}
-	else if (cmd == "setboard") {
-	    // Get FEN
-	    Game game;
-	    string fen;
-	    getline(cin, fen);
-	    fen.erase(0, 1); // Remove the first whitespace
-	    game.init(fen);
-	}
 	else if (cmd == "divide") {
-	    Game game;
-	    game.init("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	    int depth = 0;
 	    cin >> depth;
 	    cout << endl;
+	    Game game;
+	    game.init(default_fen);
 	    Color c = game.current_node().get_turn_color();
 	    int nodes_count = 0;
 	    int moves_count = 0;

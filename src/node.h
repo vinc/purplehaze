@@ -30,16 +30,24 @@ class Node
 {
     private:
 	Color side_to_move;
-	short half_move_counter;
+	short halfmove_counter;
 	short score;
 	short ply;
 	bitset<4> castle_rights;
 	Square en_passant;
+	
 	Piece capture;
 	Hash zobrist_hash;
 
     public:
-	Node();
+	Node() : 
+	    side_to_move(WHITE), 
+	    halfmove_counter(0),
+	    score(0),
+	    ply(0),
+	    //castle_rights(0), // Assume default
+	    en_passant(OUT) {}
+	
 	Hash& hash() { return zobrist_hash; };
 	Color get_turn_color() const {
 	    return side_to_move;
@@ -51,10 +59,22 @@ class Node
 	    return ply;
 	};
 	void inc_ply() {
-	    ply++;
+	    --ply;
 	};
 	void dec_ply() {
-	    ply--;
+	    --ply;
+	};
+	short get_halfmove() const {
+	    return halfmove_counter;
+	};
+	void set_halfmove(short i) {
+	    halfmove_counter = i;
+	};
+	void inc_halfmove() {
+	    ++halfmove_counter;
+	};
+	void reset_halfmove() {
+	    halfmove_counter = 0;
 	};
 	Square get_en_passant() const {
 	    return en_passant;
@@ -68,8 +88,12 @@ class Node
 	void set_capture(Piece p) {
 	    capture = p;
 	};
-	bool can_castle(Color c, PieceType t) const;
-	void set_castle_right(Color c, PieceType t, bool b = true);
+	bool can_castle(Color c, PieceType t) const {
+	    return castle_rights[2 * c + t - QUEEN];
+	};
+	void set_castle_right(Color c, PieceType t, bool b = true) {
+	    castle_rights.set(2 * c + t - QUEEN, b);
+	};
 };
 
 #endif /* !NODE_H */

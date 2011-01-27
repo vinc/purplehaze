@@ -144,23 +144,22 @@ void Game::init(string fen) {
     assert(*it == ' ');
     ++it; // Skip the space separator
     
-    /*
+    cout << *it << endl;
+
     // Parse the FEN for setting the 50 moves counter
-    int half_move = 0;
+    int halfmove = 0;
     for (; it != fen.end(); ++it) {
 	// Space separator
 	if (*it == ' ') {
-	    //current_node().set_repetitions(half_move);
+	    current_node().set_halfmove(halfmove);
 	    if (FEN_DEBUG) {
-		cout << "FEN: board repetition fixed to ";
-		cout << half_move << endl;
+		cout << "FEN: halfmove counter fixed to ";
+		cout << halfmove << endl;
 	    }
 	    break;
 	}
 	else {
-	    half_move = half_move * 10 + *it - '0';
+	    halfmove = halfmove * 10 + *it - '0';
 	}
     }
-    ++it;
-    */
 }

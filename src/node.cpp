@@ -19,20 +19,3 @@
 //using namespace std;
 
 #include "node.h"
-
-Node::Node() {
-    side_to_move = WHITE;
-    half_move_counter = 0;
-    score = 0;
-    ply = 0;
-    en_passant = OUT;
-    castle_rights = 0; //0xF;
-    //capture = Piece();
-}
-
-bool Node::can_castle(Color c, PieceType t) const {
-    return castle_rights[2 * c + t - QUEEN];
-}
-void Node::set_castle_right(Color c, PieceType t, bool b) {
-    castle_rights.set(2 * c + t - QUEEN, b);
-}
