@@ -29,15 +29,25 @@ using namespace std;
 class Moves
 {
     private:
-	list<ExtendedMove> moves;
+	//list<ExtendedMove> moves;
+	static const int MAX_MOVES = 200; // TODO Find the real value
+	ExtendedMove moves[MAX_MOVES];
+	int n;
     public:
-	Moves();
-	void add(Move m) { moves.push_back(m); };
-	list<ExtendedMove>::iterator it;
-	list<ExtendedMove>::iterator begin() { return moves.begin(); };
-	list<ExtendedMove>::iterator end() { return moves.end(); };
+	Moves() : n(0) {}
+	void add(Move m) { 
+	    //moves.push_back(m);
+	    moves[n] = m;
+	    ++n;
+	};
+	int size() const { return n; };
+	Move at(int i) const { return moves[i]; };
+	//list<ExtendedMove>::iterator it;
+	
+	//list<ExtendedMove>::iterator begin() { return moves.begin(); };
+	//list<ExtendedMove>::iterator end() { return moves.end(); };
 
-	void numeric_sort() { moves.sort(Move::numeric_comp); };
+	void numeric_sort() { /*moves.sort(Move::numeric_comp);*/ };
 	void sort(Move bm);
 };
 

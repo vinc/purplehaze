@@ -89,15 +89,17 @@ int main() {
 	    int moves_count = 0;
 	    Moves moves = game.movegen();
 	    moves.numeric_sort();
-	    for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
-		game.make_move(*moves.it);
+	    //for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
+	    //	game.make_move(*moves.it);
+	    for (int i = 0; i < moves.size(); ++i) {
+	    	game.make_move(moves.at(i));
 		if (!game.is_check(c)) {
 		    int cnt = game.perft(depth - 1);
 		    nodes_count += cnt;
 		    moves_count++;
-		    cout << *moves.it << " " << cnt << endl;
+		    cout << moves.at(i) << " " << cnt << endl;
 		}
-		game.undo_move(*moves.it);
+		game.undo_move(moves.at(i));
 	    }
 	    cout << endl;
 	    cout << "Moves: " << moves_count << endl;

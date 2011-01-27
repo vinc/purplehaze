@@ -147,6 +147,7 @@ class ExtendedMove : public Move
 	//ExtendedMove(bitset<16> c, bitset<16> e) : code(c), extra(e) {}
 	char score;
     public:
+	ExtendedMove() : score(0) { code = Move().code; }
 	ExtendedMove(Move m, int s = 0) : score(s) { code = m.code; }
 	void set_score(int s) { score = s; };
 	bool operator<(const ExtendedMove& other) const {

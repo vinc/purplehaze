@@ -59,13 +59,15 @@ int Game::perft(int depth) {
     Color c = current_node().get_turn_color();
     if (depth == 0) return 1;
     Moves moves = movegen();
-    for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
-	//cout << *moves.it << endl;
-	make_move(*moves.it);
+    //for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
+    //	make_move(*moves.it);
+    for (int i = 0; i < moves.size(); ++i) {
+    	make_move(moves.at(i));
+
 	if (!is_check(c)) {
 	    nodes_count += perft(depth - 1);
 	}
-	undo_move(*moves.it);
+	undo_move(moves.at(i));
     }
     return nodes_count;
 }
@@ -80,8 +82,9 @@ int Game::quiescence(int alpha, int beta, int depth) {
 
     Moves moves = movegen(true);
     Color player = current_node().get_turn_color();
-    for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
-	Move move = *moves.it;
+    //for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
+    for (int i = 0; i < moves.size(); ++i) {
+	const Move& move = moves.at(i);
 	make_move(move);
 
 	if (is_check(player)) { // Illegal move
@@ -142,8 +145,10 @@ int Game::search(int alpha, int beta, int depth) {
 
     bool legal_move_found = false;
     moves.sort(best_move);
-    for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
-	Move move = *moves.it;
+    //for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
+    //	Move move = *moves.it;
+    for (int i = 0; i < moves.size(); ++i) {
+	const Move& move = moves.at(i);
 	make_move(move);
 
 	if (is_check(player)) { // Illegal move
@@ -200,15 +205,17 @@ Move Game::root(int max_depth) {
 	int beta = INF;
 	//nodes_count = 0;
 	moves.sort(best_move);
-	for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
-	    Move move = *moves.it;
+	//for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
+	//    Move move = *moves.it;
+	for (int i = 0; i < moves.size(); ++i) {
+	    const Move& move = moves.at(i);
 	    make_move(move);
 	    if (is_check(player)) { // Illegal move
-		undo_move(*moves.it);
+		undo_move(move);
 		continue;
 	    }
 	    score = -search(-beta, -alpha, ply - 1);
-	    undo_move(*moves.it);
+	    undo_move(move);
 	    if (score > alpha) {
 		alpha = score;
 		best_move = move;
