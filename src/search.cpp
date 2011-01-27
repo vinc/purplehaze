@@ -281,7 +281,8 @@ Move Game::root(int max_depth) {
     Move best_move;
     Color player = current_node().get_turn_color();
     Moves moves = movegen();
-    clock_t start = clock();
+    //clock_t start = clock();
+    time.start_thinking(current_node().get_ply());
 
     nodes_count = 0;
     print_search_legend();
@@ -302,15 +303,19 @@ Move Game::root(int max_depth) {
 	    if (score > alpha) {
 		alpha = score;
 		best_move = move;
-		double time = double(clock() - start) / CLOCKS_PER_SEC;
-		print_search(0, alpha, time, nodes_count, best_move);
+		//double time = double(clock() - start) / CLOCKS_PER_SEC;
+		print_search(0, alpha, time.get_elapsed_time(), nodes_count, 
+			     best_move);
+		if (time.is_out_of_time()) break;
 	    } 
 	}
 	if (!best_move.is_null()) {
 	    tt.save(current_node().hash(), alpha, EXACT, ply, best_move);
 	}
-	double time = double(clock() - start) / CLOCKS_PER_SEC;
-	print_search(ply, alpha, time, nodes_count, best_move);
+	//double time = double(clock() - start) / CLOCKS_PER_SEC;
+	print_search(ply, alpha, time.get_elapsed_time(), nodes_count, 
+		     best_move);
+	if (time.is_out_of_time()) break;
     }
     return best_move;
 }

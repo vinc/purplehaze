@@ -15,42 +15,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PROTOCOL_H
-#define PROTOCOL_H
+#ifndef TIME_H
+#define TIME_H
 
-#include <string>
-#include <stack>
+#include <stdio.h>
+#include <time.h>
 
-#include "common.h"
-#include "game.h"
-
-class Protocol
+class Time
 {
-    protected:
-	Game game;
-	int depth;
-	stack<Move> history;
+    private:
+	int allowed_moves;
+	int allowed_time; // In centi-seconds
+
+	clock_t starting_time;
+	int allocated_time;
+	int remaining_time;
 
     public:
-	Protocol() : depth(256) {}
-	
-	void new_game();
+	Time() : 
+	    allowed_moves(40), allowed_time(24000), 
+	    allocated_time(24000), remaining_time(24000) {}
+	Time(int moves, int time) : 
+	    allowed_moves(moves), allowed_time(time), 
+	    allocated_time(time), remaining_time(time) {}
 
-	bool set_board(string fen);
-	
-	bool set_time(int moves, int time);
+	void set_remaining_time(int time) { remaining_time = time; };
+	double get_elapsed_time() { 
+	    return double(clock() - starting_time) / CLOCKS_PER_SEC;
+	};
+	void start_thinking(int ply);
+	bool is_out_of_time();
 
-	bool set_remaining_time(int time);
-
-	bool play_move(string move);
-
-	bool undo_move();
-
-	string search_move(bool use_san_notation = false);
-
-	Move parse_move(string move);
-
-	void set_depth(int d) { depth = d; };
 };
 
-#endif /* !PROTOCOL_H */
+#endif /* !TIME_H */

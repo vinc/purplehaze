@@ -39,6 +39,16 @@ bool Protocol::set_board(string fen){
     return true;
 }
 
+bool Protocol::set_time(int moves, int time){
+    game.time = Time(moves, time * 60 * 100);
+    return true;
+}
+
+bool Protocol::set_remaining_time(int time){
+    game.time.set_remaining_time(time);
+    return true;
+}
+
 Move Protocol::parse_move(string move) {
     Square from = Square(move[0] - 'a' + 16 * (move[1] - '1'));
     Square to = Square(move[2] - 'a' + 16 * (move[3] - '1'));

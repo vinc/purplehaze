@@ -82,9 +82,21 @@ void Xboard::loop() {
 	    cin >> n;
 	    cout << "pong " << n << endl;
 	}
+	else if (cmd == "level") {
+	    int moves = 40;
+	    cin >> moves;
+	    int time = 4;
+	    cin >> time;
+	    int control = 0;
+	    cin >> control;
+	    if (control == 0) {
+		set_time(moves, time);
+	    }
+	}
 	else if (cmd == "time") {
 	    int time = 0;
 	    cin >> time;
+	    set_remaining_time(time);
 	}
 	else if (cmd == "otime") {
 	    int time = 0;

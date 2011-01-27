@@ -26,6 +26,7 @@
 #include "moves.h"
 #include "node.h"
 #include "tt.h"
+#include "time.h"
 #include "tree.h"
 #include "zobrist.h"
 
@@ -41,6 +42,7 @@ class Game
 	Pieces pieces;
 	Board board;
 	Tree tree;
+	Time time;
 	Transpositions tt;
 	Game();
 	void add_piece(Color c, PieceType t, Square s);
