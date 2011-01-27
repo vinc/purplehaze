@@ -113,29 +113,52 @@ enum MoveType : unsigned char {
 };
 
 // Used in movegen.cpp and attack.cpp
-typedef std::list<Direction> Directions;
-const Directions NO_DIRS = { 
-    NO_DIR
+const int NB_DIRS[7] = { 0, 0, 8, 4, 4, 8, 8 };
+/*
+const Direction NO_DIRS[8] = {
+    NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR
 };
-const Directions KNIGHT_DIRS = {
+const Direction KNIGHT_DIRS[8] = {
     UP_UP_RIGHT, RIGHT_UP_RIGHT, RIGHT_DOWN_RIGHT, DOWN_DOWN_RIGHT, 
     DOWN_DOWN_LEFT, LEFT_DOWN_LEFT, LEFT_UP_LEFT, UP_UP_LEFT
 };
-const Directions BISHOP_DIRS = {
-    UP_RIGHT, DOWN_RIGHT, DOWN_LEFT, UP_LEFT
+const Direction BISHOP_DIRS[8] = {
+    UP_RIGHT, DOWN_RIGHT, DOWN_LEFT, UP_LEFT, NO_DIR, NO_DIR, NO_DIR, NO_DIR
 };
-const Directions ROOK_DIRS = {
-    UP, RIGHT, DOWN, LEFT
+const Direction ROOK_DIRS[8] = {
+    UP, RIGHT, DOWN, LEFT, NO_DIR, NO_DIR, NO_DIR, NO_DIR
 };
-const Directions QUEEN_DIRS = {
+const Direction QUEEN_DIRS[8] = {
     UP, UP_RIGHT, RIGHT, DOWN_RIGHT, DOWN, DOWN_LEFT, LEFT, UP_LEFT
 };
-const Directions KING_DIRS = {
+const Direction KING_DIRS[8] = {
     UP, UP_RIGHT, RIGHT, DOWN_RIGHT, DOWN, DOWN_LEFT, LEFT, UP_LEFT
 };
-const std::vector<Directions> PIECES_DIRS = {
-    NO_DIRS, NO_DIRS, // Dummy for EMPTY and PAWN
-    KNIGHT_DIRS, BISHOP_DIRS, ROOK_DIRS, QUEEN_DIRS, KING_DIRS
+*/
+const Direction PIECES_DIRS[7][8] = {
+    {
+	NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR
+    },
+    {
+	NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR
+    },
+    {
+	UP_UP_RIGHT, RIGHT_UP_RIGHT, RIGHT_DOWN_RIGHT, DOWN_DOWN_RIGHT, 
+	DOWN_DOWN_LEFT, LEFT_DOWN_LEFT, LEFT_UP_LEFT, UP_UP_LEFT
+    },
+    {
+	UP_RIGHT, DOWN_RIGHT, DOWN_LEFT, UP_LEFT, 
+	NO_DIR, NO_DIR, NO_DIR, NO_DIR
+    },
+    {
+	UP, RIGHT, DOWN, LEFT, NO_DIR, NO_DIR, NO_DIR, NO_DIR
+    },
+    {
+	UP, UP_RIGHT, RIGHT, DOWN_RIGHT, DOWN, DOWN_LEFT, LEFT, UP_LEFT
+    },
+    {
+	UP, UP_RIGHT, RIGHT, DOWN_RIGHT, DOWN, DOWN_LEFT, LEFT, UP_LEFT
+    }
 };
 
 // Used in movegen.cpp and protocol.cpp

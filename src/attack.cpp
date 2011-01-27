@@ -41,9 +41,9 @@ bool Game::is_attacked_by(Color c, Square s) const {
     
     // Pawns
     Direction d = (c == WHITE ? DOWN : UP);
-    Directions dirs = { Direction(d + LEFT), Direction(d + RIGHT) };
-    for (Directions::iterator it = dirs.begin(); it != dirs.end(); it++) {
-	Square from = Square(s + *it);
+    Direction dirs[2] = { Direction(d + LEFT), Direction(d + RIGHT) };
+    for (int i = 0; i < 2; ++i) {
+	Square from = Square(s + dirs[i]);
 	if (board.get_piece(from).get_type() == PAWN &&
 	    board.get_piece(from).get_color() == c) {
 	    return true;

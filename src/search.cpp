@@ -114,7 +114,7 @@ int Game::search(int alpha, int beta, int depth) {
     //Transposition* ptr_trans = tt.lookup(current_node().hash());
     Transposition trans = tt.lookup(current_node().hash());
     if (trans.get_bound() != UNDEF_BOUND) {
-	if (trans.get_depth() >= depth - 1) {
+	if (trans.get_depth() >= depth) {
 	    //cout << "trans" << endl;
 	    int trans_score = trans.get_value();
 	    switch (trans.get_bound()) {

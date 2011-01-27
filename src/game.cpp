@@ -40,19 +40,17 @@ Game::Game() {
 	    Square to = Square(j + (j & ~7));
 	    int diff = 0x77 + from - to;
 	    for (PieceType t = KNIGHT; t <= KING; t = PieceType(t + 1)) {
-		assert(PIECES_DIRS.size() == 7); // common.h included?
-		Directions dirs = PIECES_DIRS.at(t);
-		Directions::iterator it;
-		for (it = dirs.begin(); it != dirs.end(); it++) {
-		    Square s = Square(from + *it);
+		const Direction * dirs = PIECES_DIRS[t];
+		for (int i = 0; i < NB_DIRS[t]; ++i) {
+		    Square s = Square(from + dirs[i]);
 		    while (!board.is_out(s)) {
 			if (s == to) {
 			    attack_array[diff].set(t, true);
-			    dir_array[diff] = *it;
+			    dir_array[diff] = dirs[i];
 			    break;
 			}
 			if (t == KNIGHT || t == KING) break; // Leapers
-			s = Square(s + *it); // Sliders
+			s = Square(s + dirs[i]); // Sliders
 		    }
 		}
 	    }

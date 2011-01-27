@@ -26,12 +26,11 @@ using namespace std;
 
 void movegen_pieces(Board& board, Pieces& pieces, Moves& moves, 
 		    bool captures_only, Color c, PieceType t) {
-    Directions dirs = PIECES_DIRS[t];
-    Directions::iterator it; 
+    const Direction * dirs = PIECES_DIRS[t];
     for (int i = 0; i < pieces.get_nb_pieces(c, t); ++i) {
 	Square from = pieces.get_position(c, t, i);
-	for (it = dirs.begin(); it != dirs.end(); it++) {
-	    Square to = Square(from + *it);
+	for (int i = 0; i < NB_DIRS[t]; ++i) {
+	    Square to = Square(from + dirs[i]);
 	    while (!board.is_out(to)) {
 		if (!board.is_empty(to)) {
 		    if (board.get_piece(to).get_color() == c) break;
@@ -40,7 +39,7 @@ void movegen_pieces(Board& board, Pieces& pieces, Moves& moves,
 		}
 		else if (!captures_only) moves.add(Move(from, to, QUIET_MOVE));
 		if (t == KNIGHT || t == KING) break; // Leapers
-		to = Square(to + *it); // Sliders
+		to = Square(to + dirs[i]); // Sliders
 	    }
 	}
     }
@@ -49,7 +48,6 @@ void movegen_pieces(Board& board, Pieces& pieces, Moves& moves,
 Moves Game::movegen(bool captures_only) {
     Moves moves;
     Color c = current_node().get_turn_color();
-    Directions::iterator it; 
     
     // Pawns moves
     for (int i = 0; i < pieces.get_nb_pieces(c, PAWN); ++i) {
