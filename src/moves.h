@@ -23,6 +23,7 @@
 
 #include "common.h"
 #include "move.h"
+#include "board.h"
 
 using namespace std;
 
@@ -42,6 +43,7 @@ class Moves
 	};
 	int size() const { return n; };
 	Move at(int i) const { return moves[i]; };
+	char get_score(int i) const { return moves[i].get_score(); };
 	//list<ExtendedMove>::iterator it;
 	
 	//list<ExtendedMove>::iterator begin() { return moves.begin(); };
@@ -49,7 +51,7 @@ class Moves
 
 	void numeric_sort() { /*moves.sort(Move::numeric_comp);*/ };
 	void selection_sort();
-	void sort(Move bm);
+	void sort(Move bm, Board b);
 };
 
 #endif /* !MOVES_H */

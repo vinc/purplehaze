@@ -80,10 +80,11 @@ int Game::quiescence_search(int alpha, int beta, int depth) {
     if (stand_pat >= beta) return beta; // Beta cut-off
     if (alpha < stand_pat) alpha = stand_pat; // New alpha
 
-    Moves moves = movegen(true);
+    Moves moves = movegen(true); // Capture only
+    moves.sort(Move(), board);
     Color player = current_node().get_turn_color();
-    //for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
     for (int i = 0; i < moves.size(); ++i) {
+	if (moves.get_score(i) < 0) break; // Skip bad captures	
 	const Move& move = moves.at(i);
 	make_move(move);
 
@@ -145,7 +146,7 @@ int Game::alphabeta_search(int alpha, int beta, int depth) {
     }
 
     bool legal_move_found = false;
-    moves.sort(best_move);
+    moves.sort(best_move, board);
     //for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
     //	Move move = *moves.it;
     for (int i = 0; i < moves.size(); ++i) {
@@ -219,7 +220,7 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
     bool legal_move_found = false;
     bool is_principal_variation = true;
     Moves moves = movegen();
-    moves.sort(best_move);
+    moves.sort(best_move, board);
     for (int i = 0; i < moves.size(); ++i) {
 	const Move& move = moves.at(i);
 	make_move(move);
@@ -286,7 +287,7 @@ Move Game::root(int max_depth) {
 	int score;
 	int alpha = -INF;
 	int beta = INF;
-	moves.sort(best_move);
+	moves.sort(best_move, board);
 	for (int i = 0; i < moves.size(); ++i) {
 	    const Move& move = moves.at(i);
 	    make_move(move);

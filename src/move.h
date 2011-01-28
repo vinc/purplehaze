@@ -149,6 +149,7 @@ class ExtendedMove : public Move
     public:
 	ExtendedMove() : score(0) { code = Move().code; }
 	ExtendedMove(Move m, int s = 0) : score(s) { code = m.code; }
+	char get_score() const { return score; };
 	void set_score(int s) { score = s; };
 	bool operator<(const ExtendedMove& other) const {
 	    return this->score > other.score; // FIXME replace '<' by '>'

@@ -15,7 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <assert.h>
+
 #include "moves.h"
+#include "eval.h" // For PIECE_VALUES[]
 
 /*
 Moves::Moves() {
@@ -23,18 +26,28 @@ Moves::Moves() {
 }
 */
 
-void Moves::sort(Move bm) { 
+void Moves::sort(Move bm, Board b) {
     for (int i = 0; i != size(); ++i) {
-	if (moves[i].get_orig() == bm.get_orig() &&
-	    moves[i].get_dest() == bm.get_dest() &&
-	    moves[i].get_type() == bm.get_type()) {
-	    moves[i].set_score(3); //SCORE_BEST_MOVE;
+	ExtendedMove& m = moves[i];
+	if (m.get_orig() == bm.get_orig() &&
+	    m.get_dest() == bm.get_dest() &&
+	    m.get_type() == bm.get_type()) {
+	    m.set_score(127);
 	}
-	else if (moves[i].is_capture()) {
-	    moves[i].set_score(2); //SCORE_CAPTURE;
+	else if (m.is_capture()) {
+	    const PieceType& a = b.get_piece(m.get_orig()).get_type();
+	    const PieceType& v = b.get_piece(m.get_dest()).get_type();
+	    int aggressor = PIECE_VALUE[a];
+	    int victim = PIECE_VALUE[v];
+	    if (m.is_en_passant()) victim = PIECE_VALUE[PAWN];
+	    int score = (((victim - aggressor) / 16) - 1);
+	    assert(PIECE_VALUE[KING] == 10000);
+	    if (v == KING) score -= 500;
+	    if (a == KING) score += 500;
+	    m.set_score(score);
 	}
 	else {
-	    moves[i].set_score(1); // SCORE_QUIET;
+	    m.set_score(1); // SCORE_QUIET;
 	}
     }
     selection_sort();
