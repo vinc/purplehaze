@@ -59,7 +59,7 @@ class Node
 	    return ply;
 	};
 	void inc_ply() {
-	    --ply;
+	    ++ply;
 	};
 	void dec_ply() {
 	    --ply;
