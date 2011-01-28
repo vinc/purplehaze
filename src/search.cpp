@@ -193,7 +193,7 @@ int Game::alphabeta_search(int alpha, int beta, int depth) {
 }
 
 int Game::principal_variation_search(int alpha, int beta, int depth) {
-    int old_alpha = alpha;
+    //int old_alpha = alpha;
     int score = -INF;
     int best_score = -INF;
     Move best_move;
@@ -267,12 +267,8 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 	else return 0; // Stalemate
     }
 
-    if (old_alpha == alpha) {
-    	tt.save(current_node().hash(), alpha, UPPER, depth, Move());
-    }
-    else if (!best_move.is_null()) { // TODO Should not be null
-	tt.save(current_node().hash(), best_score, EXACT, depth, best_move);
-    }
+    Bound bound = (best_score <= alpha ? UPPER : EXACT);
+    tt.save(current_node().hash(), best_score, bound, depth, best_move);
 
     return best_score;
 }
