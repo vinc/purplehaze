@@ -50,24 +50,17 @@ void print_search(int ply, int score, double time, int nodes, Move m) {
     else {
 	cout << setw(WIDE) << nodes;
     }
-    //if (m.is_null()) cout << setw(WIDE) << "#";
-    //else cout << setw(WIDE) << m;
     cout << setw(WIDE) << m << endl;
 }
 
 int Game::perft(int depth) {
+    if (depth == 0) return 1;
     int nodes_count = 0;
     Color c = current_node().get_turn_color();
-    if (depth == 0) return 1;
     Moves moves = movegen();
-    //for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
-    //	make_move(*moves.it);
     for (int i = 0; i < moves.size(); ++i) {
     	make_move(moves.at(i));
-
-	if (!is_check(c)) {
-	    nodes_count += perft(depth - 1);
-	}
+	if (!is_check(c)) nodes_count += perft(depth - 1);
 	undo_move(moves.at(i));
     }
     return nodes_count;
@@ -111,71 +104,47 @@ int Game::quiescence_search(int alpha, int beta, int depth) {
     return alpha;
 }
 
+/* 
+ * Replaced by Principal Variation Search
+ */
 int Game::alphabeta_search(int alpha, int beta, int depth) {
-    if (depth == 0) return quiescence_search(alpha, beta, 0);
-    if (tree.has_repetition_draw()) return 0; // Fifty-move rule
-
-    int score; //= -INF;
-    int old_alpha = alpha;
-    //int best_score = -INF;
-    Color player = current_node().get_turn_color();
-    Moves moves = movegen();
+    int score;
     Move best_move;
-
-    //Transposition* ptr_trans = tt.lookup(current_node().hash());
     Transposition trans = tt.lookup(current_node().hash());
     if (trans.get_bound() != UNDEF_BOUND) {
 	if (trans.get_depth() >= depth) {
-	    //cout << "trans" << endl;
 	    int trans_score = trans.get_value();
 	    switch (trans.get_bound()) {
 		case EXACT: return trans_score;
-		case UPPER:
-		    //if (trans_score <= alpha) return trans_score;
-		    if (trans_score < beta) beta = trans_score;
-		    break;
-		case LOWER: 
-		    //if (trans_score >= beta) return trans_score;
-		    if (trans_score > alpha) alpha = trans_score;
-		    break;
+		case UPPER: if (trans_score < beta) beta = trans_score; break;
+		case LOWER: if (trans_score > alpha) alpha = trans_score; break;
 		default: assert(false);
 	    }
 	    if (alpha >= beta) return trans_score;
 	}
 	Move bm = trans.get_best_move();
-	//cout << "Try to get bm from tt... Bound: ";
-	//cout << trans.get_bound() << endl;
-	if (!bm.is_null()) {
-	    //cout << "Got bm from tt: " << bm << endl;
-	    best_move = bm;
-	}
+	if (!bm.is_null()) best_move = bm;
     }
-
+    if (depth == 0) return quiescence_search(alpha, beta, 0); // Quiescence
+    if (tree.has_repetition_draw()) return 0; // Repetition draw rules
+    Color player = current_node().get_turn_color();
     bool legal_move_found = false;
+    Moves moves = movegen();
     moves.sort(best_move, board);
-    //for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
-    //	Move move = *moves.it;
     for (int i = 0; i < moves.size(); ++i) {
 	const Move& move = moves.at(i);
 	make_move(move);
-
-	if (is_check(player)) { // Illegal move
+	if (is_check(player)) { // Skip illegal move
 	    undo_move(move);
 	    continue;
 	}
-
 	legal_move_found = true;
-	
 	score = -alphabeta_search(-beta, -alpha, depth - 1);
-	
 	undo_move(move);
-	
 	if (score >= beta) {
 	    tt.save(current_node().hash(), score, LOWER, depth, move);
-	    //cout << "Save LOWER!" << endl;
-	    return beta; // FIXME Should be score
+	    return beta; // FIXME Should it be score?
 	} 
-	
 	if (score > alpha) {
 	    alpha = score;
 	    best_move = move;
@@ -185,17 +154,8 @@ int Game::alphabeta_search(int alpha, int beta, int depth) {
 	if (is_check(player)) return -INF + 100 - depth; // Checkmate
 	else return 0; // Stalemate
     }
-
-    //tt.save(current_node().hash(), alpha, alpha, beta, depth, best_move);
-    if (old_alpha == alpha) {
-	//cout << "Save UPPER!" << endl;
-	tt.save(current_node().hash(), alpha, UPPER, depth, Move());
-    }
-    else if (!best_move.is_null()) {
-	//cout << "Save EXACT!" << endl;
-	tt.save(current_node().hash(), alpha, EXACT, depth, best_move);
-    }
-
+    Bound bound = (best_score <= alpha ? UPPER : EXACT);
+    tt.save(current_node().hash(), best_score, bound, depth, best_move);
     return alpha;
 }
 
@@ -289,14 +249,12 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 }
 
 Move Game::root(int max_depth) {
-    Move best_move;
-    Color player = current_node().get_turn_color();
-    Moves moves = movegen();
-    //clock_t start = clock();
     time.start_thinking(current_node().get_ply());
-
-    nodes_count = 0;
+    Color player = current_node().get_turn_color();
     print_search_legend();
+    nodes_count = 0;
+    Move best_move;
+    Moves moves = movegen();
     for (int ply = 1; ply < max_depth; ++ply) {
 	int score;
 	int alpha = -INF;
@@ -305,7 +263,7 @@ Move Game::root(int max_depth) {
 	for (int i = 0; i < moves.size(); ++i) {
 	    const Move& move = moves.at(i);
 	    make_move(move);
-	    if (is_check(player)) { // Illegal move
+	    if (is_check(player)) { // Skip illegal move
 		undo_move(move);
 		continue;
 	    }
@@ -314,7 +272,6 @@ Move Game::root(int max_depth) {
 	    if (score > alpha) {
 		alpha = score;
 		best_move = move;
-		//double time = double(clock() - start) / CLOCKS_PER_SEC;
 		print_search(0, alpha, time.get_elapsed_time(), nodes_count, 
 			     best_move);
 		if (time.is_out_of_time()) break;
@@ -323,7 +280,6 @@ Move Game::root(int max_depth) {
 	if (!best_move.is_null()) {
 	    tt.save(current_node().hash(), alpha, EXACT, ply, best_move);
 	}
-	//double time = double(clock() - start) / CLOCKS_PER_SEC;
 	print_search(ply, alpha, time.get_elapsed_time(), nodes_count, 
 		     best_move);
 	if (time.is_out_of_time()) break;
