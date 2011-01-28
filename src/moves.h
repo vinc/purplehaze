@@ -18,9 +18,6 @@
 #ifndef MOVES_H
 #define MOVES_H
 
-#include <algorithm>
-#include <list>
-
 #include "common.h"
 #include "move.h"
 #include "board.h"

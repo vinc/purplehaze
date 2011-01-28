@@ -20,8 +20,17 @@
 
 #include <iostream>
 #include <fstream>
+#include <string>
 
 #include "protocol.h"
+
+#define XBOARD_NB_FEATURES	3
+
+const string XBOARD_FEATURES[XBOARD_NB_FEATURES][2] = {
+    { "setboard",	"1" },
+    { "sigint",		"0" },
+    { "done",		"1" },
+};
 
 class Xboard : public Protocol
 {

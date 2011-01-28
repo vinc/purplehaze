@@ -32,7 +32,7 @@ void Xboard::think() {
     string move = search_move();
     string output = "";
     if (move == "LOST") {
-	output = "result ";
+	output = "RESULT ";
 	if (game.current_node().get_turn_color() == WHITE) {
 	    output += "0-1 {Black mates}";
 	}
@@ -41,7 +41,7 @@ void Xboard::think() {
 	}
     }	
     else if (move == "DRAW") {
-	output = "result 1/2-1/2";
+	output = "RESULT 1/2-1/2";
     }
     else if (!force_mode) {
 	play_move(move);
@@ -53,12 +53,12 @@ void Xboard::think() {
 
 void Xboard::loop() {
     cout << endl; // Acknowledge Xboard mode
-    log.open("game.log", ios::app); 
+    log.open("/tmp/game.log", ios::app); 
     log << "DEBUG: PurpleHaze starting" << endl;
-    cout << "feature setboard=1" << endl;
-    cout << "feature sigint=0" << endl;
-    //cout << "feature ping=1" << endl;
-    cout << "feature done=1" << endl;
+    for (int i = 0; i < XBOARD_NB_FEATURES; ++i) {
+	cout << "feature " << XBOARD_FEATURES[i][0];
+	cout << "=" << XBOARD_FEATURES[i][1] << endl;
+    }
 
     string cmd;
     cin >> cmd;
@@ -117,7 +117,7 @@ void Xboard::loop() {
 	else if (cmd == "hard") {
 
 	}
-	else if (cmd == "level") {
+	else if (cmd == "egtb") { // Sent by PyChess
 
 	}
 	else if (4 <= cmd.size() && cmd.size() <= 5) {

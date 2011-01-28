@@ -41,16 +41,21 @@ void print_search_legend() {
 }
 
 void print_search(int ply, int score, double time, int nodes, Move m) {
-    if (ply) cout << setw(4) << ply;
-    else cout << setw(4) << ' ';
+    cout << setw(4) << ply;
     cout << setw(WIDE) << score;
-    cout << setw(WIDE) << setprecision(3) << time;
-    if (nodes >= 1000000) {
-	cout << setw(WIDE - 1) << setprecision(3) << nodes / 1000000.0 << "M";
+    cout << setw(WIDE) << int(time * 100);
+    /*
+    if (nodes > 999999) {
+	char unit = 'M';
+	float ns = nodes / 1000;
+	if (ns > 999.9) {
+	    unit = 'G';
+	    ns /= 1000;
+	}
+	cout << setw(WIDE - 1) << setprecision(3) << ns << unit;
     }
-    else {
-	cout << setw(WIDE) << nodes;
-    }
+    */
+    cout << setw(WIDE) << nodes;
     cout << setw(WIDE) << m << endl;
 }
 
@@ -284,7 +289,7 @@ Move Game::root(int max_depth) {
 	    if (score > alpha) {
 		alpha = score;
 		best_move = move;
-		print_search(0, alpha, time.get_elapsed_time(), nodes_count, 
+		print_search(ply, alpha, time.get_elapsed_time(), nodes_count, 
 			     best_move);
 		if (time.is_out_of_time()) break;
 	    } 

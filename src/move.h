@@ -18,7 +18,6 @@
 #ifndef MOVE_H
 #define MOVE_H
 
-#include <bitset>
 #include <string>
 
 #include "common.h"
