@@ -28,6 +28,7 @@
 
 using namespace std;
 
+#define R     3
 #define WIDE 10
 
 void print_search_legend() {
@@ -109,6 +110,7 @@ int Game::quiescence_search(int alpha, int beta, int depth) {
  */
 int Game::alphabeta_search(int alpha, int beta, int depth) {
     int score;
+    int old_alpha = alpha;
     Move best_move;
     Transposition trans = tt.lookup(current_node().hash());
     if (trans.get_bound() != UNDEF_BOUND) {
@@ -154,8 +156,8 @@ int Game::alphabeta_search(int alpha, int beta, int depth) {
 	if (is_check(player)) return -INF + 100 - depth; // Checkmate
 	else return 0; // Stalemate
     }
-    Bound bound = (best_score <= alpha ? UPPER : EXACT);
-    tt.save(current_node().hash(), best_score, bound, depth, best_move);
+    Bound bound = (old_alpha <= alpha ? UPPER : EXACT); // FIXME probably wrong
+    tt.save(current_node().hash(), alpha, bound, depth, best_move);
     return alpha;
 }
 
@@ -186,6 +188,16 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
     if (tree.has_repetition_draw()) return 0; // Repetition draw rules
 
     Color player = current_node().get_turn_color();
+    
+    // Null Move Pruning
+    if (!is_check(player) && depth > R) {
+	Move null_move;
+	make_move(null_move);
+	score = -principal_variation_search(-beta, 1 - beta, depth - R - 1);
+	undo_move(null_move);
+	if (score >= beta) return beta;
+    }
+
     bool legal_move_found = false;
     bool is_principal_variation = true;
     Moves moves = movegen();

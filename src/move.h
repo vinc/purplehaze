@@ -102,7 +102,7 @@ class Move
 	//bool is_capture() { return code[2]; }; // w/o null move
 	bool is_capture() const {
 	    //return code[2] && (!is_null());
-	    return is_set(2) && (!is_null());
+	    return is_set(2) && !is_null();
 	}; 
 	bool is_castle() const {
 	    //return !code[3] && !code[2] && code[1];

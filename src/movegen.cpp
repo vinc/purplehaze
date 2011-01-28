@@ -149,6 +149,7 @@ void Game::make_move(Move m) {
     Square ep = current_node().get_en_passant();
     Color c = current_node().get_turn_color();
     Piece p = board.get_piece(orig);
+    PieceType t = p.get_type();
     Piece capture;
     assert(!board.is_out(orig));
     assert(!board.is_out(dest));
@@ -156,8 +157,17 @@ void Game::make_move(Move m) {
     nodes_count++;
     new_node(); // From now on, current_node() is refering to the new node
     
+    // Update halfmove counter
+    if (m.is_capture() || t == PAWN) current_node().reset_halfmove();
+    else current_node().inc_halfmove();
+  
+    // Null Move
+    if (m.is_null()) {
+	current_node().set_en_passant(OUT);
+	return;
+    }
+
     // Update castling rights
-    PieceType t = p.get_type();
     if ((current_node().can_castle(c, KING)) && 
 	(t == KING || (t == ROOK && orig == Square(H1 + A8 * c)))) {
 	current_node().set_castle_right(c, KING, false);
@@ -169,6 +179,7 @@ void Game::make_move(Move m) {
 	zobrist.update_castle_right(current_node().hash(), c, QUEEN);
     }
     
+    // Capture
     if (m.is_capture()) {
 	Square s = dest;
 	if (m.is_en_passant()) {
@@ -192,6 +203,7 @@ void Game::make_move(Move m) {
 	assert(board.is_empty(s));
     }
 
+    // Castling
     if (m.is_castle()) {
 	Square rook_orig, rook_dest;
 	switch (m.get_castle_side()) {
@@ -237,10 +249,6 @@ void Game::make_move(Move m) {
     else {
 	current_node().set_en_passant(OUT);
     }
-    
-    // Update halfmove counter
-    if (m.is_capture() || t == PAWN) current_node().reset_halfmove();
-    else current_node().inc_halfmove();
 }
 
 void Game::undo_move(Move m) {
@@ -253,7 +261,7 @@ void Game::undo_move(Move m) {
 	add_piece(p.get_color(), PAWN, orig);
 	del_piece(p);
     }
-    else {
+    else if (!m.is_null()) {
 	board.set_piece(p, orig);
 	pieces.set_position(p, orig);
     }
@@ -269,10 +277,11 @@ void Game::undo_move(Move m) {
 	}
 	add_piece(capture.get_color(), capture.get_type(), s);
     }
-    else {
+    else if (!m.is_null()) {
 	board.set_piece(Piece(), dest);
     }
     del_node();
+    if (m.is_null()) return;
     if (m.is_castle()) {
 	Square rook_orig, rook_dest;
 	Color c = current_node().get_turn_color();
