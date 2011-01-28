@@ -24,6 +24,7 @@
 #include <iomanip>
 
 #include "game.h"
+#include "eval.h"
 
 using namespace std;
 
@@ -75,9 +76,14 @@ int Game::perft(int depth) {
 int Game::quiescence_search(int alpha, int beta, int depth) {
     int score;
     int stand_pat = eval();
-
     if (depth < -MAX_DEPTH) return stand_pat;
+    
     if (stand_pat >= beta) return beta; // Beta cut-off
+
+    // Delta pruning
+    int delta = PIECE_VALUE[QUEEN]; // TODO: Switch of in late endgame
+    if (stand_pat < alpha - delta) return alpha;
+    
     if (alpha < stand_pat) alpha = stand_pat; // New alpha
 
     Moves moves = movegen(true); // Capture only
@@ -96,7 +102,7 @@ int Game::quiescence_search(int alpha, int beta, int depth) {
 	score = -quiescence_search(-beta, -alpha, depth - 1);
 	undo_move(move);
 	if (score >= beta) {
-	    return beta;
+	    return score;
 	} 
 	if (score > alpha) {
 	    alpha = score;
@@ -194,27 +200,30 @@ int Game::alphabeta_search(int alpha, int beta, int depth) {
 }
 
 int Game::principal_variation_search(int alpha, int beta, int depth) {
-    //int old_alpha = alpha;
     int score = -INF;
     int best_score = -INF;
     Move best_move;
+
+    // Lookup in Transposition Table
     const Transposition& trans = tt.lookup(current_node().hash());
     if (trans.get_bound() != UNDEF_BOUND) {
 	if (trans.get_depth() >= depth) {
 	    int tr_score = trans.get_value();
 	    switch (trans.get_bound()) {
-		case EXACT: return tr_score;
+		case EXACT: return tr_score; // Already searched node
 		case UPPER: if (tr_score < beta) beta = tr_score; break;
 		case LOWER: if (tr_score > alpha) alpha = tr_score; break;
 		default: assert(false);
 	    }
-	    if (alpha >= beta) return tr_score;
+	    if (alpha >= beta) return tr_score; // TT cause a cut-off
 	}
 	const Move& bm = trans.get_best_move();
-	if (!bm.is_null()) best_move = bm;
+	if (!bm.is_null()) best_move = bm; // Save the best move
     }
-    if (depth == 0) return quiescence_search(alpha, beta, 0);
-    if (tree.has_repetition_draw()) return 0; // Fifty-move rule
+    
+    // End of regular search?
+    if (depth == 0) return quiescence_search(alpha, beta, 0); // Quiescence
+    if (tree.has_repetition_draw()) return 0; // Repetition draw rules
 
     Color player = current_node().get_turn_color();
     bool legal_move_found = false;
@@ -225,12 +234,13 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 	const Move& move = moves.at(i);
 	make_move(move);
 
-	if (is_check(player)) { // Illegal move
+	if (is_check(player)) { // Skip illegal move
 	    undo_move(move);
 	    continue;
 	}
 	legal_move_found = true;
 	
+	// PVS code from http://www.talkchess.com/forum/viewtopic.php?t=26974
 	if (is_principal_variation) {
 	    best_score = -principal_variation_search(-beta, -alpha, depth - 1);
 	    undo_move(move);
@@ -253,9 +263,12 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 		}
 	    }		
 	    undo_move(move);
-	    if (score > best_score) {
-		if (score >= beta) {
+	    if (score > best_score) { // Found a new best move
+		if (score >= beta) {// Sufficient to cause a cut-off?
+		    // Store the search to Transposition Table
 		    tt.save(current_node().hash(), score, LOWER, depth, move);
+		    
+		    // Beta cut-off
 		    return score;
 		} 
 		best_score = score;
@@ -263,11 +276,12 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 	    } 
 	}
     }
-    if (!legal_move_found) {
+    if (!legal_move_found) { // End of game?
 	if (is_check(player)) return -INF + 100 - depth; // Checkmate
 	else return 0; // Stalemate
     }
 
+    // Store the search to Transposition Table
     Bound bound = (best_score <= alpha ? UPPER : EXACT);
     tt.save(current_node().hash(), best_score, bound, depth, best_move);
 
