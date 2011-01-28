@@ -24,10 +24,8 @@ void Time::start_thinking(int ply) {
     if (remaining_time != allocated_time) {
 	int remaining_moves = allowed_moves - (ply % allowed_moves);
 	allocated_time = remaining_time / remaining_moves;
-	//std::cout << remaining_time << " / " << remaining_moves << std::endl;
     }
     else {
-	//std::cout << allowed_time << " / " << allowed_moves << std::endl;
 	allocated_time = allowed_time / allowed_moves;
     }
     std::cout << " " << double(allocated_time / 100);
@@ -35,7 +33,6 @@ void Time::start_thinking(int ply) {
 }
 
 bool Time::is_out_of_time() {
-    //std::cout << 100 * get_elapsed_time() << " * 2 > " << allocated_time << std::endl;
     if (2 * 100 * get_elapsed_time() > allocated_time) return true;
     else return false;
 }

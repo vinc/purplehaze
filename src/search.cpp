@@ -193,8 +193,6 @@ int Game::alphabeta_search(int alpha, int beta, int depth) {
 }
 
 int Game::principal_variation_search(int alpha, int beta, int depth) {
-    if (depth == 0) return quiescence_search(alpha, beta, 0);
-    if (tree.has_repetition_draw()) return 0; // Fifty-move rule
     int old_alpha = alpha;
     int score = -INF;
     int best_score = -INF;
@@ -214,6 +212,8 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 	const Move& bm = trans.get_best_move();
 	if (!bm.is_null()) best_move = bm;
     }
+    if (depth == 0) return quiescence_search(alpha, beta, 0);
+    if (tree.has_repetition_draw()) return 0; // Fifty-move rule
 
     Color player = current_node().get_turn_color();
     bool legal_move_found = false;
