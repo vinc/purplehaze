@@ -1,10 +1,30 @@
-CXX=g++
-#CXXFLAGS=-Wall -pedantic-errors -g -O3 -march=native -mtune=native -std=c++0x
-#CXXFLAGS=-Wall -pedantic-errors -pg -std=c++0x
-CXXFLAGS=-Wall -pedantic-errors -g -std=c++0x #-lprofiler
-SOURCES=$(shell ls src/*.cpp)
-OBJECTS=$(SOURCES:.cpp=.o)
-EXECUTABLE=purplehaze
+optimize = no
+profiler = no
+null_move_pruning = yes
+transpositions_table = yes
+
+CXX = g++
+CXXFLAGS = -Wall -pedantic-errors -g -std=c++0x
+
+ifeq ($(optimize),yes)
+    CXXFLAGS += -O3 -march=native -mtune=native
+endif
+
+ifeq ($(profiler),yes)
+    CXXFLAGS += -lprofiler
+endif
+
+ifeq ($(null_move_pruning),yes)
+    CXXFLAGS += -DNMP
+endif
+
+ifeq ($(transpositions_table),yes)
+    CXXFLAGS += -DTT
+endif
+
+SOURCES = $(shell ls src/*.cpp)
+OBJECTS = $(SOURCES:.cpp=.o)
+EXECUTABLE = purplehaze
 
 all: $(SOURCES) $(EXECUTABLE)
 
