@@ -72,10 +72,8 @@ class Transpositions
 	    tt = NULL;
 	};
 	Transposition& lookup(Hash hash);
-	void save(Hash h, int v, int a, int b, int d, Move bm);
-	void save(Hash h, int v, Bound b, int d, Move bm); /* {
-	    tt[h & (SIZE - 1)] = Transposition(h, v, b, d, bm);
-	}*/
+	//void save(Hash h, int v, int a, int b, int d, Move bm);
+	void save(Hash h, int v, Bound b, int d, Move bm);
 	void clear();
 
 	// Used only for unit testing

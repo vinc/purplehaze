@@ -53,7 +53,7 @@ void Xboard::think() {
 
 void Xboard::loop() {
     cout << endl; // Acknowledge Xboard mode
-    log.open("/tmp/game.log", ios::app); 
+    log.open("game.log", ios::app); 
     log << "DEBUG: PurpleHaze starting" << endl;
 
     string cmd;

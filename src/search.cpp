@@ -61,7 +61,7 @@ int Game::quiescence_search(int alpha, int beta, int depth) {
     Color player = current_node().get_turn_color();
     for (int i = 0; i < moves.size(); ++i) {
 	if (moves.get_score(i) < 0) break; // Skip bad captures	
-	const Move& move = moves.at(i);
+	Move move = moves.at(i);
 	make_move(move);
 
 	if (is_check(player)) { // Illegal move
@@ -110,7 +110,7 @@ int Game::alphabeta_search(int alpha, int beta, int depth) {
     Moves moves = movegen();
     moves.sort(best_move, board);
     for (int i = 0; i < moves.size(); ++i) {
-	const Move& move = moves.at(i);
+	Move move = moves.at(i);
 	make_move(move);
 	if (is_check(player)) { // Skip illegal move
 	    undo_move(move);
@@ -142,6 +142,7 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
     int best_score = -INF;
     Move best_move;
 
+#ifdef TT
     // Lookup in Transposition Table
     const Transposition& trans = tt.lookup(current_node().hash());
     if (trans.get_bound() != UNDEF_BOUND) {
@@ -158,6 +159,7 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 	const Move& bm = trans.get_best_move();
 	if (!bm.is_null()) best_move = bm; // Save the best move
     }
+#endif
     
     // End of regular search?
     if (depth == 0) return quiescence_search(alpha, beta, 0); // Quiescence
@@ -165,6 +167,7 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 
     Color player = current_node().get_turn_color();
     
+#ifdef NMP
     // Null Move Pruning
     if (!is_check(player) && depth > R) {
 	Move null_move;
@@ -173,13 +176,14 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 	undo_move(null_move);
 	if (score >= beta) return beta; // beta or score?
     }
+#endif
 
     bool legal_move_found = false;
     bool is_principal_variation = true;
     Moves moves = movegen();
     moves.sort(best_move, board);
     for (int i = 0; i < moves.size(); ++i) {
-	const Move& move = moves.at(i);
+	Move move = moves.at(i);
 	make_move(move);
 
 	if (is_check(player)) { // Skip illegal move
@@ -195,7 +199,7 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 	    if (best_score > alpha) {
 		if (best_score >= beta) {
 		    tt.save(current_node().hash(), best_score, LOWER, depth, 
-			    move);
+		    	    move);
 		    return best_score;
 		} 
 		alpha = best_score;
@@ -249,7 +253,7 @@ Move Game::root(int max_depth) {
 	int beta = INF;
 	moves.sort(best_move, board);
 	for (int i = 0; i < moves.size(); ++i) {
-	    const Move& move = moves.at(i);
+	    Move move = moves.at(i);
 	    make_move(move);
 	    if (is_check(player)) { // Skip illegal move
 		undo_move(move);

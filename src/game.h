@@ -18,7 +18,6 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <bitset>
 #include <string>
 
 #include "pieces.h"
@@ -88,8 +87,8 @@ class Game
 	// Output
 	void print_thinking_header();
 	void print_thinking(int ply, int score, Move m);
-	void print_principal_variation(int depth, Move m);
-	void print_move(Move m);
+	string output_principal_variation(int depth, Move m);
+	string output_move(Move m);
 };
 
 #endif /* !GAME_H */

@@ -18,6 +18,7 @@
 #include <assert.h>
 #include <iostream>
 #include <iomanip>
+#include <string>
 
 #include "game.h"
 
@@ -40,17 +41,21 @@ void Game::print_thinking(int ply, int score, Move m) {
     cout << setw(WIDE) << int(time.get_elapsed_time() * 100);
     cout << setw(WIDE) << nodes_count;
     cout << setw(WIDE - 3) << " ";
-    print_principal_variation(ply, m);
-    cout << endl;
+    int depth = current_node().get_ply();
+    if (depth % 2 != 0) cout << 1 + (depth / 2) << ". ...";
+    cout << output_principal_variation(ply, m) << endl;
 }
 
-void Game::print_principal_variation(int depth, Move m) {
-    cout << " ";
+string Game::output_principal_variation(int depth, Move m) {
+    string res = " ";
     int ply = current_node().get_ply();
-    if (ply % 2 == 0) cout << 1 + (ply / 2) << ". ";
-    print_move(m);
+    if (ply % 2 == 0) {
+	res += char('1' + 1 + (ply / 2));
+	res += ". ";
+    }
+    res += output_move(m);
     make_move(m);
-    if (is_check(current_node().get_turn_color())) cout << "+";
+    if (is_check(current_node().get_turn_color())) res += "+";
     
     // Find next move in TT
     Transposition trans = tt.lookup(current_node().hash());
@@ -62,18 +67,54 @@ void Game::print_principal_variation(int depth, Move m) {
     cout << ", move=" << trans.get_best_move() << endl;
     */
     Move move = trans.get_best_move();
-    if (depth > 0 && !move.is_null()) {
-	print_principal_variation(depth - 1, move);
+    if (depth > 0 && !move.is_null() && trans.get_bound() < 3) {
+	res += output_principal_variation(depth - 1, move);
     }
 
     undo_move(m);
+    return res;
 }
 
-void Game::print_move(Move m) {
-    Square s = m.get_orig();
-    Piece p = board.get_piece(s);
+string Game::output_move(Move m) {
+    string res = "";
+    // Castling
+    if (m.is_castle()) {
+	if (m.get_castle_side() == QUEEN) res = "O-";
+	return res + "O-O";
+    }
+
+    // Type of piece
+    Square from = m.get_orig();
+    Piece p = board.get_piece(from);
     PieceType t = p.get_type();
-    if (t > PAWN) cout << Piece(WHITE, t).to_string(); // Upper case
-    cout << char('a' + m.get_dest_file());
-    cout << char('1' + m.get_dest_rank());
+    if (t > PAWN) res += Piece(WHITE, t).to_string(); // Upper case
+    
+    // Capture
+    if (m.is_capture()) {
+	if (t == PAWN) res += char('a' + m.get_orig_file());
+	else { // Disambiguation
+	    Color c = current_node().get_turn_color();
+	    Square to = m.get_dest();
+	    for (int i = 0; i < pieces.get_nb_pieces(c, t); ++i) {
+		Square s = pieces.get_position(c, t, i);
+		if (s != from && can_attack(t, s, to)) {
+		    res += char('a' + m.get_orig_file());
+		    break;
+		}
+	    }
+	}
+	res += "x";
+    }
+    
+    // Destination
+    res += char('a' + m.get_dest_file());
+    res += char('1' + m.get_dest_rank());
+    
+    // Promotion
+    if (m.is_promotion()) {
+	res += "=";
+	res += Piece(WHITE, m.get_promotion_type()).to_string();
+    }
+
+    return res;
 }

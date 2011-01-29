@@ -39,23 +39,16 @@ void Transpositions::clear() {
 }
 
 Transposition& Transpositions::lookup(Hash h) {
-    assert(tt != NULL);
-    assert((h & (SIZE - 1)) < SIZE);
     Transposition t = tt[h & (SIZE - 1)];
-    //cout << ">" << t.get_hash() << " / " << h << endl;
-    //if (t.get_bound() < 0 || 2 < t.get_bound()) return 0;
-    //return (h && t.get_hash() == h ? t : 0);
     return (h && t.get_hash() == h ? t : null_entry);
 }
 void Transpositions::save(Hash h, int v, Bound b, int d, Move bm) {
     tt[h & (SIZE - 1)] = Transposition(h, v, b, d, bm);
-    //cout << "<" << /*t.get_hash() << " / " <<*/ h;
-    //cout << " b=" << b << ", bm=" << bm << endl;
 }
 
+/*
 void Transpositions::save(Hash h, int v, int a, int b, int d, Move bm) {
-    assert((h & (SIZE - 1)) < SIZE);
     Bound bound = (v <= a ? UPPER : (v >= b ? LOWER : EXACT));
     tt[h & (SIZE - 1)] = Transposition(h, v, bound, d, bm); // Always Replace
-    cout << "<" << /*t.get_hash() << " / " <<*/ h << endl;
 }
+*/

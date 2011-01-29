@@ -40,12 +40,22 @@ int main() {
     cout << version << endl;
     cout << endl;
     
+    /*
     cout << "Piece: " << sizeof(Piece) << endl;
     cout << "Move: " << sizeof(Move) << endl;
     cout << "ExtendedMove: " << sizeof(ExtendedMove) << endl;
     cout << "Transposition: " << sizeof(Transposition) << endl;
-    //cout << size_t << endl;
     cout << endl;
+    */
+
+    cout << "Compiled with options:";
+#ifdef NMP
+    cout << " NMP";
+#endif
+#ifdef TT
+    cout << " TT";
+#endif
+    cout << endl << endl;
 
     string default_fen = 
 	"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
