@@ -19,6 +19,7 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
+#include <sstream>
 
 #include "game.h"
 
@@ -35,27 +36,25 @@ void Game::print_thinking_header() {
     cout << endl;
 }
 
-void Game::print_thinking(int ply, int score, Move m) {
-    cout << setw(4) << ply;
+void Game::print_thinking(int depth, int score, Move m) {
+    cout << setw(4) << depth;
     cout << setw(WIDE) << score;
     cout << setw(WIDE) << int(time.get_elapsed_time() * 100);
     cout << setw(WIDE) << nodes_count;
     cout << setw(WIDE - 3) << " ";
-    int depth = current_node().get_ply();
-    if (depth % 2 != 0) cout << 1 + (depth / 2) << ". ...";
-    cout << output_principal_variation(ply, m) << endl;
+    int ply = current_node().get_ply();
+    if (ply % 2 != 0) cout << 1 + (ply / 2) << ". ...";
+    cout << output_principal_variation(depth, m) << endl;
 }
 
 string Game::output_principal_variation(int depth, Move m) {
-    string res = " ";
+    ostringstream stream;
+    stream << " ";
     int ply = current_node().get_ply();
-    if (ply % 2 == 0) {
-	res += char('1' + 1 + (ply / 2));
-	res += ". ";
-    }
-    res += output_move(m);
+    if (ply % 2 == 0) stream << 1 + (ply / 2) << ". ";
+    stream << output_move(m);
     make_move(m);
-    if (is_check(current_node().get_turn_color())) res += "+";
+    if (is_check(current_node().get_turn_color())) stream << "+";
     
     // Find next move in TT
     Transposition trans = tt.lookup(current_node().hash());
@@ -68,53 +67,52 @@ string Game::output_principal_variation(int depth, Move m) {
     */
     Move move = trans.get_best_move();
     if (depth > 0 && !move.is_null() && trans.get_bound() < 3) {
-	res += output_principal_variation(depth - 1, move);
+	stream << output_principal_variation(depth - 1, move);
     }
 
     undo_move(m);
-    return res;
+    return stream.str();
 }
 
 string Game::output_move(Move m) {
-    string res = "";
+    ostringstream stream;
+
     // Castling
     if (m.is_castle()) {
-	if (m.get_castle_side() == QUEEN) res = "O-";
-	return res + "O-O";
+	if (m.get_castle_side() == QUEEN) stream << "O-";
+	return stream.str() + "O-O";
     }
 
     // Type of piece
     Square from = m.get_orig();
     Piece p = board.get_piece(from);
     PieceType t = p.get_type();
-    if (t > PAWN) res += Piece(WHITE, t).to_string(); // Upper case
+    if (t > PAWN) stream << Piece(WHITE, t); // Upper case
     
     // Capture
     if (m.is_capture()) {
-	if (t == PAWN) res += char('a' + m.get_orig_file());
+	if (t == PAWN) stream << char('a' + m.get_orig_file());
 	else { // Disambiguation
 	    Color c = current_node().get_turn_color();
 	    Square to = m.get_dest();
 	    for (int i = 0; i < pieces.get_nb_pieces(c, t); ++i) {
 		Square s = pieces.get_position(c, t, i);
 		if (s != from && can_attack(t, s, to)) {
-		    res += char('a' + m.get_orig_file());
+		    stream << char('a' + m.get_orig_file());
 		    break;
 		}
 	    }
 	}
-	res += "x";
+	stream << "x";
     }
     
     // Destination
-    res += char('a' + m.get_dest_file());
-    res += char('1' + m.get_dest_rank());
+    stream << char('a' + m.get_dest_file()) << char('1' + m.get_dest_rank());
     
     // Promotion
     if (m.is_promotion()) {
-	res += "=";
-	res += Piece(WHITE, m.get_promotion_type()).to_string();
+	stream << "=" << Piece(WHITE, m.get_promotion_type());
     }
 
-    return res;
+    return stream.str();
 }

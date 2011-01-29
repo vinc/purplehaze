@@ -4,14 +4,17 @@ null_move_pruning = yes
 transpositions_table = yes
 
 CXX = g++
-CXXFLAGS = -Wall -pedantic-errors -g -std=c++0x
+CXXFLAGS = -Wall -pedantic-errors -g -std=c++0x \
+	   -Wcast-qual -Wshadow \
+	   -W -pipe -Wextra \
+	   #-Wconversion
 
 ifeq ($(optimize),yes)
-    CXXFLAGS += -march=native -mtune=native
+    CXXFLAGS += -O3 -march=native -mtune=native
 endif
 
 ifeq ($(profiler),yes)
-    CXXFLAGS += -lprofiler
+    CXXFLAGS += -pg -lprofiler
 endif
 
 ifeq ($(null_move_pruning),yes)

@@ -18,6 +18,8 @@
 #ifndef TT_H
 #define TT_H
 
+#include <string>
+
 #include "common.h"
 #include "move.h"
 #include "zobrist.h"
@@ -32,7 +34,7 @@ class Transposition
 {
     private:
 	Hash hash;
-	unsigned char value;
+	int value;
 	Bound bound;
 	unsigned char depth;
 	Move best_move;
@@ -51,6 +53,8 @@ class Transposition
 	Bound get_bound() const { return bound; };
 	int get_depth() const { return depth; };
 	Move get_best_move() const { return best_move; };
+	bool is_empty() const;
+	string to_string() const;
 };
 
 class Transpositions
@@ -64,14 +68,15 @@ class Transpositions
 
     public:
 	Transpositions(int n = TT_SIZE) : SIZE(n / sizeof(Transposition)) {
-	    assert((n & (n - 1)) == 0);
+	    //assert(SIZE > 0);
+	    //assert((n & (n - 1)) == 0);
 	    tt = new Transposition[SIZE];
 	};
 	~Transpositions() {
 	    delete [] tt;
 	    tt = NULL;
 	};
-	Transposition& lookup(Hash hash);
+	Transposition lookup(Hash hash);
 	//void save(Hash h, int v, int a, int b, int d, Move bm);
 	void save(Hash h, int v, Bound b, int d, Move bm);
 	void clear();

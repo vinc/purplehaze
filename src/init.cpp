@@ -38,9 +38,9 @@ void Game::init(string fen) {
     pieces = Pieces();
     tree = Tree();
 
+    Square s = A8;
     if (FEN_DEBUG) cout << "FEN: parsing: " << fen << endl;
     // Parse the FEN for discovering pieces
-    Square s = A8;
     for (it = fen.begin(); it != fen.end(); ++it) {
 	// Space separator
 	if (*it == ' ') {
@@ -129,7 +129,7 @@ void Game::init(string fen) {
 	char file = *it;
 	++it;
 	char rank = *it;
-	Square s = Square((rank - '1') * 16 + file - 'a');
+	s = Square((rank - '1') * 16 + file - 'a');
 	if (board.is_out(s)) it = it - 3; // Bugged FEN
 	else {
 	    current_node().set_en_passant(s);

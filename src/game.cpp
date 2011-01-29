@@ -40,16 +40,16 @@ Game::Game() {
 	    int diff = 0x77 + from - to;
 	    for (PieceType t = KNIGHT; t <= KING; t = PieceType(t + 1)) {
 		const Direction * dirs = PIECES_DIRS[t];
-		for (int i = 0; i < NB_DIRS[t]; ++i) {
-		    Square s = Square(from + dirs[i]);
+		for (int d = 0; d < NB_DIRS[t]; ++d) {
+		    Square s = Square(from + dirs[d]);
 		    while (!board.is_out(s)) {
 			if (s == to) {
 			    attack_array[diff].set(t, true);
-			    dir_array[diff] = dirs[i];
+			    dir_array[diff] = dirs[d];
 			    break;
 			}
 			if (t == KNIGHT || t == KING) break; // Leapers
-			s = Square(s + dirs[i]); // Sliders
+			s = Square(s + dirs[d]); // Sliders
 		    }
 		}
 	    }

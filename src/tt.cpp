@@ -17,11 +17,28 @@
 
 #include <iostream>
 #include <assert.h>
+#include <sstream>
+#include <string>
 
 #include "tt.h"
 
 using namespace std;
 
+bool Transposition::is_empty() const {
+    if (get_hash() != 0 || get_value() != 0 || get_depth() != 0 ||
+	get_bound() != UNDEF_BOUND || !get_best_move().is_null()) {	
+	return false;
+    }
+    return true;
+}
+
+string Transposition::to_string() const {
+    ostringstream stream;
+    stream << "<" << hex << get_hash();
+    stream << ", " << dec << get_value() << ", " << get_depth();
+    stream << ", " << get_bound() << ", " << get_best_move() << ">";
+    return stream.str();
+}
 /*
 Transpositions::Transpositions(int n) {
     if (n == 0) n = TT_SIZE;
@@ -35,15 +52,32 @@ Transpositions::Transpositions(int n) {
 */
 
 void Transpositions::clear() {
-    for (int i = 0; i < SIZE; ++i) tt[i] = Transposition();
+    //cout << "Cleaning the " << SIZE << " entries in TT" << endl;
+    for (int i = 0; i < SIZE; ++i) {
+	tt[i] = Transposition();
+	//assert(tt[i].is_empty());
+    }
 }
 
-Transposition& Transpositions::lookup(Hash h) {
+Transposition Transpositions::lookup(Hash h) {
+    //assert(SIZE > 0);
+    //assert(null_entry.is_empty());
     Transposition t = tt[h & (SIZE - 1)];
-    return (h && t.get_hash() == h ? t : null_entry);
+    //cout << "look " << t.to_string() << endl;
+    return ((h && t.get_hash() == h) ? t : null_entry);
 }
 void Transpositions::save(Hash h, int v, Bound b, int d, Move bm) {
-    tt[h & (SIZE - 1)] = Transposition(h, v, b, d, bm);
+    //cout << "cast <" << hex << h << ", " << dec << v << ", " << d << ", ";
+    //cout << b << ", " << bm << ">" << endl;
+    Transposition t(h, v, b, d, bm);
+    /*
+    assert(h == t.get_hash());
+    assert(v == t.get_value());
+    assert(b == t.get_bound());
+    assert(bm == t.get_best_move());
+    */
+    //cout << "save " << t.to_string() << endl;
+    tt[h & (SIZE - 1)] = t;
 }
 
 /*

@@ -29,8 +29,8 @@ void movegen_pieces(Board& board, Pieces& pieces, Moves& moves,
     const Direction * dirs = PIECES_DIRS[t];
     for (int i = 0; i < pieces.get_nb_pieces(c, t); ++i) {
 	Square from = pieces.get_position(c, t, i);
-	for (int i = 0; i < NB_DIRS[t]; ++i) {
-	    Square to = Square(from + dirs[i]);
+	for (int d = 0; d < NB_DIRS[t]; ++d) {
+	    Square to = Square(from + dirs[d]);
 	    while (!board.is_out(to)) {
 		if (!board.is_empty(to)) {
 		    if (board.get_piece(to).get_color() == c) break;
@@ -39,7 +39,7 @@ void movegen_pieces(Board& board, Pieces& pieces, Moves& moves,
 		}
 		else if (!captures_only) moves.add(Move(from, to, QUIET_MOVE));
 		if (t == KNIGHT || t == KING) break; // Leapers
-		to = Square(to + dirs[i]); // Sliders
+		to = Square(to + dirs[d]); // Sliders
 	    }
 	}
     }
@@ -54,8 +54,8 @@ Moves Game::movegen(bool captures_only) {
 	Square from = pieces.get_position(c, PAWN, i);
 
 	// Pawn captures
-	for (int i = 0; i < 2; ++i) {
-	    Square to = Square(from + PAWN_CAPTURE_DIRS[c][i]);
+	for (int d = 0; d < 2; ++d) {
+	    Square to = Square(from + PAWN_CAPTURE_DIRS[c][d]);
 	    if (board.is_out(to)) continue;
 	    if (!board.is_empty(to) && board.get_piece(to).get_color() != c) {
 		if (board.is_pawn_end(c, to)) {
@@ -242,9 +242,9 @@ void Game::make_move(Move m) {
     // Update en passant
     current_node().set_capture(capture);
     if (m.is_double_pawn_push()) {
-	Square ep = Square(orig + (dest - orig) / 2);
-	current_node().set_en_passant(ep);
-	zobrist.update_en_passant(current_node().hash(), ep);
+	Square new_ep = Square(orig + (dest - orig) / 2);
+	current_node().set_en_passant(new_ep);
+	zobrist.update_en_passant(current_node().hash(), new_ep);
     }
     else {
 	current_node().set_en_passant(OUT);
@@ -305,5 +305,7 @@ void Game::undo_move(Move m) {
 
 bool Game::is_legal_move(Move m) {
     // TODO
-    return true;
+    //Square from = m.get_orig();
+    //Square to = m.get_dest();
+    return !m.is_null();
 }

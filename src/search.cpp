@@ -28,19 +28,19 @@
 
 using namespace std;
 
-#define R     3
+#define	R   3
 
 int Game::perft(int depth) {
     if (depth == 0) return 1;
-    int nodes_count = 0;
+    int nodes = 0;
     Color c = current_node().get_turn_color();
     Moves moves = movegen();
     for (int i = 0; i < moves.size(); ++i) {
     	make_move(moves.at(i));
-	if (!is_check(c)) nodes_count += perft(depth - 1);
+	if (!is_check(c)) nodes += perft(depth - 1);
 	undo_move(moves.at(i));
     }
-    return nodes_count;
+    return nodes;
 }
 
 int Game::quiescence_search(int alpha, int beta, int depth) {
@@ -145,14 +145,15 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 #ifdef TT
     // Lookup in Transposition Table
     const Transposition& trans = tt.lookup(current_node().hash());
-    if (trans.get_bound() != UNDEF_BOUND) {
+    if (!trans.is_empty()) {
+	//cout << "eval " << trans.to_string() << endl;
 	if (trans.get_depth() >= depth) {
 	    int tr_score = trans.get_value();
 	    switch (trans.get_bound()) {
 		case EXACT: return tr_score; // Already searched node
 		case UPPER: if (tr_score < beta) beta = tr_score; break;
 		case LOWER: if (tr_score > alpha) alpha = tr_score; break;
-		default: assert(false);
+		default: assert(!"Corrupted Transposition Table");
 	    }
 	    if (alpha >= beta) return tr_score; // TT cause a cut-off
 	}
