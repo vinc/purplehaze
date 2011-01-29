@@ -40,11 +40,11 @@ void Game::print_thinking(int ply, int score, Move m) {
     cout << setw(WIDE) << int(time.get_elapsed_time() * 100);
     cout << setw(WIDE) << nodes_count;
     cout << setw(WIDE - 3) << " ";
-    print_principal_variation(m);
+    print_principal_variation(ply, m);
     cout << endl;
 }
 
-void Game::print_principal_variation(Move m) {
+void Game::print_principal_variation(int depth, Move m) {
     cout << " ";
     int ply = current_node().get_ply();
     if (ply % 2 == 0) cout << 1 + (ply / 2) << ". ";
@@ -62,8 +62,8 @@ void Game::print_principal_variation(Move m) {
     cout << ", move=" << trans.get_best_move() << endl;
     */
     Move move = trans.get_best_move();
-    if (!move.is_null()) {
-	print_principal_variation(move);
+    if (depth > 0 && !move.is_null()) {
+	print_principal_variation(depth - 1, move);
     }
 
     undo_move(m);

@@ -88,7 +88,7 @@ class Game
 	// Output
 	void print_thinking_header();
 	void print_thinking(int ply, int score, Move m);
-	void print_principal_variation(Move m);
+	void print_principal_variation(int depth, Move m);
 	void print_move(Move m);
 };
 
