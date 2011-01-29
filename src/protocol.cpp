@@ -39,8 +39,12 @@ bool Protocol::set_board(string fen){
     return true;
 }
 
+/*
+ * Set time control:
+ * 'n' moves in 't' time with time in seconds.
+ */
 bool Protocol::set_time(int moves, int time){
-    game.time = Time(moves, time * 60 * 100);
+    game.time = Time(moves, time * 100);
     return true;
 }
 

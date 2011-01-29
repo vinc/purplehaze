@@ -17,6 +17,7 @@
 
 #include <assert.h>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 #include "xboard.h"
@@ -104,14 +105,35 @@ void Xboard::loop() {
 	    cout << "pong " << n << endl;
 	}
 	else if (cmd == "level") {
-	    int moves = 40;
+	    // Number of moves
+	    int moves;
 	    cin >> moves;
-	    int time = 4;
-	    cin >> time;
-	    int control = 0;
+
+	    // Time interval in minutes or minutes:seconds
+	    int time;
+	    string str_time;
+	    cin >> str_time;
+	    size_t sep = str_time.find(":");
+	    if (sep == string::npos) {
+		istringstream minutes(str_time);
+		minutes >> time;
+		time *= 60;
+	    }
+	    else {
+		istringstream minutes(str_time.substr(0, sep));
+		istringstream seconds(str_time.substr(sep + 1));
+		seconds >> time;
+		int tmp;
+		minutes >> tmp;
+		time += 60 * tmp;
+	    }
+
+	    // Control character
+	    int control;
 	    cin >> control;
 	    if (control == 0) {
 		set_time(moves, time);
+		log << "> level " << moves << " " << time << endl;
 	    }
 	}
 	else if (cmd == "time") {
