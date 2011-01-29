@@ -20,6 +20,16 @@
 
 #include "common.h"
 
+#define MALUS_KING_BREAKING_CASTLE_RIGHT    -40
+#define BONUS_CASTLE			    100
+#define BONUS_KING_SHIELD		     30
+#define BONUS_BISHOP_PAIR		     40
+#define MALUS_NO_PAWN			    -30
+#define MALUS_QUEEN_EARLY_MOVE		    -20
+#define BONUS_ROOK_OPEN_FILE		     30
+#define BONUS_ROOK_SEMI_OPEN_FILE	     15
+#define BONUS_ROOK_SEVENTH_RANK		      5
+
 // Hans Berliner's system
 const int PIECE_VALUE[8] = { 
         0, // Empty piece
@@ -29,6 +39,17 @@ const int PIECE_VALUE[8] = {
       510, // Rook
       880, // Queen
     10000, // King
+};
+
+// Adjustement based on the number of own paws (taken from CPW engine)
+const int KNIGHT_ADJ[9] = {
+    -20, -16, -12, -8, -4,  0,  4,  8, 12
+};
+const int ROOK_ADJ[9] = {
+    15,  12,   9,  6,  3,  0, -3, -6, -9
+};
+const int MALUS_MULTI_PAWN[7] = { // Pawns on the same file
+    0, 0, -25, -60, -100, -100, -100
 };
 
 /*
@@ -136,26 +157,5 @@ const int FLIP[BOARD_SIZE] = {
      16,  17,  18,  19,  20,  21,  22,  23,  24,  25,  26,  27,  28,  29,  30,  31,
       0,   1,   2,   3,   4,   5,   6,   7,   8,   9,  10,  11,  12,  13,  14,  15,
 };
-
-const int KNIGHT_ADJ[9] = { 
-    -20, -16, -12, -8, -4,  0,  4,  8, 12
-};
-const int ROOK_ADJ[9] =   {
-    15,  12,   9,  6,  3,  0, -3, -6, -9
-};
-const int MALUS_MULTI_PAWN[7] = {
-    0, 0, -25, -60, -100, -100, -100
-};
-
-const int BONUS_CASTLE =			100;
-const int BONUS_KING_SHIELD =			 30;
-const int BONUS_RANDOM_MAX =			  3;
-const int BONUS_BISHOP_PAIR =			 30;
-const int MALUS_NO_PAWN =			-30;
-const int MALUS_KING_BREAKING_CASTLE_RIGHT =	-40;
-const int MALUS_QUEEN_EARLY_MOVE =		-20;
-const int BONUS_ROOK_OPEN_FILE =		 30;
-const int BONUS_ROOK_SEVENTH_RANK =		  5;
-
 
 #endif /* !EVAL_H */
