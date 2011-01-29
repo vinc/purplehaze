@@ -24,6 +24,8 @@ using namespace std;
 
 Game::Game() {
     nodes_count = 0;
+
+    tt.clear();
     
     // Initialize direction array
     for (int i = 0; i < 240; ++i) { 

@@ -1,4 +1,4 @@
-optimize = no
+optimize = yes
 profiler = no
 null_move_pruning = yes
 transpositions_table = yes
@@ -7,7 +7,7 @@ CXX = g++
 CXXFLAGS = -Wall -pedantic-errors -g -std=c++0x
 
 ifeq ($(optimize),yes)
-    CXXFLAGS += -O3 -march=native -mtune=native
+    CXXFLAGS += -march=native -mtune=native
 endif
 
 ifeq ($(profiler),yes)
