@@ -55,18 +55,39 @@ void Xboard::loop() {
     cout << endl; // Acknowledge Xboard mode
     log.open("/tmp/game.log", ios::app); 
     log << "DEBUG: PurpleHaze starting" << endl;
-    for (int i = 0; i < XBOARD_NB_FEATURES; ++i) {
-	cout << "feature " << XBOARD_FEATURES[i][0];
-	cout << "=" << XBOARD_FEATURES[i][1] << endl;
-    }
 
     string cmd;
     cin >> cmd;
     while (cmd != "quit") {
 	log << ">" << cmd << endl; 
-	if (cmd == "new") {
+	if (cmd == "protover") {
+	    int n;
+	    cin >> n;
+	    if (n == 2) {
+		for (int i = 0; i < XBOARD_NB_FEATURES; ++i) {
+		    cout << "feature " << XBOARD_FEATURES[i][0];
+		    cout << "=" << XBOARD_FEATURES[i][1] << endl;
+		    string reply, feature;
+		    cin >> reply;
+		    cin >> feature;
+		    assert(feature == XBOARD_FEATURES[i][0]);
+		    if (reply == "accepted") continue;
+		    else if (reply == "rejected") assert(false); // FIXME
+		    else assert(false); // FIXME
+		}
+	    }
+	}
+	else if (cmd == "new") {
 	    new_game();
 	    set_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	    force_mode = false;
+	}
+	else if (cmd == "setboard") {
+	    string fen;
+	    getline(cin, fen);
+	    fen.erase(0, 1); // Remove the first whitespace
+	    new_game();
+	    set_board(fen);
 	    force_mode = false;
 	}
 	else if (cmd == "go") {
@@ -117,15 +138,15 @@ void Xboard::loop() {
 	else if (cmd == "hard") {
 
 	}
-	else if (cmd == "egtb") { // Sent by PyChess
-
-	}
-	else if (4 <= cmd.size() && cmd.size() <= 5) {
-	    if (!parse_move(cmd).is_null()) { // TODO This need improvement
-		log << "DEBUG: move parsed: " << cmd << endl;
-		play_move(cmd);
-		think();
-	    }
+	else if (4 <= cmd.size() && cmd.size() <= 5 &&
+		 'a' <= cmd[0] && cmd[0] <= 'h' &&
+		 '1' <= cmd[1] && cmd[1] <= '8' &&
+		 'a' <= cmd[2] && cmd[2] <= 'h' &&
+		 '1' <= cmd[3] && cmd[3] <= '8' &&
+		 !parse_move(cmd).is_null()) {
+	    log << "DEBUG: move parsed: " << cmd << endl;
+	    play_move(cmd);
+	    think();
 	}
 	else {
 	    log << "DEBUG: ignoring: " << cmd << endl;

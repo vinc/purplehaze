@@ -29,35 +29,6 @@
 using namespace std;
 
 #define R     3
-#define WIDE 10
-
-void print_search_legend() {
-    cout << setw(4) << "ply";
-    cout << setw(WIDE) << "score";
-    cout << setw(WIDE) << "time";
-    cout << setw(WIDE) << "nodes";
-    cout << setw(WIDE) << " pv";
-    cout << endl;
-}
-
-void print_search(int ply, int score, double time, int nodes, Move m) {
-    cout << setw(4) << ply;
-    cout << setw(WIDE) << score;
-    cout << setw(WIDE) << int(time * 100);
-    /*
-    if (nodes > 999999) {
-	char unit = 'M';
-	float ns = nodes / 1000;
-	if (ns > 999.9) {
-	    unit = 'G';
-	    ns /= 1000;
-	}
-	cout << setw(WIDE - 1) << setprecision(3) << ns << unit;
-    }
-    */
-    cout << setw(WIDE) << nodes;
-    cout << setw(WIDE) << m << endl;
-}
 
 int Game::perft(int depth) {
     if (depth == 0) return 1;
@@ -200,7 +171,7 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 	make_move(null_move);
 	score = -principal_variation_search(-beta, 1 - beta, depth - R - 1);
 	undo_move(null_move);
-	if (score >= beta) return beta;
+	if (score >= beta) return beta; // beta or score?
     }
 
     bool legal_move_found = false;
@@ -268,11 +239,11 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 Move Game::root(int max_depth) {
     time.start_thinking(current_node().get_ply());
     Color player = current_node().get_turn_color();
-    print_search_legend();
+    print_thinking_header();
     nodes_count = 0;
     Move best_move;
     Moves moves = movegen();
-    for (int ply = 1; ply < max_depth; ++ply) {
+    for (int ply = 1; ply < max_depth; ++ply) { // Iterative Deepening
 	int score;
 	int alpha = -INF;
 	int beta = INF;
@@ -289,16 +260,14 @@ Move Game::root(int max_depth) {
 	    if (score > alpha) {
 		alpha = score;
 		best_move = move;
-		print_search(ply, alpha, time.get_elapsed_time(), nodes_count, 
-			     best_move);
+		print_thinking(ply, alpha, best_move);
 		if (time.is_out_of_time()) break;
 	    } 
 	}
 	if (!best_move.is_null()) {
 	    tt.save(current_node().hash(), alpha, EXACT, ply, best_move);
 	}
-	print_search(ply, alpha, time.get_elapsed_time(), nodes_count, 
-		     best_move);
+	print_thinking(ply, alpha, best_move);
 	if (time.is_out_of_time()) break;
     }
     return best_move;

@@ -84,6 +84,12 @@ class Game
 	// Position's evaluation
 	int piece_eval(Color c, PieceType t, int i);
 	int eval();
+
+	// Output
+	void print_thinking_header();
+	void print_thinking(int ply, int score, Move m);
+	void print_principal_variation(Move m);
+	void print_move(Move m);
 };
 
 #endif /* !GAME_H */
