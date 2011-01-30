@@ -66,7 +66,7 @@ string Game::output_principal_variation(int depth, Move m) {
     cout << ", move=" << trans.get_best_move() << endl;
     */
     Move move = trans.get_best_move();
-    if (depth > 0 && !move.is_null() && trans.get_bound() < 3) {
+    if (depth > 0 && is_legal(move) && trans.get_bound() < 3) {
 	stream << output_principal_variation(depth - 1, move);
     }
 

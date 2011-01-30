@@ -103,7 +103,7 @@ bool Protocol::play_move(string move) {
     
     // Test legality
     if (m.is_null()) return false;
-    if (!game.is_legal_move(m)) return false;
+    if (!game.is_legal(m)) return false;
     
     // Play move
     game.make_move(m);

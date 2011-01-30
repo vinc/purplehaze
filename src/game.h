@@ -71,7 +71,7 @@ class Game
 	Moves movegen(bool captures_only = false);
 	void make_move(Move m);
 	void undo_move(Move m);
-	bool is_legal_move(Move m);
+	bool is_legal(Move m);
 	
 	// Search
 	int perft(int depth);

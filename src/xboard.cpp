@@ -33,7 +33,7 @@ void Xboard::think() {
     string move = search_move();
     string output = "";
     if (move == "LOST") {
-	output = "RESULT ";
+	output = "result ";
 	if (game.current_node().get_turn_color() == WHITE) {
 	    output += "0-1 {Black mates}";
 	}
@@ -42,7 +42,7 @@ void Xboard::think() {
 	}
     }	
     else if (move == "DRAW") {
-	output = "RESULT 1/2-1/2";
+	output = "result 1/2-1/2";
     }
     else if (!force_mode) {
 	play_move(move);
@@ -167,8 +167,10 @@ void Xboard::loop() {
 		 '1' <= cmd[3] && cmd[3] <= '8' &&
 		 !parse_move(cmd).is_null()) {
 	    log << "DEBUG: move parsed: " << cmd << endl;
-	    play_move(cmd);
-	    think();
+	    if (!play_move(cmd)) {
+		cout << "Illegal move: " << cmd << endl;
+	    }
+	    else think();
 	}
 	else {
 	    log << "DEBUG: ignoring: " << cmd << endl;

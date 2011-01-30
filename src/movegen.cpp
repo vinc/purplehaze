@@ -58,17 +58,17 @@ Moves Game::movegen(bool captures_only) {
 	    Square to = Square(from + PAWN_CAPTURE_DIRS[c][d]);
 	    if (board.is_out(to)) continue;
 	    if (!board.is_empty(to) && board.get_piece(to).get_color() != c) {
-		if (board.is_pawn_end(c, to)) {
+		if (board.is_pawn_end(c, to)) { // Promotion capture
 		    moves.add(Move(from, to, KNIGHT_PROMOTION_CAPTURE));
 		    moves.add(Move(from, to, BISHOP_PROMOTION_CAPTURE));
 		    moves.add(Move(from, to, ROOK_PROMOTION_CAPTURE));
 		    moves.add(Move(from, to, QUEEN_PROMOTION_CAPTURE));
 		}
-		else {
+		else { // Capture
 		    moves.add(Move(from, to, CAPTURE));
 		}
 	    }
-	    else if (to == current_node().get_en_passant()) {
+	    else if (to == current_node().get_en_passant()) { // En passant
 		moves.add(Move(from, to, EN_PASSANT));
 	    }
 	}
@@ -304,9 +304,26 @@ void Game::undo_move(Move m) {
     }
 }
 
-bool Game::is_legal_move(Move m) {
-    // TODO
-    //Square from = m.get_orig();
-    //Square to = m.get_dest();
-    return !m.is_null();
+bool Game::is_legal(Move m) {
+    Square from = m.get_orig();
+    Square to = m.get_dest();
+    Color c = current_node().get_turn_color();
+
+    if (m.is_null()) return false;
+
+    if (board.is_empty(from)) return false;
+
+    if (m.is_capture()) {
+	Square s = to;
+	if (m.is_en_passant()) {
+	    Square ep = current_node().get_en_passant();
+	    s = (c == BLACK ? Square(ep + UP) : Square(ep + DOWN));   
+	    
+	    if (to != ep) return false; // For reconstructing the PV from TT
+	    if (board.get_piece(s).get_type() != PAWN) return false;
+	}
+	if (board.is_empty(s)) return false;
+    }
+
+    return true;
 }
