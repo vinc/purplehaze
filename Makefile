@@ -1,6 +1,6 @@
 optimize = yes
 profiler = no
-null_move_pruning = yes
+null_move_pruning = no
 transpositions_table = yes
 
 CXX = g++
