@@ -115,6 +115,23 @@ int Game::eval() {
 	}
 	if (Color(c) == opponent) material_score *= -1;
 	score += material_score;
+
+	// Castling bonus/malus
+	int castle_score = 0;
+	if (current_node().has_castle(Color(c))) {
+	    castle_score += BONUS_CASTLE;
+	}
+	else { // If color has broken castle,
+	    // Add malus for each side where he can no more castle
+	    if (!current_node().can_castle(Color(c), QUEEN)) {
+		castle_score += MALUS_BREAKING_CASTLE;
+	    }
+	    if (!current_node().can_castle(Color(c), KING)) {
+		castle_score += MALUS_BREAKING_CASTLE;
+	    }
+	}
+	if (Color(c) == opponent) castle_score *= -1;
+	score += castle_score;
     }
 
     score += pawn_structure_eval(pieces, player);

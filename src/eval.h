@@ -20,7 +20,7 @@
 
 #include "common.h"
 
-#define MALUS_KING_BREAKING_CASTLE_RIGHT    -40
+#define MALUS_BREAKING_CASTLE               -40
 #define BONUS_CASTLE			    100
 #define BONUS_KING_SHIELD		     30
 #define BONUS_BISHOP_PAIR		     40

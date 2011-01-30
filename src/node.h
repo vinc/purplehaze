@@ -33,8 +33,9 @@ class Node
 	short halfmove_counter;
 	short score;
 	short ply;
-	bitset<4> castle_rights;
 	Square en_passant;
+	bitset<4> castle_rights;
+	bitset<2> castle;
 	
 	Piece capture;
 	Hash zobrist_hash;
@@ -45,7 +46,6 @@ class Node
 	    halfmove_counter(0),
 	    score(0),
 	    ply(0),
-	    //castle_rights(0), // Assume default
 	    en_passant(OUT) {}
 	
 	Hash& hash() { return zobrist_hash; };
@@ -93,6 +93,12 @@ class Node
 	};
 	void set_castle_right(Color c, PieceType t, bool b = true) {
 	    castle_rights.set(2 * c + t - QUEEN, b);
+	};
+	bool has_castle(Color c) const {
+	    return castle[c];
+	};
+	void set_has_castle(Color c, bool b = true) {
+	    castle.set(c, b);
 	};
 };
 

@@ -224,6 +224,7 @@ void Game::make_move(Move m) {
 	pieces.set_position(rook, rook_dest);
 	zobrist.update_piece(current_node().hash(), c, ROOK, rook_orig);
 	zobrist.update_piece(current_node().hash(), c, ROOK, rook_dest);
+	current_node().set_has_castle(c); // For bonus/malus in eval
     }
 
     // Move the piece
