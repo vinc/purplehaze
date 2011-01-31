@@ -19,6 +19,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <signal.h>
 
 #include "xboard.h"
 
@@ -53,6 +54,7 @@ void Xboard::think() {
 }
 
 void Xboard::loop() {
+    signal(SIGINT, SIG_IGN);
     cout << endl; // Acknowledge Xboard mode
     log.open("game.log", ios::app); 
     log << "DEBUG: PurpleHaze starting" << endl;

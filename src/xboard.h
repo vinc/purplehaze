@@ -28,7 +28,6 @@
 
 const string XBOARD_FEATURES[XBOARD_NB_FEATURES][2] = {
     { "setboard",	"1" },
-    //{ "sigint",		"0" },
     { "done",		"1" },
 };
 
