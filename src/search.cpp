@@ -173,10 +173,11 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
     if (tree.has_repetition_draw()) return 0; // Repetition draw rules
 
     Color player = current_node().get_turn_color();
-    
+    bool is_in_check = is_check(player);
+
 #ifdef NMP
     // Null Move Pruning
-    if (!is_check(player) && depth > R) {
+    if (!is_in_check && depth > R) {
 	Move null_move;
 	make_move(null_move);
 	score = -principal_variation_search(-beta, -beta + 1, depth - R - 1);
@@ -222,7 +223,22 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 	    is_principal_variation = false;
 	}
 	else {
-	    score = -principal_variation_search(-alpha - 1, -alpha, depth - 1);
+
+	    // Late Move Reduction
+	    if (i > 3 && // Not for best move or killer moves
+		depth > 2 && // Not near leaf
+		!move.is_capture() && !move.is_promotion() &&
+		!is_in_check && !is_check(Color(!player))) {
+		
+		// Do the search at a reduced depth
+		score = -principal_variation_search(-alpha - 1, -alpha, 
+						    depth - 2);
+	    }
+	    else {
+		score = -principal_variation_search(-alpha - 1, -alpha, 
+						    depth - 1);
+	    }
+
 	    if (alpha < score && score < beta) {
 		score = -principal_variation_search(-beta, -alpha, depth - 1);
 		if (alpha < score) {
