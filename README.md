@@ -22,11 +22,11 @@ bugs.
 
 Most of its concepts or algorithms are inspired from scientific papers and 
 Open Source engines, notably TSCP, CPW, Fruit, Crafty and Stockfish. A lot of 
-the ideas used for during the implementation of theses concepts also comes 
-from reading the [Computer Chess Club Forums](http://talkchess.com/forum/) and 
-the [Chess Programming Wiki](http://chessprogramming.wikispaces.com/). Without 
-them Purple Haze would not be able to do more than moving the piece around the 
-board.
+the ideas used for the implementation of theses concepts also comes from 
+reading the [Computer Chess Club Forums](http://talkchess.com/forum/) and the 
+[Chess Programming Wiki](http://chessprogramming.wikispaces.com/). Without 
+them Purple Haze would not be able to do more than moving the pieces around 
+the board.
 
 
 Implemented features
