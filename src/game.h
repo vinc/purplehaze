@@ -35,6 +35,8 @@ class Game
 	Zobrist zobrist;
 	bitset<7> attack_array[240];
 	Direction dir_array[240];
+	Move killer_moves[MAX_DEPTH][2];
+
     public:
 	unsigned int nodes_count; // Used in search
 	//list<Move> moves_history; // Temporary
@@ -79,6 +81,12 @@ class Game
 	int alphabeta_search(int alpha, int beta, int depth);
 	int principal_variation_search(int alpha, int beta, int depth);
 	Move root(int max_depth);
+
+	// Killer Moves
+	Move get_killer_move(int depth, int index) {
+	    return killer_moves[depth][index];
+	}
+	void set_killer_move(int depth, Move move);
 	
 	// Position's evaluation
 	int piece_eval(Color c, PieceType t, int i);

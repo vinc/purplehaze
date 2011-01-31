@@ -48,7 +48,9 @@ class Moves
 
 	void numeric_sort() { /*moves.sort(Move::numeric_comp);*/ };
 	void selection_sort();
-	void sort(Move bm, Board b);
+	void sort(Board b, Move bm = Move(), 
+			   Move killer1 = Move(), 
+			   Move killer2 = Move());
 };
 
 #endif /* !MOVES_H */

@@ -105,3 +105,13 @@ void Game::del_node() {
     // Take back the previous "snapshot"
     tree.pop();
 }
+
+/*
+ * Killer move setter for the Killer Heuristic in move ordering.
+ */
+void Game::set_killer_move(int depth, Move move) {
+    if (move != killer_moves[depth][0]) {
+	killer_moves[depth][1] = killer_moves[depth][0];
+	killer_moves[depth][0] = move;
+    }
+}

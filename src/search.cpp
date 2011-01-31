@@ -58,7 +58,7 @@ int Game::quiescence_search(int alpha, int beta, int depth) {
     if (alpha < stand_pat) alpha = stand_pat; // New alpha
 
     Moves moves = movegen(true); // Capture only
-    moves.sort(Move(), board);
+    moves.sort(board);
     Color player = current_node().get_turn_color();
     for (int i = 0; i < moves.size(); ++i) {
 	if (moves.get_score(i) < 0) break; // Skip bad captures	
@@ -111,7 +111,7 @@ int Game::alphabeta_search(int alpha, int beta, int depth) {
     Color player = current_node().get_turn_color();
     bool legal_move_found = false;
     Moves moves = movegen();
-    moves.sort(best_move, board);
+    moves.sort(board, best_move);
     for (int i = 0; i < moves.size(); ++i) {
 	Move move = moves.at(i);
 	make_move(move);
@@ -188,7 +188,9 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
     bool legal_move_found = false;
     bool is_principal_variation = true;
     Moves moves = movegen();
-    moves.sort(best_move, board);
+    Move killer1 = get_killer_move(depth, 0);
+    Move killer2 = get_killer_move(depth, 1);
+    moves.sort(board, best_move, killer1, killer2);
     for (int i = 0; i < moves.size(); ++i) {
 	Move move = moves.at(i);
 	make_move(move);
@@ -205,8 +207,14 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 	    undo_move(move);
 	    if (best_score > alpha) {
 		if (best_score >= beta) {
+		    // Store the search to Transposition Table
 		    tt.save(current_node().hash(), best_score, LOWER, depth, 
 		    	    move);
+		    
+		    // Update killer moves
+		    set_killer_move(depth, move);
+		    
+		    // Beta cut-off
 		    return best_score;
 		} 
 		alpha = best_score;
@@ -227,6 +235,9 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 		if (score >= beta) {// Sufficient to cause a cut-off?
 		    // Store the search to Transposition Table
 		    tt.save(current_node().hash(), score, LOWER, depth, move);
+		    
+		    // Update killer moves
+		    set_killer_move(depth, move); // TODO update killers in PV?
 		    
 		    // Beta cut-off
 		    return score;
@@ -261,7 +272,7 @@ Move Game::root(int max_depth) {
 	int alpha = -INF;
 	int beta = INF;
 	if (time.is_out_of_time()) break; // Do not start this ply if no time
-	moves.sort(best_move, board);
+	moves.sort(board, best_move);
 	for (int i = 0; i < moves.size(); ++i) {
 	    Move move = moves.at(i);
 	    make_move(move);

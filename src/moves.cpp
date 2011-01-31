@@ -26,28 +26,29 @@ Moves::Moves() {
 }
 */
 
-void Moves::sort(Move bm, Board b) {
+void Moves::sort(Board b, Move bm, Move killer1, Move killer2) {
     for (int i = 0; i != size(); ++i) {
 	ExtendedMove& m = moves[i];
-	if (m.get_orig() == bm.get_orig() &&
-	    m.get_dest() == bm.get_dest() &&
-	    m.get_type() == bm.get_type()) {
-	    m.set_score(127);
-	}
+	//if (m.get_orig() == bm.get_orig() &&
+	//    m.get_dest() == bm.get_dest() &&
+	//    m.get_type() == bm.get_type()) {
+	if (m == bm) m.set_score(127);
+	else if (m == killer1) m.set_score(1);
+	else if (m == killer2) m.set_score(0);
 	else if (m.is_capture()) {
-	    const PieceType& a = b.get_piece(m.get_orig()).get_type();
-	    const PieceType& v = b.get_piece(m.get_dest()).get_type();
+	    PieceType a = b.get_piece(m.get_orig()).get_type();
+	    PieceType v = b.get_piece(m.get_dest()).get_type();
 	    int aggressor = PIECE_VALUE[a];
 	    int victim = PIECE_VALUE[v];
 	    if (m.is_en_passant()) victim = PIECE_VALUE[PAWN];
-	    int score = (((victim - aggressor) / 16) - 1);
-	    assert(PIECE_VALUE[KING] == 10000);
+	    int score = ((victim - aggressor) / 16);
+	    //assert(PIECE_VALUE[KING] == 10000);
 	    if (v == KING) score -= 500;
 	    if (a == KING) score += 500;
 	    m.set_score(score);
 	}
 	else {
-	    m.set_score(1); // SCORE_QUIET;
+	    m.set_score(-127); // SCORE_QUIET;
 	}
     }
     selection_sort();
