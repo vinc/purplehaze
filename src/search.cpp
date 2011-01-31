@@ -28,7 +28,7 @@
 
 using namespace std;
 
-#define	R   3
+#define	R 2
 
 int Game::perft(int depth) {
     if (depth == 0) return 1;
@@ -45,10 +45,11 @@ int Game::perft(int depth) {
 
 int Game::quiescence_search(int alpha, int beta, int depth) {
     int score;
+    if (time.poll(nodes_count)) return 0;
     int stand_pat = eval();
     if (depth < -MAX_DEPTH) return stand_pat;
     
-    if (stand_pat >= beta) return beta; // Beta cut-off
+    if (stand_pat >= beta) return stand_pat; // Beta cut-off
 
     // Delta pruning
     int delta = PIECE_VALUE[QUEEN]; // TODO: Switch of in late endgame
@@ -71,6 +72,7 @@ int Game::quiescence_search(int alpha, int beta, int depth) {
 	
 	score = -quiescence_search(-beta, -alpha, depth - 1);
 	undo_move(move);
+	if (time.poll(nodes_count)) return 0;
 	if (score >= beta) {
 	    return score;
 	} 
@@ -78,6 +80,7 @@ int Game::quiescence_search(int alpha, int beta, int depth) {
 	    alpha = score;
 	} 
     }
+    if (time.poll(nodes_count)) return 0;
     return alpha;
 }
 
@@ -139,12 +142,15 @@ int Game::alphabeta_search(int alpha, int beta, int depth) {
 
 int Game::principal_variation_search(int alpha, int beta, int depth) {
     int score = -INF;
+    int old_alpha = alpha;
     int best_score = -INF;
     Move best_move;
 
+    if (time.poll(nodes_count)) return 0;
+
 #ifdef TT
     // Lookup in Transposition Table
-    const Transposition& trans = tt.lookup(current_node().hash());
+    Transposition trans = tt.lookup(current_node().hash());
     if (!trans.is_empty()) {
 	//cout << "eval " << trans.to_string() << endl;
 	if (trans.get_depth() >= depth) {
@@ -157,7 +163,7 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 	    }
 	    if (alpha >= beta) return tr_score; // TT cause a cut-off
 	}
-	const Move& bm = trans.get_best_move();
+	Move bm = trans.get_best_move();
 	if (!bm.is_null()) best_move = bm; // Save the best move
     }
 #endif
@@ -173,9 +179,9 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
     if (!is_check(player) && depth > R) {
 	Move null_move;
 	make_move(null_move);
-	score = -principal_variation_search(-beta, 1 - beta, depth - R - 1);
+	score = -principal_variation_search(-beta, -beta + 1, depth - R - 1);
 	undo_move(null_move);
-	if (score >= beta) return beta; // beta or score?
+	if (score >= beta) return score; // beta or score?
     }
 #endif
 
@@ -216,6 +222,7 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 		}
 	    }		
 	    undo_move(move);
+	    if (time.poll(nodes_count)) return 0;
 	    if (score > best_score) { // Found a new best move
 		if (score >= beta) {// Sufficient to cause a cut-off?
 		    // Store the search to Transposition Table
@@ -229,13 +236,14 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 	    } 
 	}
     }
+    if (time.poll(nodes_count)) return 0;
     if (!legal_move_found) { // End of game?
 	if (is_check(player)) return -INF + 100 - depth; // Checkmate
 	else return 0; // Stalemate
     }
 
     // Store the search to Transposition Table
-    Bound bound = (best_score <= alpha ? UPPER : EXACT);
+    Bound bound = (best_score <= old_alpha ? UPPER : EXACT);
     tt.save(current_node().hash(), best_score, bound, depth, best_move);
 
     return best_score;
@@ -252,6 +260,7 @@ Move Game::root(int max_depth) {
 	int score;
 	int alpha = -INF;
 	int beta = INF;
+	if (time.is_out_of_time()) break; // Do not start this ply if no time
 	moves.sort(best_move, board);
 	for (int i = 0; i < moves.size(); ++i) {
 	    Move move = moves.at(i);
@@ -262,18 +271,18 @@ Move Game::root(int max_depth) {
 	    }
 	    score = -principal_variation_search(-beta, -alpha, ply - 1);
 	    undo_move(move);
+	    if (time.is_out_of_time()) break; // Discard this move
 	    if (score > alpha) {
 		alpha = score;
 		best_move = move;
 		print_thinking(ply, alpha, best_move);
-		if (time.is_out_of_time()) break;
 	    } 
 	}
+	if (time.is_out_of_time()) break; // Discard this ply
 	if (!best_move.is_null()) {
 	    tt.save(current_node().hash(), alpha, EXACT, ply, best_move);
 	}
 	print_thinking(ply, alpha, best_move);
-	if (time.is_out_of_time()) break;
     }
     return best_move;
 }

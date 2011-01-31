@@ -24,11 +24,11 @@
 
 #include "protocol.h"
 
-#define XBOARD_NB_FEATURES	3
+#define XBOARD_NB_FEATURES	2
 
 const string XBOARD_FEATURES[XBOARD_NB_FEATURES][2] = {
     { "setboard",	"1" },
-    { "sigint",		"0" },
+    //{ "sigint",		"0" },
     { "done",		"1" },
 };
 

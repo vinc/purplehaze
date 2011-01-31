@@ -31,21 +31,27 @@ class Time
 	int allocated_time;
 	int remaining_time;
 
+	bool abort_search;
+	int polling_interval;
+	int last_poll_nodes_count;
+
     public:
 	Time() : 
 	    allowed_moves(40), allowed_time(24000), 
-	    allocated_time(24000), remaining_time(24000) {}
+	    allocated_time(24000), remaining_time(24000),
+	    abort_search(false), 
+	    polling_interval(500000), last_poll_nodes_count(0)  {}
 	Time(int moves, int time) : 
 	    allowed_moves(moves), allowed_time(time), 
 	    allocated_time(time), remaining_time(time) {}
 
 	void set_remaining_time(int time) { remaining_time = time; };
-	double get_elapsed_time() { 
-	    return double(clock() - starting_time) / CLOCKS_PER_SEC;
+	int get_elapsed_time() { 
+	    return (100 * (clock() - starting_time)) / CLOCKS_PER_SEC;
 	};
 	void start_thinking(int ply);
 	bool is_out_of_time();
-
+	bool poll(int nodes_count);
 };
 
 #endif /* !TIME_H */

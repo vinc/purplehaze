@@ -39,7 +39,7 @@ void Game::print_thinking_header() {
 void Game::print_thinking(int depth, int score, Move m) {
     cout << setw(4) << depth;
     cout << setw(WIDE) << score;
-    cout << setw(WIDE) << int(time.get_elapsed_time() * 100);
+    cout << setw(WIDE) << time.get_elapsed_time();
     cout << setw(WIDE) << nodes_count;
     cout << setw(WIDE - 3) << " ";
     int ply = current_node().get_ply();

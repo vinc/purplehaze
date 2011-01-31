@@ -21,6 +21,9 @@
 
 void Time::start_thinking(int ply) {
     starting_time = clock();
+    abort_search = false;
+    last_poll_nodes_count = 0;
+    polling_interval = 1000000;
     if (remaining_time != allocated_time) {
 	int remaining_moves = allowed_moves - (ply % allowed_moves);
 	allocated_time = remaining_time / remaining_moves;
@@ -28,11 +31,19 @@ void Time::start_thinking(int ply) {
     else {
 	allocated_time = allowed_time / allowed_moves;
     }
-    std::cout << " " << double(allocated_time / 100);
+    std::cout << " " << double(allocated_time / 100.0);
     std::cout << " seconds alocated to play" << std::endl << std::endl;
 }
 
 bool Time::is_out_of_time() {
-    if (2 * 100 * get_elapsed_time() > allocated_time) return true;
+    if (2 * get_elapsed_time() > allocated_time) return true;
     else return false;
+}
+
+bool Time::poll(int nodes_count) {
+    if (nodes_count - last_poll_nodes_count > polling_interval) {
+	last_poll_nodes_count = nodes_count;
+	abort_search = is_out_of_time();
+    }
+    return abort_search;
 }
