@@ -27,7 +27,8 @@ class Pieces
 {
     private:
 	Square positions[2][7][9];
-	short nb_pieces[2][7];
+	unsigned char nb_pieces[2][7];
+	unsigned char sum[2];
 	//friend class Game;
     public:
 	Pieces();
@@ -45,13 +46,22 @@ class Pieces
 	    assert(0 <= i && i < 9);
 	    positions[c][t][i] = s;
 	};
-	short get_nb_pieces(Color c, PieceType t) const {
+	unsigned char get_nb_pieces(Color c, PieceType t) const {
 	    return nb_pieces[c][t];
+	};
+	unsigned char get_nb_pieces(Color c) const {
+	    return sum[c];
 	};
 
 	// FIXME? No warning if nb < 0 or nb > 9
-	void inc_nb_pieces(Color c, PieceType t) { nb_pieces[c][t]++; };
-	void dec_nb_pieces(Color c, PieceType t) { nb_pieces[c][t]--; };
+	void inc_nb_pieces(Color c, PieceType t) {
+	    nb_pieces[c][t]++;
+	    sum[c]++;
+	};
+	void dec_nb_pieces(Color c, PieceType t) {
+	    nb_pieces[c][t]--;
+	    sum[c]++;
+	};
 };
 
 #endif /* !PIECESL_H */

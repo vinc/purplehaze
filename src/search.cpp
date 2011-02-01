@@ -30,6 +30,10 @@ using namespace std;
 
 #define	R 2
 
+// Adaptive Null-Move Pruning (Heinz 1999)
+#define R_ADAPT(c, d) ( \
+    2 + ((d) > (6 + ((pieces.get_nb_pieces(c) < 3) ? 2 : 0))))
+
 int Game::perft(int depth) {
     if (depth == 0) return 1;
     int nodes = 0;
@@ -180,10 +184,11 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
     bool last_move_was_null = current_node().get_last_move().is_null();
     bool null_move_allowed = !is_in_check && !last_move_was_null;
 
-    if (null_move_allowed && depth > 2) {
+    if (null_move_allowed && depth >= 2) {
 	Move null_move;
 	make_move(null_move);
-	score = -principal_variation_search(-beta, -beta + 1, depth - R - 1);
+	score = -principal_variation_search(-beta, -beta + 1, 
+					    depth - R_ADAPT(player, depth) - 1);
 	undo_move(null_move);
 	if (score >= beta) return score;
     }
