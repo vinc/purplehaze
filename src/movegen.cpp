@@ -156,11 +156,13 @@ void Game::make_move(Move m) {
 
     nodes_count++;
     new_node(); // From now on, current_node() is refering to the new node
-    
+
+    current_node().set_last_move(m); // Used in Search for Null Move
+  
     // Update halfmove counter
     if (m.is_capture() || t == PAWN) current_node().reset_halfmove();
     else current_node().inc_halfmove();
-  
+    
     // Null Move
     if (m.is_null()) {
 	current_node().set_en_passant(OUT);

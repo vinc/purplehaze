@@ -40,13 +40,12 @@ int main() {
     cout << version << endl;
     cout << endl;
     
-    /*
     cout << "Piece: " << sizeof(Piece) << endl;
     cout << "Move: " << sizeof(Move) << endl;
     cout << "ExtendedMove: " << sizeof(ExtendedMove) << endl;
     cout << "Transposition: " << sizeof(Transposition) << endl;
+    cout << "Node: " << sizeof(Node) << endl;
     cout << endl;
-    */
 
     cout << "Compiled with options:";
 #ifdef NMP

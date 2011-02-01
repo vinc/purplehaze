@@ -22,6 +22,7 @@
 
 #include "common.h"
 #include "pieces.h"
+#include "move.h"
 #include "zobrist.h"
 
 using namespace std;
@@ -30,22 +31,25 @@ class Node
 {
     private:
 	Color side_to_move;
-	short halfmove_counter;
-	short score;
+	//short halfmove_counter;
+	unsigned char halfmove_counter;
+	//short score;
 	short ply;
 	Square en_passant;
 	bitset<4> castle_rights;
 	bitset<2> castle;
 	
 	Piece capture;
+	Move last_move;
 	Hash zobrist_hash;
 
     public:
 	Node() : 
 	    side_to_move(WHITE), 
 	    halfmove_counter(0),
-	    score(0),
+	    //score(0),
 	    ply(0),
+	    //last_move(Move()
 	    en_passant(OUT) {}
 	
 	Hash& hash() { return zobrist_hash; };
@@ -64,10 +68,10 @@ class Node
 	void dec_ply() {
 	    --ply;
 	};
-	short get_halfmove() const {
+	unsigned char get_halfmove() const {
 	    return halfmove_counter;
 	};
-	void set_halfmove(short i) {
+	void set_halfmove(unsigned char i) {
 	    halfmove_counter = i;
 	};
 	void inc_halfmove() {
@@ -88,6 +92,13 @@ class Node
 	void set_capture(Piece p) {
 	    capture = p;
 	};
+	Move get_last_move() const {
+	    return last_move;
+	};
+	void set_last_move(Move m) {
+	    last_move = m;
+	};
+
 	bool can_castle(Color c, PieceType t) const {
 	    return castle_rights[2 * c + t - QUEEN];
 	};

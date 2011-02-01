@@ -177,12 +177,17 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 
 #ifdef NMP
     // Null Move Pruning
-    if (!is_in_check && depth > R) {
+    
+    bool last_move_was_null = current_node().get_last_move().is_null();
+    
+    bool null_move_allowed = !is_in_check && !last_move_was_null;
+
+    if (null_move_allowed && depth > 2) {
 	Move null_move;
 	make_move(null_move);
 	score = -principal_variation_search(-beta, -beta + 1, depth - R - 1);
 	undo_move(null_move);
-	if (score >= beta) return score; // beta or score?
+	if (score >= beta) return score;
     }
 #endif
 
