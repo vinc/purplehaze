@@ -31,8 +31,6 @@ void Time::start_thinking(int ply) {
     else {
 	allocated_time = allowed_time / allowed_moves;
     }
-    std::cout << " " << double(allocated_time / 100.0);
-    std::cout << " seconds alocated to play" << std::endl << std::endl;
 }
 
 bool Time::is_out_of_time() {

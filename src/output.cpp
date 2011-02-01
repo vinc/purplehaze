@@ -28,6 +28,7 @@ using namespace std;
 #define WIDE 10
 
 void Game::print_thinking_header() {
+    if (!output_thinking) return;
     cout << setw(4) << "ply";
     cout << setw(WIDE) << "score";
     cout << setw(WIDE) << "time";
@@ -37,6 +38,7 @@ void Game::print_thinking_header() {
 }
 
 void Game::print_thinking(int depth, int score, Move m) {
+    if (!output_thinking) return;
     cout << setw(4) << depth;
     cout << setw(WIDE) << score;
     cout << setw(WIDE) << time.get_elapsed_time();

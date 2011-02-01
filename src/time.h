@@ -46,6 +46,9 @@ class Time
 	    allocated_time(time), remaining_time(time) {}
 
 	void set_remaining_time(int time) { remaining_time = time; };
+	int get_allocated_time() const {
+	    return allocated_time;
+	};
 	int get_elapsed_time() { 
 	    return (100 * (clock() - starting_time)) / CLOCKS_PER_SEC;
 	};

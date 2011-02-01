@@ -16,6 +16,8 @@
  */
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <string>
 #include <assert.h>
 #include <stdio.h>
@@ -98,8 +100,6 @@ int main() {
 	    int moves_count = 0;
 	    Moves moves = game.movegen();
 	    moves.numeric_sort();
-	    //for (moves.it = moves.begin(); moves.it != moves.end(); moves.it++) {
-	    //	game.make_move(*moves.it);
 	    for (int i = 0; i < moves.size(); ++i) {
 	    	game.make_move(moves.at(i));
 		if (!game.is_check(c)) {
@@ -113,7 +113,68 @@ int main() {
 	    cout << endl;
 	    cout << "Moves: " << moves_count << endl;
 	    cout << "Nodes: " << nodes_count << endl;
+	}
+	else if (cmd == "testsuite") {
+	    // Get EPD test suite
+	    string filename;
+	    cin >> filename;
+	    ifstream epdfile;
+	    epdfile.open(filename);
+	    if (!epdfile.is_open()) {
+		cout << "Cannot open '" << filename;
+		cout << "': No such file or directory" << endl;
+	    }
 
+	    // Get time per move (optional)
+	    string seconds;
+	    getline(cin, seconds);
+	    int time = 10;
+	    if (seconds != "") {
+		istringstream iss(seconds);
+		iss >> time;
+	    }
+	    
+	    cout << "Loading '" << filename << "', "; 
+	    cout << time << "s per move" << endl; // In seconds
+	    
+	    // Load game protocol
+	    Protocol proto;
+	    proto.set_output_thinking(false);
+	    proto.set_time(1, time);
+	    
+	    // Read positions in file
+	    int res = 0;
+	    int i = 0;
+	    while (epdfile.good()) {
+		proto.new_game();
+		string line;
+		getline(epdfile, line);
+		size_t fensep = line.find(" bm ");
+		size_t bmsep = line.find(";");
+		if (fensep == string::npos || bmsep == string::npos) continue;
+		
+		// Load position in game
+		string fen = line.substr(0, fensep);
+		cout << "Loading position #" << i + 1 << " '" << fen << "' ";
+		proto.set_board(fen);
+		
+		// Search best move and test it
+		string best_move = line.substr(fensep + 4, bmsep - fensep - 4);
+		cout << "bm " << best_move;
+		string move = proto.search_move(true);
+		cout << " => " << move;
+		if (best_move == move) {
+		    cout << " OK" << endl;
+		    ++res;
+		}
+		else {
+		    cout << " KO" << endl;
+		}
+		++i;
+	    }
+	    cout << "Result: " << res << "/" << i << endl;
+
+	    epdfile.close();
 	}
 	cmd = prompt();
     }	

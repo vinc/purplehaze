@@ -35,6 +35,8 @@ class Protocol
 	Protocol() : depth(256) {}
 	
 	void new_game();
+	
+	bool set_output_thinking(bool ot = true);
 
 	bool set_board(string fen);
 	

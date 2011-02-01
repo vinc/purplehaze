@@ -53,6 +53,11 @@ bool Protocol::set_remaining_time(int time){
     return true;
 }
 
+bool Protocol::set_output_thinking(bool ot){
+    game.output_thinking = ot;
+    return true;
+}
+
 Move Protocol::parse_move(string move) {
     Square from = Square(move[0] - 'a' + 16 * (move[1] - '1'));
     Square to = Square(move[2] - 'a' + 16 * (move[3] - '1'));
@@ -127,16 +132,6 @@ bool Protocol::undo_move() {
 string Protocol::search_move(bool use_san_notation) {
     Move m = game.root(depth + 1);
     if (m.is_null()) {
-	cout << "DEBUG: end of match, eval=";
-	cout << game.eval() << endl;
-	cout << game.board << endl;
-	/*
-	switch (game.eval()) {
-	    case  INF: return  "WIN";
-	    case -INF: return "LOSS"; 
-	    default  : return "DRAW";
-	}
-	*/
 	if (game.is_check(game.current_node().get_turn_color())) {
 	    return "LOST";
 	}
@@ -144,5 +139,19 @@ string Protocol::search_move(bool use_san_notation) {
 	    return "DRAW";
 	}
     }
-    else return m.to_string();
+    else {
+	if (use_san_notation) {
+	    string res = game.output_move(m);
+	    // TODO Add check detection in Game::outputmove(Move m);
+	    play_move(m.to_string());
+	    if (game.is_check(game.current_node().get_turn_color())) {
+		res += "+";
+	    }
+	    undo_move();
+	    return res;
+	}
+	else {
+	    return m.to_string();
+	}
+    }
 }

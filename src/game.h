@@ -38,6 +38,7 @@ class Game
 	Move killer_moves[MAX_DEPTH][2];
 
     public:
+	bool output_thinking;
 	unsigned int nodes_count; // Used in search
 	//list<Move> moves_history; // Temporary
 	Pieces pieces;

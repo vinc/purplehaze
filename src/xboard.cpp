@@ -30,7 +30,12 @@ Xboard::Xboard() {
 }
 
 void Xboard::think() {
-    cout << game.board << endl;
+    if (game.output_thinking) {
+	cout << game.board << endl;
+	cout << " " << double(game.time.get_allocated_time() / 100.0);
+	cout << " seconds alocated to play" << endl << endl;
+    }
+
     string move = search_move();
     string output = "";
     if (move == "LOST") {
@@ -95,7 +100,6 @@ void Xboard::loop() {
 	}
 	else if (cmd == "go") {
 	    force_mode = false;
-	    cout << game.board << endl;
 	    think();
 	}
 	else if (cmd == "force") {
