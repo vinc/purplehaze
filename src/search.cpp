@@ -106,7 +106,7 @@ int Game::alphabeta_search(int alpha, int beta, int depth) {
 	Move bm = trans.get_best_move();
 	if (!bm.is_null()) best_move = bm;
     }
-    if (depth == 0) return quiescence_search(alpha, beta, 0); // Quiescence
+    if (depth <= 0) return quiescence_search(alpha, beta, 0); // Quiescence
     if (tree.has_repetition_draw()) return 0; // Repetition draw rules
     Color player = current_node().get_turn_color();
     bool legal_move_found = false;
@@ -169,7 +169,7 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 #endif
     
     // End of regular search?
-    if (depth == 0) return quiescence_search(alpha, beta, 0); // Quiescence
+    if (depth <= 0) return quiescence_search(alpha, beta, 0); // Quiescence
     if (tree.has_repetition_draw()) return 0; // Repetition draw rules
 
     Color player = current_node().get_turn_color();
@@ -177,9 +177,7 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 
 #ifdef NMP
     // Null Move Pruning
-    
     bool last_move_was_null = current_node().get_last_move().is_null();
-    
     bool null_move_allowed = !is_in_check && !last_move_was_null;
 
     if (null_move_allowed && depth > 2) {
