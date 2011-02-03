@@ -144,9 +144,10 @@ int Game::alphabeta_search(int alpha, int beta, int depth) {
     return alpha;
 }
 
-int Game::principal_variation_search(int alpha, int beta, int depth) {
+int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
     int score = -INF;
     int old_alpha = alpha;
+    Node pos = current_node();
     int best_score = -INF;
     Move best_move;
 
@@ -154,9 +155,9 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 
 #ifdef TT
     // Lookup in Transposition Table
-    Transposition trans = tt.lookup(current_node().hash());
+    Transposition trans = tt.lookup(pos.hash());
+    //Transposition trans = tt.lookup(current_node().hash());
     if (!trans.is_empty()) {
-	//cout << "eval " << trans.to_string() << endl;
 	if (trans.get_depth() >= depth) {
 	    int tr_score = trans.get_value();
 	    switch (trans.get_bound()) {
@@ -176,22 +177,26 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
     if (depth <= 0) return quiescence_search(alpha, beta, 0); // Quiescence
     if (tree.has_repetition_draw()) return 0; // Repetition draw rules
 
-    Color player = current_node().get_turn_color();
+    Color player = pos.get_turn_color();
+    //Color player = current_node().get_turn_color();
     bool is_in_check = is_check(player);
 
 #ifdef NMP
     // Null Move Pruning
-    bool last_move_was_null = current_node().get_last_move().is_null();
-    bool null_move_allowed = !is_in_check && !last_move_was_null;
-
+    bool is_null = pos.get_last_move().is_null();
+    //bool is_null = current_node().get_last_move().is_null();
+    bool is_pv = (node_type == PV_NODE);
+    bool null_move_allowed = !is_in_check && !is_null && !is_pv;
+    /*
     if (null_move_allowed && depth >= 2) {
 	Move null_move;
 	make_move(null_move);
-	score = -principal_variation_search(-beta, -beta + 1, 
-					    depth - R_ADAPT(player, depth) - 1);
+	int reduced_depth = depth - R_ADAPT(player, depth) - 1;
+	score = -pv_search(-beta, -beta + 1, reduced_depth, node_type);
 	undo_move(null_move);
 	if (score >= beta) return score;
     }
+    */
 #endif
 
     bool legal_move_found = false;
@@ -212,13 +217,13 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 	
 	// PVS code from http://www.talkchess.com/forum/viewtopic.php?t=26974
 	if (is_principal_variation) {
-	    best_score = -principal_variation_search(-beta, -alpha, depth - 1);
+	    best_score = -pv_search(-beta, -alpha, depth - 1, PV_NODE);
 	    undo_move(move);
 	    if (best_score > alpha) {
 		if (best_score >= beta) {
 		    // Store the search to Transposition Table
-		    tt.save(current_node().hash(), best_score, LOWER, depth, 
-		    	    move);
+		    tt.save(pos.hash(), best_score, LOWER, depth, move);
+		    //tt.save(current_node().hash(), best_score, LOWER, depth, move);
 		    
 		    // Update killer moves
 		    set_killer_move(depth, move);
@@ -239,16 +244,14 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 		!is_in_check && !is_check(Color(!player))) {
 		
 		// Do the search at a reduced depth
-		score = -principal_variation_search(-alpha - 1, -alpha, 
-						    depth - 2);
+		score = -pv_search(-alpha - 1, -alpha, depth - 2, ALL_NODE);
 	    }
 	    else {
-		score = -principal_variation_search(-alpha - 1, -alpha, 
-						    depth - 1);
+		score = -pv_search(-alpha - 1, -alpha, depth - 1, ALL_NODE);
 	    }
 
 	    if (alpha < score && score < beta) {
-		score = -principal_variation_search(-beta, -alpha, depth - 1);
+		score = -pv_search(-beta, -alpha, depth - 1, ALL_NODE);
 		if (alpha < score) {
 		    alpha = score;
 		}
@@ -258,7 +261,11 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 	    if (score > best_score) { // Found a new best move
 		if (score >= beta) {// Sufficient to cause a cut-off?
 		    // Store the search to Transposition Table
-		    tt.save(current_node().hash(), score, LOWER, depth, move);
+		    cout << "p=" << pos.hash() << endl;
+		    cout << "c=" << current_node().hash() << endl;
+		    assert(pos.hash() == current_node().hash());
+		    tt.save(pos.hash(), score, LOWER, depth, move);
+		    //tt.save(current_node().hash(), score, LOWER, depth, move);
 		    
 		    // Update killer moves
 		    set_killer_move(depth, move); // TODO update killers in PV?
@@ -279,7 +286,8 @@ int Game::principal_variation_search(int alpha, int beta, int depth) {
 
     // Store the search to Transposition Table
     Bound bound = (best_score <= old_alpha ? UPPER : EXACT);
-    tt.save(current_node().hash(), best_score, bound, depth, best_move);
+    tt.save(pos.hash(), best_score, bound, depth, best_move);
+    //tt.save(current_node().hash(), best_score, bound, depth, best_move);
 
     return best_score;
 }
@@ -304,20 +312,23 @@ Move Game::root(int max_depth) {
 		undo_move(move);
 		continue;
 	    }
-	    score = -principal_variation_search(-beta, -alpha, ply - 1);
+	    NodeType node_type = (i == 0 ? PV_NODE : ALL_NODE);
+	    score = -pv_search(-beta, -alpha, ply - 1, node_type);
 	    undo_move(move);
 	    if (time.is_out_of_time()) break; // Discard this move
 	    if (score > alpha) {
 		alpha = score;
 		best_move = move;
-		print_thinking(ply, alpha, best_move);
+		if (nodes_count > 500000) {
+		    print_thinking(ply, alpha, best_move);
+		}
 	    } 
 	}
 	if (time.is_out_of_time()) break; // Discard this ply
 	if (!best_move.is_null()) {
 	    tt.save(current_node().hash(), alpha, EXACT, ply, best_move);
 	}
-	print_thinking(ply, alpha, best_move);
+	//print_thinking(ply, alpha, best_move);
     }
     return best_move;
 }

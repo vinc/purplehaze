@@ -29,6 +29,8 @@
 #include "tree.h"
 #include "zobrist.h"
 
+enum NodeType : unsigned char {PV_NODE, CUT_NODE, ALL_NODE};
+
 class Game
 {
     private:
@@ -80,7 +82,7 @@ class Game
 	int perft(int depth);
 	int quiescence_search(int alpha, int beta, int depth);
 	int alphabeta_search(int alpha, int beta, int depth);
-	int principal_variation_search(int alpha, int beta, int depth);
+	int pv_search(int alpha, int beta, int depth, NodeType node_type);
 	Move root(int max_depth);
 
 	// Killer Moves
