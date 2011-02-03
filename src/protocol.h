@@ -30,9 +30,10 @@ class Protocol
 	Game game;
 	int depth;
 	stack<Move> history;
+	unsigned short verbosity;
 
     public:
-	Protocol() : depth(256) {}
+	Protocol() : depth(256), verbosity(0) {}
 	
 	void new_game();
 	
@@ -53,6 +54,10 @@ class Protocol
 	Move parse_move(string move);
 
 	void set_depth(int d) { depth = d; };
+	
+	void set_verbosity(int v = 0) { verbosity = v; };
+	
+	int get_verbosity() { return verbosity; };
 };
 
 #endif /* !PROTOCOL_H */

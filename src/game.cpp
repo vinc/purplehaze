@@ -24,7 +24,7 @@ using namespace std;
 
 Game::Game() {
     nodes_count = 0;
-    output_thinking = true;
+    output_thinking = false;
     tt.clear();
     
     // Initialize direction array

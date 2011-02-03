@@ -187,7 +187,7 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
     //bool is_null = current_node().get_last_move().is_null();
     bool is_pv = (node_type == PV_NODE);
     bool null_move_allowed = !is_in_check && !is_null && !is_pv;
-    /*
+    
     if (null_move_allowed && depth >= 2) {
 	Move null_move;
 	make_move(null_move);
@@ -196,7 +196,7 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 	undo_move(null_move);
 	if (score >= beta) return score;
     }
-    */
+    
 #endif
 
     bool legal_move_found = false;
@@ -261,9 +261,9 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 	    if (score > best_score) { // Found a new best move
 		if (score >= beta) {// Sufficient to cause a cut-off?
 		    // Store the search to Transposition Table
-		    cout << "p=" << pos.hash() << endl;
-		    cout << "c=" << current_node().hash() << endl;
-		    assert(pos.hash() == current_node().hash());
+		    //cout << "p=" << pos.hash() << endl;
+		    //cout << "c=" << current_node().hash() << endl;
+		    //assert(pos.hash() == current_node().hash());
 		    tt.save(pos.hash(), score, LOWER, depth, move);
 		    //tt.save(current_node().hash(), score, LOWER, depth, move);
 		    
@@ -319,7 +319,8 @@ Move Game::root(int max_depth) {
 	    if (score > alpha) {
 		alpha = score;
 		best_move = move;
-		if (nodes_count > 500000) {
+		if (nodes_count > 500000 || time.get_allocated_time() > 900) {
+		    // Print thinking only if we are not short in time
 		    print_thinking(ply, alpha, best_move);
 		}
 	    } 
