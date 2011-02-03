@@ -88,13 +88,13 @@ void Game::del_piece(Color c, PieceType t, int i) {
 }
 
 void Game::new_node() {
+    // Take a "snapshot" of the current position
+    tree.push();
+
     // Remove the previous en passant square from the Zobrist hash
     zobrist.update_en_passant(current_node().hash(), 
 			      current_node().get_en_passant());
     
-    // Take a "snapshot" of the current position
-    tree.push();
-
     // Update the position for a new move
     current_node().inc_ply();
     current_node().change_side();

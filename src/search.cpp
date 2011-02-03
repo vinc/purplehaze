@@ -208,7 +208,6 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
     for (int i = 0; i < moves.size(); ++i) {
 	Move move = moves.at(i);
 	make_move(move);
-
 	if (is_check(player)) { // Skip illegal move
 	    undo_move(move);
 	    continue;
@@ -218,6 +217,7 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 	// PVS code from http://www.talkchess.com/forum/viewtopic.php?t=26974
 	if (is_principal_variation) {
 	    best_score = -pv_search(-beta, -alpha, depth - 1, PV_NODE);
+
 	    undo_move(move);
 	    if (best_score > alpha) {
 		if (best_score >= beta) {
@@ -261,9 +261,6 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 	    if (score > best_score) { // Found a new best move
 		if (score >= beta) {// Sufficient to cause a cut-off?
 		    // Store the search to Transposition Table
-		    //cout << "p=" << pos.hash() << endl;
-		    //cout << "c=" << current_node().hash() << endl;
-		    //assert(pos.hash() == current_node().hash());
 		    tt.save(pos.hash(), score, LOWER, depth, move);
 		    //tt.save(current_node().hash(), score, LOWER, depth, move);
 		    
@@ -319,8 +316,7 @@ Move Game::root(int max_depth) {
 	    if (score > alpha) {
 		alpha = score;
 		best_move = move;
-		if (nodes_count > 500000 || time.get_allocated_time() > 900) {
-		    // Print thinking only if we are not short in time
+		if (nodes_count > 500000) { // Save CPU time at the beginning
 		    print_thinking(ply, alpha, best_move);
 		}
 	    } 
