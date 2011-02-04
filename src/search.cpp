@@ -34,6 +34,15 @@ using namespace std;
 #define R_ADAPT(c, d) ( \
     2 + ((d) > (6 + ((pieces.get_nb_pieces(c) < 3) ? 2 : 0))))
 
+static const int futility_depth = 3;
+
+static const int futility_margins[futility_depth + 1] = {
+    0,
+    PIECE_VALUE[PAWN],
+    PIECE_VALUE[KNIGHT],
+    PIECE_VALUE[ROOK]
+};
+
 int Game::perft(int depth) {
     if (depth == 0) return 1;
     int nodes = 0;
@@ -184,8 +193,8 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 
 #ifdef NMP
     // Null Move Pruning
-    //bool is_null = pos.get_last_move().is_null();
-    bool is_null = pos.get_null_move_right();
+    //bool is_null = pos.get_last_move().is_null(); // No successive null-move
+    bool is_null = pos.get_null_move_right(); // No more than one null-move
     bool is_pv = (node_type == PV_NODE);
     bool null_move_allowed = !is_in_check && !is_null && !is_pv;
     
@@ -215,7 +224,7 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 	    continue;
 	}
 	legal_move_found = true;
-	
+
 	// PVS code from http://www.talkchess.com/forum/viewtopic.php?t=26974
 	if (is_principal_variation) {
 	    best_score = -pv_search(-beta, -alpha, depth - 1, PV_NODE);
@@ -238,11 +247,25 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 	}
 	else {
 
+	    bool is_giving_check = is_check(Color(!player));
+
+	    // Futility Pruning
+	    if (depth <= futility_depth && 
+		!is_in_check && !is_giving_check &&
+		!move.is_capture() && !move.is_promotion()) {
+		score = eval() + futility_margins[depth];
+		if (score < alpha) {
+		    if (score > best_score) best_score = score;
+		    undo_move(move);
+		    continue;
+		}
+	    }
+
 	    // Late Move Reduction
 	    if (i > 2 && // Not for best move or killer moves
 		depth > 2 && // Not near leaf
-		!move.is_capture() && !move.is_promotion() &&
-		!is_in_check && !is_check(Color(!player))) {
+		!is_in_check && !is_giving_check &&
+		!move.is_capture() && !move.is_promotion()) {
 		
 		// Do the search at a reduced depth
 		score = -pv_search(-alpha - 1, -alpha, depth - 2, ALL_NODE);
@@ -250,13 +273,15 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 	    else {
 		score = -pv_search(-alpha - 1, -alpha, depth - 1, ALL_NODE);
 	    }
-
+	    
+	    // Re-search
 	    if (alpha < score && score < beta) {
 		score = -pv_search(-beta, -alpha, depth - 1, ALL_NODE);
 		if (alpha < score) {
 		    alpha = score;
 		}
-	    }		
+	    }	
+
 	    undo_move(move);
 	    if (time.poll(nodes_count)) return 0;
 	    if (score > best_score) { // Found a new best move
