@@ -193,10 +193,10 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 
 #ifdef NMP
     // Null Move Pruning
-    //bool is_null = pos.get_last_move().is_null(); // No successive null-move
-    bool is_null = pos.get_null_move_right(); // No more than one null-move
+    //bool can_do_null != pos.get_last_move().is_null(); // No successive
+    bool can_do_null = !pos.get_null_move_right(); // No more than one
     bool is_pv = (node_type == PV_NODE);
-    bool null_move_allowed = !is_in_check && !is_null && !is_pv;
+    bool null_move_allowed = !is_in_check && can_do_null && !is_pv;
     
     if (null_move_allowed && depth >= 2) {
 	Move null_move;
@@ -206,6 +206,10 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 	score = -pv_search(-beta, -beta + 1, reduced_depth, node_type);
 	undo_move(null_move);
 	if (score >= beta) return score;
+    }
+    else if (!can_do_null) {
+	// Next move we will have the right to do another null-move
+	pos.set_null_move_right(true);
     }
     
 #endif
