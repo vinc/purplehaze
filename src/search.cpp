@@ -156,7 +156,6 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 #ifdef TT
     // Lookup in Transposition Table
     Transposition trans = tt.lookup(pos.hash());
-    //Transposition trans = tt.lookup(current_node().hash());
     if (!trans.is_empty()) {
 	if (trans.get_depth() >= depth) {
 	    int tr_score = trans.get_value();
@@ -178,7 +177,6 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
     if (tree.has_repetition_draw()) return 0; // Repetition draw rules
 
     Color player = pos.get_turn_color();
-    //Color player = current_node().get_turn_color();
     bool is_in_check = is_check(player);
 
     // Check Extension
@@ -194,7 +192,7 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
     if (null_move_allowed && depth >= 2) {
 	Move null_move;
 	make_move(null_move);
-	pos.set_null_move_right(false); // Forbide 2 null move in the same tree
+	pos.set_null_move_right(false); // Forbide more than one null move
 	int reduced_depth = depth - R_ADAPT(player, depth) - 1;
 	score = -pv_search(-beta, -beta + 1, reduced_depth, node_type);
 	undo_move(null_move);
@@ -227,7 +225,6 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 		if (best_score >= beta) {
 		    // Store the search to Transposition Table
 		    tt.save(pos.hash(), best_score, LOWER, depth, move);
-		    //tt.save(current_node().hash(), best_score, LOWER, depth, move);
 		    
 		    // Update killer moves
 		    set_killer_move(depth, move);
@@ -266,7 +263,6 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 		if (score >= beta) {// Sufficient to cause a cut-off?
 		    // Store the search to Transposition Table
 		    tt.save(pos.hash(), score, LOWER, depth, move);
-		    //tt.save(current_node().hash(), score, LOWER, depth, move);
 		    
 		    // Update killer moves
 		    set_killer_move(depth, move); // TODO update killers in PV?
@@ -281,14 +277,13 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
     }
     if (time.poll(nodes_count)) return 0;
     if (!legal_move_found) { // End of game?
-	if (is_check(player)) return -INF + 100 - depth; // Checkmate
+	if (is_in_check) return -INF + 100 - depth; // Checkmate
 	else return 0; // Stalemate
     }
 
     // Store the search to Transposition Table
     Bound bound = (best_score <= old_alpha ? UPPER : EXACT);
     tt.save(pos.hash(), best_score, bound, depth, best_move);
-    //tt.save(current_node().hash(), best_score, bound, depth, best_move);
 
     return best_score;
 }
@@ -340,7 +335,7 @@ Move Game::root(int max_depth) {
 		alpha = score;
 		best_score = score;
 		best_move = move;
-		if (nodes_count > 500000) { // Save CPU time at the beginning
+		if (nodes_count > 200000) { // Save CPU time at the beginning
 		    print_thinking(ply, alpha, best_move);
 		}
 	    } 
