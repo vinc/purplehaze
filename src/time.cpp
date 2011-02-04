@@ -34,10 +34,7 @@ void Time::start_thinking(int ply) {
 }
 
 bool Time::is_out_of_time() {
-    if (2 * get_elapsed_time() > get_allocated_time()) {
-	std::cout << "Out of time!" << std::endl;
-	return true;
-    }
+    if (2 * get_elapsed_time() > get_allocated_time()) return true;
     else return false;
 }
 

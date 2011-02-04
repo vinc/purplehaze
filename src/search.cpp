@@ -181,6 +181,9 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
     //Color player = current_node().get_turn_color();
     bool is_in_check = is_check(player);
 
+    // Check Extension
+    if (is_in_check) ++depth;
+
 #ifdef NMP
     // Null Move Pruning
     //bool is_null = pos.get_last_move().is_null();

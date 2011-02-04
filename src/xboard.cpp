@@ -32,10 +32,6 @@ Xboard::Xboard() {
 
 void Xboard::think() {
     if (get_verbosity() > 1) cout << game.board << endl;
-    if (get_verbosity() > 0) {
-	cout << " " << game.time.get_allocated_time() / 100.0f;
-	cout << " seconds allocated to play" << endl << endl;
-    }
 
     string move = search_move();
     string output = "";
@@ -53,11 +49,9 @@ void Xboard::think() {
     }
     else if (!force_mode) {
 	play_move(move);
-	if (get_verbosity() > 0) {
-	    cout << endl;
-	    cout << " " << game.time.get_elapsed_time() / 100.0f;
-	    cout << " seconds used to play" << endl << endl;
-	}
+	log << game.time.get_elapsed_time() / 100.0f;
+	log << " of " << game.time.get_allocated_time() / 100.0f;
+	log << " seconds used to play" << endl << endl;
 	if (get_verbosity() > 1) {
 	    cout << "TT statistics:" << endl;
 	    game.print_tt_stats();
