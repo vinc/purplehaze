@@ -24,27 +24,34 @@
 class Time
 {
     private:
+	// Set the time to play the game
 	int allowed_moves;
 	int allowed_time; // In centi-seconds
 
+	// Set the time to play a move
 	clock_t starting_time;
-	int allocated_time;
-	int remaining_time;
+	int allocated_time; // Calculated
+	int remaining_time; // Given by protocols like Xboard
 
-	bool abort_search;
 	int polling_interval;
 	int last_poll_nodes_count;
+	bool abort_search;
 
     public:
 	Time() : 
 	    allowed_moves(40), allowed_time(24000), 
-	    allocated_time(24000), remaining_time(24000),
-	    abort_search(false), 
-	    polling_interval(500000), last_poll_nodes_count(0)  {}
+	    allocated_time(allowed_time / allowed_moves), 
+	    remaining_time(allowed_time / allowed_moves),
+	    polling_interval(500000), last_poll_nodes_count(0),
+	    abort_search(false) {} 
 	Time(int moves, int time) : 
 	    allowed_moves(moves), allowed_time(time), 
-	    allocated_time(time), remaining_time(time) {}
+	    allocated_time(allowed_time / allowed_moves), 
+	    remaining_time(allowed_time / allowed_moves),
+	    polling_interval(500000), last_poll_nodes_count(0),
+	    abort_search(false) {} 
 
+	void set_polling_interval(int nodes) { polling_interval = nodes; };
 	void set_remaining_time(int time) { remaining_time = time; };
 	int get_allocated_time() const {
 	    return allocated_time;

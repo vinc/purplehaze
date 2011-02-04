@@ -32,12 +32,13 @@ class Node
     private:
 	Hash zobrist_hash;
 	short ply;
-	Move last_move;
+	//Move last_move;
 	Piece capture;
 	bitset<4> castle_rights;
 	bitset<2> castle;
 	Square en_passant;
 	unsigned char halfmove_counter;
+	bool null_move_right;
 	Color side_to_move;
 
     public:
@@ -45,6 +46,7 @@ class Node
 	    ply(0),
 	    en_passant(OUT),
 	    halfmove_counter(0),
+	    null_move_right(true),
 	    side_to_move(WHITE) {} 
 	
 	Hash& hash() { return zobrist_hash; };
@@ -87,12 +89,14 @@ class Node
 	void set_capture(Piece p) {
 	    capture = p;
 	};
+	/*
 	Move get_last_move() const {
 	    return last_move;
 	};
 	void set_last_move(Move m) {
 	    last_move = m;
 	};
+	*/
 
 	bool can_castle(Color c, PieceType t) const {
 	    return castle_rights[2 * c + t - QUEEN];
@@ -105,6 +109,12 @@ class Node
 	};
 	void set_has_castle(Color c, bool b = true) {
 	    castle.set(c, b);
+	};
+	bool get_null_move_right() const {
+	    return null_move_right;
+	};
+	void set_null_move_right(bool b) {
+	    null_move_right = b;
 	};
 };
 

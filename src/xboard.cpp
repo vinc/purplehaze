@@ -27,13 +27,14 @@ using namespace std;
 
 Xboard::Xboard() {
    force_mode = true;
+   verbosity = 1;
 }
 
 void Xboard::think() {
-    if (get_verbosity() > 1) {
-	cout << game.board << endl;
+    if (get_verbosity() > 1) cout << game.board << endl;
+    if (get_verbosity() > 0) {
 	cout << " " << game.time.get_allocated_time() / 100.0f;
-	cout << " seconds alocated to play" << endl << endl;
+	cout << " seconds allocated to play" << endl << endl;
     }
 
     string move = search_move();
@@ -52,7 +53,16 @@ void Xboard::think() {
     }
     else if (!force_mode) {
 	play_move(move);
-	//game.print_tt_stats();
+	if (get_verbosity() > 0) {
+	    cout << endl;
+	    cout << " " << game.time.get_elapsed_time() / 100.0f;
+	    cout << " seconds used to play" << endl << endl;
+	}
+	if (get_verbosity() > 1) {
+	    cout << "TT statistics:" << endl;
+	    game.print_tt_stats();
+	    cout << endl;
+	}
 	output = "move " + move;
     }
     cout << output << endl;
@@ -184,6 +194,9 @@ void Xboard::loop() {
 		cout << "Illegal move: " << cmd << endl;
 	    }
 	    else think();
+	}
+	else if (cmd == "verbose") { // Debug mode
+	    verbosity = 2;
 	}
 	else {
 	    log << "DEBUG: ignoring: " << cmd << endl;

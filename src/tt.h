@@ -24,7 +24,7 @@
 #include "move.h"
 #include "zobrist.h"
 
-static const int TT_SIZE = 1024*1024*256;
+static const int TT_SIZE = 1024*1024*128;
 
 enum Bound : unsigned char { EXACT, LOWER, UPPER, UNDEF_BOUND };
 

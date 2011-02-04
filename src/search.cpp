@@ -183,14 +183,15 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 
 #ifdef NMP
     // Null Move Pruning
-    bool is_null = pos.get_last_move().is_null();
-    //bool is_null = current_node().get_last_move().is_null();
+    //bool is_null = pos.get_last_move().is_null();
+    bool is_null = pos.get_null_move_right();
     bool is_pv = (node_type == PV_NODE);
     bool null_move_allowed = !is_in_check && !is_null && !is_pv;
     
     if (null_move_allowed && depth >= 2) {
 	Move null_move;
 	make_move(null_move);
+	pos.set_null_move_right(false); // Forbide 2 null move in the same tree
 	int reduced_depth = depth - R_ADAPT(player, depth) - 1;
 	score = -pv_search(-beta, -beta + 1, reduced_depth, node_type);
 	undo_move(null_move);
@@ -294,13 +295,31 @@ Move Game::root(int max_depth) {
     Color player = current_node().get_turn_color();
     print_thinking_header();
     nodes_count = 0;
+    int best_score = 0;
     Move best_move;
     Moves moves = movegen();
-    for (int ply = 1; ply < max_depth; ++ply) { // Iterative Deepening
+    int ply;
+    assert(max_depth <= MAX_DEPTH);
+    int best_scores[MAX_DEPTH];
+    for (ply = 1; ply < max_depth; ++ply) { // Iterative Deepening
 	int score;
 	int alpha = -INF;
 	int beta = INF;
 	if (time.is_out_of_time()) break; // Do not start this ply if no time
+	if (time.get_allocated_time() - time.get_elapsed_time() < 100) {
+	    // Decrease polling interval if <1s left
+	    time.set_polling_interval(100000);
+	}
+	// Mate pruning
+	if (ply > 6) {
+	    bool is_mate = true;
+	    for (int i = 1; i < 4; ++i) {
+		int val = best_scores[ply - i];
+		if (-INF + 100 < val && val < INF - 100) is_mate = false;
+	    }
+	    if (is_mate) break; // The position was mate in the 3 previous ply
+	}
+
 	moves.sort(board, best_move);
 	for (int i = 0; i < moves.size(); ++i) {
 	    Move move = moves.at(i);
@@ -312,20 +331,29 @@ Move Game::root(int max_depth) {
 	    NodeType node_type = (i == 0 ? PV_NODE : ALL_NODE);
 	    score = -pv_search(-beta, -alpha, ply - 1, node_type);
 	    undo_move(move);
+	    //print_thinking(ply, score, move);
 	    if (time.is_out_of_time()) break; // Discard this move
 	    if (score > alpha) {
 		alpha = score;
+		best_score = score;
 		best_move = move;
 		if (nodes_count > 500000) { // Save CPU time at the beginning
 		    print_thinking(ply, alpha, best_move);
 		}
 	    } 
 	}
-	if (time.is_out_of_time()) break; // Discard this ply
+	if (time.is_out_of_time()) {
+	    // TODO Restore best_move and best_score from previous ply?
+	    break; // Discard this ply
+	}
 	if (!best_move.is_null()) {
 	    tt.save(current_node().hash(), alpha, EXACT, ply, best_move);
 	}
-	//print_thinking(ply, alpha, best_move);
+	best_scores[ply] = best_score;
+	//print_thinking(ply, best_score, best_move);
+    }
+    if (!best_move.is_null()) {
+	print_thinking(ply, best_score, best_move);
     }
     return best_move;
 }
