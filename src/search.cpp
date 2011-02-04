@@ -154,13 +154,15 @@ int Game::alphabeta_search(int alpha, int beta, int depth) {
 }
 
 int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
+    if (time.poll(nodes_count)) return 0;
+    if (depth <= 0) return quiescence_search(alpha, beta, 0); // Quiescence
+    if (tree.has_repetition_draw()) return 0; // Repetition draw rules
+
     int score = -INF;
     int old_alpha = alpha;
     Node pos = current_node();
     int best_score = -INF;
     Move best_move;
-
-    if (time.poll(nodes_count)) return 0;
 
 #ifdef TT
     // Lookup in Transposition Table
@@ -181,10 +183,6 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
     }
 #endif
     
-    // End of regular search?
-    if (depth <= 0) return quiescence_search(alpha, beta, 0); // Quiescence
-    if (tree.has_repetition_draw()) return 0; // Repetition draw rules
-
     Color player = pos.get_turn_color();
     bool is_in_check = is_check(player);
 
