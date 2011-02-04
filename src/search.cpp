@@ -238,7 +238,7 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 	else {
 
 	    // Late Move Reduction
-	    if (i > 3 && // Not for best move or killer moves
+	    if (i > 2 && // Not for best move or killer moves
 		depth > 2 && // Not near leaf
 		!move.is_capture() && !move.is_promotion() &&
 		!is_in_check && !is_check(Color(!player))) {

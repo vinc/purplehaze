@@ -25,7 +25,7 @@
 #define MAX_DEPTH      64
 #define INF	    29999
 
-enum Square {
+enum Square : unsigned char {
     A1=0x00, B1, C1, D1, E1, F1, G1, H1,
     A2=0x10, B2, C2, D2, E2, F2, G2, H2,
     A3=0x20, B3, C3, D3, E3, F3, G3, H3,

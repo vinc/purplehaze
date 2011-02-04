@@ -42,6 +42,7 @@ int main() {
     cout << version << endl;
     cout << endl;
     
+    cout << "Hash: " << sizeof(Hash) << endl;
     cout << "Piece: " << sizeof(Piece) << endl;
     cout << "Move: " << sizeof(Move) << endl;
     cout << "ExtendedMove: " << sizeof(ExtendedMove) << endl;

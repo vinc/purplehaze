@@ -20,6 +20,7 @@
 #include <iomanip>
 #include <string>
 #include <sstream>
+#include <bitset>
 
 #include "game.h"
 
@@ -46,6 +47,8 @@ void Game::print_thinking(int depth, int score, Move m) {
     cout << setw(WIDE - 3) << " ";
     int ply = current_node().get_ply();
     if (ply % 2 != 0) cout << 1 + (ply / 2) << ". ...";
+    //cout << m << endl; 
+    assert(is_legal(m));
     cout << output_principal_variation(depth, m) << endl;
 }
 
@@ -55,6 +58,7 @@ string Game::output_principal_variation(int depth, Move m) {
     int ply = current_node().get_ply();
     if (ply % 2 == 0) stream << 1 + (ply / 2) << ". ";
     stream << output_move(m);
+    Node pos = current_node();
     make_move(m);
     if (is_check(current_node().get_turn_color())) stream << "+";
     
@@ -73,6 +77,7 @@ string Game::output_principal_variation(int depth, Move m) {
     }
 
     undo_move(m);
+    assert(pos.hash() == current_node().hash());
     return stream.str();
 }
 
@@ -117,4 +122,46 @@ string Game::output_move(Move m) {
     }
 
     return stream.str();
+}
+
+void Game::print_tt_stats() {
+    long zeros = 0;
+    long ones = 0;
+    for (int i = 0; i < tt.size(); ++i) {
+	if (tt.at(i).is_empty()) continue;
+	Hash h = tt.at(i).get_hash();
+	bitset<64> b = h;
+	int z = b.count();
+	//cout << "0: " << 64 - z << ", 1: " << z << endl;
+	zeros += 64 - z;
+	ones += z;
+    }
+
+    cout << "Zobrist:          " << hex << current_node().hash() << dec << endl;
+    cout << "TT Size:          " << TT_SIZE / 1024 / 1024 << "Mb" << endl;
+    cout << "Entries:          " << tt.size() << endl;
+    cout << "Usage:            " << tt.get_usage();
+    float percent_usage = (100 * tt.get_usage()) / float(tt.size());
+    cout << " (" << percent_usage << "%)" << endl;
+    float percent_zeros = (100.0 * zeros) / (64.0 * tt.get_usage());
+    cout << "0's:              " << percent_zeros << "%" << endl;
+    float percent_ones = (100.0 * ones) / (64.0 * tt.get_usage());
+    cout << "1's:              " << percent_ones << "%" << endl;
+    
+    cout << "Lookups:          " << tt.get_nb_lookups() << endl;
+    
+    cout << "Hits:             " << tt.get_nb_hits();
+    float percent_hits = (100 * tt.get_nb_hits()) / 
+			 float(tt.get_nb_lookups());
+    cout << " (" << percent_hits << "%)" << endl;
+    
+    cout << "Index Collisions: " << tt.get_nb_collisions();
+    float percent_collisions = (100 * tt.get_nb_collisions()) / 
+			       float(tt.get_nb_lookups());
+    cout << " (" << percent_collisions << "%)" << endl;
+    
+    cout << "Misses:           " << tt.get_nb_misses();
+    float percent_misses = (100 * tt.get_nb_misses()) / 
+			   float(tt.get_nb_lookups());
+    cout << " (" << percent_misses << "%)" << endl;
 }

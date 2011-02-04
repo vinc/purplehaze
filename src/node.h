@@ -30,27 +30,22 @@ using namespace std;
 class Node
 {
     private:
-	Color side_to_move;
-	//short halfmove_counter;
-	unsigned char halfmove_counter;
-	//short score;
+	Hash zobrist_hash;
 	short ply;
-	Square en_passant;
+	Move last_move;
+	Piece capture;
 	bitset<4> castle_rights;
 	bitset<2> castle;
-	
-	Piece capture;
-	Move last_move;
-	Hash zobrist_hash;
+	Square en_passant;
+	unsigned char halfmove_counter;
+	Color side_to_move;
 
     public:
 	Node() : 
-	    side_to_move(WHITE), 
-	    halfmove_counter(0),
-	    //score(0),
 	    ply(0),
-	    //last_move(Move()
-	    en_passant(OUT) {}
+	    en_passant(OUT),
+	    halfmove_counter(0),
+	    side_to_move(WHITE) {} 
 	
 	Hash& hash() { return zobrist_hash; };
 	Color get_turn_color() const {

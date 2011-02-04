@@ -24,29 +24,26 @@
 #include "move.h"
 #include "zobrist.h"
 
-//#define TT_SIZE	2048 //1024*1024*128 // Transpositions table of 128Mb
+static const int TT_SIZE = 1024*1024*256;
 
-static const int TT_SIZE = 1024*1024*128;
-
-enum Bound : unsigned char { EXACT = 0, LOWER, UPPER, UNDEF_BOUND };
+enum Bound : unsigned char { EXACT, LOWER, UPPER, UNDEF_BOUND };
 
 class Transposition
 {
     private:
-	Hash hash;
-	int value;
-	Bound bound;
-	unsigned char depth;
-	Move best_move;
+	Hash hash;		// 64 bits needed
+	short value;		// 16 bits needed
+	Move best_move;		// 16 bits needed
+	unsigned char depth;	// 10 bits needed (depth < 512)
+	Bound bound;		// 3 bits needed
 
     public:
-	//Transposition()
-	//    : hash(0), value(0), bound(UNDEF_BOUND), depth(d), best_move(Move()) {}
 	Transposition(Hash h, int v, Bound b, int d, Move bm)
-	    : hash(h), value(v), bound(b), depth(d), best_move(bm) {}
+	    : hash(h), value(v), best_move(bm), depth(d), 
+	      bound(b) {}
 	Transposition() 
-	    : hash(Hash()), value(0), bound(UNDEF_BOUND), depth(0), 
-	      best_move(Move()) {}
+	    : hash(Hash()), value(0), best_move(Move()), depth(0), 
+	      bound(UNDEF_BOUND) {}
 	
 	Hash get_hash() const { return hash; };
 	int get_value() const { return value; };
@@ -60,30 +57,40 @@ class Transposition
 class Transpositions
 {
     private:
-	//static const int SIZE = (TT_SIZE / sizeof(Transposition));
-	//Transposition tt[SIZE];
 	const int SIZE;
-	Transposition* tt; // = new Transposition[SIZE];
-	Transposition null_entry;
+	Transposition* tt;
+	const Transposition NULL_ENTRY;
+	int hits;
+	int collisions;
+	int misses;
 
     public:
 	Transpositions(int n = TT_SIZE) : SIZE(n / sizeof(Transposition)) {
 	    //assert(SIZE > 0);
 	    //assert((n & (n - 1)) == 0);
 	    tt = new Transposition[SIZE];
+	    hits = 0;
+	    collisions = 0;
+	    misses = 0;
 	};
 	~Transpositions() {
 	    delete [] tt;
 	    tt = NULL;
 	};
 	Transposition lookup(Hash hash);
-	//void save(Hash h, int v, int a, int b, int d, Move bm);
 	void save(Hash h, int v, Bound b, int d, Move bm);
 	void clear();
 
 	// Used only for unit testing
 	int size() const { return SIZE; };
 	Transposition& at(int i) const { return tt[i]; };
+
+	// Used to print stats
+	int get_usage() const;
+	int get_nb_lookups() const { return hits + misses; };
+	int get_nb_hits() const { return hits; };
+	int get_nb_collisions() const { return collisions; };
+	int get_nb_misses() const { return misses; };
 };
 
 #endif /* !TT_H */

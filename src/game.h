@@ -100,6 +100,7 @@ class Game
 	void print_thinking(int depth, int score, Move m);
 	string output_principal_variation(int depth, Move m);
 	string output_move(Move m);
+	void print_tt_stats();
 };
 
 #endif /* !GAME_H */

@@ -26,7 +26,7 @@ Board::Board() {
 }
 
 ostream& operator<<(ostream& out, const Board board) {
-    for (Square s = A8; s >= A1; s = Square(s + 1)) {
+    for (Square s = A8; ; s = Square(s + 1)) {
 	if (board.is_out(s)) continue;
 	if (board.get_file(s) == FILE_A) {
 	    out << "     +---+---+---+---+---+---+---+---+" << endl;

@@ -32,7 +32,7 @@ Xboard::Xboard() {
 void Xboard::think() {
     if (get_verbosity() > 1) {
 	cout << game.board << endl;
-	cout << " " << double(game.time.get_allocated_time() / 100.0);
+	cout << " " << game.time.get_allocated_time() / 100.0f;
 	cout << " seconds alocated to play" << endl << endl;
     }
 
@@ -52,6 +52,7 @@ void Xboard::think() {
     }
     else if (!force_mode) {
 	play_move(move);
+	//game.print_tt_stats();
 	output = "move " + move;
     }
     cout << output << endl;
@@ -60,7 +61,7 @@ void Xboard::think() {
 
 void Xboard::loop() {
     signal(SIGINT, SIG_IGN);
-    //cout << endl; // Acknowledge Xboard mode
+    cout << endl; // Acknowledge Xboard mode
     log.open("game.log", ios::app); 
     log << "DEBUG: PurpleHaze starting" << endl;
 

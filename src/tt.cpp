@@ -57,6 +57,8 @@ void Transpositions::clear() {
 	tt[i] = Transposition();
 	//assert(tt[i].is_empty());
     }
+    hits = 0;
+    misses = 0;
 }
 
 Transposition Transpositions::lookup(Hash h) {
@@ -64,8 +66,19 @@ Transposition Transpositions::lookup(Hash h) {
     //assert(null_entry.is_empty());
     Transposition t = tt[h & (SIZE - 1)];
     //cout << "look " << t.to_string() << endl;
-    return ((h && t.get_hash() == h) ? t : null_entry);
+
+    //return ((h && t.get_hash() == h) ? t : NULL_ENTRY);
+    if (h && t.get_hash() == h) {
+	++hits;
+	return t;
+    }
+    else {
+	if (h && !t.is_empty()) ++collisions;
+	++misses;
+	return NULL_ENTRY;
+    }
 }
+
 void Transpositions::save(Hash h, int v, Bound b, int d, Move bm) {
     //cout << "cast <" << hex << h << ", " << dec << v << ", " << d << ", ";
     //cout << b << ", " << bm << ">" << endl;
@@ -77,6 +90,13 @@ void Transpositions::save(Hash h, int v, Bound b, int d, Move bm) {
     assert(bm == t.get_best_move());
     */
     //cout << "save " << t.to_string() << endl;
+    
+    /*
+    cout << "tt: " << hex << tt[h & (SIZE - 1)].get_hash() << endl;
+    cout << "h:  " << hex << h << endl;
+    cout << dec << endl;
+    */
+
     tt[h & (SIZE - 1)] = t;
 }
 
@@ -86,3 +106,10 @@ void Transpositions::save(Hash h, int v, int a, int b, int d, Move bm) {
     tt[h & (SIZE - 1)] = Transposition(h, v, bound, d, bm); // Always Replace
 }
 */
+
+int Transpositions::get_usage() const {
+    int res = 0; 
+    for (int i = 0; i < SIZE; ++i) if (!tt[i].is_empty()) ++res;
+    return res;
+}
+
