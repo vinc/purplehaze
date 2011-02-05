@@ -24,11 +24,11 @@
 
 #include "protocol.h"
 
-#define XBOARD_NB_FEATURES	2
-
-const string XBOARD_FEATURES[XBOARD_NB_FEATURES][2] = {
-    { "setboard",	"1" },
-    { "done",		"1" },
+static const int XBOARD_NB_FEATURES = 3;
+static const string XBOARD_FEATURES[XBOARD_NB_FEATURES][2] = {
+    { "myname",	"Purple Haze 2.0.0" },
+    { "setboard",		"1" },
+    { "done",			"1" },
 };
 
 class Xboard : public Protocol

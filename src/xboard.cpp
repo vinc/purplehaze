@@ -79,7 +79,13 @@ void Xboard::loop() {
 	    if (n == 2) {
 		for (int i = 0; i < XBOARD_NB_FEATURES; ++i) {
 		    cout << "feature " << XBOARD_FEATURES[i][0];
-		    cout << "=" << XBOARD_FEATURES[i][1] << endl;
+		    string value = XBOARD_FEATURES[i][1];
+		    if (value == "0" || value == "1") {
+			cout << "=" << value << endl;
+		    }
+		    else {
+			cout << "=\"" << value << "\"" << endl;
+		    }
 		    string reply, feature;
 		    cin >> reply;
 		    cin >> feature;
