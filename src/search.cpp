@@ -34,8 +34,8 @@ using namespace std;
 #define R_ADAPT(c, d) ( \
     2 + ((d) > (6 + ((pieces.get_nb_pieces(c) < 3) ? 2 : 0))))
 
+// Array of pruning margin values indexed by depth. Idea from Crafty
 static const int futility_depth = 3;
-
 static const int futility_margins[futility_depth + 1] = {
     0,
     PIECE_VALUE[PAWN],
@@ -65,7 +65,7 @@ int Game::quiescence_search(int alpha, int beta, int depth) {
     if (stand_pat >= beta) return stand_pat; // Beta cut-off
 
     // Delta pruning
-    int delta = PIECE_VALUE[QUEEN]; // TODO: Switch of in late endgame
+    int delta = PIECE_VALUE[QUEEN]; // TODO: Switch off in late endgame
     if (stand_pat < alpha - delta) return alpha;
     
     if (alpha < stand_pat) alpha = stand_pat; // New alpha
@@ -255,7 +255,7 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 	    if (depth <= futility_depth && 
 		!is_in_check && !is_giving_check &&
 		!move.is_capture() && !move.is_promotion()) {
-		score = eval() + futility_margins[depth];
+		score = eval() + futility_margins[depth]; // Idea from Crafty
 		if (score < alpha) {
 		    if (score > best_score) best_score = score;
 		    undo_move(move);
@@ -362,9 +362,9 @@ Move Game::root(int max_depth) {
 		alpha = score;
 		best_score = score;
 		best_move = move;
-		if (nodes_count > 200000) { // Save CPU time at the beginning
+		//if (nodes_count > 200000) { // Save CPU time at the beginning
 		    print_thinking(ply, alpha, best_move);
-		}
+		//}
 	    } 
 	}
 	if (time.is_out_of_time()) {
