@@ -25,6 +25,7 @@ using namespace std;
 
 int Game::piece_eval(Color c, PieceType t, int i) {
     Square s = pieces.get_position(c, t, i);
+    int res;
     const int* pcsq_table;
     switch (t) {
 	case PAWN:   pcsq_table = PAWN_PCSQ;   break;
@@ -36,23 +37,55 @@ int Game::piece_eval(Color c, PieceType t, int i) {
 	default: assert(false);
     }
     switch (c) {
-	case WHITE: return pcsq_table[s];
-	case BLACK: return pcsq_table[FLIP[s]];
-    }	
+	case WHITE: res = pcsq_table[s];
+	case BLACK: res = pcsq_table[FLIP[s]];
+    }
+    //if (is_attacked_by(c, s)) res += 30;
+    return res;
 }
 
-int pawn_structure_eval(Pieces& pieces, Color player) {
+int pawn_structure_eval(/*Board& board,*/ Pieces& pieces, Color player) {
     int score = 0;
     int pawns_files[2][8] = {
 	{ 0, 0, 0, 0, 0, 0, 0, 0 },
 	{ 0, 0, 0, 0, 0, 0, 0, 0 }
     };
-    for (int c = 0; c < 2; ++c) { 
+    for (int c = 0; c < 2; ++c) {
+	/*
+	int endgame_coef = 4 - pieces.get_nb_pieces(Color(c));
+	if (endgame_coef < 0) endgame_coef = 0;
+	*/
 	int pawns_score = 0;
 	// Building the (color x file) table
 	for (int i = 0; i < pieces.get_nb_pieces(Color(c), PAWN); ++i) {
 	    Square s = pieces.get_position(Color(c), PAWN, i);
 	    pawns_files[c][s & 7]++;
+	   
+	    /*
+	    Square flipped_s = (c == WHITE ? s : Square(FLIP[s]));
+
+	    // Passed pawns
+	    int passed_bonus = PASSED_PAWN_PCSQ[flipped_s];
+	    pawns_score += passed_bonus * endgame_coef;
+
+	    // Weak pawns
+	    bool is_weak = true;
+	    Direction d = (c == WHITE ? DOWN : UP);
+	    Direction dirs[4] = {
+		LEFT, RIGHT, Direction(d + LEFT), Direction(d + RIGHT)
+	    };
+	    for (int j = 0; j < 4; ++j) {
+		Square sq_protecting = Square(s + dirs[j]);
+		if (!board.is_out(sq_protecting)) {
+		    Piece p = board.get_piece(sq_protecting);
+		    if (p.get_color() == c && p.get_type() == PAWN) {
+			is_weak = false;
+			break;
+		    }
+		}
+	    }
+	    if (is_weak) pawns_score += WEAK_PAWN_PCSQ[s];
+	    */
 	}
 	// Malus for doubled (or more) pawns
 	for (int i = 0; i < 8; ++i) {
@@ -134,7 +167,7 @@ int Game::eval() {
 	score += castle_score;
     }
 
-    score += pawn_structure_eval(pieces, player);
+    score += pawn_structure_eval(/*board,*/ pieces, player);
 
     return score;
 }
