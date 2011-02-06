@@ -35,8 +35,6 @@ class Game
 {
     private:
 	Zobrist zobrist;
-	bitset<7> attack_array[240];
-	Direction dir_array[240];
 	Move killer_moves[MAX_DEPTH][2];
 
     public:
@@ -61,19 +59,14 @@ class Game
 
 	void init(string fen);
 
-	bool can_attack(PieceType t, Square from, Square to) const {
-	    return bool(attack_array[0x77 + from - to][t]);
-	}
-	Direction get_direction_to(Square from, Square to) const {
-	    return dir_array[0x77 + from - to];
-	}
-
-	bool is_attacked_by(Color c, Square s) const;
 	bool is_check(Color c) const {
-	    return is_attacked_by(Color(!c), pieces.get_position(c, KING, 0));
+	    return board.is_attacked_by(Color(!c), 
+					pieces.get_position(c, KING, 0),
+					pieces);
 	}
 
-	Moves movegen(bool captures_only = false);
+
+	//Moves movegen(bool captures_only = false);
 	void make_move(Move m);
 	void undo_move(Move m);
 	bool is_legal(Move m);
@@ -81,7 +74,7 @@ class Game
 	// Search
 	int perft(int depth);
 	int quiescence_search(int alpha, int beta, int depth);
-	int alphabeta_search(int alpha, int beta, int depth);
+	//int alphabeta_search(int alpha, int beta, int depth);
 	int pv_search(int alpha, int beta, int depth, NodeType node_type);
 	Move root(int max_depth);
 
@@ -90,6 +83,10 @@ class Game
 	    return killer_moves[depth][index];
 	}
 	void set_killer_move(int depth, Move move);
+	bool is_killer_move(int depth, Move move) {
+	    return (move == killer_moves[depth][0] || 
+		    move == killer_moves[depth][1]);
+	};
 	
 	// Position's evaluation
 	int piece_eval(Color c, PieceType t, int i);
@@ -100,6 +97,10 @@ class Game
 	void print_thinking(int depth, int score, Move m);
 	string output_principal_variation(int depth, Move m);
 	string output_move(Move m);
+	string output_square(Square s) { 
+	    return output_square(board.get_file(s), board.get_rank(s));
+	} ;
+	string output_square(File f, Rank r);
 	void print_tt_stats();
 };
 

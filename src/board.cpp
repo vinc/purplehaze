@@ -22,7 +22,37 @@
 using namespace std;
 
 Board::Board() {
-    for (int i = 0; i < BOARD_SIZE; ++i) board[i] = Piece();
+    // Initialize board
+    for (int i = 0; i < BOARD_SIZE; ++i) board[i] = Piece();   
+
+    // Initialize direction array
+    for (int i = 0; i < 240; ++i) { 
+	dir_array[i] = NO_DIR;
+    }
+
+    // Initialize attack array
+    for (int i = 0; i < 64; ++i) { 
+	for (int j = 0; j < 64; ++j) { 
+	    Square from = Square(i + (i & ~7));
+	    Square to = Square(j + (j & ~7));
+	    int diff = 0x77 + from - to;
+	    for (PieceType t = KNIGHT; t <= KING; t = PieceType(t + 1)) {
+		const Direction * dirs = PIECES_DIRS[t];
+		for (int d = 0; d < NB_DIRS[t]; ++d) {
+		    Square s = Square(from + dirs[d]);
+		    while (!is_out(s)) {
+			if (s == to) {
+			    attack_array[diff].set(t, true);
+			    dir_array[diff] = dirs[d];
+			    break;
+			}
+			if (t == KNIGHT || t == KING) break; // Leapers
+			s = Square(s + dirs[d]); // Sliders
+		    }
+		}
+	    }
+	}
+    }
 }
 
 ostream& operator<<(ostream& out, const Board board) {

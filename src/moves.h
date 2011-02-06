@@ -21,36 +21,64 @@
 #include "common.h"
 #include "move.h"
 #include "board.h"
+#include "node.h"
 
 using namespace std;
 
-static const int MAX_MOVES = 200; // TODO Find the real value
+
+typedef char Score;
+
+const int MAX_MOVES = 200; // TODO Find the real value
+const Score BEST_SCORE = 127;
+const Score KILLERS_SCORE = 0;
+
+enum MovesState : unsigned char { 
+    BEST, GOOD_CAPTURES, KILLERS, BAD_CAPTURES, QUIET_MOVES, UNDEF_MOVES
+};
 
 class Moves
 {
-    private:
-	ExtendedMove moves[MAX_MOVES];
-	int n;
-    public:
-	Moves() : n(0) {}
-	void add(Move m) { 
-	    //moves.push_back(m);
-	    moves[n] = m;
-	    ++n;
-	};
-	int size() const { return n; };
-	Move at(int i) const { return moves[i]; };
-	char get_score(int i) const { return moves[i].get_score(); };
-	//list<ExtendedMove>::iterator it;
-	
-	//list<ExtendedMove>::iterator begin() { return moves.begin(); };
-	//list<ExtendedMove>::iterator end() { return moves.end(); };
+    private:	
+    	ExtendedMove moves[MAX_MOVES];
+	Node& current_node;
+	Board& board;
+	Pieces& pieces;
+	MovesState state;
+	unsigned char i, n;
+	unsigned char size[5]; // Number of differents moves'types
+	bool use_lazy_generation;
 
-	void numeric_sort() { /*moves.sort(Move::numeric_comp);*/ };
-	void selection_sort();
-	void sort(Board b, Move bm = Move(), 
-			   Move killer1 = Move(), 
-			   Move killer2 = Move());
+    public:
+	static Score mvv_lva_scores[KING + 1][KING + 1];
+    	Moves(Board& b, Pieces& ps, Node& cn, bool lg = true) : 
+	    current_node(cn), board(b), pieces(ps),
+	    state(BEST),
+	    i(0), n(0),
+	    use_lazy_generation(lg)
+	    { size = { 0, 0, 0, 0, 0 }; }
+
+	void generate(MoveType mt = NULL_MOVE); // here NULL_MOVE => ALL_MOVE 
+	void generate_pieces(Color c, PieceType t, MoveType mt);
+	void add(Move m, MovesState mt = UNDEF_MOVES);
+	ExtendedMove next();
+	MovesState get_state() const { return state; };
+
+	static void init_mvv_lva_scores();
+	Score get_mvv_lva_score(Move m);	
+
+	// Used for compatibility only
+	/*
+	int size() { 
+	    return n;
+	};
+	Move at(int i) {
+	    assert(i < n);
+	    return moves[i];
+	};
+	*/
+
+	// Used in divide
+	void numeric_sort() { /*moves.sort(Move::numeric_comp);*/ };	
 };
 
 #endif /* !MOVES_H */

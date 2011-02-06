@@ -47,11 +47,13 @@ int Game::perft(int depth) {
     if (depth == 0) return 1;
     int nodes = 0;
     Color c = current_node().get_turn_color();
-    Moves moves = movegen();
-    for (int i = 0; i < moves.size(); ++i) {
-    	make_move(moves.at(i));
+    bool use_lazy_generation = false; // Useless overhead in perft()
+    Moves moves(board, pieces, current_node(), use_lazy_generation);
+    Move move;
+    while (!(move = moves.next()).is_null()) {
+    	make_move(move);
 	if (!is_check(c)) nodes += perft(depth - 1);
-	undo_move(moves.at(i));
+	undo_move(move);
     }
     return nodes;
 }
@@ -59,6 +61,7 @@ int Game::perft(int depth) {
 int Game::quiescence_search(int alpha, int beta, int depth) {
     int score;
     if (time.poll(nodes_count)) return 0;
+
     int stand_pat = eval();
     if (depth < -MAX_DEPTH) return stand_pat;
     
@@ -70,12 +73,12 @@ int Game::quiescence_search(int alpha, int beta, int depth) {
     
     if (alpha < stand_pat) alpha = stand_pat; // New alpha
 
-    Moves moves = movegen(true); // Capture only
-    moves.sort(board);
     Color player = current_node().get_turn_color();
-    for (int i = 0; i < moves.size(); ++i) {
-	if (moves.get_score(i) < 0) break; // Skip bad captures	
-	Move move = moves.at(i);
+    
+    Moves moves(board, pieces, current_node());    
+    Move move;
+    while (!(move = moves.next()).is_null()) {
+	if (moves.get_state() > GOOD_CAPTURES) break; // Skip bad captures	
 	make_move(move);
 
 	if (is_check(player)) { // Illegal move
@@ -100,6 +103,7 @@ int Game::quiescence_search(int alpha, int beta, int depth) {
 /* 
  * Replaced by Principal Variation Search
  */
+/*
 int Game::alphabeta_search(int alpha, int beta, int depth) {
     int score;
     int old_alpha = alpha;
@@ -152,6 +156,7 @@ int Game::alphabeta_search(int alpha, int beta, int depth) {
     tt.save(current_node().hash(), alpha, bound, depth, best_move);
     return alpha;
 }
+*/
 
 int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
     if (time.poll(nodes_count)) return 0;
@@ -214,12 +219,41 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 
     bool legal_move_found = false;
     bool is_principal_variation = true;
-    Moves moves = movegen();
-    Move killer1 = get_killer_move(depth, 0);
-    Move killer2 = get_killer_move(depth, 1);
-    moves.sort(board, best_move, killer1, killer2);
-    for (int i = 0; i < moves.size(); ++i) {
-	Move move = moves.at(i);
+    
+    Moves moves(board, pieces, current_node());
+    //if (is_legal(best_move)) 
+    moves.add(best_move, BEST);
+    //moves.add(get_killer_move(depth, 0), KILLERS);
+    //moves.add(get_killer_move(depth, 1), KILLERS);
+    
+    Move move;
+    while (!(move = moves.next()).is_null()) {
+	
+	// Killer moves need pseudo legality checking before we made them,
+	// but they can cause a cut-off and dispense to generate quiet moves
+	// so it's worth it.
+	if (is_killer_move(depth, move) && !is_legal(move)) continue;
+	/*
+	else {
+	    cout << endl << board;
+	    cout << (player == WHITE ? "White" : "Black") << " to play ";
+	    cout << output_move(move) << " (" << move << ")";
+	    cout << " is legal" << endl;
+	}
+	*/
+	
+	
+	assert(is_legal(move) || assert_msg(
+	    endl << board << endl <<
+	    "m = " << output_move(move) << " (" << move << ")" << endl <<
+	    "m is en passant: " << move.is_en_passant() << endl <<
+	    "m is promotion: " << move.is_promotion() << endl <<
+	    "m is legal: " << is_legal(move) << endl <<
+	    "m is killer: " << is_killer_move(depth, move) << endl <<
+	    hex << current_node().hash()
+	));
+	
+
 	make_move(move);
 	if (is_check(player)) { // Skip illegal move
 	    undo_move(move);
@@ -238,7 +272,7 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 		    tt.save(pos.hash(), best_score, LOWER, depth, move);
 		    
 		    // Update killer moves
-		    set_killer_move(depth, move);
+		    if (!move.is_capture()) set_killer_move(depth, move);
 		    
 		    // Beta cut-off
 		    return best_score;
@@ -264,8 +298,8 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 	    }
 
 	    // Late Move Reduction
-	    if (i > 2 && // Not for best move or killer moves
-		depth > 2 && // Not near leaf
+	    if (depth > 2 && // Not near leaf
+		!is_killer_move(depth, move) &&
 		!is_in_check && !is_giving_check &&
 		!move.is_capture() && !move.is_promotion()) {
 		
@@ -292,7 +326,7 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 		    tt.save(pos.hash(), score, LOWER, depth, move);
 		    
 		    // Update killer moves
-		    set_killer_move(depth, move); // TODO update killers in PV?
+		    if (!move.is_capture()) set_killer_move(depth, move);
 		    
 		    // Beta cut-off
 		    return score;
@@ -322,7 +356,6 @@ Move Game::root(int max_depth) {
     nodes_count = 0;
     int best_score = 0;
     Move best_move;
-    Moves moves = movegen();
     int ply;
     assert(max_depth <= MAX_DEPTH);
     int best_scores[MAX_DEPTH];
@@ -345,9 +378,10 @@ Move Game::root(int max_depth) {
 	    if (is_mate) break; // The position was mate in the 3 previous ply
 	}
 
-	moves.sort(board, best_move);
-	for (int i = 0; i < moves.size(); ++i) {
-	    Move move = moves.at(i);
+	Moves moves(board, pieces, current_node());
+	moves.add(best_move, BEST);    
+	Move move;
+	for (int i = 0; !(move = moves.next()).is_null(); ++i) {
 	    make_move(move);
 	    if (is_check(player)) { // Skip illegal move
 		undo_move(move);

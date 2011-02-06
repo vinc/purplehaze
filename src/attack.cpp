@@ -16,14 +16,10 @@
  */
 
 #include <assert.h>
-//#include <iostream>
-#include <list>
 
 #include "game.h"
 
-//using namespace std;
-
-bool Game::is_attacked_by(Color c, Square s) const {
+bool Board::is_attacked_by(Color c, Square s, const Pieces& pieces) const {
     for (PieceType t = KNIGHT; t <= KING; t = PieceType(t + 1)) {
 	int n = pieces.get_nb_pieces(c, t);
 	for (int i = 0; i < n; ++i) {
@@ -32,7 +28,7 @@ bool Game::is_attacked_by(Color c, Square s) const {
 	    if (t == KNIGHT || t == KING) return true;
 	    Direction d = get_direction_to(from, s);
 	    Square to = Square(from + d);
-	    while (to != s && board.is_empty(to)) {
+	    while (to != s && is_empty(to)) {
 		to = Square(to + d);
 	    }
 	    if (to == s) return true;
@@ -44,12 +40,48 @@ bool Game::is_attacked_by(Color c, Square s) const {
     Direction dirs[2] = { Direction(d + LEFT), Direction(d + RIGHT) };
     for (int i = 0; i < 2; ++i) {
 	Square from = Square(s + dirs[i]);
-	if (board.get_piece(from).get_type() == PAWN &&
-	    board.get_piece(from).get_color() == c) {
+	if (get_piece(from).get_type() == PAWN &&
+	    get_piece(from).get_color() == c) {
 	    return true;
 	}
     }
 
+    return false;
+}
+
+bool Board::can_go(Piece p, Square from, Square to) const {
+    PieceType t = p.get_type();
+    Color c = p.get_color();
+    Direction d = get_direction_to(from, to);
+    
+    // A piece cannot capture another piece of the same color
+    if (!is_empty(to) && get_piece(to).get_color() == c) return false;
+    
+    Direction push_dir;
+    Square s;
+    switch (t) {
+	case PAWN:
+	    push_dir = (c == WHITE ? UP : DOWN);
+	    if (!is_empty(to)) {
+		if (to == Square(from + push_dir + LEFT)) return true;
+		if (to == Square(from + push_dir + RIGHT)) return true;
+	    }
+	    else {
+		if (to == Square(from + push_dir)) return true;
+		if (to == Square(from + 2 * push_dir) &&
+		    is_pawn_begin(c, from)) return true;
+	    }
+	    break;
+	default:
+	    if (!can_attack(t, from, to)) return false;
+	    if (t == KNIGHT || t == KING) return true;
+	    s = Square(from + d);
+	    while (s != to && is_empty(s)) {
+		s = Square(s + d);
+	    }
+	    if (s == to) return true;
+	    break;
+    }
     return false;
 }
 

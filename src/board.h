@@ -18,14 +18,19 @@
 #ifndef BOARD_H
 #define BOARD_H
 
+#include <bitset>
+
 #include "common.h"
-#include "piece.h"
+#include "pieces.h"
 
 class Board
 {
     friend ostream& operator<<(ostream& out, const Board board);
     private:
 	Piece board[BOARD_SIZE];
+	bitset<7> attack_array[240];
+	Direction dir_array[240];
+
     public:
 	Board();
 	Piece get_piece(Square s) const {
@@ -58,6 +63,19 @@ class Board
 	bool is_pawn_end(Color c, Square s) const {
 	    return (get_rank(s) + 7 * c) == 7;
 	};
+
+	// Theoretical answer by array lookup
+	bool can_attack(PieceType t, Square from, Square to) const {
+	    return bool(attack_array[0x77 + from - to][t]);
+	}
+	Direction get_direction_to(Square from, Square to) const {
+	    return dir_array[0x77 + from - to];
+	}
+
+	// Practical answer
+	bool is_attacked_by(Color c, Square s, const Pieces& pieces) const;
+	bool can_go(Piece p, Square from, Square to) const; 
+
 };
 
 #endif /* !BOARD_H */

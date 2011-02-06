@@ -48,7 +48,12 @@ void Game::print_thinking(int depth, int score, Move m) {
     int ply = current_node().get_ply();
     if (ply % 2 != 0) cout << 1 + (ply / 2) << ". ...";
     //cout << m << endl; 
-    assert(is_legal(m));
+    assert(is_legal(m) || assert_msg(
+	    endl << board << endl << 
+	    "m = " << output_move(m) << " (" << m << ")" << endl <<
+	    "m is en passant: " << m.is_en_passant()
+	));
+
     cout << output_principal_variation(depth, m) << endl;
 }
 
@@ -100,11 +105,11 @@ string Game::output_move(Move m) {
     if (m.is_capture()) {
 	if (t == PAWN) stream << char('a' + m.get_orig_file());
 	else { // Disambiguation
-	    Color c = current_node().get_turn_color();
+	    Color c = current_node().get_turn_color(); // FIXME invert color
 	    Square to = m.get_dest();
 	    for (int i = 0; i < pieces.get_nb_pieces(c, t); ++i) {
 		Square s = pieces.get_position(c, t, i);
-		if (s != from && can_attack(t, s, to)) {
+		if (s != from && board.can_attack(t, s, to)) {
 		    stream << char('a' + m.get_orig_file());
 		    break;
 		}
@@ -114,13 +119,19 @@ string Game::output_move(Move m) {
     }
     
     // Destination
-    stream << char('a' + m.get_dest_file()) << char('1' + m.get_dest_rank());
+    stream << output_square(m.get_dest_file(), m.get_dest_rank());
     
     // Promotion
     if (m.is_promotion()) {
 	stream << "=" << Piece(WHITE, m.get_promotion_type());
     }
 
+    return stream.str();
+}
+
+string Game::output_square(File f, Rank r) {
+    ostringstream stream;
+    stream << char('a' + f) << char('1' + r);
     return stream.str();
 }
 

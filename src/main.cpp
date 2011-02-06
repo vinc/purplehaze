@@ -99,17 +99,17 @@ int main() {
 	    Color c = game.current_node().get_turn_color();
 	    int nodes_count = 0;
 	    int moves_count = 0;
-	    Moves moves = game.movegen();
-	    moves.numeric_sort();
-	    for (int i = 0; i < moves.size(); ++i) {
-	    	game.make_move(moves.at(i));
+	    Moves moves(game.board, game.pieces, game.current_node());    
+	    Move move;
+	    while (!(move = moves.next()).is_null()) {
+	    	game.make_move(move);
 		if (!game.is_check(c)) {
 		    int cnt = game.perft(depth - 1);
 		    nodes_count += cnt;
 		    moves_count++;
-		    cout << moves.at(i) << " " << cnt << endl;
+		    cout << move << " " << cnt << endl;
 		}
-		game.undo_move(moves.at(i));
+		game.undo_move(move);
 	    }
 	    cout << endl;
 	    cout << "Moves: " << moves_count << endl;

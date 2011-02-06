@@ -24,20 +24,19 @@
 
 using namespace std;
 
-void movegen_pieces(Board& board, Pieces& pieces, Moves& moves, 
-		    bool captures_only, Color c, PieceType t) {
+void Moves::generate_pieces(Color c, PieceType t, MoveType mt) {
     const Direction * dirs = PIECES_DIRS[t];
-    for (int i = 0; i < pieces.get_nb_pieces(c, t); ++i) {
-	Square from = pieces.get_position(c, t, i);
+    for (int j = 0; j < pieces.get_nb_pieces(c, t); ++j) {
+	Square from = pieces.get_position(c, t, j);
 	for (int d = 0; d < NB_DIRS[t]; ++d) {
 	    Square to = Square(from + dirs[d]);
 	    while (!board.is_out(to)) {
 		if (!board.is_empty(to)) {
 		    if (board.get_piece(to).get_color() == c) break;
-		    moves.add(Move(from, to, CAPTURE));
+		    if (mt != QUIET_MOVE) add(Move(from, to, CAPTURE));
 		    break;
 		}
-		else if (!captures_only) moves.add(Move(from, to, QUIET_MOVE));
+		else if (mt != CAPTURE) add(Move(from, to, QUIET_MOVE));
 		if (t == KNIGHT || t == KING) break; // Leapers
 		to = Square(to + dirs[d]); // Sliders
 	    }
@@ -45,70 +44,73 @@ void movegen_pieces(Board& board, Pieces& pieces, Moves& moves,
     }
 }
 
-Moves Game::movegen(bool captures_only) {
-    Moves moves;
-    Color c = current_node().get_turn_color();
+void Moves::generate(MoveType mt) {
+    Color c = current_node.get_turn_color();
     
     // Pawns moves
-    for (int i = 0; i < pieces.get_nb_pieces(c, PAWN); ++i) {
-	Square from = pieces.get_position(c, PAWN, i);
+    for (int j = 0; j < pieces.get_nb_pieces(c, PAWN); ++j) {
+	Square from = pieces.get_position(c, PAWN, j);
 
 	// Pawn captures
 	for (int d = 0; d < 2; ++d) {
+	    if (mt == QUIET_MOVE) break;
 	    Square to = Square(from + PAWN_CAPTURE_DIRS[c][d]);
 	    if (board.is_out(to)) continue;
 	    if (!board.is_empty(to) && board.get_piece(to).get_color() != c) {
 		if (board.is_pawn_end(c, to)) { // Promotion capture
-		    moves.add(Move(from, to, KNIGHT_PROMOTION_CAPTURE));
-		    moves.add(Move(from, to, BISHOP_PROMOTION_CAPTURE));
-		    moves.add(Move(from, to, ROOK_PROMOTION_CAPTURE));
-		    moves.add(Move(from, to, QUEEN_PROMOTION_CAPTURE));
+		    add(Move(from, to, KNIGHT_PROMOTION_CAPTURE));
+		    add(Move(from, to, BISHOP_PROMOTION_CAPTURE));
+		    add(Move(from, to, ROOK_PROMOTION_CAPTURE));
+		    add(Move(from, to, QUEEN_PROMOTION_CAPTURE));
 		}
 		else { // Capture
-		    moves.add(Move(from, to, CAPTURE));
+		    add(Move(from, to, CAPTURE));
 		}
 	    }
-	    else if (to == current_node().get_en_passant()) { // En passant
-		moves.add(Move(from, to, EN_PASSANT));
+	    else if (to == current_node.get_en_passant()) { // En passant
+		add(Move(from, to, EN_PASSANT));
 	    }
 	}
 	
-	if (captures_only) continue;
+	if (mt == CAPTURE) continue;
 	Square to = Square(from + PAWN_PUSH_DIRS[c]);
+	assert(!board.is_out(to) || assert_msg(
+	    endl << board << endl << 
+	    "from=" << hex << from <<
+	    " to=" << hex << to << endl
+	));
 	assert(!board.is_out(to)); // Should never happend
 	if (!board.is_empty(to)) continue;
 	
 	// Promotion
 	if (board.is_pawn_end(c, to)) {
-	    moves.add(Move(from, to, KNIGHT_PROMOTION));
-	    moves.add(Move(from, to, BISHOP_PROMOTION));
-	    moves.add(Move(from, to, ROOK_PROMOTION));
-	    moves.add(Move(from, to, QUEEN_PROMOTION));
+	    add(Move(from, to, KNIGHT_PROMOTION));
+	    add(Move(from, to, BISHOP_PROMOTION));
+	    add(Move(from, to, ROOK_PROMOTION));
+	    add(Move(from, to, QUEEN_PROMOTION));
 	    continue;
 	}
 
 	// Pawn push
-	moves.add(Move(from, to, QUIET_MOVE));
+	add(Move(from, to, QUIET_MOVE));
 	
 	// Double pawn push
 	if (board.is_pawn_begin(c, from)) {
 	    to = Square(to + PAWN_PUSH_DIRS[c]);
 	    if (!board.is_empty(to)) continue;
-	    moves.add(Move(from, to, DOUBLE_PAWN_PUSH));
+	    add(Move(from, to, DOUBLE_PAWN_PUSH));
 	}
     }
 
     // Standard moves
-    movegen_pieces(board, pieces, moves, captures_only, c, KNIGHT);
-    movegen_pieces(board, pieces, moves, captures_only, c, BISHOP);
-    movegen_pieces(board, pieces, moves, captures_only, c, ROOK);
-    movegen_pieces(board, pieces, moves, captures_only, c, QUEEN);
-    movegen_pieces(board, pieces, moves, captures_only, c, KING);
+    for (PieceType t = KNIGHT; t <= KING; t = PieceType(t + 1)) {
+	generate_pieces(c, t, mt);
+    }
 
-    if (captures_only) return moves;
+    if (mt == CAPTURE) return;
     
     // Castling
-    if (current_node().can_castle(c, KING)) {
+    if (current_node.can_castle(c, KING)) {
 	Square from = Square(E1 + A8 * c);
 	Square to = Square(G1 + A8 * c);
 	Square rook = Square(H1 + A8 * c);
@@ -116,14 +118,14 @@ Moves Game::movegen(bool captures_only) {
 	    board.is_empty(to) &&
 	    board.get_piece(rook).get_type() == ROOK &&
 	    board.get_piece(rook).get_color() == c &&
-	    !is_attacked_by(Color(!c), from) &&
-	    !is_attacked_by(Color(!c), Square((F1 + A8 * c))) &&
-	    !is_attacked_by(Color(!c), to)
+	    !board.is_attacked_by(Color(!c), from, pieces) &&
+	    !board.is_attacked_by(Color(!c), Square((F1 + A8 * c)), pieces) &&
+	    !board.is_attacked_by(Color(!c), to, pieces)
 	    ) {
-	    moves.add(Move(from, to, KING_CASTLE));
+	    add(Move(from, to, KING_CASTLE));
 	}
     }
-    if (current_node().can_castle(c, QUEEN)) {
+    if (current_node.can_castle(c, QUEEN)) {
 	Square from = Square(E1 + A8 * c);
 	Square to = Square(C1 + A8 * c);
 	Square rook = Square(A1 + A8 * c);
@@ -132,15 +134,13 @@ Moves Game::movegen(bool captures_only) {
 	    board.is_empty(to) &&
 	    board.get_piece(rook).get_type() == ROOK &&
 	    board.get_piece(rook).get_color() == c &&
-	    !is_attacked_by(Color(!c), from) &&
-	    !is_attacked_by(Color(!c), Square((D1 + A8 * c))) &&
-	    !is_attacked_by(Color(!c), to)
+	    !board.is_attacked_by(Color(!c), from, pieces) &&
+	    !board.is_attacked_by(Color(!c), Square((D1 + A8 * c)), pieces) &&
+	    !board.is_attacked_by(Color(!c), to, pieces)
 	    ) {
-	    moves.add(Move(from, to, QUEEN_CASTLE));
+	    add(Move(from, to, QUEEN_CASTLE));
 	}
     }
-    
-    return moves;
 }
 
 void Game::make_move(Move m) {
@@ -187,7 +187,13 @@ void Game::make_move(Move m) {
 	if (m.is_en_passant()) {
 	    s = (c == BLACK ? Square(ep + UP) : Square(ep + DOWN));
 	}
-	assert(!board.is_empty(s));
+
+	assert(!board.is_empty(s) || assert_msg(
+	    output_square(s) << " is empty:" << endl << board << endl << 
+	    "m = " << output_move(m) << " (" << m << ")" << endl <<
+	    "m is en passant: " << m.is_en_passant()
+	));
+
 	capture = board.get_piece(s);
 	if (capture.get_type() == ROOK) { // Update opponent's castling rights
 	    if (dest == Square(H1 + A8 * c)) {
@@ -202,7 +208,11 @@ void Game::make_move(Move m) {
 	    }
 	}
 	del_piece(capture);
-	assert(board.is_empty(s));
+	assert(board.is_empty(s) || assert_msg(
+	    output_square(s) << " is not empty:" << endl << board << endl << 
+	    "m = " << output_move(m) << " (" << m << ")" << endl <<
+	    "m is en passant: " << m.is_en_passant()
+	));
     }
 
     // Castling
@@ -307,25 +317,77 @@ void Game::undo_move(Move m) {
 }
 
 bool Game::is_legal(Move m) {
+    // Null-move is obviously wrong
+    if (m.is_null()) return false;
+    
     Square from = m.get_orig();
     Square to = m.get_dest();
-    Color c = current_node().get_turn_color();
-
-    if (m.is_null()) return false;
-
+    
+    // There must be a piece to move on the board
     if (board.is_empty(from)) return false;
 
+    Piece p = board.get_piece(from);
+    PieceType t = p.get_type();
+    Color c = p.get_color();
+
+    // The piece cannot be one of the opponent
+    if (c != current_node().get_turn_color()) return false;
+    
+    // It must be able to do the move
+    if (!m.is_en_passant() && 
+	!m.is_castle() && 
+	!board.can_go(p, from, to)) return false;
+    
+    // Promotion
+    if (t == PAWN && board.is_pawn_end(c, to) && !m.is_promotion()) {
+	return false;
+    }
+    
+    /*
+    if (t == PAWN && board.is_pawn_end(c, to)) {
+	cout << "start m = " << m << " (" << output_move(m) << ")" << endl;
+	cout << "m is promotion: " << m.is_promotion() << endl;
+	cout << board << hex << current_node().hash() << endl;
+    }
+    */
+
+    // If it's a capture
     if (m.is_capture()) {
 	Square s = to;
+
+	// There are special conditions for en passant
 	if (m.is_en_passant()) {
+	    // It must be a pawn
+	    if (t != PAWN) return false;
+
+	    // After a double push
 	    Square ep = current_node().get_en_passant();
-	    s = (c == BLACK ? Square(ep + UP) : Square(ep + DOWN));   
+	    if (to != ep) return false;
 	    
-	    if (to != ep) return false; // For reconstructing the PV from TT
+	    // from another pawn, the later being captured by the former
+	    s = (c == BLACK ? Square(ep + UP) : Square(ep + DOWN));   
 	    if (board.get_piece(s).get_type() != PAWN) return false;
 	}
+
+	// An opponent's piece must be captured
 	if (board.is_empty(s)) return false;
+	if (c == board.get_piece(s).get_color()) return false;
+
     }
+    else if (m.is_castle()) {
+	// TODO
+	return true;
+    }
+    else {
+	if (!board.is_empty(to)) return false;
+    }
+
+    /*
+    if (t == PAWN && board.is_pawn_end(c, to)) {
+	cout << "end m = " << m << " (" << output_move(m) << ") is legal" << endl;
+	cout << board << hex << current_node().hash() << endl;
+    }
+    */
 
     return true;
 }
