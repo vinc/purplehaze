@@ -69,6 +69,7 @@ bool Board::can_go(Piece p, Square from, Square to) const {
 	    else {
 		if (to == Square(from + push_dir)) return true;
 		if (to == Square(from + 2 * push_dir) &&
+		    is_empty(Square(from + push_dir)) &&
 		    is_pawn_begin(c, from)) return true;
 	    }
 	    break;
@@ -78,6 +79,7 @@ bool Board::can_go(Piece p, Square from, Square to) const {
 	    s = Square(from + d);
 	    while (s != to && is_empty(s)) {
 		s = Square(s + d);
+		assert(!is_out(s));
 	    }
 	    if (s == to) return true;
 	    break;

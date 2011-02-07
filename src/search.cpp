@@ -221,38 +221,32 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
     bool is_principal_variation = true;
     
     Moves moves(board, pieces, current_node());
-    //if (is_legal(best_move)) 
     moves.add(best_move, BEST);
-    //moves.add(get_killer_move(depth, 0), KILLERS);
-    //moves.add(get_killer_move(depth, 1), KILLERS);
+    
+    // Killer moves need pseudo legality checking before we can use them,
+    // but they can cause a cut-off and dispense to generate quiet moves
+    // so it's worth it.
+    //Move killers[MAX_KILLERS];
+    for (int i = 0; i < MAX_KILLERS; ++i) { 
+	Move killer = get_killer_move(depth, i);
+	if (is_legal(killer)) {
+	    //cout << debug_move(killer);
+	    killer_used[depth][i] = true;
+	    moves.add(killer, KILLERS);
+	}
+	else {
+	    killer_used[depth][i] = false;
+	}
+    }
+    
     
     Move move;
     while (!(move = moves.next()).is_null()) {
 	
-	// Killer moves need pseudo legality checking before we made them,
-	// but they can cause a cut-off and dispense to generate quiet moves
-	// so it's worth it.
-	if (is_killer_move(depth, move) && !is_legal(move)) continue;
-	/*
-	else {
-	    cout << endl << board;
-	    cout << (player == WHITE ? "White" : "Black") << " to play ";
-	    cout << output_move(move) << " (" << move << ")";
-	    cout << " is legal" << endl;
-	}
-	*/
-	
+	//if (is_killer_move(depth, move) /*&& !is_legal(move)*/) continue;
 	
 	assert(is_legal(move) || assert_msg(
-	    endl << board << endl <<
-	    "m = " << output_move(move) << " (" << move << ")" << endl <<
-	    "m is en passant: " << move.is_en_passant() << endl <<
-	    "m is promotion: " << move.is_promotion() << endl <<
-	    "m is legal: " << is_legal(move) << endl <<
-	    "m is killer: " << is_killer_move(depth, move) << endl <<
-	    hex << current_node().hash()
-	));
-	
+	    debug_move(move) << debug_killers(depth)));	
 
 	make_move(move);
 	if (is_check(player)) { // Skip illegal move
@@ -260,6 +254,7 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 	    continue;
 	}
 	legal_move_found = true;
+	played[depth] = move;
 
 	// PVS code from http://www.talkchess.com/forum/viewtopic.php?t=26974
 	if (is_principal_variation) {
@@ -387,6 +382,7 @@ Move Game::root(int max_depth) {
 		undo_move(move);
 		continue;
 	    }
+	    played[ply] = move;
 	    NodeType node_type = (i == 0 ? PV_NODE : ALL_NODE);
 	    score = -pv_search(-beta, -alpha, ply - 1, node_type);
 	    undo_move(move);

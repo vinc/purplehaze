@@ -342,7 +342,10 @@ bool Game::is_legal(Move m) {
     if (t == PAWN && board.is_pawn_end(c, to) && !m.is_promotion()) {
 	return false;
     }
-    
+    if (m.is_promotion()) {
+	if (t != PAWN || !board.is_pawn_end(c, to)) return false;
+    }
+
     /*
     if (t == PAWN && board.is_pawn_end(c, to)) {
 	cout << "start m = " << m << " (" << output_move(m) << ")" << endl;
@@ -376,7 +379,41 @@ bool Game::is_legal(Move m) {
     }
     else if (m.is_castle()) {
 	// TODO
+	Square rook = Square(H1 + A8 * c);
+	switch (m.get_castle_side()){
+	    case KING:
+		rook = Square(H1 + A8 * c);
+		if (!(board.is_empty(Square(F1 + A8 * c)) &&
+		    board.is_empty(to) &&
+		    board.get_piece(rook).get_type() == ROOK &&
+		    board.get_piece(rook).get_color() == c &&
+		    !board.is_attacked_by(Color(!c), from, pieces) &&
+		    !board.is_attacked_by(Color(!c), Square((F1 + A8 * c)), pieces) &&
+		    !board.is_attacked_by(Color(!c), to, pieces))) {
+		    return false;
+		}
+		break;
+	    case QUEEN:
+		rook = Square(A1 + A8 * c);
+		if (!(board.is_empty(Square(B1 + A8 * c)) &&
+		    board.is_empty(Square(D1 + A8 * c)) &&
+		    board.is_empty(to) &&
+		    board.get_piece(rook).get_type() == ROOK &&
+		    board.get_piece(rook).get_color() == c &&
+		    !board.is_attacked_by(Color(!c), from, pieces) &&
+		    !board.is_attacked_by(Color(!c), Square((D1 + A8 * c)), pieces) &&
+		    !board.is_attacked_by(Color(!c), to, pieces))) {
+		    return false;
+		}
+		break;
+	    default:
+		return false;
+	}
 	return true;
+    }
+    else if (m.is_double_pawn_push()) {
+	if (t != PAWN) return false;
+	if (!board.is_pawn_begin(c, from)) return false; // Done by can_go()
     }
     else {
 	if (!board.is_empty(to)) return false;

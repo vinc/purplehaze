@@ -168,6 +168,8 @@ const Direction PAWN_CAPTURE_DIRS[2][2] = {
     {DOWN_LEFT, DOWN_RIGHT}
 };
 
+const int MAX_KILLERS = 2;
+
 #define assert_msg(x) !(std::cerr << "Assertion failed: " << x << std::endl)
 
 #endif /* !COMMON_H */

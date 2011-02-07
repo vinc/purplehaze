@@ -146,7 +146,7 @@ class ExtendedMove : public Move
 	//ExtendedMove(bitset<16> c, bitset<16> e) : code(c), extra(e) {}
 	char score;
     public:
-	ExtendedMove() : score(0) { code = Move().code; }
+	ExtendedMove() : score(0) { code = NULL_MOVE; }
 	ExtendedMove(Move m, int s = 0) : score(s) { code = m.code; }
 	char get_score() const { return score; };
 	void set_score(int s) { score = s; };

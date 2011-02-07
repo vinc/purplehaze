@@ -176,3 +176,35 @@ void Game::print_tt_stats() {
 			   float(tt.get_nb_lookups());
     cout << " (" << percent_misses << "%)" << endl;
 }
+
+string Game::debug_move(Move m) {
+    ostringstream stream;
+    Color c = current_node().get_turn_color();
+    stream << endl << board << endl <<
+	      (c == WHITE ? "White" : "Black") << " to move" << endl <<
+	      "m = " << output_move(m) << " (" << m << ")" << endl <<
+	      "m is en passant: " << m.is_en_passant() << endl <<
+	      "m is promotion: " << m.is_promotion() << endl <<
+	      "m is legal: " << is_legal(m) << endl <<
+	      hex << current_node().hash();
+    return stream.str();
+}
+
+string Game::debug_killers(int depth) {
+    ostringstream stream;
+    for (int i = 0; i <= 20; ++i) {
+	stream << endl;
+	stream << "depth = " << i;
+	if (i == depth) stream << "*";
+	stream << ", killers[0] = " << get_killer_move(i, 0);
+	stream << "(" << output_move(get_killer_move(i, 0)) << ")";
+	stream << (killer_used[i][0] ? "!" : "?");
+	stream << ", killers[1] = " << get_killer_move(i, 1);
+	stream << "(" << output_move(get_killer_move(i, 1)) << ")";
+	stream << (killer_used[i][1] ? "!" : "?");
+	stream << ", played[" << i << "] = " << played[i];
+	stream << "(" << output_move(played[i]) << ")";
+	stream << endl;
+    }
+    return stream.str();
+}

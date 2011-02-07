@@ -107,24 +107,30 @@ void Moves::add(Move move, MovesState mt) {
     switch (mt) {
 	case BEST: 
 	    score = BEST_SCORE;
+	    size[mt]++;
 	    break;
 	case KILLERS:
 	    score = KILLERS_SCORE - size[KILLERS];
+	    size[mt]++;
 	    break;
 	default:
-	    size[state]++; // If move is a capture or a quiet move
+	    //assert(state > KILLERS);
+	    //size[state]++; // If move is a capture or a quiet move
 	    break;
     }
     switch (state) {
 	case GOOD_CAPTURES:
 	case BAD_CAPTURES:
 	    score = get_mvv_lva_score(move);
+	    size[state]++;
 	    break;
 	case QUIET_MOVES:
 	    score = -BEST_SCORE;
+	    size[state]++;
 	    break;
 	default:
-	    size[mt]++; // If move is a best or killer move
+	    //assert(mt < GOOD_CAPTURES);
+	    //size[mt]++; // If move is a best or killer move
 	    break;
     }
     
