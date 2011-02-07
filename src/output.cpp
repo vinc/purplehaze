@@ -105,7 +105,7 @@ string Game::output_move(Move m) {
     if (m.is_capture()) {
 	if (t == PAWN) stream << char('a' + m.get_orig_file());
 	else { // Disambiguation
-	    Color c = current_node().get_turn_color(); // FIXME invert color
+	    Color c = Color(!current_node().get_turn_color());
 	    Square to = m.get_dest();
 	    for (int i = 0; i < pieces.get_nb_pieces(c, t); ++i) {
 		Square s = pieces.get_position(c, t, i);
