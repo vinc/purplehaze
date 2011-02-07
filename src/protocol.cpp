@@ -27,6 +27,7 @@ using namespace std;
 void Protocol::new_game(){
     //game = Game();
     game.tt.clear();
+    game.clear_killers();
 }
 
 bool Protocol::set_board(string fen){

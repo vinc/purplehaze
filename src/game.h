@@ -79,6 +79,7 @@ class Game
 	Move root(int max_depth);
 
 	// Killer Moves
+	void clear_killers();
 	Move get_killer_move(int depth, int index) {
 	    return killer_moves[depth][index];
 	}

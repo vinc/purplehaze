@@ -26,10 +26,20 @@ Game::Game() {
     nodes_count = 0;
     output_thinking = false;
     tt.clear();
-
+    clear_killers();
+    
     // Initialize MVV/LVA score array
     Moves::init_mvv_lva_scores();
 }
+
+void Game::clear_killers() {
+    for (int i = 0; i < MAX_DEPTH; ++i) {
+	for (int j = 0; j < MAX_KILLERS; ++j) {
+	    killer_moves[i][j] = Move();
+	}
+    }
+}
+
 
 void Game::add_piece(Color c, PieceType t, Square s) {
     int i = pieces.get_nb_pieces(c, t);
