@@ -36,8 +36,6 @@ class Game
     private:
 	Zobrist zobrist;
 	Move killer_moves[MAX_DEPTH][MAX_KILLERS];
-	bool killer_used[MAX_DEPTH][MAX_KILLERS];
-	Move played[MAX_DEPTH];
 
     public:
 	bool output_thinking;
@@ -105,7 +103,6 @@ class Game
 	string output_square(File f, Rank r);
 	void print_tt_stats();
 	string debug_move(Move m);
-	string debug_killers(int depth);
 };
 
 #endif /* !GAME_H */

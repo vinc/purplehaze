@@ -226,27 +226,15 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
     // Killer moves need pseudo legality checking before we can use them,
     // but they can cause a cut-off and dispense to generate quiet moves
     // so it's worth it.
-    //Move killers[MAX_KILLERS];
     for (int i = 0; i < MAX_KILLERS; ++i) { 
 	Move killer = get_killer_move(depth, i);
-	if (is_legal(killer)) {
-	    //cout << debug_move(killer);
-	    killer_used[depth][i] = true;
-	    moves.add(killer, KILLERS);
-	}
-	else {
-	    killer_used[depth][i] = false;
-	}
+	if (is_legal(killer)) moves.add(killer, KILLERS);
     }
-    
     
     Move move;
     while (!(move = moves.next()).is_null()) {
-	
-	//if (is_killer_move(depth, move) /*&& !is_legal(move)*/) continue;
-	
-	assert(is_legal(move) || assert_msg(
-	    debug_move(move) << debug_killers(depth)));	
+	//assert(is_legal(move) || assert_msg(
+	//    debug_move(move) << debug_killers(depth)));	
 
 	make_move(move);
 	if (is_check(player)) { // Skip illegal move
@@ -254,7 +242,6 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 	    continue;
 	}
 	legal_move_found = true;
-	played[depth] = move;
 
 	// PVS code from http://www.talkchess.com/forum/viewtopic.php?t=26974
 	if (is_principal_variation) {
@@ -382,7 +369,6 @@ Move Game::root(int max_depth) {
 		undo_move(move);
 		continue;
 	    }
-	    played[ply] = move;
 	    NodeType node_type = (i == 0 ? PV_NODE : ALL_NODE);
 	    score = -pv_search(-beta, -alpha, ply - 1, node_type);
 	    undo_move(move);

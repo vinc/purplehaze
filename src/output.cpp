@@ -189,22 +189,3 @@ string Game::debug_move(Move m) {
 	      hex << current_node().hash();
     return stream.str();
 }
-
-string Game::debug_killers(int depth) {
-    ostringstream stream;
-    for (int i = 0; i <= 20; ++i) {
-	stream << endl;
-	stream << "depth = " << i;
-	if (i == depth) stream << "*";
-	stream << ", killers[0] = " << get_killer_move(i, 0);
-	stream << "(" << output_move(get_killer_move(i, 0)) << ")";
-	stream << (killer_used[i][0] ? "!" : "?");
-	stream << ", killers[1] = " << get_killer_move(i, 1);
-	stream << "(" << output_move(get_killer_move(i, 1)) << ")";
-	stream << (killer_used[i][1] ? "!" : "?");
-	stream << ", played[" << i << "] = " << played[i];
-	stream << "(" << output_move(played[i]) << ")";
-	stream << endl;
-    }
-    return stream.str();
-}

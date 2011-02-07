@@ -74,11 +74,6 @@ void Moves::generate(MoveType mt) {
 	
 	if (mt == CAPTURE) continue;
 	Square to = Square(from + PAWN_PUSH_DIRS[c]);
-	assert(!board.is_out(to) || assert_msg(
-	    endl << board << endl << 
-	    "from=" << hex << from <<
-	    " to=" << hex << to << endl
-	));
 	assert(!board.is_out(to)); // Should never happend
 	if (!board.is_empty(to)) continue;
 	
@@ -187,12 +182,7 @@ void Game::make_move(Move m) {
 	if (m.is_en_passant()) {
 	    s = (c == BLACK ? Square(ep + UP) : Square(ep + DOWN));
 	}
-
-	assert(!board.is_empty(s) || assert_msg(
-	    output_square(s) << " is empty:" << endl << board << endl << 
-	    "m = " << output_move(m) << " (" << m << ")" << endl <<
-	    "m is en passant: " << m.is_en_passant()
-	));
+	assert(!board.is_empty(s) || assert_msg(debug_move(m)));
 
 	capture = board.get_piece(s);
 	if (capture.get_type() == ROOK) { // Update opponent's castling rights
@@ -208,11 +198,7 @@ void Game::make_move(Move m) {
 	    }
 	}
 	del_piece(capture);
-	assert(board.is_empty(s) || assert_msg(
-	    output_square(s) << " is not empty:" << endl << board << endl << 
-	    "m = " << output_move(m) << " (" << m << ")" << endl <<
-	    "m is en passant: " << m.is_en_passant()
-	));
+	assert(board.is_empty(s) || assert_msg(debug_move(m)));
     }
 
     // Castling
@@ -346,14 +332,6 @@ bool Game::is_legal(Move m) {
 	if (t != PAWN || !board.is_pawn_end(c, to)) return false;
     }
 
-    /*
-    if (t == PAWN && board.is_pawn_end(c, to)) {
-	cout << "start m = " << m << " (" << output_move(m) << ")" << endl;
-	cout << "m is promotion: " << m.is_promotion() << endl;
-	cout << board << hex << current_node().hash() << endl;
-    }
-    */
-
     // If it's a capture
     if (m.is_capture()) {
 	Square s = to;
@@ -378,7 +356,6 @@ bool Game::is_legal(Move m) {
 
     }
     else if (m.is_castle()) {
-	// TODO
 	Square rook = Square(H1 + A8 * c);
 	switch (m.get_castle_side()){
 	    case KING:
@@ -418,13 +395,6 @@ bool Game::is_legal(Move m) {
     else {
 	if (!board.is_empty(to)) return false;
     }
-
-    /*
-    if (t == PAWN && board.is_pawn_end(c, to)) {
-	cout << "end m = " << m << " (" << output_move(m) << ") is legal" << endl;
-	cout << board << hex << current_node().hash() << endl;
-    }
-    */
 
     return true;
 }
