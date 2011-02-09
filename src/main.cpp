@@ -48,6 +48,7 @@ int main() {
     cout << "ExtendedMove: " << sizeof(ExtendedMove) << endl;
     cout << "Transposition: " << sizeof(Transposition) << endl;
     cout << "Node: " << sizeof(Node) << endl;
+    cout << "Moves: " << sizeof(Moves) << endl;
     cout << endl;
 
     cout << "Compiled with options:";

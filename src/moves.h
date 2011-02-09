@@ -28,7 +28,7 @@ using namespace std;
 
 typedef char Score;
 
-const int MAX_MOVES = 200; // TODO Find the real value
+const int MAX_MOVES = 128; // TODO Find the real value
 const Score BEST_SCORE = 127;
 const Score KILLERS_SCORE = 0;
 
@@ -40,12 +40,15 @@ class Moves
 {
     private:	
     	ExtendedMove moves[MAX_MOVES];
+
 	Node& current_node;
 	Board& board;
 	Pieces& pieces;
+
 	MovesState state;
 	unsigned char i, n;
 	unsigned char size[5]; // Number of differents moves'types
+
 	bool use_lazy_generation;
 
     public:
@@ -55,7 +58,7 @@ class Moves
 	    state(BEST),
 	    i(0), n(0),
 	    use_lazy_generation(lg)
-	    { size = { 0, 0, 0, 0, 0 }; }
+	    { size = { 0 }; }
 
 	void generate(MoveType mt = NULL_MOVE); // here NULL_MOVE => ALL_MOVE 
 	void generate_pieces(Color c, PieceType t, MoveType mt);

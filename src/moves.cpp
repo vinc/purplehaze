@@ -163,3 +163,4 @@ Score Moves::get_mvv_lva_score(Move move) {
     if (move.is_en_passant()) return mvv_lva_scores[PAWN][a];
     return mvv_lva_scores[v][a];
 }
+

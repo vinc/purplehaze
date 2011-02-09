@@ -48,11 +48,8 @@ void Game::print_thinking(int depth, int score, Move m) {
     int ply = current_node().get_ply();
     if (ply % 2 != 0) cout << 1 + (ply / 2) << ". ...";
     //cout << m << endl; 
-    assert(is_legal(m) || assert_msg(
-	    endl << board << endl << 
-	    "m = " << output_move(m) << " (" << m << ")" << endl <<
-	    "m is en passant: " << m.is_en_passant()
-	));
+    assert(is_legal(m) || assert_msg(debug_move(m)));
+
 
     cout << output_principal_variation(depth, m) << endl;
 }

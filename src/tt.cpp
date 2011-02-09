@@ -63,7 +63,8 @@ Transposition Transpositions::lookup(Hash h) {
     //assert(SIZE > 0);
     //assert(null_entry.is_empty());
     Transposition t = tt[h & (SIZE - 1)];
-    /*
+    
+    // Verbose mode
     if (h && t.get_hash() == h) {
 	++hits;
 	return t;
@@ -73,8 +74,8 @@ Transposition Transpositions::lookup(Hash h) {
 	++misses;
 	return NULL_ENTRY;
     }
-    */
-    return ((h && t.get_hash() == h) ? t : NULL_ENTRY);
+    
+    //return ((h && t.get_hash() == h) ? t : NULL_ENTRY);
 }
 
 /*

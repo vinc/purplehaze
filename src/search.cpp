@@ -270,6 +270,7 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 	    // Futility Pruning
 	    if (depth <= futility_depth && 
 		!is_in_check && !is_giving_check &&
+		!is_killer_move(depth, move) &&
 		!move.is_capture() && !move.is_promotion()) {
 		score = eval() + futility_margins[depth]; // Idea from Crafty
 		if (score < alpha) {
@@ -281,8 +282,8 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 
 	    // Late Move Reduction
 	    if (depth > 2 && // Not near leaf
-		!is_killer_move(depth, move) &&
 		!is_in_check && !is_giving_check &&
+		!is_killer_move(depth, move) &&
 		!move.is_capture() && !move.is_promotion()) {
 		
 		// Do the search at a reduced depth
