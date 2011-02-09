@@ -251,8 +251,9 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 	    if (best_score > alpha) {
 		if (best_score >= beta) {
 		    // Store the search to Transposition Table
-		    tt.save(pos.hash(), best_score, LOWER, depth, move);
-		    
+		    if (depth >= trans.get_depth()) {
+			tt.save(pos.hash(), best_score, LOWER, depth, move);
+		    }
 		    // Update killer moves
 		    if (!move.is_capture()) set_killer_move(depth, move);
 		    
@@ -306,7 +307,9 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 	    if (score > best_score) { // Found a new best move
 		if (score >= beta) {// Sufficient to cause a cut-off?
 		    // Store the search to Transposition Table
-		    tt.save(pos.hash(), score, LOWER, depth, move);
+		    if (depth >= trans.get_depth()) {
+			tt.save(pos.hash(), score, LOWER, depth, move);
+		    }
 		    
 		    // Update killer moves
 		    if (!move.is_capture()) set_killer_move(depth, move);
@@ -326,8 +329,10 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
     }
 
     // Store the search to Transposition Table
-    Bound bound = (best_score <= old_alpha ? UPPER : EXACT);
-    tt.save(pos.hash(), best_score, bound, depth, best_move);
+    if (depth >= trans.get_depth()) {
+	Bound bound = (best_score <= old_alpha ? UPPER : EXACT);
+	tt.save(pos.hash(), best_score, bound, depth, best_move);
+    }
 
     return best_score;
 }
