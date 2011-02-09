@@ -249,16 +249,12 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 
 	    undo_move(move);
 	    if (best_score > alpha) {
-		if (best_score >= beta) {
-		    // Store the search to Transposition Table
-		    if (depth >= trans.get_depth()) {
-			tt.save(pos.hash(), best_score, LOWER, depth, move);
-		    }
+		if (best_score >= beta) { // Beta cut-off
 		    // Update killer moves
 		    if (!move.is_capture()) set_killer_move(depth, move);
 		    
-		    // Beta cut-off
-		    return best_score;
+		    best_move = move;
+		    goto transposition;
 		} 
 		alpha = best_score;
 	    } 
@@ -305,20 +301,14 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 	    undo_move(move);
 	    if (time.poll(nodes_count)) return 0;
 	    if (score > best_score) { // Found a new best move
+		best_score = score;
+		best_move = move;
 		if (score >= beta) {// Sufficient to cause a cut-off?
-		    // Store the search to Transposition Table
-		    if (depth >= trans.get_depth()) {
-			tt.save(pos.hash(), score, LOWER, depth, move);
-		    }
-		    
 		    // Update killer moves
 		    if (!move.is_capture()) set_killer_move(depth, move);
 		    
-		    // Beta cut-off
-		    return score;
+		    goto transposition;
 		} 
-		best_score = score;
-		best_move = move;
 	    } 
 	}
     }
@@ -327,12 +317,14 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 	if (is_in_check) return -INF + 100 - depth; // Checkmate
 	else return 0; // Stalemate
     }
-
+    
     // Store the search to Transposition Table
-    if (depth >= trans.get_depth()) {
-	Bound bound = (best_score <= old_alpha ? UPPER : EXACT);
-	tt.save(pos.hash(), best_score, bound, depth, best_move);
-    }
+    transposition:
+	if (depth >= trans.get_depth()) {
+	    Bound bound = (best_score >= beta ? LOWER :
+			  (best_score <= old_alpha ? UPPER : EXACT));
+	    tt.save(pos.hash(), best_score, bound, depth, best_move);
+	}
 
     return best_score;
 }
