@@ -34,9 +34,12 @@ using namespace std;
 #define R_ADAPT(c, d) ( \
     2 + ((d) > (6 + ((pieces.get_nb_pieces(c) < 3) ? 2 : 0))))
 
+static const int NMP_DEPTH = 3;		// depth > NMP_DEPTH
+static const int LMR_DEPTH = 2;		// depth > LMR_DEPTH
+static const int FUTILITY_DEPTH = 3;	// depth <= FUTILITY_DEPTH
+
 // Array of pruning margin values indexed by depth. Idea from Crafty
-static const int futility_depth = 3;
-static const int futility_margins[futility_depth + 1] = {
+static const int FUTILITY_MARGINS[FUTILITY_DEPTH + 1] = {
     0,
     PIECE_VALUE[PAWN],
     PIECE_VALUE[KNIGHT],
@@ -62,7 +65,7 @@ int Game::quiescence_search(int alpha, int beta, int depth) {
     int score;
     if (time.poll(nodes_count)) return 0;
 
-    int stand_pat = eval();
+    int stand_pat = eval(alpha, beta);
     if (depth < -MAX_DEPTH) return stand_pat;
     
     if (stand_pat >= beta) return stand_pat; // Beta cut-off
@@ -201,7 +204,7 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
     bool is_pv = (node_type == PV_NODE);
     bool null_move_allowed = !is_in_check && can_do_null && !is_pv;
     
-    if (null_move_allowed && depth >= 2) {
+    if (null_move_allowed && depth > NMP_DEPTH) {
 	Move null_move;
 	make_move(null_move);
 	pos.set_null_move_right(false); // Forbide more than one null move
@@ -211,7 +214,7 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 	if (score >= beta) return score;
     }
     else if (!can_do_null) {
-	// Next move we will have the right to do another null-move
+	// Next move we will again have the right to do another null-move
 	pos.set_null_move_right(true);
     }
     
@@ -265,12 +268,12 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 	    bool is_giving_check = is_check(Color(!player));
 
 	    // Futility Pruning
-	    if (depth <= futility_depth && 
+	    if (depth <= FUTILITY_DEPTH && 
 		!is_in_check && !is_giving_check &&
 		!is_killer_move(depth, move) &&
 		!move.is_capture() && !move.is_promotion()) {
 		    // Using an array of margins is an idea from Crafty
-		    score = material_eval() + futility_margins[depth];
+		    score = material_eval() + FUTILITY_MARGINS[depth];
 		    if (score < alpha) {
 			if (score > best_score) best_score = score;
 			undo_move(move);
@@ -279,7 +282,7 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 	    }
 
 	    // Late Move Reduction
-	    if (depth > 2 && // Not near leaf
+	    if (depth > LMR_DEPTH && // TODO find the best minimal depth
 		!is_in_check && !is_giving_check &&
 		!is_killer_move(depth, move) &&
 		!move.is_capture() && !move.is_promotion()) {
@@ -377,9 +380,9 @@ Move Game::root(int max_depth) {
 		alpha = score;
 		best_score = score;
 		best_move = move;
-		//if (nodes_count > 200000) { // Save CPU time at the beginning
+		if (nodes_count > 200000) { // Save CPU time at the beginning
 		    print_thinking(ply, alpha, best_move);
-		//}
+		}
 	    } 
 	}
 	if (time.is_out_of_time()) {

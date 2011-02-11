@@ -125,7 +125,9 @@ void Game::init_eval() {
     */
 }
 
-int Game::eval() {
+static const int LAZY_EVAL_MARGIN = PIECE_VALUE[ROOK];
+
+int Game::eval(int alpha, int beta) {
     // Material evaluation
     //Color c = current_node().get_turn_color();
     //cout << "Eval(" << (c == WHITE ? "White" : "Black") << "): ";
@@ -136,7 +138,11 @@ int Game::eval() {
     /*if (score == 0) return 0; // Draw
     else*/ if (score > PIECE_VALUE[KING]) return INF; // Win
     else if (score < -PIECE_VALUE[KING]) return -INF; // Loss
-    
+   
+    // Lazy evaluation
+    if (score + LAZY_EVAL_MARGIN < alpha) return score;
+    if (score - LAZY_EVAL_MARGIN > beta) return score;
+
     // TODO Positionnal evaluation
     score += position_eval();
     //cout << ", position:" << score << endl;

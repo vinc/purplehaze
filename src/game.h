@@ -91,7 +91,7 @@ class Game
 	
 	// Position's evaluation
 	void init_eval();
-	int eval();
+	int eval(int alpha, int beta);
 	int material_eval();
 	int position_eval();
 
