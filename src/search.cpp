@@ -269,12 +269,13 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 		!is_in_check && !is_giving_check &&
 		!is_killer_move(depth, move) &&
 		!move.is_capture() && !move.is_promotion()) {
-		score = eval() + futility_margins[depth]; // Idea from Crafty
-		if (score < alpha) {
-		    if (score > best_score) best_score = score;
-		    undo_move(move);
-		    continue;
-		}
+		    // Using an array of margins is an idea from Crafty
+		    score = material_eval() + futility_margins[depth];
+		    if (score < alpha) {
+			if (score > best_score) best_score = score;
+			undo_move(move);
+			continue;
+		    }
 	    }
 
 	    // Late Move Reduction
