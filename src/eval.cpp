@@ -94,6 +94,7 @@ void Game::init_eval() {
     }
     
     // Print PST
+    /*
     cout << endl << "Opening pawn PST";
     string squares[BOARD_SIZE];
     for (int i = 0; i < BOARD_SIZE; ++i) {
@@ -121,6 +122,7 @@ void Game::init_eval() {
 	squares[i] = stream.str();
     }
     cout << endl << board.to_string(squares); 
+    */
 }
 
 int Game::eval() {
@@ -210,7 +212,8 @@ int Game::material_eval() {
 		    if (nb_minors > 1) {
 			// With two or more minor pieces, the queen
 			// equal two rooks. (Kaufman 1999)
-			material_bonus[c] += 2 * PIECE_VALUE[ROOK];
+			material_bonus[c] += (2 * PIECE_VALUE[ROOK]) -
+					     (PIECE_VALUE[QUEEN]);
 		    }
 		    // Value adjusted by the number of pawns on the board
 		    adj = PAWNS_ADJUSTEMENT[QUEEN][nb_pawns];
@@ -221,6 +224,14 @@ int Game::material_eval() {
 	    }
 	}
     }
+    
+    /*
+    cout << " mat(w): " << material_score[WHITE]; 
+    cout << " mat(b): " << material_score[BLACK]; 
+    cout << " bon(w): " << material_bonus[WHITE]; 
+    cout << " bon(b): " << material_bonus[BLACK]; 
+    */
+
     // Insufficiant material
     for (int i = 0; i < 2; ++i) {
 	c = Color(i);
