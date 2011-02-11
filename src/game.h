@@ -90,8 +90,10 @@ class Game
 	};
 	
 	// Position's evaluation
-	int piece_eval(Color c, PieceType t, int i);
+	void init_eval();
 	int eval();
+	int material_eval();
+	int position_eval();
 
 	// Output
 	void print_thinking_header();

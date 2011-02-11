@@ -19,6 +19,7 @@
 #define BOARD_H
 
 #include <bitset>
+#include <string>
 
 #include "common.h"
 #include "pieces.h"
@@ -48,6 +49,9 @@ class Board
 	bool is_dark(Square s) const {
 	    return (s & 7) % 2 == (s >> 4) % 2;
 	};
+	bool is_same_color(Square a, Square b) const {
+	    return (is_dark(a) && is_dark(b)) || (!is_dark(a) && !is_dark(b));
+	}
 	Square get_square(Square s, Direction d) const { 
 	    return Square(s + d);
 	};
@@ -58,11 +62,31 @@ class Board
 	    return Rank(s >> 4); 
 	};
 	bool is_pawn_begin(Color c, Square s) const {
-	    return (get_rank(s) - 5 * c) == 1;
+	    return (get_rank(s) - RANK_6 * c) == RANK_2;
 	};
 	bool is_pawn_end(Color c, Square s) const {
-	    return (get_rank(s) + 7 * c) == 7;
+	    return (get_rank(s) + RANK_8 * c) == RANK_8;
 	};
+
+	bool is_border(Square s) {
+	    File f = get_file(s);
+	    Rank r = get_rank(s);
+	    if (f == FILE_A || f == FILE_H) return true;
+	    else if (r == RANK_1 || r == RANK_8) return true;
+	    else return false;
+	};
+
+	Square square_from_index(int i) {
+	    return Square(i + (i & ~7));
+	};
+
+	Square square_from_coords(File f, Rank r) {
+	    return Square(16 * r + f);
+	};
+
+	Square flip(Square s) {
+	    return square_from_coords(get_file(s), Rank(RANK_8 - get_rank(s)));
+	}
 
 	// Theoretical answer by array lookup
 	bool can_attack(PieceType t, Square from, Square to) const {
@@ -75,7 +99,8 @@ class Board
 	// Practical answer
 	bool is_attacked_by(Color c, Square s, const Pieces& pieces) const;
 	bool can_go(Piece p, Square from, Square to) const; 
-
+    
+	string to_string(string squares[]) const;
 };
 
 #endif /* !BOARD_H */

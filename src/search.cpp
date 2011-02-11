@@ -173,7 +173,7 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
     // Lookup in Transposition Table
     Transposition trans = tt.lookup(pos.hash());
     if (!trans.is_empty()) {
-	if (trans.get_depth() >= depth) {
+	if (depth <= trans.get_depth()) {
 	    int tr_score = trans.get_value();
 	    switch (trans.get_bound()) {
 		case EXACT: return tr_score; // Already searched node

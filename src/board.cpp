@@ -16,6 +16,8 @@
  */
 
 #include <iostream>
+#include <sstream>
+#include <iomanip>
 
 #include "board.h"
 
@@ -55,7 +57,51 @@ Board::Board() {
     }
 }
 
+string Board::to_string(string squares[]) const {
+    ostringstream stream;
+    stream << endl;
+    for (Square s = A8; ; s = Square(s + 1)) {
+	if (is_out(s)) continue;
+	if (get_file(s) == FILE_A) {
+	    stream << "     +";
+	    for (int i = 0; i < 8; ++i) {
+		for (unsigned int j = 0; j < squares[s].size(); ++j) {
+		    stream << "-";
+		}
+		stream << "+";
+	    }
+	    stream << endl;
+	    stream << "   " << get_rank(s) + 1 << " ";
+	}
+	stream << "|";
+	stream << squares[s];
+	if (get_file(s) == FILE_H) {
+	    stream << "|" << endl;
+	    if (s == H1) break;
+	    else s = Square(s - 0x18);
+	}
+    }
+    stream << "     +";
+    for (int i = 0; i < 8; ++i) {
+	for (unsigned int j = 0; j < squares[A1].size(); ++j) {
+	    stream << "-";
+	}
+	stream << "+";
+    }
+    stream << endl << "     ";
+    for (char c = 'a'; c <= 'h'; ++c) {
+	int l = squares[A1].size() / 2;
+	int r = squares[A1].size() % 2;
+	stream << setw(l + 2) << c << setw(r) << " ";
+    }
+    stream << endl;
+    //stream << "     +---+---+---+---+---+---+---+---+" << endl;
+    //stream << "       a   b   c   d   e   f   g   h  " << endl;
+    return stream.str();
+}
+
 ostream& operator<<(ostream& out, const Board board) {
+    /*
     for (Square s = A8; ; s = Square(s + 1)) {
 	if (board.is_out(s)) continue;
 	if (board.get_file(s) == FILE_A) {
@@ -75,5 +121,18 @@ ostream& operator<<(ostream& out, const Board board) {
     }
     out << "     +---+---+---+---+---+---+---+---+" << endl;
     out << "       a   b   c   d   e   f   g   h  " << endl;
+    return out;
+    */
+
+    string squares[BOARD_SIZE];
+    for (int i = 0; i < BOARD_SIZE; ++i) {
+	Square s = Square(i);
+	squares[i] = " ";
+	if (!board.is_empty(s)) squares[i] += board.get_piece(s).to_string();
+	else if (board.is_dark(s)) squares[i] += ".";
+	else squares[i] += " ";
+	squares[i] += " ";
+    }
+    out << board.to_string(squares);
     return out;
 }

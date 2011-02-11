@@ -28,6 +28,9 @@ Game::Game() {
     tt.clear();
     clear_killers();
     
+    // Make PST
+    init_eval();
+    
     // Initialize MVV/LVA score array
     Moves::init_mvv_lva_scores();
 }
