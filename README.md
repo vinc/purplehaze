@@ -32,24 +32,41 @@ the board.
 Implemented features
 --------------------
 
+* Data Structures:
+    * 0x88 Board Representation
+    * Piece-Lists
+
+* Moves:
+    * Lazy Move Generation
+    * Best Move from Iterative Deepening or Transposition Table
+    * Most Valuable Victim / Least Valuable Aggressor
+    * Killer Moves
+
 * Search:
     * Principal Variation Search
     * Iterative Deepening
     * Transposition Table
-    * Null Move Pruning (still counterproductive for the moment)
-
-* Move Ordering:
-    * Best move from Iterative Deepening or Transposition Table
-    * Most Valuable Victim / Least Valuable Aggressor
+    * Mate Pruning
+    * Check Extension
+    * Adaptative Null Move Pruning
+    * Extended Futility Pruning
+    * Late Move Reduction
 
 * Quiescence Search:
-    * Standing pat
+    * Standing Pat
     * Delta Pruning
-    * Limitation to good captures only (via MVV/LVA)
+    * Move Ordering (via MVV/LVA)
+
+* Evaluation:
+    * Lazy Evaluation
+    * Material Hash Table
+    * Opening and Ending Piece-Square Tables
+    * Tapered Evaluation
 
 * Debuging
     * Perft
     * Divide
+    * EPD Test Positions
 
 * Miscellaneous
     * SAN output
@@ -62,7 +79,8 @@ Implemented features
 Installation
 ------------
 
-See INSTALL for installation instructions.
+See INSTALL for installation instructions. For the moment there is no stable
+version yet.
 
 
 Usage
