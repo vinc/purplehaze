@@ -25,6 +25,7 @@
 #include "moves.h"
 #include "node.h"
 #include "tt.h"
+#include "hashtable.h"
 #include "time.h"
 #include "tree.h"
 #include "zobrist.h"
@@ -36,6 +37,7 @@ class Game
     private:
 	Zobrist zobrist;
 	Move killer_moves[MAX_DEPTH][MAX_KILLERS];
+	HashTable<int> material_table;
 
     public:
 	bool output_thinking;

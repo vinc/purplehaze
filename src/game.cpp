@@ -26,6 +26,7 @@ Game::Game() {
     nodes_count = 0;
     output_thinking = false;
     tt.clear();
+    material_table.clear();
     clear_killers();
     
     // Make PST
@@ -51,7 +52,13 @@ void Game::add_piece(Color c, PieceType t, Square s) {
     pieces.inc_nb_pieces(c, t);
     
     // Update Zobrist hash
-    zobrist.update_piece(current_node().hash(), c, t, s);
+    Node& pos = current_node();
+    zobrist.update_piece(pos.hash(), c, t, s);
+    // For the material hash the position is irrelevant, but each piece
+    // must have a unique hash. Hack using Square(i).
+    //cout << "Add " << Piece(c, t, i) << " xor " << i << ", " << i + 1 << endl;
+    zobrist.update_piece(pos.material_hash(), c, t, Square(i));
+    zobrist.update_piece(pos.material_hash(), c, t, Square(i + 1));
 }
 
 void Game::del_piece(Color c, PieceType t, int i) {
@@ -69,9 +76,18 @@ void Game::del_piece(Color c, PieceType t, int i) {
 	pieces.set_position(c, t, j, OUT);	   // TODO: not needed
 	board.set_piece(Piece(c, t, i), s);	   // Update board
     }
-    
     // Update Zobrist hash
-    zobrist.update_piece(current_node().hash(), c, t, emptied);
+    Node& pos = current_node();
+    zobrist.update_piece(pos.hash(), c, t, emptied);
+    // For the material hash the position is irrelevant, but each piece
+    // must have a unique hash. Hack using Square(j).
+    //cout << "Del " << Piece(c, t, i) << " xor " << j + 1;
+    zobrist.update_piece(pos.material_hash(), c, t, Square(j + 1));
+    //if (j + 1 > 0) {
+	//cout << ", " << j << endl;
+	zobrist.update_piece(pos.material_hash(), c, t, Square(j));
+    //}
+    //cout << endl;
 }
 
 void Game::new_node() {

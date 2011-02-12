@@ -25,6 +25,10 @@
 #define MAX_DEPTH     128
 #define INF	    29999
 
+
+static const int TT_SIZE = 1024*1024*128;
+static const int MT_SIZE = 1024*1024;
+
 enum Square : unsigned char {
     A1=0x00, B1, C1, D1, E1, F1, G1, H1,
     A2=0x10, B2, C2, D2, E2, F2, G2, H2,

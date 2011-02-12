@@ -31,6 +31,7 @@ class Node
 {
     private:
 	Hash zobrist_hash;
+	Hash material_zobrist_hash;
 	short ply;
 	//Move last_move;
 	Piece capture;
@@ -50,6 +51,7 @@ class Node
 	    side_to_move(WHITE) {} 
 	
 	Hash& hash() { return zobrist_hash; };
+	Hash& material_hash() { return material_zobrist_hash; };
 	Color get_turn_color() const {
 	    return side_to_move;
 	};

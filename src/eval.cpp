@@ -24,6 +24,7 @@
 
 #include "game.h"
 #include "eval.h"
+#include "hashtable.h"
 
 using namespace std;
 
@@ -154,15 +155,23 @@ int Game::eval(int alpha, int beta) {
 }
 
 int Game::material_eval() {
+    Color c;
     int score = 0;
+    Node& pos = current_node();
     
     // Lookup in hash table
-    //Material entry = material_table.lookup(position().material_hash());
-    //if (!entry.is_empty()) return entry.get_score();
+    bool is_empty = true;
+    int hash_score = material_table.lookup(pos.material_hash(), is_empty);
+    //cout << "Material_Table(" << hex << pos.material_hash() << "): ";
+    if (!is_empty) {
+	c = pos.get_turn_color();
+	//cout << "hit " << dec << hash_score << endl;
+	//return (c == WHITE ? hash_score : -hash_score);
+    }
+    //else cout << "miss" << endl;
     
     int material_score[2] = { 0 };
     int material_bonus[2] = { 0 };
-    Color c;
     for (int i = 0; i < 2; ++i) {
 	c = Color(i);
 	int nb_pawns = 0;
@@ -262,12 +271,19 @@ int Game::material_eval() {
 	}
     }
 
-    c = current_node().get_turn_color();
+    c = pos.get_turn_color();
     score = material_score[c] - material_score[Color(!c)];
     score += material_bonus[c] - material_bonus[Color(!c)];
 
     return_material_score:
-	//material_table.save(position().material_hash(), score);
+	/*
+	if (hash_score != score) {
+	    cout << "Material_Table(" << hex << pos.material_hash() << "): ";
+	    cout << "replace " << dec << hash_score << " by " << score << endl;
+	}
+	*/
+	hash_score = (c == WHITE ? score : -score);
+	material_table.save(pos.material_hash(), hash_score);
 	return score;
 }
 
