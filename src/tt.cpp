@@ -69,11 +69,9 @@ Transposition Transpositions::lookup(Hash h) {
 	++hits;
 	return t;
     }
-    else {
-	if (h && !t.is_empty()) ++collisions;
-	++misses;
-	return NULL_ENTRY;
-    }
+    if (h && !t.is_empty()) ++collisions;
+    ++misses;
+    return NULL_ENTRY;
     
     //return ((h && t.get_hash() == h) ? t : NULL_ENTRY);
 }

@@ -55,22 +55,21 @@ class Transposition
 class Transpositions
 {
     private:
-	const int SIZE;
-	Transposition* tt;
-	const Transposition NULL_ENTRY;
 	int hits;
 	int collisions;
 	int misses;
+	const int SIZE;
+	Transposition* tt;
+	const Transposition NULL_ENTRY;
 
     public:
-	Transpositions(int n = TT_SIZE) : SIZE(n / sizeof(Transposition)) {
-	    //assert(SIZE > 0);
-	    //assert((n & (n - 1)) == 0);
-	    tt = new Transposition[SIZE];
-	    hits = 0;
-	    collisions = 0;
-	    misses = 0;
-	};
+	Transpositions(int n = TT_SIZE) : 
+	    hits(0),
+	    collisions(0),
+	    misses(0),
+	    SIZE(n / sizeof(Transposition)),
+	    tt(new Transposition[SIZE])
+	    {}
 	~Transpositions() {
 	    delete [] tt;
 	    tt = NULL;

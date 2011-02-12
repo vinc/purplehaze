@@ -172,6 +172,35 @@ void Game::print_tt_stats() {
     float percent_misses = (100 * tt.get_nb_misses()) / 
 			   float(tt.get_nb_lookups());
     cout << " (" << percent_misses << "%)" << endl;
+  
+    cout << endl << "Material HashTable" << endl;
+    HashTable<int>& table = material_table;
+    cout << "MT Size:          " << MT_SIZE / 1024 / 1024 << "Mb" << endl;
+    cout << "Entries:          " << table.size() << endl;
+    cout << "Usage:            " << table.get_usage();
+    percent_usage = (100 * table.get_usage()) / float(table.size());
+    cout << " (" << percent_usage << "%)" << endl;
+    percent_zeros = (100.0 * zeros) / (64.0 * table.get_usage());
+    cout << "0's:              " << percent_zeros << "%" << endl;
+    percent_ones = (100.0 * ones) / (64.0 * table.get_usage());
+    cout << "1's:              " << percent_ones << "%" << endl;
+    
+    cout << "Lookups:          " << table.get_nb_lookups() << endl;
+    
+    cout << "Hits:             " << table.get_nb_hits();
+    percent_hits = (100 * table.get_nb_hits()) / 
+			 float(table.get_nb_lookups());
+    cout << " (" << percent_hits << "%)" << endl;
+    
+    cout << "Index Collisions: " << table.get_nb_collisions();
+    percent_collisions = (100 * table.get_nb_collisions()) / 
+			       float(table.get_nb_lookups());
+    cout << " (" << percent_collisions << "%)" << endl;
+    
+    cout << "Misses:           " << table.get_nb_misses();
+    percent_misses = (100 * table.get_nb_misses()) / 
+			   float(table.get_nb_lookups());
+    cout << " (" << percent_misses << "%)" << endl;
 }
 
 string Game::debug_move(Move m) {
