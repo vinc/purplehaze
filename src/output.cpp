@@ -107,21 +107,29 @@ string Game::output_move(Move m) {
     Piece p = board.get_piece(from);
     PieceType t = p.get_type();
     if (t > PAWN) stream << Piece(WHITE, t); // Upper case
-    
+
+    // Disambiguation
+    if (t != PAWN) {
+	Color c = p.get_color();
+	Square to = m.get_dest();
+	for (int i = 0; i < pieces.get_nb_pieces(c, t); ++i) {
+	    Piece other(c, t, i);
+	    if (other == p) continue;
+	    Square s = pieces.get_position(other);
+	    if (board.can_attack(t, s, to) && board.can_go(other, s, to)) {
+		// If another piece of the same type can theoretically 
+		// attack the destination (fast answer by array lookup)
+		// and can really go to this destination (not so fast
+		// answer) then a disambiguation is needed
+		stream << char('a' + m.get_orig_file());
+		break;
+	    }
+	}
+    }
+
     // Capture
     if (m.is_capture()) {
 	if (t == PAWN) stream << char('a' + m.get_orig_file());
-	else { // Disambiguation
-	    Color c = Color(!current_node().get_turn_color());
-	    Square to = m.get_dest();
-	    for (int i = 0; i < pieces.get_nb_pieces(c, t); ++i) {
-		Square s = pieces.get_position(c, t, i);
-		if (s != from && board.can_attack(t, s, to)) {
-		    stream << char('a' + m.get_orig_file());
-		    break;
-		}
-	    }
-	}
 	stream << "x";
     }
     
@@ -155,6 +163,7 @@ void Game::print_tt_stats() {
 	ones += z;
     }
 
+    // TODO Ugly code...
     cout << "Zobrist:          " << hex << current_node().hash() << dec << endl;
     cout << "TT Size:          " << TT_SIZE / 1024 / 1024 << "Mb" << endl;
     cout << "Entries:          " << tt.size() << endl;
