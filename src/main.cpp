@@ -41,7 +41,7 @@ string prompt() {
 int main() {
     cout << version << endl;
     cout << endl;
-    
+    /*
     cout << "Hash: " << sizeof(Hash) << endl;
     cout << "Piece: " << sizeof(Piece) << endl;
     cout << "Move: " << sizeof(Move) << endl;
@@ -59,6 +59,7 @@ int main() {
     cout << " TT";
 #endif
     cout << endl << endl;
+    */
 
     string default_fen = 
 	"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -161,11 +162,22 @@ int main() {
 		proto.set_board(fen);
 		
 		// Search best move and test it
-		string best_move = line.substr(fensep + 4, bmsep - fensep - 4);
-		cout << "bm " << best_move;
+		string best_moves = line.substr(fensep + 4, bmsep - fensep - 4);
+		cout << "bm " << best_moves;
 		string move = proto.search_move(true);
 		cout << " => " << move;
-		if (best_move == move) {
+		istringstream iss(best_moves);
+		bool is_found = false;
+		do {
+		    string best_move;
+		    iss >> best_move;
+		    if (best_move == move) {
+			is_found = true;
+			break;
+		    }
+		} while (iss);
+
+		if (is_found) {
 		    cout << " OK" << endl;
 		    ++res;
 		}
