@@ -100,7 +100,7 @@ class Game
 	// Output
 	void print_thinking_header();
 	void print_thinking(int depth, int score, Move m);
-	string output_principal_variation(int depth, Move m);
+	string output_pv(int depth, int score, Move m);
 	string output_move(Move m);
 	string output_square(Square s) { 
 	    return output_square(board.get_file(s), board.get_rank(s));

@@ -51,19 +51,25 @@ void Game::print_thinking(int depth, int score, Move m) {
     assert(is_legal(m) || assert_msg(debug_move(m)));
 
 
-    cout << output_principal_variation(depth, m) << endl;
+    cout << output_pv(depth, score, m) << endl;
 }
 
-string Game::output_principal_variation(int depth, Move m) {
+bool is_mate(int score) {
+    if ((score < -INF - 100) || (INF - 100 < score)) return true;
+    return false;
+}
+
+string Game::output_pv(int depth, int score, Move m) {
     ostringstream stream;
     stream << " ";
     int ply = current_node().get_ply();
     if (ply % 2 == 0) stream << 1 + (ply / 2) << ". ";
     stream << output_move(m);
-    Node pos = current_node();
-    make_move(m);
-    if (is_check(current_node().get_turn_color())) stream << "+";
     
+    make_move(m);
+    
+    bool is_in_check = is_check(current_node().get_turn_color());
+        
     // Find next move in TT
     Transposition trans = tt.lookup(current_node().hash());
     /*
@@ -75,11 +81,15 @@ string Game::output_principal_variation(int depth, Move m) {
     */
     Move move = trans.get_best_move();
     if (depth > 0 && is_legal(move) && trans.get_bound() < 3) {
-	stream << output_principal_variation(depth - 1, move);
+	if (is_in_check) stream << "+"; // Check
+	stream << output_pv(depth - 1, trans.get_value(), move);
     }
-
+    else if (move.is_null() && is_mate(score)) {
+	if (is_in_check) stream << "#"; // Mate
+    }
+    else if (is_in_check) stream << "+"; // Cut-off
+    
     undo_move(m);
-    assert(pos.hash() == current_node().hash());
     return stream.str();
 }
 
