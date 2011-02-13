@@ -31,9 +31,9 @@ using namespace std;
 void Game::print_thinking_header() {
     if (!output_thinking) return;
     cout << setw(4) << "ply";
-    cout << setw(WIDE) << "score";
+    cout << setw(WIDE - 1) << "score";
     cout << setw(WIDE) << "time";
-    cout << setw(WIDE) << "nodes";
+    cout << setw(WIDE + 3) << "nodes";
     cout << setw(WIDE) << "pv";
     cout << endl;
 }
@@ -41,9 +41,9 @@ void Game::print_thinking_header() {
 void Game::print_thinking(int depth, int score, Move m) {
     if (!output_thinking) return;
     cout << setw(4) << depth;
-    cout << setw(WIDE) << score;
+    cout << setw(WIDE - 1) << score;
     cout << setw(WIDE) << time.get_elapsed_time();
-    cout << setw(WIDE) << nodes_count;
+    cout << setw(WIDE + 3) << nodes_count;
     cout << setw(WIDE - 3) << " ";
     int ply = current_node().get_ply();
     if (ply % 2 != 0) cout << 1 + (ply / 2) << ". ...";
