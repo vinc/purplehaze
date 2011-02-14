@@ -31,10 +31,23 @@ void Time::start_thinking(int ply) {
     else {
 	allocated_time = allowed_time / allowed_moves;
     }
+
+    if (allocated_time > 3000) {
+	coef_1 = 16; coef_2 = 15;
+    }
+    else if (allocated_time > 1000) {
+	coef_1 = 4; coef_2 = 3;
+    }
+    else {
+	coef_1 = 2; coef_2 = 1;
+    }
+    std::cout << allocated_time << " " << coef_1 << " " << coef_2 << std::endl;
 }
 
 bool Time::is_out_of_time() {
-    if (2 * get_elapsed_time() > get_allocated_time()) return true;
+    if (coef_1 * get_elapsed_time() > coef_2 * get_allocated_time()) {
+	return true;
+    }
     else return false;
 }
 

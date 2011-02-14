@@ -156,11 +156,13 @@ void Xboard::loop() {
 	else if (cmd == "time") {
 	    int time = 0;
 	    cin >> time;
+	    log << time << endl;
 	    set_remaining_time(time);
 	}
 	else if (cmd == "otim") {
 	    int time = 0;
 	    cin >> time;
+	    log << time << endl;
 	}
 	else if (cmd == "sd") {
 	    int d = 0;

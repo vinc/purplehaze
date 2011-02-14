@@ -32,6 +32,7 @@ class Time
 	clock_t starting_time;
 	int allocated_time; // Calculated
 	int remaining_time; // Given by protocols like Xboard
+	int coef_1, coef_2;
 
 	int polling_interval;
 	int last_poll_nodes_count;
