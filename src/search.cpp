@@ -176,35 +176,11 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
 #endif
        
     Color player = pos.get_turn_color();
+    bool is_in_check = is_check(player);
     bool is_null_move = !pos.get_null_move_right(); // No more than one
     bool is_pv = (node_type == PV);
-
-    // Internal Iterative Deepening
-    if (depth > 5 && best_move.is_null() && !is_null_move && is_pv) {
-	Moves moves(board, pieces, current_node());
-	int internal_best_score = -INF;
-	Move move;
-	while (!(move = moves.next()).is_null()) {
-	    make_move(move);
-	    if (is_check(player)) {
-		undo_move(move);
-		continue;
-	    }
-	    score = -pv_search<PV>(-beta, -alpha, depth / 2, ply + 1);
-	    undo_move(move);
-	    if (score > internal_best_score) {
-		internal_best_score = score;
-		best_move = move;
-	    }
-	}
-
-	//score = -pv_search<PV>(alpha, beta, depth / 2, ply);
-	//Move trans_move = tt.lookup(pos.hash()).get_best_move();
-	//assert(trans_move == best_move); // trans_move is sometime null
-    }
     
     // Check Extension
-    bool is_in_check = is_check(player);
     if (is_in_check) ++depth;
 
 #ifdef NMP
@@ -228,8 +204,31 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
 	// Next move we will again have the right to do another null-move
 	pos.set_null_move_right(true);
     }
-    
 #endif
+
+    // Internal Iterative Deepening
+    if (depth > IID_DEPTH && best_move.is_null() && !is_null_move && is_pv) {
+	Moves moves(board, pieces, current_node());
+	int internal_best_score = -INF;
+	Move move;
+	while (!(move = moves.next()).is_null()) {
+	    make_move(move);
+	    if (is_check(player)) {
+		undo_move(move);
+		continue;
+	    }
+	    score = -pv_search<PV>(-beta, -alpha, depth / 2, ply + 1);
+	    undo_move(move);
+	    if (score > internal_best_score) {
+		internal_best_score = score;
+		best_move = move;
+	    }
+	}
+	// TODO Call pv_search directly and find the best move in TT?
+	//score = -pv_search<PV>(alpha, beta, depth / 2, ply);
+	//Move trans_move = tt.lookup(pos.hash()).get_best_move();
+	//assert(trans_move == best_move); // trans_move is sometime null
+    }
 
     bool legal_move_found = false;
     bool is_principal_variation = true;
