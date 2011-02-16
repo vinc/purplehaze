@@ -174,19 +174,38 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
 	if (!bm.is_null()) best_move = bm; // Save the best move
     }
 #endif
-    
+       
     Color player = pos.get_turn_color();
-    bool is_in_check = is_check(player);
+    bool is_null_move = !pos.get_null_move_right(); // No more than one
+    bool is_pv = (node_type == PV);
 
+    // Internal Iterative Deepening
+    if (depth > 5 && best_move.is_null() && !is_null_move && is_pv) {
+	Moves moves(board, pieces, current_node());
+	int internal_best_score = -INF;
+	Move move;
+	while (!(move = moves.next()).is_null()) {
+	    make_move(move);
+	    if (is_check(player)) {
+		undo_move(move);
+		continue;
+	    }
+	    score = -pv_search<PV>(-beta, -alpha, depth / 2, ply + 1);
+	    undo_move(move);
+	    if (score > internal_best_score) {
+		internal_best_score = score;
+		best_move = move;
+	    }
+	}
+    }
+    
     // Check Extension
+    bool is_in_check = is_check(player);
     if (is_in_check) ++depth;
 
 #ifdef NMP
     // Null Move Pruning
-    //bool can_do_null != pos.get_last_move().is_null(); // No successive
-    bool can_do_null = pos.get_null_move_right(); // No more than one
-    bool is_pv = (node_type == PV);
-    bool null_move_allowed = !is_in_check && can_do_null && !is_pv;
+    bool null_move_allowed = !is_in_check && !is_null_move && !is_pv;
     
     if (null_move_allowed && depth > NMP_DEPTH) {
 	Move null_move;
@@ -201,7 +220,7 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
 	    return score;
 	}
     }
-    else if (!can_do_null) {
+    else if (is_null_move) {
 	// Next move we will again have the right to do another null-move
 	pos.set_null_move_right(true);
     }
