@@ -55,7 +55,7 @@ void Game::print_thinking(int depth, int score, Move m) {
 }
 
 bool is_mate(int score) {
-    if ((score < -INF - 100) || (INF - 100 < score)) return true;
+    if ((score < -INF + MAX_PLY) || (INF - MAX_PLY < score)) return true;
     return false;
 }
 

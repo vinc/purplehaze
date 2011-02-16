@@ -33,7 +33,7 @@ class Protocol
 	unsigned short verbosity;
 
     public:
-	Protocol() : depth(MAX_DEPTH - 1), verbosity(0) {}
+	Protocol() : depth(MAX_PLY - 1), verbosity(0) {}
 	
 	void new_game();
 	

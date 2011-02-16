@@ -30,13 +30,13 @@
 #include "tree.h"
 #include "zobrist.h"
 
-enum NodeType : unsigned char {PV_NODE, CUT_NODE, ALL_NODE};
+enum NodeType : unsigned char {PV, CUT, ALL};
 
 class Game
 {
     private:
 	Zobrist zobrist;
-	Move killer_moves[MAX_DEPTH][MAX_KILLERS];
+	Move killer_moves[MAX_PLY][MAX_KILLERS];
 	HashTable<int> material_table;
 
     public:
@@ -75,9 +75,11 @@ class Game
 	
 	// Search
 	int perft(int depth);
-	int quiescence_search(int alpha, int beta, int depth);
+	int q_search(int alpha, int beta, int depth, int ply);
 	//int alphabeta_search(int alpha, int beta, int depth);
-	int pv_search(int alpha, int beta, int depth, NodeType node_type);
+	
+	template<NodeType node_type>
+	int pv_search(int alpha, int beta, int depth, int ply);
 	Move root(int max_depth);
 
 	// Killer Moves

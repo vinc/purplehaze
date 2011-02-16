@@ -21,11 +21,9 @@
 #include <list>
 #include <vector>
 
-#define BOARD_SIZE    128
-#define MAX_DEPTH     128
-#define INF	    29999
-
-
+static const int BOARD_SIZE = 128;
+static const int MAX_PLY = 128;
+static const int INF = 29999;
 static const int TT_SIZE = 1024*1024*128;
 static const int MT_SIZE = 1024*1024;
 

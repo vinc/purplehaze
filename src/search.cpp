@@ -46,6 +46,43 @@ static const int FUTILITY_MARGINS[FUTILITY_DEPTH + 1] = {
     PIECE_VALUE[ROOK]
 };
 
+static const bool DEBUG = true;
+int value_to_trans(int value, int ply) {
+    //assert(-INF <= value && value <= INF);
+    if (value < -INF + MAX_PLY) {
+	if (DEBUG) cout << " --> storing " << value << " at ply " << ply;
+	value -= ply;
+	//assert(-INF == value);
+	if (DEBUG) cout << ": " << value << endl;
+    }
+    else if (value > INF - MAX_PLY) {
+	if (DEBUG) cout << " --> storing " << value << " at ply " << ply;
+	value += ply;
+	//assert(INF == value);
+	if (DEBUG) cout << ": " << value << endl;
+    }
+    //if (value > INF) value = INF;
+    //else if (value < -INF) value = -INF;
+    //assert(-INF <= value && value <= INF);
+    return value;
+}
+
+int value_from_trans(int value, int ply) {
+    //assert(-INF <= value && value <= INF);
+    if (value < -INF + MAX_PLY) {
+	if (DEBUG) cout << "Restoring " << value << " at ply " << ply;
+	value += ply;
+	if (DEBUG) cout << ": " << value << endl;
+    }
+    else if (value > INF - MAX_PLY) {
+	if (DEBUG) cout << "Restoring " << value << " at ply " << ply;
+	value -= ply;
+	if (DEBUG) cout << ": " << value << endl;
+    }
+    //assert(-INF <= value && value <= INF);
+    return value;
+}
+
 int Game::perft(int depth) {
     if (depth == 0) return 1;
     int nodes = 0;
@@ -61,12 +98,12 @@ int Game::perft(int depth) {
     return nodes;
 }
 
-int Game::quiescence_search(int alpha, int beta, int depth) {
+int Game::q_search(int alpha, int beta, int depth, int ply) {
     int score;
     if (time.poll(nodes_count)) return 0;
 
     int stand_pat = eval(alpha, beta);
-    if (depth < -MAX_DEPTH) return stand_pat;
+    if (ply >= MAX_PLY) return stand_pat;
     
     if (stand_pat >= beta) return stand_pat; // Beta cut-off
 
@@ -89,7 +126,7 @@ int Game::quiescence_search(int alpha, int beta, int depth) {
 	    continue;
 	}
 	
-	score = -quiescence_search(-beta, -alpha, depth - 1);
+	score = -q_search(-beta, -alpha, depth - 1, ply + 1);
 	undo_move(move);
 	if (time.poll(nodes_count)) return 0;
 	if (score >= beta) {
@@ -161,9 +198,10 @@ int Game::alphabeta_search(int alpha, int beta, int depth) {
 }
 */
 
-int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
+template<NodeType node_type>
+int Game::pv_search(int alpha, int beta, int depth, int ply) {
     if (time.poll(nodes_count)) return 0;
-    if (depth <= 0) return quiescence_search(alpha, beta, 0); // Quiescence
+    if (depth <= 0) return q_search(alpha, beta, 0, ply + 1); // Quiescence
     if (tree.has_repetition_draw()) return 0; // Repetition draw rules
 
     int score = -INF;
@@ -177,7 +215,7 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
     Transposition trans = tt.lookup(pos.hash());
     if (!trans.is_empty()) {
 	if (depth <= trans.get_depth()) {
-	    int tr_score = trans.get_value();
+	    int tr_score = value_from_trans(trans.get_value(), ply);
 	    switch (trans.get_bound()) {
 		case EXACT: return tr_score; // Already searched node
 		case UPPER: if (tr_score < beta) beta = tr_score; break;
@@ -201,17 +239,20 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
     // Null Move Pruning
     //bool can_do_null != pos.get_last_move().is_null(); // No successive
     bool can_do_null = !pos.get_null_move_right(); // No more than one
-    bool is_pv = (node_type == PV_NODE);
+    bool is_pv = (node_type == PV);
     bool null_move_allowed = !is_in_check && can_do_null && !is_pv;
     
     if (null_move_allowed && depth > NMP_DEPTH) {
 	Move null_move;
 	make_move(null_move);
 	pos.set_null_move_right(false); // Forbide more than one null move
-	int reduced_depth = depth - R_ADAPT(player, depth) - 1;
-	score = -pv_search(-beta, -beta + 1, reduced_depth, node_type);
+	int r_depth = depth - R_ADAPT(player, depth) - 1;
+	score = -pv_search<node_type>(-beta, -beta + 1, r_depth, ply + 1);
 	undo_move(null_move);
-	if (score >= beta) return score;
+	if (score >= beta) {
+	    //if (score >= INF - MAX_PLY) return beta;
+	    return score;
+	}
     }
     else if (!can_do_null) {
 	// Next move we will again have the right to do another null-move
@@ -239,6 +280,14 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 	//assert(is_legal(move) || assert_msg(
 	//    debug_move(move) << debug_killers(depth)));	
 
+	if (move.is_capture()) {
+	    if (board.get_piece(move.get_dest()).get_type() == KING) {
+		if (DEBUG) {
+		    cout << "Mate at ply " << ply << " d=" << depth << endl;
+		}
+		return INF - ply; // Checkmate
+	    }
+	}
 	make_move(move);
 	if (is_check(player)) { // Skip illegal move
 	    undo_move(move);
@@ -248,7 +297,7 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 
 	// PVS code from http://www.talkchess.com/forum/viewtopic.php?t=26974
 	if (is_principal_variation) {
-	    best_score = -pv_search(-beta, -alpha, depth - 1, PV_NODE);
+	    best_score = -pv_search<PV>(-beta, -alpha, depth - 1, ply + 1);
 
 	    undo_move(move);
 	    if (best_score > alpha) {
@@ -288,15 +337,15 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
 		!move.is_capture() && !move.is_promotion()) {
 		
 		// Do the search at a reduced depth
-		score = -pv_search(-alpha - 1, -alpha, depth - 2, ALL_NODE);
+		score = -pv_search<ALL>(-alpha - 1, -alpha, depth - 2, ply + 1);
 	    }
 	    else {
-		score = -pv_search(-alpha - 1, -alpha, depth - 1, ALL_NODE);
+		score = -pv_search<ALL>(-alpha - 1, -alpha, depth - 1, ply + 1);
 	    }
 	    
 	    // Re-search
 	    if (alpha < score && score < beta) {
-		score = -pv_search(-beta, -alpha, depth - 1, ALL_NODE);
+		score = -pv_search<ALL>(-beta, -alpha, depth - 1, ply + 1);
 		if (alpha < score) {
 		    alpha = score;
 		}
@@ -318,16 +367,30 @@ int Game::pv_search(int alpha, int beta, int depth, NodeType node_type) {
     }
     if (time.poll(nodes_count)) return 0;
     if (!legal_move_found) { // End of game?
-	if (is_in_check) return -INF + 100 - depth; // Checkmate
+	//if (is_in_check) return -INF + 100 - depth; // Checkmate
+	if (is_in_check) {
+	    if (DEBUG) {
+		cout << "Mated at ply " << ply << " d=" << depth << endl;
+	    }
+	    return -INF + ply; // Checkmate
+	}
 	else return 0; // Stalemate
     }
     
     // Store the search to Transposition Table
     transposition:
 	if (depth >= trans.get_depth()) {
+	    if (DEBUG && 
+		(best_score < -INF + MAX_PLY || INF - MAX_PLY < best_score)) {
+		cout << "Storing " << best_score << " at ply " << ply;
+		cout << " alpha=" << alpha;
+		cout << " beta=" << beta;
+		cout << " d=" << depth << endl;
+	    }
+	    int value = value_to_trans(best_score, ply);
 	    Bound bound = (best_score >= beta ? LOWER :
 			  (best_score <= old_alpha ? UPPER : EXACT));
-	    tt.save(pos.hash(), best_score, bound, depth, best_move);
+	    tt.save(pos.hash(), value, bound, depth, best_move);
 	}
 
     return best_score;
@@ -340,10 +403,10 @@ Move Game::root(int max_depth) {
     nodes_count = 0;
     int best_score = 0;
     Move best_move;
-    int ply;
-    assert(max_depth <= MAX_DEPTH);
-    int best_scores[MAX_DEPTH];
-    for (ply = 1; ply < max_depth; ++ply) { // Iterative Deepening
+    assert(max_depth <= MAX_PLY);
+    int id; // Iteration of Depth
+    int best_scores[MAX_PLY];
+    for (id = 1; id < max_depth; ++id) { // Iterative Deepening
 	int score;
 	int alpha = -INF;
 	int beta = INF;
@@ -353,11 +416,13 @@ Move Game::root(int max_depth) {
 	    time.set_polling_interval(100000);
 	}
 	// Mate pruning
-	if (ply > 6) {
+	if (id > 6) {
 	    bool is_mate = true;
 	    for (int i = 1; i < 4; ++i) {
-		int val = best_scores[ply - i];
-		if (-INF + 100 < val && val < INF - 100) is_mate = false;
+		int val = best_scores[id - i];
+		if (-INF + MAX_PLY < val && val < INF - MAX_PLY) {
+		    is_mate = false;
+		}
 	    }
 	    if (is_mate) break; // The position was mate in the 3 previous ply
 	}
@@ -371,17 +436,19 @@ Move Game::root(int max_depth) {
 		undo_move(move);
 		continue;
 	    }
-	    NodeType node_type = (i == 0 ? PV_NODE : ALL_NODE);
-	    score = -pv_search(-beta, -alpha, ply - 1, node_type);
+	    //NodeType node_type = (i == 0 ? PV : ALL);
+	    //score = -pv_search<node_type>(-beta, -alpha, id - 1, 1);
+	    if (i == 0) score = -pv_search<PV>(-beta, -alpha, id - 1, 1);
+	    else score = -pv_search<ALL>(-beta, -alpha, id - 1, 1);
 	    undo_move(move);
-	    //print_thinking(ply, score, move);
+	    //print_thinking(id, score, move);
 	    if (time.is_out_of_time()) break; // Discard this move
 	    if (score > alpha) {
 		alpha = score;
 		best_score = score;
 		best_move = move;
 		if (nodes_count > 200000) { // Save CPU time at the beginning
-		    print_thinking(ply, alpha, best_move);
+		    print_thinking(id, alpha, best_move);
 		}
 	    } 
 	}
@@ -390,13 +457,13 @@ Move Game::root(int max_depth) {
 	    break; // Discard this ply
 	}
 	if (!best_move.is_null()) {
-	    tt.save(current_node().hash(), alpha, EXACT, ply, best_move);
+	    tt.save(current_node().hash(), alpha, EXACT, id, best_move);
 	}
-	best_scores[ply] = best_score;
-	//print_thinking(ply, best_score, best_move);
+	best_scores[id] = best_score;
+	//print_thinking(id, best_score, best_move);
     }
     if (!best_move.is_null()) {
-	print_thinking(ply, best_score, best_move);
+	print_thinking(id, best_score, best_move);
     }
     return best_move;
 }

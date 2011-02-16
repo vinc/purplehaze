@@ -37,7 +37,7 @@ Game::Game() {
 }
 
 void Game::clear_killers() {
-    for (int i = 0; i < MAX_DEPTH; ++i) {
+    for (int i = 0; i < MAX_PLY; ++i) {
 	for (int j = 0; j < MAX_KILLERS; ++j) {
 	    killer_moves[i][j] = Move();
 	}
