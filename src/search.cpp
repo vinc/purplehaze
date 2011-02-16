@@ -184,7 +184,7 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
 #ifdef NMP
     // Null Move Pruning
     //bool can_do_null != pos.get_last_move().is_null(); // No successive
-    bool can_do_null = !pos.get_null_move_right(); // No more than one
+    bool can_do_null = pos.get_null_move_right(); // No more than one
     bool is_pv = (node_type == PV);
     bool null_move_allowed = !is_in_check && can_do_null && !is_pv;
     
