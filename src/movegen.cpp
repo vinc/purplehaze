@@ -114,8 +114,8 @@ void Moves::generate(MoveType mt) {
 	    board.get_piece(rook).get_type() == ROOK &&
 	    board.get_piece(rook).get_color() == c &&
 	    !board.is_attacked_by(Color(!c), from, pieces) &&
-	    !board.is_attacked_by(Color(!c), Square((F1 + A8 * c)), pieces) &&
-	    !board.is_attacked_by(Color(!c), to, pieces)
+	    !board.is_attacked_by(Color(!c), to, pieces) &&
+	    !board.is_attacked_by(Color(!c), Square((F1 + A8 * c)), pieces)
 	    ) {
 	    add(Move(from, to, KING_CASTLE));
 	}
@@ -130,8 +130,8 @@ void Moves::generate(MoveType mt) {
 	    board.get_piece(rook).get_type() == ROOK &&
 	    board.get_piece(rook).get_color() == c &&
 	    !board.is_attacked_by(Color(!c), from, pieces) &&
-	    !board.is_attacked_by(Color(!c), Square((D1 + A8 * c)), pieces) &&
-	    !board.is_attacked_by(Color(!c), to, pieces)
+	    !board.is_attacked_by(Color(!c), to, pieces) &&
+	    !board.is_attacked_by(Color(!c), Square((D1 + A8 * c)), pieces)
 	    ) {
 	    add(Move(from, to, QUEEN_CASTLE));
 	}
@@ -149,13 +149,13 @@ void Game::make_move(Move m) {
     assert(!board.is_out(orig));
     assert(!board.is_out(dest));
 
-    nodes_count++;
+    ++nodes_count;
     new_node(); // From now on, current_node() is refering to the new node
 
     //current_node().set_last_move(m); // Used in Search for Null Move
   
     // Update halfmove counter
-    if (m.is_capture() || t == PAWN) current_node().reset_halfmove();
+    if (t == PAWN || m.is_capture()) current_node().reset_halfmove();
     else current_node().inc_halfmove();
     
     // Null Move
@@ -186,15 +186,14 @@ void Game::make_move(Move m) {
 
 	capture = board.get_piece(s);
 	if (capture.get_type() == ROOK) { // Update opponent's castling rights
+	    Color oc = Color(!c); // Opponent's color
 	    if (dest == Square(H1 + A8 * c)) {
-		current_node().set_castle_right(Color(!c), KING, false);
-		zobrist.update_castle_right(current_node().hash(), 
-					 Color(!c), KING);
+		current_node().set_castle_right(oc, KING, false);
+		zobrist.update_castle_right(current_node().hash(), oc, KING);
 	    }
 	    else if (dest == Square(A1 + A8 * c)) {
-		current_node().set_castle_right(Color(!c), QUEEN, false);
-		zobrist.update_castle_right(current_node().hash(), 
-					 Color(!c), QUEEN);
+		current_node().set_castle_right(oc, QUEEN, false);
+		zobrist.update_castle_right(current_node().hash(), oc, QUEEN);
 	    }
 	}
 	del_piece(capture);

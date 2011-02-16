@@ -73,7 +73,7 @@ class Game
 	bool is_legal(Move m);
 	
 	// Search
-	int perft(int depth);
+	unsigned int perft(int depth);
 	int q_search(int alpha, int beta, int depth, int ply);
 	//int alphabeta_search(int alpha, int beta, int depth);
 	

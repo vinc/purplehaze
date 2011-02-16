@@ -28,9 +28,9 @@
 #include "eval.h"
 
 using namespace std;
-int Game::perft(int depth) {
+unsigned int Game::perft(int depth) {
     if (depth == 0) return 1;
-    int nodes = 0;
+    unsigned int nodes = 0;
     Color c = current_node().get_turn_color();
     bool use_lazy_generation = false; // Useless overhead in perft()
     Moves moves(board, pieces, current_node(), use_lazy_generation);
