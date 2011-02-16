@@ -48,38 +48,14 @@ static const int FUTILITY_MARGINS[FUTILITY_DEPTH + 1] = {
 
 static const bool DEBUG = true;
 int value_to_trans(int value, int ply) {
-    //assert(-INF <= value && value <= INF);
-    if (value < -INF + MAX_PLY) {
-	if (DEBUG) cout << " --> storing " << value << " at ply " << ply;
-	value -= ply;
-	//assert(-INF == value);
-	if (DEBUG) cout << ": " << value << endl;
-    }
-    else if (value > INF - MAX_PLY) {
-	if (DEBUG) cout << " --> storing " << value << " at ply " << ply;
-	value += ply;
-	//assert(INF == value);
-	if (DEBUG) cout << ": " << value << endl;
-    }
-    //if (value > INF) value = INF;
-    //else if (value < -INF) value = -INF;
-    //assert(-INF <= value && value <= INF);
+    if (value < -INF + MAX_PLY) value -= ply;
+    else if (value > INF - MAX_PLY) value += ply;
     return value;
 }
 
 int value_from_trans(int value, int ply) {
-    //assert(-INF <= value && value <= INF);
-    if (value < -INF + MAX_PLY) {
-	if (DEBUG) cout << "Restoring " << value << " at ply " << ply;
-	value += ply;
-	if (DEBUG) cout << ": " << value << endl;
-    }
-    else if (value > INF - MAX_PLY) {
-	if (DEBUG) cout << "Restoring " << value << " at ply " << ply;
-	value -= ply;
-	if (DEBUG) cout << ": " << value << endl;
-    }
-    //assert(-INF <= value && value <= INF);
+    if (value < -INF + MAX_PLY) value += ply;
+    else if (value > INF - MAX_PLY) value -= ply;
     return value;
 }
 
@@ -282,9 +258,6 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
 
 	if (move.is_capture()) {
 	    if (board.get_piece(move.get_dest()).get_type() == KING) {
-		if (DEBUG) {
-		    cout << "Mate at ply " << ply << " d=" << depth << endl;
-		}
 		return INF - ply; // Checkmate
 	    }
 	}
@@ -367,26 +340,13 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
     }
     if (time.poll(nodes_count)) return 0;
     if (!legal_move_found) { // End of game?
-	//if (is_in_check) return -INF + 100 - depth; // Checkmate
-	if (is_in_check) {
-	    if (DEBUG) {
-		cout << "Mated at ply " << ply << " d=" << depth << endl;
-	    }
-	    return -INF + ply; // Checkmate
-	}
+	if (is_in_check) return -INF + ply; // Checkmate
 	else return 0; // Stalemate
     }
     
     // Store the search to Transposition Table
     transposition:
 	if (depth >= trans.get_depth()) {
-	    if (DEBUG && 
-		(best_score < -INF + MAX_PLY || INF - MAX_PLY < best_score)) {
-		cout << "Storing " << best_score << " at ply " << ply;
-		cout << " alpha=" << alpha;
-		cout << " beta=" << beta;
-		cout << " d=" << depth << endl;
-	    }
 	    int value = value_to_trans(best_score, ply);
 	    Bound bound = (best_score >= beta ? LOWER :
 			  (best_score <= old_alpha ? UPPER : EXACT));
