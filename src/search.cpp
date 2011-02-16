@@ -160,7 +160,8 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
     Transposition trans = tt.lookup(pos.hash());
     if (!trans.is_empty()) {
 	if (depth <= trans.get_depth()) {
-	    int tr_score = value_from_trans(trans.get_value(), ply);
+	    //int tr_score = value_from_trans(trans.get_value(), ply);
+	    int tr_score = trans.get_value();
 	    switch (trans.get_bound()) {
 		case EXACT: return tr_score; // Already searched node
 		case UPPER: if (tr_score < beta) beta = tr_score; break;
@@ -317,7 +318,8 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
     // Store the search to Transposition Table
     transposition:
 	if (depth >= trans.get_depth()) {
-	    int value = value_to_trans(best_score, ply);
+	    //int value = value_to_trans(best_score, ply);
+	    int value = best_score;
 	    Bound bound = (best_score >= beta ? LOWER :
 			  (best_score <= old_alpha ? UPPER : EXACT));
 	    tt.save(pos.hash(), value, bound, depth, best_move);

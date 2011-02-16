@@ -65,7 +65,6 @@ static const int PHASE_MAX = 16 * PHASE_COEF[PAWN] +
 		       2 * PHASE_COEF[QUEEN]; // 64
 
 // PST[Phase][Color][PieceType][Square]
-static int PST[2][2][KING + 1][BOARD_SIZE] = { { { { 0 } } } };
 
 static const int BORDER_MALUS = -5;
 static const int CENTER_BONUS[] = {   
