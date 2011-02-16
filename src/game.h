@@ -29,8 +29,7 @@
 #include "time.h"
 #include "tree.h"
 #include "zobrist.h"
-
-enum NodeType : unsigned char {PV, CUT, ALL};
+#include "search.h"
 
 class Game
 {

@@ -24,41 +24,10 @@
 #include <iomanip>
 
 #include "game.h"
+#include "search.h"
 #include "eval.h"
 
 using namespace std;
-
-#define	R 2
-
-// Adaptive Null-Move Pruning (Heinz 1999)
-#define R_ADAPT(c, d) ( \
-    2 + ((d) > (6 + ((pieces.get_nb_pieces(c) < 3) ? 2 : 0))))
-
-static const int NMP_DEPTH = 3;		// depth > NMP_DEPTH
-static const int LMR_DEPTH = 2;		// depth > LMR_DEPTH
-static const int FUTILITY_DEPTH = 3;	// depth <= FUTILITY_DEPTH
-
-// Array of pruning margin values indexed by depth. Idea from Crafty
-static const int FUTILITY_MARGINS[FUTILITY_DEPTH + 1] = {
-    0,
-    PIECE_VALUE[PAWN],
-    PIECE_VALUE[KNIGHT],
-    PIECE_VALUE[ROOK]
-};
-
-static const bool DEBUG = true;
-int value_to_trans(int value, int ply) {
-    if (value < -INF + MAX_PLY) value -= ply;
-    else if (value > INF - MAX_PLY) value += ply;
-    return value;
-}
-
-int value_from_trans(int value, int ply) {
-    if (value < -INF + MAX_PLY) value += ply;
-    else if (value > INF - MAX_PLY) value -= ply;
-    return value;
-}
-
 int Game::perft(int depth) {
     if (depth == 0) return 1;
     int nodes = 0;
@@ -222,7 +191,8 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
 	Move null_move;
 	make_move(null_move);
 	pos.set_null_move_right(false); // Forbide more than one null move
-	int r_depth = depth - R_ADAPT(player, depth) - 1;
+	int n = pieces.get_nb_pieces(player);
+	int r_depth = depth - R_ADAPT(depth, n) - 1;
 	score = -pv_search<node_type>(-beta, -beta + 1, r_depth, ply + 1);
 	undo_move(null_move);
 	if (score >= beta) {

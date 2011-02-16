@@ -1,4 +1,4 @@
-optimize = no
+optimize = yes
 profiler = no
 null_move_pruning = yes
 transpositions_table = yes
