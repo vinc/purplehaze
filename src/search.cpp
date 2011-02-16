@@ -197,6 +197,10 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
 		best_move = move;
 	    }
 	}
+
+	//score = -pv_search<PV>(alpha, beta, depth / 2, ply);
+	//Move trans_move = tt.lookup(pos.hash()).get_best_move();
+	//assert(trans_move == best_move); // trans_move is sometime null
     }
     
     // Check Extension
@@ -210,9 +214,9 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
     if (null_move_allowed && depth > NMP_DEPTH) {
 	Move null_move;
 	make_move(null_move);
-	pos.set_null_move_right(false); // Forbide more than one null move
 	int n = pieces.get_nb_pieces(player);
 	int r_depth = depth - R_ADAPT(depth, n) - 1;
+	current_node().set_null_move_right(false); // Forbide more than one null move
 	score = -pv_search<node_type>(-beta, -beta + 1, r_depth, ply + 1);
 	undo_move(null_move);
 	if (score >= beta) {
