@@ -25,7 +25,7 @@ enum NodeType : unsigned char {PV, CUT, ALL};
 
 // Adaptive Null-Move Pruning (Heinz 1999)
 inline static int R_ADAPT(int d, int n) {
-    return 2 + ((d) > (6 + ((n < 3) ? 2 : 0)));
+    return 2 + (d > (6 + ((n < 3) ? 2 : 0)));
 }
 
 static const int R = 2;
