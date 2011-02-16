@@ -1,3 +1,4 @@
+revision_number = yes
 optimize = yes
 profiler = no
 null_move_pruning = yes
@@ -8,6 +9,10 @@ CXXFLAGS = -Wall -pedantic-errors -g -std=c++0x \
 	   -Wcast-qual -Wshadow \
 	   -W -pipe -Wextra \
 	   #-Wconversion
+
+ifeq ($(revision_number),yes)
+    CXXFLAGS += -DVERSION=\"$(shell git describe HEAD)\"
+endif
 
 ifeq ($(optimize),yes)
     CXXFLAGS += -O3 -march=native -mtune=native

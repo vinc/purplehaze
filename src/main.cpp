@@ -29,7 +29,9 @@
 
 using namespace std;
 
-string version = "PurpleHaze 2.0.0";
+#ifndef VERSION
+#define VERSION "2.0.1"
+#endif
 
 string prompt() {
     string cmd;
@@ -39,7 +41,7 @@ string prompt() {
 }
 
 int main() {
-    cout << version << endl;
+    cout << "Purple Haze " << VERSION << endl;
     cout << endl;
     /*
     cout << "Hash: " << sizeof(Hash) << endl;
@@ -73,7 +75,7 @@ int main() {
 	    return 0;
 	}
 	else if (cmd == "version") {
-	    cout << version << endl;
+	    cout << VERSION << endl;
 	}
 	else if (cmd == "setboard") {
 	    // Get FEN
