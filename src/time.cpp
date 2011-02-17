@@ -25,7 +25,7 @@ void Time::start_thinking(int ply) {
     last_poll_nodes_count = 0;
     polling_interval = 1000000;
     if (remaining_time != allocated_time) {
-	int remaining_moves = allowed_moves - (ply % allowed_moves);
+	int remaining_moves = allowed_moves - ((ply + 1) / 2);
 	allocated_time = remaining_time / remaining_moves;
     }
     else {
@@ -39,9 +39,8 @@ void Time::start_thinking(int ply) {
 	coef_1 = 4; coef_2 = 3;
     }
     else {
-	coef_1 = 2; coef_2 = 1;
+	coef_1 = 5; coef_2 = 3;
     }
-    std::cout << allocated_time << " " << coef_1 << " " << coef_2 << std::endl;
 }
 
 bool Time::is_out_of_time() {

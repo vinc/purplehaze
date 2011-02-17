@@ -225,9 +225,25 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
 	    }
 	}
 	// TODO Call pv_search directly and find the best move in TT?
-	//score = -pv_search<PV>(alpha, beta, depth / 2, ply);
-	//Move trans_move = tt.lookup(pos.hash()).get_best_move();
+	/*
+	tt.save(pos.hash(), 0, UNDEF_BOUND, 0, Move());
+	Transposition trans_test = tt.lookup(pos.hash());
+	pos.set_null_move_right(false);
+	score = pv_search<PV>(alpha, beta, depth / 2, ply);
+	if (score <= alpha) {
+	    // Avoid storing lower bound in TT
+	    score = pv_search<PV>(-INF, beta, depth / 2, ply);
+	}
+	pos.set_null_move_right(true);
+	Move trans_move = tt.lookup(pos.hash()).get_best_move();
+	if (trans_move != best_move) {
+	    cout << "score=" << score << " alpha=" << alpha << " ";
+	    cout << trans_test.to_string() << " ";
+	    cout << internal_best_score << " " << best_move << " ";
+	    cout << tt.lookup(pos.hash()).to_string() << endl;
+	}
 	//assert(trans_move == best_move); // trans_move is sometime null
+	*/
     }
 
     bool legal_move_found = false;
@@ -284,6 +300,7 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
 
 	    // Futility Pruning
 	    if (depth <= FUTILITY_DEPTH && 
+		//!best_move.is_null() &&
 		!is_in_check && !is_giving_check &&
 		!is_killer_move(depth, move) &&
 		!move.is_capture() && !move.is_promotion()) {
@@ -298,6 +315,7 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
 
 	    // Late Move Reduction
 	    if (depth > LMR_DEPTH && // TODO find the best minimal depth
+		//!best_move.is_null() &&
 		!is_in_check && !is_giving_check &&
 		!is_killer_move(depth, move) &&
 		!move.is_capture() && !move.is_promotion()) {
@@ -339,6 +357,7 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
     
     // Store the search to Transposition Table
     transposition:
+	//assert(!best_move.is_null());
 	if (depth >= trans.get_depth()) {
 	    //int value = value_to_trans(best_score, ply);
 	    int value = best_score;
