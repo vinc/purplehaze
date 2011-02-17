@@ -25,7 +25,8 @@ void Time::start_thinking(int ply) {
     last_poll_nodes_count = 0;
     polling_interval = 1000000;
     if (remaining_time != allocated_time) {
-	int remaining_moves = allowed_moves - ((ply + 1) / 2);
+	int n = allowed_moves;
+	int remaining_moves = n - (((ply + 1) / 2) % n);
 	allocated_time = remaining_time / remaining_moves;
     }
     else {

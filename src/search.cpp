@@ -358,7 +358,7 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
     // Store the search to Transposition Table
     transposition:
 	//assert(!best_move.is_null());
-	if (depth >= trans.get_depth()) {
+	if (depth >= trans.get_depth() && !is_null_move) {
 	    //int value = value_to_trans(best_score, ply);
 	    int value = best_score;
 	    Bound bound = (best_score >= beta ? LOWER :
