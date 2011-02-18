@@ -377,9 +377,9 @@ Move Game::root(int max_depth) {
     int best_score = 0;
     Move best_move;
     assert(max_depth <= MAX_PLY);
-    int id; // Iteration of Depth
+    int it; // Iteration of Depth
     int best_scores[MAX_PLY];
-    for (id = 1; id < max_depth; ++id) { // Iterative Deepening
+    for (it = 1; it < max_depth; ++it) { // Iterative Deepening
 	int score;
 	int alpha = -INF;
 	int beta = INF;
@@ -389,10 +389,10 @@ Move Game::root(int max_depth) {
 	    time.set_polling_interval(100000);
 	}
 	// Mate pruning
-	if (id > 6) {
+	if (it > 6) {
 	    bool is_mate = true;
 	    for (int i = 1; i < 4; ++i) {
-		int val = best_scores[id - i];
+		int val = best_scores[it - i];
 		if (-INF + MAX_PLY < val && val < INF - MAX_PLY) {
 		    is_mate = false;
 		}
@@ -407,12 +407,13 @@ Move Game::root(int max_depth) {
 	    make_move(move);
 	    if (is_check(player)) { // Skip illegal move
 		undo_move(move);
+		if (i > 0) --i;
 		continue;
 	    }
 	    //NodeType node_type = (i == 0 ? PV : ALL);
 	    //score = -pv_search<node_type>(-beta, -alpha, id - 1, 1);
-	    if (i == 0) score = -pv_search<PV>(-beta, -alpha, id - 1, 1);
-	    else score = -pv_search<ALL>(-beta, -alpha, id - 1, 1);
+	    if (i == 0) score = -pv_search<PV>(-beta, -alpha, it - 1, 1);
+	    else score = -pv_search<ALL>(-beta, -alpha, it - 1, 1);
 	    undo_move(move);
 	    //print_thinking(id, score, move);
 	    if (time.is_out_of_time()) break; // Discard this move
@@ -421,7 +422,7 @@ Move Game::root(int max_depth) {
 		best_score = score;
 		best_move = move;
 		if (nodes_count > 200000) { // Save CPU time at the beginning
-		    print_thinking(id, alpha, best_move);
+		    print_thinking(it, alpha, best_move);
 		}
 	    } 
 	}
@@ -430,13 +431,13 @@ Move Game::root(int max_depth) {
 	    break; // Discard this ply
 	}
 	if (!best_move.is_null()) {
-	    tt.save(current_node().hash(), alpha, EXACT, id, best_move);
+	    tt.save(current_node().hash(), alpha, EXACT, it, best_move);
 	}
-	best_scores[id] = best_score;
+	best_scores[it] = best_score;
 	//print_thinking(id, best_score, best_move);
     }
     if (!best_move.is_null()) {
-	print_thinking(id, best_score, best_move);
+	print_thinking(it, best_score, best_move);
     }
     return best_move;
 }
