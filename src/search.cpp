@@ -403,16 +403,17 @@ Move Game::root(int max_depth) {
 	Moves moves(board, pieces, current_node());
 	moves.add(best_move, BEST);    
 	Move move;
-	for (int i = 0; !(move = moves.next()).is_null(); ++i) {
+	int nb_moves;
+	for (nb_moves = 1; !(move = moves.next()).is_null(); ++nb_moves) {
 	    make_move(move);
 	    if (is_check(player)) { // Skip illegal move
 		undo_move(move);
-		if (i > 0) --i;
+		--nb_moves;
 		continue;
 	    }
 	    //NodeType node_type = (i == 0 ? PV : ALL);
 	    //score = -pv_search<node_type>(-beta, -alpha, id - 1, 1);
-	    if (i == 0) score = -pv_search<PV>(-beta, -alpha, it - 1, 1);
+	    if (nb_moves == 1) score = -pv_search<PV>(-beta, -alpha, it - 1, 1);
 	    else score = -pv_search<ALL>(-beta, -alpha, it - 1, 1);
 	    undo_move(move);
 	    //print_thinking(id, score, move);
@@ -435,6 +436,9 @@ Move Game::root(int max_depth) {
 	}
 	best_scores[it] = best_score;
 	//print_thinking(id, best_score, best_move);
+	
+	// If there is only one legal move, no iterative deepening needed
+	if (nb_moves == 1) break;
     }
     if (!best_move.is_null()) {
 	print_thinking(it, best_score, best_move);
