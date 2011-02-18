@@ -18,6 +18,7 @@
 #include <iostream>
 
 #include "time.h"
+#include "assert.h"
 
 void Time::start_thinking(int ply) {
     starting_time = clock();
@@ -27,9 +28,11 @@ void Time::start_thinking(int ply) {
     if (remaining_time != allocated_time) {
 	int n = allowed_moves;
 	int remaining_moves = n - (((ply + 1) / 2) % n);
+	assert(remaining_moves > 0);
 	allocated_time = remaining_time / remaining_moves;
     }
     else {
+	assert(allowed_moves > 0);
 	allocated_time = allowed_time / allowed_moves;
     }
 

@@ -195,7 +195,7 @@ void Xboard::loop() {
 	    if (!play_move(cmd)) {
 		cout << "Illegal move: " << cmd << endl;
 	    }
-	    else think();
+	    if (!force_mode) think();
 	}
 	else if (cmd == "verbose") { // Debug mode
 	    verbosity = 2;
