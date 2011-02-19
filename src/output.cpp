@@ -47,8 +47,9 @@ void Game::print_thinking(int depth, int score, Move m) {
     cout << setw(WIDE - 3) << " ";
     int ply = current_node().get_ply();
     
-    // TODO: use (current_node().get_turn_color() == BLACK)
-    if (ply % 2 != 0) cout << 1 + (ply / 2) << ". ...";
+    if (current_node().get_turn_color() == BLACK) {
+	cout << " " << 1 + (ply / 2) << ". ...";
+    }
     
     assert(is_legal(m) || assert_msg(debug_move(m)));
     cout << output_pv(depth, score, m) << endl;
@@ -63,7 +64,9 @@ string Game::output_pv(int depth, int score, Move m) {
     ostringstream stream;
     stream << " ";
     int ply = current_node().get_ply();
-    if (ply % 2 == 0) stream << 1 + (ply / 2) << ". ";
+    if (current_node().get_turn_color() == WHITE) {
+	stream << 1 + (ply / 2) << ". ";
+    }
     stream << output_move(m);
     
     make_move(m);
