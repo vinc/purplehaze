@@ -301,6 +301,7 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
 	    int value = best_score;
 	    Bound bound = (best_score >= beta ? LOWER :
 			  (best_score <= old_alpha ? UPPER : EXACT));
+	    if (bound == UPPER) best_move = Move(); // Don't store best move
 	    tt.save(pos.hash(), value, bound, depth, best_move);
 	}
 
