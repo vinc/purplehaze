@@ -27,7 +27,7 @@
 
 using namespace std;
 
-class Node
+class Position
 {
     private:
 	Hash zobrist_hash;
@@ -43,7 +43,7 @@ class Node
 	Color side_to_move;
 
     public:
-	Node() : 
+	Position() : 
 	    ply(0),
 	    en_passant(OUT),
 	    halfmove_counter(0),

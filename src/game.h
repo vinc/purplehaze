@@ -23,7 +23,7 @@
 #include "pieces.h"
 #include "board.h"
 #include "moves.h"
-#include "node.h"
+#include "position.h"
 #include "tt.h"
 #include "hashtable.h"
 #include "time.h"
@@ -53,9 +53,9 @@ class Game
 	    del_piece(p.get_color(), p.get_type(), p.get_index());
 	};
 	
-	void new_node();
-	void del_node();
-	Node& current_node() { return tree.top(); };
+	void new_position();
+	void del_position();
+	Position& current_position() { return tree.top(); };
 
 	void init(string fen);
 

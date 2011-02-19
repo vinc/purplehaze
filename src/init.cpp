@@ -89,7 +89,7 @@ void Game::init(string fen) {
 	    if (FEN_DEBUG) cout << "FEN: white to play" << endl;
 	    break;
 	case 'b':
-	    current_node().change_side();
+	    current_position().change_side();
 	    if (FEN_DEBUG) cout << "FEN: black to play" << endl;
 	    break;
 	default:
@@ -105,10 +105,10 @@ void Game::init(string fen) {
     for (; *it != ' '; ++it) {
 	switch(*it) {
 	    case '-': break;
-	    case 'K': current_node().set_castle_right(WHITE, KING); break;
-	    case 'Q': current_node().set_castle_right(WHITE, QUEEN); break;
-	    case 'k': current_node().set_castle_right(BLACK, KING); break;
-	    case 'q': current_node().set_castle_right(BLACK, QUEEN); break;
+	    case 'K': current_position().set_castle_right(WHITE, KING); break;
+	    case 'Q': current_position().set_castle_right(WHITE, QUEEN); break;
+	    case 'k': current_position().set_castle_right(BLACK, KING); break;
+	    case 'q': current_position().set_castle_right(BLACK, QUEEN); break;
 	}
     }
     assert(*it == ' ');
@@ -122,7 +122,7 @@ void Game::init(string fen) {
 	s = Square((rank - '1') * 16 + file - 'a');
 	if (board.is_out(s)) it = it - 3; // Bugged FEN
 	else {
-	    current_node().set_en_passant(s);
+	    current_position().set_en_passant(s);
 	    if (FEN_DEBUG) {
 		cout << "FEN: en passant square fixed to ";
 		cout << char(file) << char(rank) << endl;
@@ -139,7 +139,7 @@ void Game::init(string fen) {
     for (; it != fen.end(); ++it) {
 	// Space separator
 	if (*it == ' ') {
-	    current_node().set_halfmove(halfmove);
+	    current_position().set_halfmove(halfmove);
 	    if (FEN_DEBUG) {
 		cout << "FEN: halfmove counter fixed to ";
 		cout << halfmove << endl;

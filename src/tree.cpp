@@ -18,11 +18,11 @@
 #include "tree.h"
 
 bool Tree::has_repetition_draw() {
-    Node& current_node = tree[tree_top];
-    if (current_node.get_halfmove() >= 99) return 0; // Fifty-move rule
+    Position& current_position = tree[tree_top];
+    if (current_position.get_halfmove() >= 99) return 0; // Fifty-move rule
     if (tree_top < 4) return false;
-    Hash& pos = current_node.hash();
-    int previous_halfmove = current_node.get_halfmove();
+    Hash& pos = current_position.hash();
+    int previous_halfmove = current_position.get_halfmove();
     for (int i = tree_top - 2; i >= 0; i -= 2) {
 	if (tree[i].hash() == pos) return true; // Second repetition
 	if (tree[i].get_halfmove() > previous_halfmove) { // Halfmove reseted

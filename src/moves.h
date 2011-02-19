@@ -21,7 +21,7 @@
 #include "common.h"
 #include "move.h"
 #include "board.h"
-#include "node.h"
+#include "position.h"
 
 using namespace std;
 
@@ -41,7 +41,7 @@ class Moves
     private:	
     	ExtendedMove moves[MAX_MOVES];
 
-	Node& current_node;
+	Position& current_position;
 	Board& board;
 	Pieces& pieces;
 
@@ -53,8 +53,8 @@ class Moves
 
     public:
 	static Score mvv_lva_scores[KING + 1][KING + 1];
-    	Moves(Board& b, Pieces& ps, Node& cn, bool lg = true) : 
-	    current_node(cn), board(b), pieces(ps),
+    	Moves(Board& b, Pieces& ps, Position& cn, bool lg = true) : 
+	    current_position(cn), board(b), pieces(ps),
 	    state(BEST),
 	    i(0), n(0),
 	    use_lazy_generation(lg)

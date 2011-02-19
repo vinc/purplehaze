@@ -18,15 +18,15 @@
 #ifndef TREE_H
 #define TREE_H
 
-#include "node.h"
+#include "position.h"
 
 static const unsigned int MAX_TREE = 512;
 
 class Tree
 {
     private:
-	Node tree[MAX_TREE];
-	unsigned int tree_top; // Redondant with current_node().get_ply()
+	Position tree[MAX_TREE];
+	unsigned int tree_top; // Redondant with current_position().get_ply()
     public:
 	Tree() : tree_top(0) {}
 	void push() {
@@ -36,7 +36,7 @@ class Tree
 	void pop() { 
 	    --tree_top;
 	};
-	Node& top() { 
+	Position& top() { 
 	    return tree[tree_top]; 
 	};
 	bool has_repetition_draw();

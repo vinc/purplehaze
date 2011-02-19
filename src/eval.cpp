@@ -155,7 +155,7 @@ int Game::eval(int alpha, int beta) {
 int Game::material_eval() {
     Color c;
     int score = 0;
-    Node& pos = current_node();
+    Position& pos = current_position();
     
     // Lookup in hash table
     bool is_empty = true;
@@ -269,7 +269,7 @@ int Game::material_eval() {
 	return score;
 }
 
-int castling_score(const Node& pos, Color c) {
+int castling_score(const Position& pos, Color c) {
     int score = 0;
     if (pos.has_castle(c)) {
 	score += CASTLE_BONUS;
@@ -288,7 +288,7 @@ int Game::position_eval() {
     int phase = 0;
     int position_score[2][2] = { { 0 } };
     int pawns_files[2][8] = { { 0 } };
-    const Node& pos = current_node();
+    const Position& pos = current_position();
     Color c;
     for (int i = 0; i < 2; ++i) {
 	c = Color(i);

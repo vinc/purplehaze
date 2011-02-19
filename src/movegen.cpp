@@ -43,7 +43,7 @@ void Moves::generate_pieces(Color c, PieceType t, MoveType mt) {
 }
 
 void Moves::generate(MoveType mt) {
-    Color c = current_node.get_turn_color();
+    Color c = current_position.get_turn_color();
     
     // Pawns moves
     for (int j = 0; j < pieces.get_nb_pieces(c, PAWN); ++j) {
@@ -65,7 +65,7 @@ void Moves::generate(MoveType mt) {
 		    add(Move(from, to, CAPTURE));
 		}
 	    }
-	    else if (to == current_node.get_en_passant()) { // En passant
+	    else if (to == current_position.get_en_passant()) { // En passant
 		add(Move(from, to, EN_PASSANT));
 	    }
 	}
@@ -103,7 +103,7 @@ void Moves::generate(MoveType mt) {
     if (mt == CAPTURE) return;
     
     // Castling
-    if (current_node.can_castle(c, KING)) {
+    if (current_position.can_castle(c, KING)) {
 	Square from = Square(E1 + A8 * c);
 	Square to = Square(G1 + A8 * c);
 	Square rook = Square(H1 + A8 * c);
@@ -118,7 +118,7 @@ void Moves::generate(MoveType mt) {
 	    add(Move(from, to, KING_CASTLE));
 	}
     }
-    if (current_node.can_castle(c, QUEEN)) {
+    if (current_position.can_castle(c, QUEEN)) {
 	Square from = Square(E1 + A8 * c);
 	Square to = Square(C1 + A8 * c);
 	Square rook = Square(A1 + A8 * c);
@@ -139,8 +139,8 @@ void Moves::generate(MoveType mt) {
 void Game::make_move(Move m) {
     Square orig = m.get_orig();
     Square dest = m.get_dest();
-    Square ep = current_node().get_en_passant();
-    Color c = current_node().get_turn_color();
+    Square ep = current_position().get_en_passant();
+    Color c = current_position().get_turn_color();
     Piece p = board.get_piece(orig);
     PieceType t = p.get_type();
     Piece capture;
@@ -148,28 +148,29 @@ void Game::make_move(Move m) {
     assert(!board.is_out(dest));
 
     ++nodes_count;
-    new_node(); // From now on, current_node() is refering to the new node
+    new_position(); // current_position() is now refering to a new position
+    Position& pos = current_position();
 
     // Update halfmove counter
-    if (t == PAWN || m.is_capture()) current_node().reset_halfmove();
-    else current_node().inc_halfmove();
+    if (t == PAWN || m.is_capture()) pos.reset_halfmove();
+    else pos.inc_halfmove();
     
     // Null Move
     if (m.is_null()) {
-	current_node().set_en_passant(OUT);
+	pos.set_en_passant(OUT);
 	return;
     }
 
     // Update castling rights
-    if ((current_node().can_castle(c, KING)) && 
+    if ((pos.can_castle(c, KING)) && 
 	(t == KING || (t == ROOK && orig == Square(H1 + A8 * c)))) {
-	current_node().set_castle_right(c, KING, false);
-	zobrist.update_castle_right(current_node().hash(), c, KING);
+	pos.set_castle_right(c, KING, false);
+	zobrist.update_castle_right(pos.hash(), c, KING);
     }
-    if ((current_node().can_castle(c, QUEEN)) && 
+    if ((pos.can_castle(c, QUEEN)) && 
 	(t == KING || (t == ROOK && orig == Square(A1 + A8 * c)))) {
-	current_node().set_castle_right(c, QUEEN, false);
-	zobrist.update_castle_right(current_node().hash(), c, QUEEN);
+	pos.set_castle_right(c, QUEEN, false);
+	zobrist.update_castle_right(pos.hash(), c, QUEEN);
     }
     
     // Capture
@@ -184,12 +185,12 @@ void Game::make_move(Move m) {
 	if (capture.get_type() == ROOK) { // Update opponent's castling rights
 	    Color oc = Color(!c); // Opponent's color
 	    if (dest == Square(H1 + A8 * c)) {
-		current_node().set_castle_right(oc, KING, false);
-		zobrist.update_castle_right(current_node().hash(), oc, KING);
+		pos.set_castle_right(oc, KING, false);
+		zobrist.update_castle_right(pos.hash(), oc, KING);
 	    }
 	    else if (dest == Square(A1 + A8 * c)) {
-		current_node().set_castle_right(oc, QUEEN, false);
-		zobrist.update_castle_right(current_node().hash(), oc, QUEEN);
+		pos.set_castle_right(oc, QUEEN, false);
+		zobrist.update_castle_right(pos.hash(), oc, QUEEN);
 	    }
 	}
 	del_piece(capture);
@@ -215,9 +216,9 @@ void Game::make_move(Move m) {
 	board.set_piece(Piece(), rook_orig);
 	board.set_piece(rook, rook_dest);
 	pieces.set_position(rook, rook_dest);
-	zobrist.update_piece(current_node().hash(), c, ROOK, rook_orig);
-	zobrist.update_piece(current_node().hash(), c, ROOK, rook_dest);
-	current_node().set_has_castle(c); // For bonus/malus in eval
+	zobrist.update_piece(pos.hash(), c, ROOK, rook_orig);
+	zobrist.update_piece(pos.hash(), c, ROOK, rook_dest);
+	pos.set_has_castle(c); // For bonus/malus in eval
     }
 
     // Move the piece
@@ -229,19 +230,19 @@ void Game::make_move(Move m) {
     else {
 	board.set_piece(p, dest);
 	pieces.set_position(p, dest);
-	zobrist.update_piece(current_node().hash(), c, t, orig);
-	zobrist.update_piece(current_node().hash(), c, t, dest);
+	zobrist.update_piece(pos.hash(), c, t, orig);
+	zobrist.update_piece(pos.hash(), c, t, dest);
     }
     
     // Update en passant
-    current_node().set_capture(capture);
+    pos.set_capture(capture);
     if (m.is_double_pawn_push()) {
 	Square new_ep = Square(orig + (dest - orig) / 2);
-	current_node().set_en_passant(new_ep);
-	zobrist.update_en_passant(current_node().hash(), new_ep);
+	pos.set_en_passant(new_ep);
+	zobrist.update_en_passant(pos.hash(), new_ep);
     }
     else {
-	current_node().set_en_passant(OUT);
+	pos.set_en_passant(OUT);
     }
 }
 
@@ -262,10 +263,10 @@ void Game::undo_move(Move m) {
     
     // Restore captured piece
     if (m.is_capture()) {
-	Piece capture = current_node().get_capture();
+	Piece capture = current_position().get_capture();
 	Square s = dest;
 	if (m.is_en_passant()) {
-	    Color c = current_node().get_turn_color();
+	    Color c = current_position().get_turn_color();
 	    s = (c == WHITE ? Square(dest + UP) : Square(dest + DOWN));
 	    board.set_piece(Piece(), dest);
 	}
@@ -274,11 +275,11 @@ void Game::undo_move(Move m) {
     else if (!m.is_null()) {
 	board.set_piece(Piece(), dest);
     }
-    del_node();
+    del_position();
     if (m.is_null()) return;
     if (m.is_castle()) {
 	Square rook_orig, rook_dest;
-	Color c = current_node().get_turn_color();
+	Color c = current_position().get_turn_color();
 	switch (m.get_castle_side()) {
 	    case KING:
 		rook_orig = Square(H1 + A8 * c); 
@@ -315,7 +316,7 @@ bool Game::is_legal(Move m) {
     Color c = p.get_color();
 
     // The piece cannot be one of the opponent
-    if (c != current_node().get_turn_color()) return false;
+    if (c != current_position().get_turn_color()) return false;
     
     // It must be able to do the move
     if (!m.is_en_passant() && 
@@ -340,7 +341,7 @@ bool Game::is_legal(Move m) {
 	    if (t != PAWN) return false;
 
 	    // After a double push
-	    Square ep = current_node().get_en_passant();
+	    Square ep = current_position().get_en_passant();
 	    if (to != ep) return false;
 	    
 	    // from another pawn, the later being captured by the former

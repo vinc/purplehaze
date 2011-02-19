@@ -45,9 +45,9 @@ void Game::print_thinking(int depth, int score, Move m) {
     cout << setw(WIDE) << time.get_elapsed_time();
     cout << setw(WIDE + 3) << nodes_count;
     cout << setw(WIDE - 3) << " ";
-    int ply = current_node().get_ply();
+    int ply = current_position().get_ply();
     
-    if (current_node().get_turn_color() == BLACK) {
+    if (current_position().get_turn_color() == BLACK) {
 	cout << " " << 1 + (ply / 2) << ". ...";
     }
     
@@ -63,18 +63,18 @@ bool is_mate(int score) {
 string Game::output_pv(int depth, int score, Move m) {
     ostringstream stream;
     stream << " ";
-    int ply = current_node().get_ply();
-    if (current_node().get_turn_color() == WHITE) {
+    int ply = current_position().get_ply();
+    if (current_position().get_turn_color() == WHITE) {
 	stream << 1 + (ply / 2) << ". ";
     }
     stream << output_move(m);
     
     make_move(m);
     
-    bool is_in_check = is_check(current_node().get_turn_color());
+    bool is_in_check = is_check(current_position().get_turn_color());
         
     // Find next move in TT
-    Transposition trans = tt.lookup(current_node().hash());
+    Transposition trans = tt.lookup(current_position().hash());
     Move move = trans.get_best_move();
     if (depth > 0 && is_legal(move) && trans.get_bound() < 3) {
 	if (is_in_check) stream << "+"; // Check
@@ -160,7 +160,8 @@ void Game::print_tt_stats() {
     }
 
     // TODO: change this *very* ugly code...
-    cout << "Zobrist:          " << hex << current_node().hash() << dec << endl;
+    cout << "Zobrist:          " << hex << current_position().hash();
+    cout << dec << endl;
     cout << "TT Size:          " << TT_SIZE / 1024 / 1024 << "Mb" << endl;
     cout << "Entries:          " << tt.size() << endl;
     cout << "Usage:            " << tt.get_usage();
@@ -220,14 +221,14 @@ void Game::print_tt_stats() {
 
 string Game::debug_move(Move m) {
     ostringstream stream;
-    Color c = current_node().get_turn_color();
+    Color c = current_position().get_turn_color();
     stream << endl << board << endl <<
 	      (c == WHITE ? "White" : "Black") << " to move" << endl <<
 	      "m = " << output_move(m) << " (" << m << ")" << endl <<
 	      "m is en passant: " << m.is_en_passant() << endl <<
 	      "m is promotion: " << m.is_promotion() << endl <<
 	      "m is legal: " << is_legal(m) << endl <<
-	      hex << current_node().hash();
+	      hex << current_position().hash();
     return stream.str();
 }
 

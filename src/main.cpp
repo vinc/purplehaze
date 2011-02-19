@@ -74,10 +74,10 @@ int main() {
 	    cout << endl;
 	    Game game;
 	    game.init(fen);
-	    Color c = game.current_node().get_turn_color();
+	    Color c = game.current_position().get_turn_color();
 	    unsigned int nodes_count = 0;
 	    unsigned int moves_count = 0;
-	    Moves moves(game.board, game.pieces, game.current_node());    
+	    Moves moves(game.board, game.pieces, game.current_position());    
 	    Move move;
 	    while (!(move = moves.next()).is_null()) {
 	    	game.make_move(move);
@@ -91,7 +91,7 @@ int main() {
 	    }
 	    cout << endl;
 	    cout << "Moves: " << moves_count << endl;
-	    cout << "Nodes: " << nodes_count << endl;
+	    cout << "Positions: " << nodes_count << endl;
 	}
 	else if (cmd == "testsuite") { // Load EPD test suite
 	    string filename;

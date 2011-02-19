@@ -51,7 +51,7 @@ void Game::add_piece(Color c, PieceType t, Square s) {
     pieces.inc_nb_pieces(c, t);
     
     // Update Zobrist hash
-    Node& pos = current_node();
+    Position& pos = current_position();
     zobrist.update_piece(pos.hash(), c, t, s);
 
     // Hack: for the material hash, the position is irrelevant but each piece
@@ -78,7 +78,7 @@ void Game::del_piece(Color c, PieceType t, int i) {
 	board.set_piece(Piece(c, t, i), s);	   // Update board
     }
     // Update Zobrist hash
-    Node& pos = current_node();
+    Position& pos = current_position();
     zobrist.update_piece(pos.hash(), c, t, emptied);
     
     // Same hack heare for the material hash than in add_piece()
@@ -86,21 +86,21 @@ void Game::del_piece(Color c, PieceType t, int i) {
     zobrist.update_piece(pos.material_hash(), c, t, Square(j));
 }
 
-void Game::new_node() {
+void Game::new_position() {
     // Take a "snapshot" of the current position
     tree.push();
 
     // Remove the previous en passant square from the Zobrist hash
-    zobrist.update_en_passant(current_node().hash(), 
-			      current_node().get_en_passant());
+    zobrist.update_en_passant(current_position().hash(), 
+			      current_position().get_en_passant());
     
     // Update the position for a new move
-    current_node().inc_ply();
-    current_node().change_side();
-    zobrist.change_side(current_node().hash());
+    current_position().inc_ply();
+    current_position().change_side();
+    zobrist.change_side(current_position().hash());
 }
 
-void Game::del_node() {
+void Game::del_position() {
     // Take back the previous "snapshot"
     tree.pop();
 }

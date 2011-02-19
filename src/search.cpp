@@ -30,9 +30,9 @@ using namespace std;
 unsigned int Game::perft(int depth) {
     if (depth == 0) return 1;
     unsigned int nodes = 0;
-    Color c = current_node().get_turn_color();
+    Color c = current_position().get_turn_color();
     bool use_lazy_generation = false; // Useless overhead in perft()
-    Moves moves(board, pieces, current_node(), use_lazy_generation);
+    Moves moves(board, pieces, current_position(), use_lazy_generation);
     Move move;
     while (!(move = moves.next()).is_null()) {
     	make_move(move);
@@ -57,9 +57,9 @@ int Game::q_search(int alpha, int beta, int depth, int ply) {
     
     if (alpha < stand_pat) alpha = stand_pat; // New alpha
 
-    Color player = current_node().get_turn_color();
+    Color player = current_position().get_turn_color();
     
-    Moves moves(board, pieces, current_node());    
+    Moves moves(board, pieces, current_position());    
     Move move;
     while (!(move = moves.next()).is_null()) {
 	if (moves.get_state() > GOOD_CAPTURES) break; // Skip bad captures	
@@ -92,7 +92,7 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
 
     int score = -INF;
     int old_alpha = alpha;
-    Node pos = current_node();
+    Position pos = current_position();
     int best_score = -INF;
     Move best_move;
 
@@ -132,7 +132,7 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
     if (null_move_allowed && depth > NMP_DEPTH && nb_pieces < 3) {
 	Move null_move;
 	make_move(null_move);
-	current_node().set_null_move_right(false); // Forbide more than one null move
+	current_position().set_null_move_right(false); // No consecutive NM
 	int r_depth = depth - R_ADAPT(depth, nb_pieces) - 1;
 	score = -pv_search<node_type>(-beta, -beta + 1, r_depth, ply + 1);
 	undo_move(null_move);
@@ -149,7 +149,7 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
 
     // Internal Iterative Deepening
     if (depth > IID_DEPTH && best_move.is_null() && !is_null_move && is_pv) {
-	Moves moves(board, pieces, current_node());
+	Moves moves(board, pieces, current_position());
 	int internal_best_score = -INF;
 	Move move;
 	while (!(move = moves.next()).is_null()) {
@@ -190,7 +190,7 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
     bool legal_move_found = false;
     bool is_principal_variation = true;
     
-    Moves moves(board, pieces, current_node());
+    Moves moves(board, pieces, current_position());
     moves.add(best_move, BEST);
     
     // Killer moves need pseudo legality checking before we can use them,
@@ -309,8 +309,8 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
 }
 
 Move Game::root(int max_depth) {
-    time.start_thinking(current_node().get_ply());
-    Color player = current_node().get_turn_color();
+    time.start_thinking(current_position().get_ply());
+    Color player = current_position().get_turn_color();
     print_thinking_header();
     nodes_count = 0;
     int best_score = 0;
@@ -339,7 +339,7 @@ Move Game::root(int max_depth) {
 	    if (is_mate) break; // The position was mate in the 3 previous ply
 	}
 
-	Moves moves(board, pieces, current_node());
+	Moves moves(board, pieces, current_position());
 	moves.add(best_move, BEST);    
 	Move move;
 	int nb_moves;
@@ -370,7 +370,7 @@ Move Game::root(int max_depth) {
 	    break; // Discard this ply
 	}
 	if (!best_move.is_null()) {
-	    tt.save(current_node().hash(), alpha, EXACT, it, best_move);
+	    tt.save(current_position().hash(), alpha, EXACT, it, best_move);
 	}
 	best_scores[it] = best_score;
 	
