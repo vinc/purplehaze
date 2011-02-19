@@ -26,7 +26,7 @@
 
 using namespace std;
 
-#define WIDE 10
+static const int WIDE = 10;
 
 void Game::print_thinking_header() {
     if (!output_thinking) return;
@@ -46,11 +46,11 @@ void Game::print_thinking(int depth, int score, Move m) {
     cout << setw(WIDE + 3) << nodes_count;
     cout << setw(WIDE - 3) << " ";
     int ply = current_node().get_ply();
+    
+    // TODO: use (current_node().get_turn_color() == BLACK)
     if (ply % 2 != 0) cout << 1 + (ply / 2) << ". ...";
-    //cout << m << endl; 
+    
     assert(is_legal(m) || assert_msg(debug_move(m)));
-
-
     cout << output_pv(depth, score, m) << endl;
 }
 
@@ -72,13 +72,6 @@ string Game::output_pv(int depth, int score, Move m) {
         
     // Find next move in TT
     Transposition trans = tt.lookup(current_node().hash());
-    /*
-    cout << endl;
-    cout << "value=" << trans.get_value();
-    cout << ", bound=" << trans.get_bound();
-    cout << ", depth=" << trans.get_depth();
-    cout << ", move=" << trans.get_best_move() << endl;
-    */
     Move move = trans.get_best_move();
     if (depth > 0 && is_legal(move) && trans.get_bound() < 3) {
 	if (is_in_check) stream << "+"; // Check
@@ -163,7 +156,7 @@ void Game::print_tt_stats() {
 	ones += z;
     }
 
-    // TODO Ugly code...
+    // TODO: change this *very* ugly code...
     cout << "Zobrist:          " << hex << current_node().hash() << dec << endl;
     cout << "TT Size:          " << TT_SIZE / 1024 / 1024 << "Mb" << endl;
     cout << "Entries:          " << tt.size() << endl;
@@ -234,3 +227,4 @@ string Game::debug_move(Move m) {
 	      hex << current_node().hash();
     return stream.str();
 }
+

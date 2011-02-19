@@ -98,7 +98,7 @@ void Xboard::loop() {
 	}
 	else if (cmd == "new") {
 	    new_game();
-	    set_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	    set_board(DEFAULT_FEN);
 	    force_mode = false;
 	}
 	else if (cmd == "setboard") {
@@ -152,6 +152,12 @@ void Xboard::loop() {
 		set_time(moves, time);
 		log << "> level " << moves << " " << time << endl;
 	    }
+	    else { // Not in Xboard protocol
+		// If not zero, control is a time increment,
+		// but currently this time is not directly used
+		set_time(moves, time);
+		log << "> level " << moves << " " << time << endl;
+	    }
 	}
 	else if (cmd == "time") {
 	    int time = 0;
@@ -192,9 +198,7 @@ void Xboard::loop() {
 		 '1' <= cmd[3] && cmd[3] <= '8' &&
 		 !parse_move(cmd).is_null()) {
 	    log << "DEBUG: move parsed: " << cmd << endl;
-	    if (!play_move(cmd)) {
-		cout << "Illegal move: " << cmd << endl;
-	    }
+	    if (!play_move(cmd)) cout << "Illegal move: " << cmd << endl;
 	    if (!force_mode) think();
 	}
 	else if (cmd == "verbose") { // Debug mode

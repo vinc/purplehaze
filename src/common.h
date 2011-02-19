@@ -18,14 +18,21 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#include <list>
-#include <vector>
+#include <string>
+
+#ifndef VERSION
+#define VERSION "2.0.1"
+#endif
 
 static const int BOARD_SIZE = 128;
 static const int MAX_PLY = 128;
 static const int INF = 29999;
 static const int TT_SIZE = 1024*1024*128;
 static const int MT_SIZE = 1024*1024;
+static const int MAX_KILLERS = 2;
+
+static const std::string DEFAULT_FEN = 
+    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
 enum Square : unsigned char {
     A1=0x00, B1, C1, D1, E1, F1, G1, H1,
@@ -115,63 +122,41 @@ enum MoveType : unsigned char {
 };
 
 // Used in movegen.cpp and attack.cpp
-const int NB_DIRS[] = { 0, 0, 8, 4, 4, 8, 8 };
-/*
-const Direction NO_DIRS[8] = {
-    NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR
-};
-const Direction KNIGHT_DIRS[8] = {
-    UP_UP_RIGHT, RIGHT_UP_RIGHT, RIGHT_DOWN_RIGHT, DOWN_DOWN_RIGHT, 
-    DOWN_DOWN_LEFT, LEFT_DOWN_LEFT, LEFT_UP_LEFT, UP_UP_LEFT
-};
-const Direction BISHOP_DIRS[8] = {
-    UP_RIGHT, DOWN_RIGHT, DOWN_LEFT, UP_LEFT, NO_DIR, NO_DIR, NO_DIR, NO_DIR
-};
-const Direction ROOK_DIRS[8] = {
-    UP, RIGHT, DOWN, LEFT, NO_DIR, NO_DIR, NO_DIR, NO_DIR
-};
-const Direction QUEEN_DIRS[8] = {
-    UP, UP_RIGHT, RIGHT, DOWN_RIGHT, DOWN, DOWN_LEFT, LEFT, UP_LEFT
-};
-const Direction KING_DIRS[8] = {
-    UP, UP_RIGHT, RIGHT, DOWN_RIGHT, DOWN, DOWN_LEFT, LEFT, UP_LEFT
-};
-*/
-const Direction PIECES_DIRS[][8] = {
-    {
+static const int NB_DIRS[] = { 0, 0, 8, 4, 4, 8, 8 };
+static const Direction PIECES_DIRS[][8] = {
+    {   // Empty
 	NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR
     },
-    {
+    {	// Pawns
 	NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR
     },
-    {
+    {	// Knights
 	UP_UP_RIGHT, RIGHT_UP_RIGHT, RIGHT_DOWN_RIGHT, DOWN_DOWN_RIGHT, 
 	DOWN_DOWN_LEFT, LEFT_DOWN_LEFT, LEFT_UP_LEFT, UP_UP_LEFT
     },
-    {
+    {	// Bishops
 	UP_RIGHT, DOWN_RIGHT, DOWN_LEFT, UP_LEFT, 
 	NO_DIR, NO_DIR, NO_DIR, NO_DIR
     },
-    {
+    {	// Rooks
 	UP, RIGHT, DOWN, LEFT, NO_DIR, NO_DIR, NO_DIR, NO_DIR
     },
-    {
+    {	// Queens
 	UP, UP_RIGHT, RIGHT, DOWN_RIGHT, DOWN, DOWN_LEFT, LEFT, UP_LEFT
     },
-    {
+    {	// Kings
 	UP, UP_RIGHT, RIGHT, DOWN_RIGHT, DOWN, DOWN_LEFT, LEFT, UP_LEFT
     }
 };
 
 // Used in movegen.cpp and protocol.cpp
-const Direction PAWN_PUSH_DIRS[2] = { UP, DOWN };
-const Direction PAWN_CAPTURE_DIRS[2][2] = {
+static const Direction PAWN_PUSH_DIRS[2] = { UP, DOWN };
+static const Direction PAWN_CAPTURE_DIRS[2][2] = {
     {UP_LEFT, UP_RIGHT},
     {DOWN_LEFT, DOWN_RIGHT}
 };
 
-const int MAX_KILLERS = 2;
-
+// Used for debuging
 #define assert_msg(x) !(std::cerr << "Assertion failed: " << x << std::endl)
 
 #endif /* !COMMON_H */

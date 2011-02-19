@@ -24,15 +24,15 @@
 using namespace std;
 
 Board::Board() {
-    // Initialize board
+    // Initialize the board's squares
     for (int i = 0; i < BOARD_SIZE; ++i) board[i] = Piece();   
 
-    // Initialize direction array
+    // Initialize the direction array
     for (int i = 0; i < 240; ++i) { 
 	dir_array[i] = NO_DIR;
     }
 
-    // Initialize attack array
+    // Initialize the attack array
     for (int i = 0; i < 64; ++i) { 
 	for (int j = 0; j < 64; ++j) { 
 	    Square from = Square(i + (i & ~7));
@@ -57,10 +57,14 @@ Board::Board() {
     }
 }
 
+/*
+ * Generate a string for pretty printing the content of a 0x88 string array. 
+ * This could be the board but also any PST array.
+ */
 string Board::to_string(string squares[]) const {
     ostringstream stream;
     stream << endl;
-    for (Square s = A8; ; s = Square(s + 1)) {
+    for (Square s = A8; s < OUT; s = Square(s + 1)) {
 	if (is_out(s)) continue;
 	if (get_file(s) == FILE_A) {
 	    stream << "     +";
@@ -77,10 +81,12 @@ string Board::to_string(string squares[]) const {
 	stream << squares[s];
 	if (get_file(s) == FILE_H) {
 	    stream << "|" << endl;
-	    if (s == H1) break;
+	    if (s == H1) break; // The loop ends here
 	    else s = Square(s - 0x18);
 	}
     }
+
+    // Bottom's border of the array
     stream << "     +";
     for (int i = 0; i < 8; ++i) {
 	for (unsigned int j = 0; j < squares[A1].size(); ++j) {
@@ -89,41 +95,21 @@ string Board::to_string(string squares[]) const {
 	stream << "+";
     }
     stream << endl << "     ";
+
+    // Files' names.
     for (char c = 'a'; c <= 'h'; ++c) {
 	int l = squares[A1].size() / 2;
 	int r = squares[A1].size() % 2;
 	stream << setw(l + 2) << c << setw(r) << " ";
     }
     stream << endl;
-    //stream << "     +---+---+---+---+---+---+---+---+" << endl;
-    //stream << "       a   b   c   d   e   f   g   h  " << endl;
     return stream.str();
 }
 
+/*
+ * Pretty print the board
+ */
 ostream& operator<<(ostream& out, const Board board) {
-    /*
-    for (Square s = A8; ; s = Square(s + 1)) {
-	if (board.is_out(s)) continue;
-	if (board.get_file(s) == FILE_A) {
-	    out << "     +---+---+---+---+---+---+---+---+" << endl;
-	    out << "   " << board.get_rank(s) + 1 << " ";
-	}
-	out << "| ";
-	if (!board.is_empty(s)) out << board.get_piece(s);
-	else if (board.is_dark(s)) out << ".";
-	else out << " ";
-	out << " ";
-	if (board.get_file(s) == FILE_H) {
-	    out << "|" << endl;
-	    if (s == H1) break;
-	    else s = Square(s - 0x18);
-	}
-    }
-    out << "     +---+---+---+---+---+---+---+---+" << endl;
-    out << "       a   b   c   d   e   f   g   h  " << endl;
-    return out;
-    */
-
     string squares[BOARD_SIZE];
     for (int i = 0; i < BOARD_SIZE; ++i) {
 	Square s = Square(i);

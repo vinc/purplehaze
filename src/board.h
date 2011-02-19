@@ -83,7 +83,8 @@ class Board
 	Square square_from_coords(File f, Rank r) {
 	    return Square(16 * r + f);
 	};
-
+	
+	// Used for PST with black's point of view
 	Square flip(Square s) {
 	    return square_from_coords(get_file(s), Rank(RANK_8 - get_rank(s)));
 	}

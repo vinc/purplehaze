@@ -29,7 +29,7 @@ class Pieces
 	Square positions[2][7][9];
 	unsigned char nb_pieces[2][7];
 	unsigned char sum[2];
-	//friend class Game;
+    
     public:
 	Pieces();
 	Square get_position(Piece p) const {
@@ -55,12 +55,12 @@ class Pieces
 
 	// FIXME? No warning if nb < 0 or nb > 9
 	void inc_nb_pieces(Color c, PieceType t) {
-	    nb_pieces[c][t]++;
-	    sum[c]++;
+	    ++nb_pieces[c][t];
+	    ++sum[c];
 	};
 	void dec_nb_pieces(Color c, PieceType t) {
-	    nb_pieces[c][t]--;
-	    sum[c]++;
+	    --nb_pieces[c][t];
+	    --sum[c];
 	};
 };
 

@@ -17,8 +17,6 @@
 
 #include <assert.h>
 #include <iostream>
-#include <list>
-#include <vector>
 #include <stdio.h>
 #include <time.h>
 #include <iomanip>
@@ -28,6 +26,7 @@
 #include "eval.h"
 
 using namespace std;
+
 unsigned int Game::perft(int depth) {
     if (depth == 0) return 1;
     unsigned int nodes = 0;
@@ -84,64 +83,6 @@ int Game::q_search(int alpha, int beta, int depth, int ply) {
     if (time.poll(nodes_count)) return 0;
     return alpha;
 }
-
-/* 
- * Replaced by Principal Variation Search
- */
-/*
-int Game::alphabeta_search(int alpha, int beta, int depth) {
-    int score;
-    int old_alpha = alpha;
-    Move best_move;
-    Transposition trans = tt.lookup(current_node().hash());
-    if (trans.get_bound() != UNDEF_BOUND) {
-	if (trans.get_depth() >= depth) {
-	    int trans_score = trans.get_value();
-	    switch (trans.get_bound()) {
-		case EXACT: return trans_score;
-		case UPPER: if (trans_score < beta) beta = trans_score; break;
-		case LOWER: if (trans_score > alpha) alpha = trans_score; break;
-		default: assert(false);
-	    }
-	    if (alpha >= beta) return trans_score;
-	}
-	Move bm = trans.get_best_move();
-	if (!bm.is_null()) best_move = bm;
-    }
-    if (depth <= 0) return quiescence_search(alpha, beta, 0); // Quiescence
-    if (tree.has_repetition_draw()) return 0; // Repetition draw rules
-    Color player = current_node().get_turn_color();
-    bool legal_move_found = false;
-    Moves moves = movegen();
-    moves.sort(board, best_move);
-    for (int i = 0; i < moves.size(); ++i) {
-	Move move = moves.at(i);
-	make_move(move);
-	if (is_check(player)) { // Skip illegal move
-	    undo_move(move);
-	    continue;
-	}
-	legal_move_found = true;
-	score = -alphabeta_search(-beta, -alpha, depth - 1);
-	undo_move(move);
-	if (score >= beta) {
-	    tt.save(current_node().hash(), score, LOWER, depth, move);
-	    return beta; // FIXME Should it be score?
-	} 
-	if (score > alpha) {
-	    alpha = score;
-	    best_move = move;
-	} 
-    }
-    if (!legal_move_found) {
-	if (is_check(player)) return -INF + 100 - depth; // Checkmate
-	else return 0; // Stalemate
-    }
-    Bound bound = (old_alpha <= alpha ? UPPER : EXACT); // FIXME probably wrong
-    tt.save(current_node().hash(), alpha, bound, depth, best_move);
-    return alpha;
-}
-*/
 
 template<NodeType node_type>
 int Game::pv_search(int alpha, int beta, int depth, int ply) {
@@ -262,9 +203,6 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
     
     Move move;
     while (!(move = moves.next()).is_null()) {
-	//assert(is_legal(move) || assert_msg(
-	//    debug_move(move) << debug_killers(depth)));	
-
 	if (move.is_capture()) {
 	    if (board.get_piece(move.get_dest()).get_type() == KING) {
 		return INF - ply; // Checkmate
@@ -411,12 +349,11 @@ Move Game::root(int max_depth) {
 		--nb_moves;
 		continue;
 	    }
-	    //NodeType node_type = (i == 0 ? PV : ALL);
-	    //score = -pv_search<node_type>(-beta, -alpha, id - 1, 1);
+	    //NodeType node_type = (nb_moves ? PV : ALL);
+	    //score = -pv_search<node_type>(-beta, -alpha, it - 1, 1);
 	    if (nb_moves == 1) score = -pv_search<PV>(-beta, -alpha, it - 1, 1);
 	    else score = -pv_search<ALL>(-beta, -alpha, it - 1, 1);
 	    undo_move(move);
-	    //print_thinking(id, score, move);
 	    if (time.is_out_of_time()) break; // Discard this move
 	    if (score > alpha) {
 		alpha = score;
@@ -428,14 +365,13 @@ Move Game::root(int max_depth) {
 	    } 
 	}
 	if (time.is_out_of_time()) {
-	    // TODO Restore best_move and best_score from previous ply?
+	    // TODO: restore best_move and best_score from previous ply?
 	    break; // Discard this ply
 	}
 	if (!best_move.is_null()) {
 	    tt.save(current_node().hash(), alpha, EXACT, it, best_move);
 	}
 	best_scores[it] = best_score;
-	//print_thinking(id, best_score, best_move);
 	
 	// If there is only one legal move, no iterative deepening needed
 	if (nb_moves == 1) break;
@@ -445,3 +381,4 @@ Move Game::root(int max_depth) {
     }
     return best_move;
 }
+

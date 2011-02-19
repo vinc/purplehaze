@@ -39,17 +39,6 @@ string Transposition::to_string() const {
     stream << ", " << get_bound() << ", " << get_best_move() << ">";
     return stream.str();
 }
-/*
-Transpositions::Transpositions(int n) {
-    if (n == 0) n = TT_SIZE;
-    assert((n & (n - 1)) == 0); // n must be a power of two
-    SIZE = n / sizeof(Transposition);
-    tt = new Transposition[tt_size];
-    cout << "Transposition Table's size: " << (n / (1024*1024));
-    cout << "Mb (" << SIZE << " entries)" << endl;
-    clear();
-}
-*/
 
 void Transpositions::clear() {
     for (int i = 0; i < SIZE; ++i) {
@@ -75,13 +64,6 @@ Transposition Transpositions::lookup(Hash h) {
     
     //return ((h && t.get_hash() == h) ? t : NULL_ENTRY);
 }
-
-/*
-void Transpositions::save(Hash h, int v, Bound b, int d, Move bm) {
-    Transposition t(h, v, b, d, bm);
-    tt[h & (SIZE - 1)] = t;
-}
-*/
 
 int Transpositions::get_usage() const {
     int res = 0; 

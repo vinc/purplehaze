@@ -18,41 +18,27 @@
 #ifndef TREE_H
 #define TREE_H
 
-//#include <stack>
-
 #include "node.h"
-
-//using namespace std;
 
 static const unsigned int MAX_TREE = 512;
 
-
-/* 
- * FIXME When compiling with -03 the searched tree is different, and both 
- * array and stack based implementation are different too. Something must
- * be wrong...
- */
 class Tree
 {
     private:
-    	//stack<Node> tree;
 	Node tree[MAX_TREE];
 	unsigned int tree_top; // Redondant with current_node().get_ply()
     public:
-	//Tree() { tree.push(Node()); }
 	Tree() : tree_top(0) {}
-	
-	//Node& top() { return tree.top(); };
-	//void push() { tree.push(tree.top()); };	
-	//void pop() { tree.pop(); };
-	
 	void push() {
 	    tree[tree_top + 1] = tree[tree_top];
 	    ++tree_top;
 	};
-	void pop() { --tree_top; };
-	Node& top() { return tree[tree_top]; };
-	
+	void pop() { 
+	    --tree_top;
+	};
+	Node& top() { 
+	    return tree[tree_top]; 
+	};
 	bool has_repetition_draw();
 };
 

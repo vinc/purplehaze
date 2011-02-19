@@ -43,9 +43,8 @@ class Piece
 	    static const int C_SHIFT = 0;
 	    static const int T_SHIFT = 1;
 	    static const int I_SHIFT = 4;
-	    //bitset<8> code;
+	    
 	    unsigned char code;
-	    //Piece(bitset<8> c) : code(c) {}
     public:
 	    Piece() : code(EMPTY) {}
 	    Piece(Color c, PieceType t, int i = 0) {
@@ -57,16 +56,12 @@ class Piece
 	        return Color((code >> C_SHIFT) & C_MASK); 
 	    };
 	    PieceType get_type() const { 
-	        //return PieceType(((code << 4) >> 5).to_ulong()); 
 	        return PieceType((code >> T_SHIFT) & T_MASK); 
-	        //return PieceType((code << 4) >> 5); 
 	    };
 	    int get_index() const { 
 	        return (code >> I_SHIFT) & I_MASK; 
-	        //return (code >> 4).to_ulong();
 	    };
 	    void set_index(int i) { 
-	        //(code &= 0x0f) |= (i << 4); 
 		code &= I_MASK;
 		code |= (i << I_SHIFT);
 	    }

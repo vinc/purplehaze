@@ -29,10 +29,6 @@
 
 using namespace std;
 
-#ifndef VERSION
-#define VERSION "2.0.1"
-#endif
-
 string prompt() {
     string cmd;
     cout << "> ";
@@ -43,30 +39,9 @@ string prompt() {
 int main() {
     cout << "Purple Haze " << VERSION << endl;
     cout << endl;
-    /*
-    cout << "Hash: " << sizeof(Hash) << endl;
-    cout << "Piece: " << sizeof(Piece) << endl;
-    cout << "Move: " << sizeof(Move) << endl;
-    cout << "ExtendedMove: " << sizeof(ExtendedMove) << endl;
-    cout << "Transposition: " << sizeof(Transposition) << endl;
-    cout << "Node: " << sizeof(Node) << endl;
-    cout << "Moves: " << sizeof(Moves) << endl;
-    cout << endl;
-
-    cout << "Compiled with options:";
-#ifdef NMP
-    cout << " NMP";
-#endif
-#ifdef TT
-    cout << " TT";
-#endif
-    cout << endl << endl;
-    */
-
-    string default_fen = 
-	"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
     // Parse commands from CLI
+    string fen(DEFAULT_FEN);
     string cmd = prompt();
     while (cmd != "quit" && cmd != "exit") {
 	if (cmd == "xboard") { // Xboard protocol mode
@@ -77,14 +52,13 @@ int main() {
 	else if (cmd == "version") {
 	    cout << VERSION << endl;
 	}
-	else if (cmd == "setboard") {
-	    // Get FEN
-	    getline(cin, default_fen);
-	    default_fen.erase(0, 1); // Remove the first whitespace
+	else if (cmd == "setboard") { // Get FEN
+	    getline(cin, fen);
+	    fen.erase(0, 1); // Remove the first whitespace
 	}
 	else if (cmd == "perft") {
 	    Game game;
-	    game.init(default_fen);
+	    game.init(fen);
 	    for (int i = 1; ; ++i) {
 		clock_t start = clock();
 		unsigned int perft_result = game.perft(i);
@@ -99,18 +73,18 @@ int main() {
 	    cin >> depth;
 	    cout << endl;
 	    Game game;
-	    game.init(default_fen);
+	    game.init(fen);
 	    Color c = game.current_node().get_turn_color();
-	    int nodes_count = 0;
-	    int moves_count = 0;
+	    unsigned int nodes_count = 0;
+	    unsigned int moves_count = 0;
 	    Moves moves(game.board, game.pieces, game.current_node());    
 	    Move move;
 	    while (!(move = moves.next()).is_null()) {
 	    	game.make_move(move);
 		if (!game.is_check(c)) {
-		    int cnt = game.perft(depth - 1);
+		    unsigned int cnt = game.perft(depth - 1);
 		    nodes_count += cnt;
-		    moves_count++;
+		    ++moves_count;
 		    cout << move << " " << cnt << endl;
 		}
 		game.undo_move(move);
@@ -119,15 +93,14 @@ int main() {
 	    cout << "Moves: " << moves_count << endl;
 	    cout << "Nodes: " << nodes_count << endl;
 	}
-	else if (cmd == "testsuite") {
-	    // Get EPD test suite
+	else if (cmd == "testsuite") { // Load EPD test suite
 	    string filename;
 	    cin >> filename;
 	    ifstream epdfile;
 	    epdfile.open(filename);
 	    if (!epdfile.is_open()) {
-		cout << "Cannot open '" << filename;
-		cout << "': No such file or directory" << endl;
+		cerr << "Cannot open '" << filename;
+		cerr << "': No such file or directory" << endl;
 	    }
 
 	    // Get time per move (optional)
@@ -148,18 +121,19 @@ int main() {
 	    proto.set_time(1, time);
 	    
 	    // Read positions in file
-	    int res = 0;
-	    int i = 0;
+	    unsigned int res = 0;
+	    unsigned int i = 0;
 	    while (epdfile.good()) {
 		proto.new_game();
 		string line;
 		getline(epdfile, line);
+		// TODO: add am (avoid move)
 		size_t fensep = line.find(" bm ");
 		size_t bmsep = line.find(";");
 		if (fensep == string::npos || bmsep == string::npos) continue;
 		
 		// Load position in game
-		string fen = line.substr(0, fensep);
+		fen = line.substr(0, fensep);
 		cout << "Loading position #" << i + 1 << " '" << fen << "' ";
 		proto.set_board(fen);
 		
@@ -189,10 +163,10 @@ int main() {
 		++i;
 	    }
 	    cout << "Result: " << res << "/" << i << endl;
-
 	    epdfile.close();
 	}
 	cmd = prompt();
     }	
     return 0;
 }
+

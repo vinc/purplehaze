@@ -21,7 +21,6 @@
 #include <sstream>
 #include <iomanip>
 
-
 #include "game.h"
 #include "eval.h"
 #include "hashtable.h"
@@ -133,12 +132,9 @@ static const int LAZY_EVAL_MARGIN = PIECE_VALUE[ROOK];
 
 int Game::eval(int alpha, int beta) {
     // Material evaluation
-    //Color c = current_node().get_turn_color();
-    //cout << "Eval(" << (c == WHITE ? "White" : "Black") << "): ";
     int score = material_eval();
-    //cout << "material: " << score;
-    //cout << "Material eval: " << score << endl;
 
+    // TODO Draws should be catched here
     /*if (score == 0) return 0; // Draw
     else*/ if (score > PIECE_VALUE[KING]) return INF; // Win
     else if (score < -PIECE_VALUE[KING]) return -INF; // Loss
@@ -149,7 +145,6 @@ int Game::eval(int alpha, int beta) {
 
     // TODO Positionnal evaluation
     score += position_eval();
-    //cout << ", position:" << score << endl;
 
     // TODO Mobility evaluation
     //score += mobility_eval();
@@ -165,13 +160,9 @@ int Game::material_eval() {
     // Lookup in hash table
     bool is_empty = true;
     int hash_score = material_table.lookup(pos.material_hash(), is_empty);
-    //cout << "Material_Table(" << hex << pos.material_hash() << "): ";
     if (!is_empty) {
 	c = pos.get_turn_color();
-	//cout << "hit " << dec << hash_score << endl;
-	//return (c == WHITE ? hash_score : -hash_score);
     }
-    //else cout << "miss" << endl;
     
     int material_score[2] = { 0 };
     int material_bonus[2] = { 0 };
@@ -181,9 +172,10 @@ int Game::material_eval() {
 	int nb_minors = 0;
 	for (PieceType t = PAWN; t <= KING; t = PieceType(t + 1)) {
 	    int n = pieces.get_nb_pieces(c, t);
-	    // Basic values
+	    // Pieces' standard alues
 	    material_score[c] += n * PIECE_VALUE[t]; 
-	    // Bonus values
+	    
+	    // Bonus values depending on material imbalance
 	    int adj;
 	    switch (t) {
 		case PAWN:
@@ -242,18 +234,11 @@ int Game::material_eval() {
 	    }
 	}
     }
-    
-    /*
-    cout << " mat(w): " << material_score[WHITE]; 
-    cout << " mat(b): " << material_score[BLACK]; 
-    cout << " bon(w): " << material_bonus[WHITE]; 
-    cout << " bon(b): " << material_bonus[BLACK]; 
-    */
 
     // Insufficiant material
     for (int i = 0; i < 2; ++i) {
 	c = Color(i);
-	// FIDE rules for drawn
+	// FIDE rules for draw
 	const int K = PIECE_VALUE[KING];
 	const int P = PIECE_VALUE[PAWN];
 	const int N = PIECE_VALUE[KNIGHT];
@@ -279,12 +264,6 @@ int Game::material_eval() {
     score += material_bonus[c] - material_bonus[Color(!c)];
 
     return_material_score:
-	/*
-	if (hash_score != score) {
-	    cout << "Material_Table(" << hex << pos.material_hash() << "): ";
-	    cout << "replace " << dec << hash_score << " by " << score << endl;
-	}
-	*/
 	hash_score = (c == WHITE ? score : -score);
 	material_table.save(pos.material_hash(), hash_score);
 	return score;
@@ -306,7 +285,6 @@ int castling_score(const Node& pos, Color c) {
 }
 
 int Game::position_eval() {
-    int score;
     int phase = 0;
     int position_score[2][2] = { { 0 } };
     int pawns_files[2][8] = { { 0 } };
@@ -350,9 +328,6 @@ int Game::position_eval() {
 
     }
     c = pos.get_turn_color();
-    //cout << " (" << (c == WHITE ? "White" : "Black") << ")";
-    //cout << " w:" << position_score[OPENING][WHITE];
-    //cout << " b:" << position_score[OPENING][BLACK];
     int opening, ending; // Score based on opening and ending rules
     opening = position_score[OPENING][c] - position_score[OPENING][Color(!c)];
     ending = position_score[ENDING][c] - position_score[ENDING][Color(!c)];
@@ -360,8 +335,6 @@ int Game::position_eval() {
     // Tapered Eval (idea from Fruit 2.1)
     int max = PHASE_MAX;
     phase = (phase > max ? max : (phase < 0 ? 0 : phase));
-    score = (opening * phase + ending * (max - phase)) / max;
-    //cout << " o: " << opening << " s: " << score;
-    return score;
+    return (opening * phase + ending * (max - phase)) / max;
 }
 

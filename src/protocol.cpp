@@ -22,10 +22,7 @@
 
 using namespace std;
 
-// Protocol::Protocol() {}
-
 void Protocol::new_game(){
-    //game = Game();
     game.tt.clear();
     game.clear_killers();
 }
@@ -35,7 +32,6 @@ bool Protocol::set_board(string fen){
     
     // Load fen
     game.init(fen);
-    //cout << game.board << endl;
 
     return true;
 }
@@ -108,7 +104,6 @@ bool Protocol::play_move(string move) {
     Move m = parse_move(move);
     
     // Test legality
-    if (m.is_null()) return false;
     if (!game.is_legal(m)) return false;
     
     // Play move
@@ -143,7 +138,6 @@ string Protocol::search_move(bool use_san_notation) {
     else {
 	if (use_san_notation) {
 	    string res = game.output_move(m);
-	    // TODO Add check detection in Game::outputmove(Move m);
 	    play_move(m.to_string());
 	    if (game.is_check(game.current_node().get_turn_color())) {
 		res += "+";

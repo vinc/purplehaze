@@ -48,10 +48,15 @@ class Node
 	    en_passant(OUT),
 	    halfmove_counter(0),
 	    null_move_right(true),
-	    side_to_move(WHITE) {} 
+	    side_to_move(WHITE) 
+	    {} 
 	
-	Hash& hash() { return zobrist_hash; };
-	Hash& material_hash() { return material_zobrist_hash; };
+	Hash& hash() { 
+	    return zobrist_hash;
+	};
+	Hash& material_hash() { 
+	    return material_zobrist_hash; 
+	};
 	Color get_turn_color() const {
 	    return side_to_move;
 	};
@@ -91,15 +96,6 @@ class Node
 	void set_capture(Piece p) {
 	    capture = p;
 	};
-	/*
-	Move get_last_move() const {
-	    return last_move;
-	};
-	void set_last_move(Move m) {
-	    last_move = m;
-	};
-	*/
-
 	bool can_castle(Color c, PieceType t) const {
 	    return castle_rights[2 * c + t - QUEEN];
 	};

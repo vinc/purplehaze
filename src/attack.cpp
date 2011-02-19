@@ -19,6 +19,9 @@
 
 #include "game.h"
 
+/*
+ * Return true if the square s is attacked by one of the c color's pieces.
+ */
 bool Board::is_attacked_by(Color c, Square s, const Pieces& pieces) const {
     for (PieceType t = KNIGHT; t <= KING; t = PieceType(t + 1)) {
 	int n = pieces.get_nb_pieces(c, t);
@@ -35,7 +38,7 @@ bool Board::is_attacked_by(Color c, Square s, const Pieces& pieces) const {
 	}
     }
     
-    // Pawns
+    // Specific code for pawns
     Direction d = (c == WHITE ? DOWN : UP);
     Direction dirs[2] = { Direction(d + LEFT), Direction(d + RIGHT) };
     for (int i = 0; i < 2; ++i) {
@@ -49,6 +52,11 @@ bool Board::is_attacked_by(Color c, Square s, const Pieces& pieces) const {
     return false;
 }
 
+/*
+ * Return true if a piece p can do a capture or a quiet move from square from
+ * to square to on the board. This method does not say if the move is a legal
+ * one.
+ */
 bool Board::can_go(Piece p, Square from, Square to) const {
     PieceType t = p.get_type();
     Color c = p.get_color();
@@ -62,11 +70,11 @@ bool Board::can_go(Piece p, Square from, Square to) const {
     switch (t) {
 	case PAWN:
 	    push_dir = (c == WHITE ? UP : DOWN);
-	    if (!is_empty(to)) {
+	    if (!is_empty(to)) { // Capture
 		if (to == Square(from + push_dir + LEFT)) return true;
 		if (to == Square(from + push_dir + RIGHT)) return true;
 	    }
-	    else {
+	    else { // Pawn push (and double push)
 		if (to == Square(from + push_dir)) return true;
 		if (to == Square(from + 2 * push_dir) &&
 		    is_empty(Square(from + push_dir)) &&
@@ -77,7 +85,7 @@ bool Board::can_go(Piece p, Square from, Square to) const {
 	    if (!can_attack(t, from, to)) return false;
 	    if (t == KNIGHT || t == KING) return true;
 	    s = Square(from + d);
-	    while (s != to && is_empty(s)) {
+	    while (s != to && is_empty(s)) { // Search for a blocker
 		s = Square(s + d);
 		assert(!is_out(s));
 	    }

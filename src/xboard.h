@@ -26,7 +26,7 @@
 
 static const int XBOARD_NB_FEATURES = 3;
 static const string XBOARD_FEATURES[XBOARD_NB_FEATURES][2] = {
-    { "myname",	"Purple Haze 2.0.0" },
+    { "myname",	"Purple Haze " + string(VERSION) },
     { "setboard",		"1" },
     { "done",			"1" },
 };

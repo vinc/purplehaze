@@ -44,16 +44,23 @@ class Time
 	    allocated_time(allowed_time / allowed_moves), 
 	    remaining_time(allowed_time / allowed_moves),
 	    polling_interval(500000), last_poll_nodes_count(0),
-	    abort_search(false) {} 
+	    abort_search(false) 
+	    {} 
+
 	Time(int moves, int time) : 
 	    allowed_moves(moves), allowed_time(time), 
 	    allocated_time(allowed_time / allowed_moves), 
 	    remaining_time(allowed_time / allowed_moves),
 	    polling_interval(500000), last_poll_nodes_count(0),
-	    abort_search(false) {} 
+	    abort_search(false)
+	    {} 
 
-	void set_polling_interval(int nodes) { polling_interval = nodes; };
-	void set_remaining_time(int time) { remaining_time = time; };
+	void set_polling_interval(int nodes) { 
+	    polling_interval = nodes; 
+	};
+	void set_remaining_time(int time) { 
+	    remaining_time = time; 
+	};
 	int get_allocated_time() const {
 	    return allocated_time;
 	};

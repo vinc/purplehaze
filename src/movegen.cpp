@@ -17,8 +17,6 @@
 
 #include <assert.h>
 #include <iostream>
-#include <list>
-#include <vector>
 
 #include "game.h"
 
@@ -152,8 +150,6 @@ void Game::make_move(Move m) {
     ++nodes_count;
     new_node(); // From now on, current_node() is refering to the new node
 
-    //current_node().set_last_move(m); // Used in Search for Null Move
-  
     // Update halfmove counter
     if (t == PAWN || m.is_capture()) current_node().reset_halfmove();
     else current_node().inc_halfmove();
@@ -301,6 +297,9 @@ void Game::undo_move(Move m) {
     }
 }
 
+/*
+ * Check the pseudo legality of a move m
+ */
 bool Game::is_legal(Move m) {
     // Null-move is obviously wrong
     if (m.is_null()) return false;
@@ -356,6 +355,7 @@ bool Game::is_legal(Move m) {
     }
     else if (m.is_castle()) {
 	Square rook = Square(H1 + A8 * c);
+	Color oc = Color(!c); // Opponent's color
 	switch (m.get_castle_side()){
 	    case KING:
 		rook = Square(H1 + A8 * c);
@@ -363,9 +363,10 @@ bool Game::is_legal(Move m) {
 		    board.is_empty(to) &&
 		    board.get_piece(rook).get_type() == ROOK &&
 		    board.get_piece(rook).get_color() == c &&
-		    !board.is_attacked_by(Color(!c), from, pieces) &&
-		    !board.is_attacked_by(Color(!c), Square((F1 + A8 * c)), pieces) &&
-		    !board.is_attacked_by(Color(!c), to, pieces))) {
+		    !board.is_attacked_by(oc, from, pieces) &&
+		    !board.is_attacked_by(oc, Square((F1 + A8 * c)), pieces) &&
+		    !board.is_attacked_by(oc, to, pieces))
+		    ) {
 		    return false;
 		}
 		break;
@@ -376,14 +377,14 @@ bool Game::is_legal(Move m) {
 		    board.is_empty(to) &&
 		    board.get_piece(rook).get_type() == ROOK &&
 		    board.get_piece(rook).get_color() == c &&
-		    !board.is_attacked_by(Color(!c), from, pieces) &&
-		    !board.is_attacked_by(Color(!c), Square((D1 + A8 * c)), pieces) &&
-		    !board.is_attacked_by(Color(!c), to, pieces))) {
+		    !board.is_attacked_by(oc, from, pieces) &&
+		    !board.is_attacked_by(oc, Square((D1 + A8 * c)), pieces) &&
+		    !board.is_attacked_by(oc, to, pieces))
+		    ) {
 		    return false;
 		}
 		break;
-	    default:
-		return false;
+	    default: return false;
 	}
 	return true;
     }
@@ -391,9 +392,6 @@ bool Game::is_legal(Move m) {
 	if (t != PAWN) return false;
 	if (!board.is_pawn_begin(c, from)) return false; // Done by can_go()
     }
-    else {
-	if (!board.is_empty(to)) return false;
-    }
-
+    else if (!board.is_empty(to)) return false;
     return true;
 }

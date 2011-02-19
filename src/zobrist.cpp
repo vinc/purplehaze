@@ -18,6 +18,7 @@
 #include "zobrist.h"
 
 Zobrist::Zobrist() {
+    // TODO: find a good seed
     generator.seed(5489u);
     
     side_to_move = gen_hash();
@@ -41,3 +42,4 @@ Hash Zobrist::gen_hash() {
     Hash h = generator() ^ ((Hash) generator() << 32);
     return h;
 }
+

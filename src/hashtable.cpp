@@ -17,12 +17,6 @@
 
 #include "hashtable.h"
 
-/*
-HashTable::HashTable() {
-    
-}
-*/
-
 template <class T>
 T HashTable<T>::lookup(Hash h, bool& is_empty) {
     Entry entry = entries[h & (SIZE - 1)];

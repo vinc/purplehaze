@@ -18,10 +18,12 @@
 #ifndef ZOBRIST_H
 #define ZOBRIST_H
 
+#include <iostream>
 #include <boost/random.hpp>
 
-#include "move.h"
-#include "board.h"
+#include "common.h"
+
+using namespace std;
 
 typedef uint64_t Hash;
 
@@ -31,7 +33,6 @@ class Zobrist
 
 	private:
 		Hash gen_hash();
-		//Hash zobrist_key;
 		Hash pieces_positions[2][7][BOARD_SIZE];
 		Hash side_to_move;
 		Hash castle_rights[4];
@@ -39,15 +40,6 @@ class Zobrist
 		boost::mt19937 generator;
 	public:
 		Zobrist();
-
-		//void set_piece(Color c, PieceType t, Square s) {
-		//    zobrist_key ^= piece_square[c][t][s];
-		//};
-		//void add_move(Board& b, Move m);
-		//void sub_move(Board& b, Move m) { add_move(b, m); };
-		//Hash get_key() const { return zobrist_key };
-		//void set_key(Hash h) { zobrist_key = h };
-
 		void change_side(Hash& h) {
 		    h ^= side_to_move;
 		};

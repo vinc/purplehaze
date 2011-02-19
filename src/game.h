@@ -41,7 +41,6 @@ class Game
     public:
 	bool output_thinking;
 	unsigned int nodes_count; // Used in search
-	//list<Move> moves_history; // Temporary
 	Pieces pieces;
 	Board board;
 	Tree tree;
@@ -61,13 +60,10 @@ class Game
 	void init(string fen);
 
 	bool is_check(Color c) const {
-	    return board.is_attacked_by(Color(!c), 
-					pieces.get_position(c, KING, 0),
-					pieces);
+	    Square s = pieces.get_position(c, KING, 0);
+	    return board.is_attacked_by(Color(!c), s, pieces);
 	}
 
-
-	//Moves movegen(bool captures_only = false);
 	void make_move(Move m);
 	void undo_move(Move m);
 	bool is_legal(Move m);
@@ -75,8 +71,6 @@ class Game
 	// Search
 	unsigned int perft(int depth);
 	int q_search(int alpha, int beta, int depth, int ply);
-	//int alphabeta_search(int alpha, int beta, int depth);
-	
 	template<NodeType node_type>
 	int pv_search(int alpha, int beta, int depth, int ply);
 	Move root(int max_depth);

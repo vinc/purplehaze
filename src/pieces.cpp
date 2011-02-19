@@ -18,9 +18,11 @@
 #include "pieces.h"
 
 Pieces::Pieces() {
-    /* Unused indexes during the game should not be expected to remain 
-     * equal to OUT, but rather to the value of the previous piece 
-     * occuping this index.
+    /* 
+     * Unused array entries should not be expected to remain equal to OUT
+     * during the game, but rather to the position of the previous piece 
+     * pointing to the entry. But currently we use an extra instruction to
+     * set it to OUT whenever a piece is removed.
      *
      * Great care should be taken when updating the indexes counters 
      * to remain within 0 and 9 because no verifications are done in

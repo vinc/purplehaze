@@ -17,7 +17,6 @@
 
 #include <assert.h>
 #include <iostream>
-#include <list>
 
 #include "game.h"
 
@@ -25,15 +24,17 @@ using namespace std;
 
 #define FEN_DEBUG false
 
-/** Initialise the game according to a FEN record.
-  * For example the starting position in chess is :
-  * rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
-  */
+/*
+ * Initialise the game according to a FEN record.
+ * For example the starting position in chess is:
+ * rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+ */
 void Game::init(string fen) {
+    // TODO: use istringstream in place of string in this code
+
     assert(fen.length() > 0);
     string::const_iterator it;
 
-    //cout << "Cleaning the board..." << endl;
     board = Board();
     pieces = Pieces();
     tree = Tree();
@@ -42,26 +43,20 @@ void Game::init(string fen) {
     if (FEN_DEBUG) cout << "FEN: parsing: " << fen << endl;
     // Parse the FEN for discovering pieces
     for (it = fen.begin(); it != fen.end(); ++it) {
-	// Space separator
-	if (*it == ' ') {
-	    // We have found all the pieces we have to found
-	    break;
-	}
-	// Slash separator
-	else if (*it == '/') {
-	    // This is the begining of a new rank
-	    s = Square(s - 0x18);
-	}
+	// End of the FEN part concerning the board
+	if (*it == ' ') break;
+	
+	// New rank
+	if (*it == '/') s = Square(s + DOWN + 8 * LEFT);
 
 	// Empty squares
 	else if (int(*it) >= '1' && int(*it) <= '8') {
-	    // Find the next square
-	    s = Square(s + *it - '1' + 1);
+	    s = Square(s + *it - '1' + 1); // Next square
 	}
 
 	// Non empty square
 	else {
-	    // define a new piece
+	    // Add a new piece
 	    Color c = WHITE;
 	    PieceType t = EMPTY;
 	    switch (*it) {
@@ -79,23 +74,18 @@ void Game::init(string fen) {
 		case 'K': c = WHITE, t = KING; break;
 		default: assert(false);
 	    }
-
 	    add_piece(c, t, s);
-	    
-	    // Update the board's Zobrist key
-	    //board.zobrist.set_piece(c, pt, s);
 
-	    // Find the next square
-	    s = Square(s + 1);
+	    s = Square(s + RIGHT); // Next square
 	}
     }
+
     assert(*it == ' ');
     ++it; // Skip the space separator
 
     // Set the side to move
     switch(*it) {
 	case 'w':
-	    //current_node().change_side();
 	    if (FEN_DEBUG) cout << "FEN: white to play" << endl;
 	    break;
 	case 'b':

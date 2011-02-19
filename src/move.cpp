@@ -23,12 +23,6 @@
 
 using namespace std;
 
-/*
-Move::Move(Square o, Square d, MoveType t) {
-
-}
-*/
-
 PieceType Move::get_promotion_type() const {
     switch (get_type()) {
 	case KNIGHT_PROMOTION:
@@ -47,6 +41,7 @@ PieceType Move::get_promotion_type() const {
 	    return EMPTY;
     }
 }
+
 PieceType Move::get_castle_side() const {
     switch (get_type()) {
 	case KING_CASTLE: return KING;
@@ -71,3 +66,4 @@ string Move::to_string() const {
     }
     return res;
 }
+

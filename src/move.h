@@ -50,9 +50,7 @@ class Move
 	static const int OR_SHIFT = 10;
 	static const int OF_SHIFT = 13;
 	
-	//bitset<16> code;
 	short code;
-	//Move(bitset<16> c) : code(c) {}
 	
 	bool is_set(int i) const { return code & ( 1 << i); };
     
@@ -69,11 +67,9 @@ class Move
 	friend class ExtendedMove;
 	
 	File get_orig_file() const {
-	    //return File((code >> 13).to_ulong());
 	    return File((code >> OF_SHIFT) & OF_MASK);
 	};
 	Rank get_orig_rank() const {
-	    //return Rank(((code << 3) >> 13).to_ulong());
 	    return Rank((code >> OR_SHIFT) & OR_MASK);
 	};
 	File get_dest_file() const {
@@ -83,32 +79,22 @@ class Move
 	    return Rank((code >> DR_SHIFT) & DR_MASK);
 	};
 	Square get_orig() const {
-	    //return Square(16 * ((code << 3) >> 13).to_ulong()
-	    //		     + (code >> 13).to_ulong());
 	    return Square(16 * get_orig_rank() + get_orig_file());
 	};
 	Square get_dest() const {
-	    //return Square(16 * ((code << 9) >> 13).to_ulong()
-	    //		     + ((code << 6) >> 13).to_ulong());
 	    return Square(16 * get_dest_rank() + get_dest_file());
 	};
 	MoveType get_type() const {
-	    //return MoveType(((code << 12) >> 12).to_ulong());
 	    return MoveType((code >> MT_SHIFT) & MT_MASK);
 	};
 
-
-	//bool is_capture() { return code[2]; }; // w/o null move
 	bool is_capture() const {
-	    //return code[2] && (!is_null());
 	    return is_set(2) && !is_null();
 	}; 
 	bool is_castle() const {
-	    //return !code[3] && !code[2] && code[1];
 	    return !is_set(3) && !is_set(2) && is_set(1);
 	};
 	bool is_promotion() const {
-	    //return code[3];
 	    return is_set(3);
 	};
 	bool is_double_pawn_push() const {
@@ -125,7 +111,6 @@ class Move
 
 	// Static member function for sorting move in natural order
 	static bool numeric_comp(Move a, Move b) {
-	    //return (a.code.to_ulong() < b.code.to_ulong());
 	    return (a.code < b.code);
 	};
 	
@@ -141,9 +126,6 @@ class Move
 class ExtendedMove : public Move
 {
     private:
-	//bitset<16> code;
-	//bitset<16> extra;
-	//ExtendedMove(bitset<16> c, bitset<16> e) : code(c), extra(e) {}
 	char score;
     public:
 	ExtendedMove() : score(0) { code = NULL_MOVE; }
@@ -153,7 +135,6 @@ class ExtendedMove : public Move
 	bool operator<(const ExtendedMove& other) const {
 	    return this->score > other.score; // FIXME replace '<' by '>'
 	}
-
 };
 
 #endif /* !MOVE_H */
