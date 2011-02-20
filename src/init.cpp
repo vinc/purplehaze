@@ -111,7 +111,7 @@ void Game::init(string fen) {
     iss >> halfmove;
     current_position().set_halfmove(halfmove);
     
-    int fullmove = 0;
+    int fullmove = 1;
     iss >> fullmove;
     int ply = 2 * (fullmove - 1);
     if (current_position().get_turn_color() == BLACK) ++ply;
