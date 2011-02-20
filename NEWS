@@ -1,0 +1,34 @@
+20 Feb 2011 v2.0.1 - First public release
+    * New evaluation function
+	* Hash table for material
+	* Lazy evaluation
+	* Opening and ending piece square tables
+	* Tapered evaluation
+    * Improvements in search
+	* Lazy move generation
+	* Internal iterative deepening
+    * Improvements in time management
+    * Lot of bug fixes
+
+07 Feb 2011 v2.0.0 - First private release
+    * Principal variation search
+	* Check extension
+	* Adaptive null move pruning
+	* Extended futility pruning
+	* Late move reduction
+    * Quiescence search
+	* Delta pruning
+    * Move ordering
+	* Best move from transpositions table
+	* Most valuable victim / least valuable aggressor
+	* Killer moves
+    * Time management
+    * Xboard protocol
+    * Test tools
+	* Perft
+	* Divide
+	* EPD test suite
+
+21 Jan 2011 v2.0.x - Restarting from scratch
+
+15 Jan 2010 v1.0.7 - Last version from 1.x branch

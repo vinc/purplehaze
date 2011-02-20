@@ -1,8 +1,8 @@
-For compiling PurpleHaze:
+For compiling Purple Haze:
 
     make clean
     make
 
-For using PurpleHaze:
+For using Purple Haze:
 
     ./purplehaze
