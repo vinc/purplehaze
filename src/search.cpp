@@ -95,12 +95,13 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
     Position pos = current_position();
     int best_score = -INF;
     Move best_move;
+    bool is_pv = (node_type == PV);
 
 #ifdef TT
     // Lookup in Transposition Table
     Transposition trans = tt.lookup(pos.hash());
     if (!trans.is_empty()) {
-	if (depth <= trans.get_depth()) {
+	if (/*!is_pv &&*/ depth <= trans.get_depth()) {
 	    //int tr_score = value_from_trans(trans.get_value(), ply);
 	    int tr_score = trans.get_value();
 	    switch (trans.get_bound()) {
@@ -119,7 +120,6 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
     Color player = pos.get_turn_color();
     bool is_in_check = is_check(player);
     bool is_null_move = !pos.get_null_move_right(); // No more than one
-    bool is_pv = (node_type == PV);
     
     // Check Extension
     if (is_in_check) ++depth;
@@ -296,7 +296,7 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
     // Store the search to Transposition Table
     transposition:
 	//assert(!best_move.is_null());
-	if (depth >= trans.get_depth() && !is_null_move) {
+	if (depth >= trans.get_depth() /*&& !is_null_move*/) {
 	    //int value = value_to_trans(best_score, ply);
 	    int value = best_score;
 	    Bound bound = (best_score >= beta ? LOWER :

@@ -32,7 +32,7 @@ class Position
     private:
 	Hash zobrist_hash;
 	Hash material_zobrist_hash;
-	short ply;
+	unsigned short ply;
 	//Move last_move;
 	Piece capture;
 	bitset<4> castle_rights;
@@ -63,8 +63,11 @@ class Position
 	void change_side() {
 	    side_to_move = Color(!side_to_move);
 	};
-	short get_ply() const {
+	unsigned short get_ply() const {
 	    return ply;
+	};
+	void set_ply(unsigned short i) {
+	    ply = i;
 	};
 	void inc_ply() {
 	    ++ply;

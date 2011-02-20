@@ -17,12 +17,14 @@
 
 #include <assert.h>
 #include <iostream>
+#include <sstream>
+#include <string>
 
 #include "game.h"
 
 using namespace std;
 
-#define FEN_DEBUG false
+static const bool FEN_DEBUG = true;
 
 /*
  * Initialise the game according to a FEN record.
@@ -30,36 +32,29 @@ using namespace std;
  * rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
  */
 void Game::init(string fen) {
-    // TODO: use istringstream in place of string in this code
-
     assert(fen.length() > 0);
     string::const_iterator it;
+    istringstream iss(fen);
 
+    // Initialize objects
     board = Board();
     pieces = Pieces();
     tree = Tree();
 
+    // Parse board positions
     Square s = A8;
-    if (FEN_DEBUG) cout << "FEN: parsing: " << fen << endl;
-    // Parse the FEN for discovering pieces
-    for (it = fen.begin(); it != fen.end(); ++it) {
-	// End of the FEN part concerning the board
-	if (*it == ' ') break;
-	
-	// New rank
-	if (*it == '/') s = Square(s + DOWN + 8 * LEFT);
-
-	// Empty squares
-	else if (int(*it) >= '1' && int(*it) <= '8') {
-	    s = Square(s + *it - '1' + 1); // Next square
+    string positions;
+    iss >> positions;
+    for (it = positions.begin(); it != positions.end(); ++it) {
+	char sq = *it;
+	if (sq == '/') s = Square(s + DOWN + 8 * LEFT); // New rank
+	else if (int(sq) >= '1' && int(sq) <= '8') { // Empty squares
+	    s = Square(s + sq - '1' + 1); // Next square
 	}
-
-	// Non empty square
-	else {
-	    // Add a new piece
+	else { // Non empty square
 	    Color c = WHITE;
 	    PieceType t = EMPTY;
-	    switch (*it) {
+	    switch (sq) {
 		case 'p': c = BLACK, t = PAWN; break;
 		case 'n': c = BLACK, t = KNIGHT; break;
 		case 'b': c = BLACK, t = BISHOP; break;
@@ -75,34 +70,24 @@ void Game::init(string fen) {
 		default: assert(false);
 	    }
 	    add_piece(c, t, s);
-
 	    s = Square(s + RIGHT); // Next square
 	}
     }
-
-    assert(*it == ' ');
-    ++it; // Skip the space separator
+    assert(s == Square(H1 + RIGHT));
 
     // Set the side to move
-    switch(*it) {
-	case 'w':
-	    if (FEN_DEBUG) cout << "FEN: white to play" << endl;
-	    break;
-	case 'b':
-	    current_position().change_side();
-	    if (FEN_DEBUG) cout << "FEN: black to play" << endl;
-	    break;
-	default:
-	    assert(!"FEN: could not found the site to move!");
-	    break;
+    char side;
+    iss >> side;
+    assert(current_position().get_turn_color() == WHITE);
+    switch(side) {
+	case 'w': break;
+	case 'b': current_position().change_side(); break;
+	default: assert(!"FEN: no side to move!"); break;
     }
-    ++it; // Pass side to move
 
-    assert(*it == ' ');
-    ++it; // Skip the space separator
-
-    // Parse the FEN for discovering castling abilities
-    for (; *it != ' '; ++it) {
+    string castling;
+    iss >> castling;
+    for (it = castling.begin(); it != castling.end(); ++it) {
 	switch(*it) {
 	    case '-': break;
 	    case 'K': current_position().set_castle_right(WHITE, KING); break;
@@ -111,43 +96,24 @@ void Game::init(string fen) {
 	    case 'q': current_position().set_castle_right(BLACK, QUEEN); break;
 	}
     }
-    assert(*it == ' ');
-    ++it; // Skip the space separator
-
-    // Set the en passant square if any
-    if (*it != '-') {
-	char file = *it;
-	++it;
-	char rank = *it;
-	s = Square((rank - '1') * 16 + file - 'a');
-	if (board.is_out(s)) it = it - 3; // Bugged FEN
-	else {
-	    current_position().set_en_passant(s);
-	    if (FEN_DEBUG) {
-		cout << "FEN: en passant square fixed to ";
-		cout << char(file) << char(rank) << endl;
-	    }
-	}
-    }
-    ++it;
-    if (it == fen.end()) return;
-    assert(*it == ' ');
-    ++it; // Skip the space separator
     
-    // Parse the FEN for setting the 50 moves counter
-    int halfmove = 0;
-    for (; it != fen.end(); ++it) {
-	// Space separator
-	if (*it == ' ') {
-	    current_position().set_halfmove(halfmove);
-	    if (FEN_DEBUG) {
-		cout << "FEN: halfmove counter fixed to ";
-		cout << halfmove << endl;
-	    }
-	    break;
-	}
-	else {
-	    halfmove = halfmove * 10 + *it - '0';
-	}
+    string ep;
+    iss >> ep;
+    if (ep != "-") {
+	char file = ep.at(0);
+	char rank = ep.at(1);
+	s = Square((rank - '1') * 16 + file - 'a');
+	assert(!board.is_out(s));    
+	current_position().set_en_passant(s);
     }
+
+    int halfmove = 0;
+    iss >> halfmove;
+    current_position().set_halfmove(halfmove);
+    
+    int fullmove = 0;
+    iss >> fullmove;
+    int ply = 2 * (fullmove - 1);
+    if (current_position().get_turn_color() == BLACK) ++ply;
+    current_position().set_ply(ply);
 }
