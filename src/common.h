@@ -88,7 +88,11 @@ enum Direction {
     UP_UP_LEFT       = UP + UP_LEFT
 };
 
-enum Color : bool { 
+#ifdef __INTEL_COMPILER
+enum Color : unsigned char {
+#else
+enum Color : bool {
+#endif
     WHITE,
     BLACK
 };

@@ -97,7 +97,7 @@ int main() {
             string filename;
             cin >> filename;
             ifstream epdfile;
-            epdfile.open(filename);
+            epdfile.open(filename.c_str());
             if (!epdfile.is_open()) {
                 cerr << "Cannot open '" << filename;
                 cerr << "': No such file or directory" << endl;
