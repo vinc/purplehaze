@@ -52,7 +52,7 @@ class Moves
         bool use_lazy_generation;
 
     public:
-        static Score mvv_lva_scores[KING + 1][KING + 1];
+        static Score mvv_lva_scores[int(KING) + 1][int(KING) + 1];
 
         Moves(Board& b, Pieces& ps, Position& cn, bool lg = true) : 
             current_position(cn), board(b), pieces(ps),

@@ -51,8 +51,8 @@ class Piece
 
         Piece(Color c, PieceType t, int i = 0) {
             code = ((i /*& I_MASK*/) << I_SHIFT) | 
-                   ((t /*& T_MASK*/) << T_SHIFT) |
-                   ((c /*& C_MASK*/) << C_SHIFT);
+                   ((int(t) /*& T_MASK*/) << T_SHIFT) |
+                   ((int(c) /*& C_MASK*/) << C_SHIFT);
         }
         
         Color get_color() const { 
