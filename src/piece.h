@@ -29,49 +29,52 @@ class Piece
 {
     friend ostream& operator<<(ostream& out, const Piece piece);
     private:
-	    /*
-	     * A piece is coded using 8 bits:
-	     *     1 bit for the color
-	     *     3 bits for the type
-	     *     4 bits for the index in pieces[c][t][i]
-	     *
-	     *	   FIXME? No warning given if index is > 4 bits
-	     */
-	    static const int C_MASK = 0x1;
-	    static const int T_MASK = 0x7;
-	    static const int I_MASK = 0xF;
-	    static const int C_SHIFT = 0;
-	    static const int T_SHIFT = 1;
-	    static const int I_SHIFT = 4;
-	    
-	    unsigned char code;
+        /*
+         * A piece is coded using 8 bits:
+         *     1 bit for the color
+         *     3 bits for the type
+         *     4 bits for the index in pieces[c][t][i]
+         *
+         * FIXME? No warning given if index is > 4 bits
+         */
+        static const int C_MASK = 0x1;
+        static const int T_MASK = 0x7;
+        static const int I_MASK = 0xF;
+        static const int C_SHIFT = 0;
+        static const int T_SHIFT = 1;
+        static const int I_SHIFT = 4;
+
+        unsigned char code;
+
     public:
-	    Piece() : code(EMPTY) {}
-	    Piece(Color c, PieceType t, int i = 0) {
-		code = ((i /*& I_MASK*/) << I_SHIFT) | 
-		       ((t /*& T_MASK*/) << T_SHIFT) |
-		       ((c /*& C_MASK*/) << C_SHIFT);
-	    }
-	    Color get_color() const { 
-	        return Color((code >> C_SHIFT) & C_MASK); 
-	    };
-	    PieceType get_type() const { 
-	        return PieceType((code >> T_SHIFT) & T_MASK); 
-	    };
-	    int get_index() const { 
-	        return (code >> I_SHIFT) & I_MASK; 
-	    };
-	    void set_index(int i) { 
-		code &= I_MASK;
-		code |= (i << I_SHIFT);
-	    }
-	    bool operator==(const Piece& other) const {
-		return this->code == other.code;
-	    }
-	    bool operator!=(const Piece& other) const {
-		return !(*this == other);
-	    }
-	    string to_string() const;
+        Piece() : code(EMPTY) {}
+
+        Piece(Color c, PieceType t, int i = 0) {
+            code = ((i /*& I_MASK*/) << I_SHIFT) | 
+                   ((t /*& T_MASK*/) << T_SHIFT) |
+                   ((c /*& C_MASK*/) << C_SHIFT);
+        }
+        
+        Color get_color() const { 
+            return Color((code >> C_SHIFT) & C_MASK); 
+        };
+        PieceType get_type() const { 
+            return PieceType((code >> T_SHIFT) & T_MASK); 
+        };
+        int get_index() const { 
+            return (code >> I_SHIFT) & I_MASK; 
+        };
+        void set_index(int i) { 
+            code &= I_MASK;
+            code |= (i << I_SHIFT);
+        }
+        bool operator==(const Piece& other) const {
+            return this->code == other.code;
+        }
+        bool operator!=(const Piece& other) const {
+            return !(*this == other);
+        }
+        string to_string() const;
 };
 
 #endif /* !PIECE_H */

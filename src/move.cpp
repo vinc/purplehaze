@@ -25,28 +25,28 @@ using namespace std;
 
 PieceType Move::get_promotion_type() const {
     switch (get_type()) {
-	case KNIGHT_PROMOTION:
-	case KNIGHT_PROMOTION_CAPTURE:
-	    return KNIGHT;
-	case BISHOP_PROMOTION:
-	case BISHOP_PROMOTION_CAPTURE:
-	    return BISHOP;
-	case ROOK_PROMOTION:
-	case ROOK_PROMOTION_CAPTURE:
-	    return ROOK;
-	case QUEEN_PROMOTION:
-	case QUEEN_PROMOTION_CAPTURE:
-	    return QUEEN;
-	default:
-	    return EMPTY;
+        case KNIGHT_PROMOTION:
+        case KNIGHT_PROMOTION_CAPTURE:
+            return KNIGHT;
+        case BISHOP_PROMOTION:
+        case BISHOP_PROMOTION_CAPTURE:
+            return BISHOP;
+        case ROOK_PROMOTION:
+        case ROOK_PROMOTION_CAPTURE:
+            return ROOK;
+        case QUEEN_PROMOTION:
+        case QUEEN_PROMOTION_CAPTURE:
+            return QUEEN;
+        default:
+            return EMPTY;
     }
 }
 
 PieceType Move::get_castle_side() const {
     switch (get_type()) {
-	case KING_CASTLE: return KING;
-	case QUEEN_CASTLE: return QUEEN;
-	default: return EMPTY;
+        case KING_CASTLE: return KING;
+        case QUEEN_CASTLE: return QUEEN;
+        default: return EMPTY;
     }
 }
 
@@ -62,8 +62,7 @@ string Move::to_string() const {
     res += char('a' + get_dest_file());
     res += char('1' + get_dest_rank());
     if (is_promotion()) {
-	res += Piece(BLACK, get_promotion_type()).to_string(); // Lower case
+        res += Piece(BLACK, get_promotion_type()).to_string(); // Lower case
     }
     return res;
 }
-

@@ -44,129 +44,128 @@ int main() {
     string fen(DEFAULT_FEN);
     string cmd = prompt();
     while (cmd != "quit" && cmd != "exit") {
-	if (cmd == "xboard") { // Xboard protocol mode
-	    Xboard xboard;
-	    xboard.loop();
-	    return 0;
-	}
-	else if (cmd == "version") {
-	    cout << VERSION << endl;
-	}
-	else if (cmd == "setboard") { // Get FEN
-	    getline(cin, fen);
-	    fen.erase(0, 1); // Remove the first whitespace
-	}
-	else if (cmd == "perft") {
-	    Game game;
-	    game.init(fen);
-	    for (int i = 1; ; ++i) {
-		clock_t start = clock();
-		unsigned int perft_result = game.perft(i);
-		double perft_time = double(clock() - start) / CLOCKS_PER_SEC;
-		cout << "Perft(" << i << ") = " << perft_result;
-		cout << " (" << perft_time << " secs, ";
-		cout << perft_result / perft_time << " nps)" << endl;
-	    }
-	}
-	else if (cmd == "divide") {
-	    int depth = 0;
-	    cin >> depth;
-	    cout << endl;
-	    Game game;
-	    game.init(fen);
-	    Color c = game.current_position().get_turn_color();
-	    unsigned int nodes_count = 0;
-	    unsigned int moves_count = 0;
-	    Moves moves(game.board, game.pieces, game.current_position());    
-	    Move move;
-	    while (!(move = moves.next()).is_null()) {
-	    	game.make_move(move);
-		if (!game.is_check(c)) {
-		    unsigned int cnt = game.perft(depth - 1);
-		    nodes_count += cnt;
-		    ++moves_count;
-		    cout << move << " " << cnt << endl;
-		}
-		game.undo_move(move);
-	    }
-	    cout << endl;
-	    cout << "Moves: " << moves_count << endl;
-	    cout << "Positions: " << nodes_count << endl;
-	}
-	else if (cmd == "testsuite") { // Load EPD test suite
-	    string filename;
-	    cin >> filename;
-	    ifstream epdfile;
-	    epdfile.open(filename);
-	    if (!epdfile.is_open()) {
-		cerr << "Cannot open '" << filename;
-		cerr << "': No such file or directory" << endl;
-	    }
+        if (cmd == "xboard") { // Xboard protocol mode
+            Xboard xboard;
+            xboard.loop();
+            return 0;
+        }
+        else if (cmd == "version") {
+            cout << VERSION << endl;
+        }
+        else if (cmd == "setboard") { // Get FEN
+            getline(cin, fen);
+            fen.erase(0, 1); // Remove the first whitespace
+        }
+        else if (cmd == "perft") {
+            Game game;
+            game.init(fen);
+            for (int i = 1; ; ++i) {
+                clock_t start = clock();
+                unsigned int perft_result = game.perft(i);
+                double perft_time = double(clock() - start) / CLOCKS_PER_SEC;
+                cout << "Perft(" << i << ") = " << perft_result;
+                cout << " (" << perft_time << " secs, ";
+                cout << perft_result / perft_time << " nps)" << endl;
+            }
+        }
+        else if (cmd == "divide") {
+            int depth = 0;
+            cin >> depth;
+            cout << endl;
+            Game game;
+            game.init(fen);
+            Color c = game.current_position().get_turn_color();
+            unsigned int nodes_count = 0;
+            unsigned int moves_count = 0;
+            Moves moves(game.board, game.pieces, game.current_position());    
+            Move move;
+            while (!(move = moves.next()).is_null()) {
+                    game.make_move(move);
+                if (!game.is_check(c)) {
+                    unsigned int cnt = game.perft(depth - 1);
+                    nodes_count += cnt;
+                    ++moves_count;
+                    cout << move << " " << cnt << endl;
+                }
+                game.undo_move(move);
+            }
+            cout << endl;
+            cout << "Moves: " << moves_count << endl;
+            cout << "Positions: " << nodes_count << endl;
+        }
+        else if (cmd == "testsuite") { // Load EPD test suite
+            string filename;
+            cin >> filename;
+            ifstream epdfile;
+            epdfile.open(filename);
+            if (!epdfile.is_open()) {
+                cerr << "Cannot open '" << filename;
+                cerr << "': No such file or directory" << endl;
+            }
 
-	    // Get time per move (optional)
-	    string seconds;
-	    getline(cin, seconds);
-	    int time = 10;
-	    if (seconds != "") {
-		istringstream iss(seconds);
-		iss >> time;
-	    }
-	    
-	    cout << "Loading '" << filename << "', "; 
-	    cout << time << "s per move" << endl; // In seconds
-	    
-	    // Load game protocol
-	    Protocol proto;
-	    proto.set_output_thinking(false);
-	    proto.set_time(1, time);
-	    
-	    // Read positions in file
-	    unsigned int res = 0;
-	    unsigned int i = 0;
-	    while (epdfile.good()) {
-		proto.new_game();
-		string line;
-		getline(epdfile, line);
-		// TODO: add am (avoid move)
-		size_t fensep = line.find(" bm ");
-		size_t bmsep = line.find(";");
-		if (fensep == string::npos || bmsep == string::npos) continue;
-		
-		// Load position in game
-		fen = line.substr(0, fensep);
-		cout << "Loading position #" << i + 1 << " '" << fen << "' ";
-		proto.set_board(fen);
-		
-		// Search best move and test it
-		string best_moves = line.substr(fensep + 4, bmsep - fensep - 4);
-		cout << "bm " << best_moves;
-		string move = proto.search_move(true);
-		cout << " => " << move;
-		istringstream iss(best_moves);
-		bool is_found = false;
-		do {
-		    string best_move;
-		    iss >> best_move;
-		    if (best_move == move) {
-			is_found = true;
-			break;
-		    }
-		} while (iss);
+            // Get time per move (optional)
+            string seconds;
+            getline(cin, seconds);
+            int time = 10;
+            if (seconds != "") {
+                istringstream iss(seconds);
+                iss >> time;
+            }
+            
+            cout << "Loading '" << filename << "', "; 
+            cout << time << "s per move" << endl; // In seconds
+            
+            // Load game protocol
+            Protocol proto;
+            proto.set_output_thinking(false);
+            proto.set_time(1, time);
+            
+            // Read positions in file
+            unsigned int res = 0;
+            unsigned int i = 0;
+            while (epdfile.good()) {
+                proto.new_game();
+                string line;
+                getline(epdfile, line);
+                // TODO: add am (avoid move)
+                size_t fensep = line.find(" bm ");
+                size_t bmsep = line.find(";");
+                if (fensep == string::npos || bmsep == string::npos) continue;
+                
+                // Load position in game
+                fen = line.substr(0, fensep);
+                cout << "Loading position #" << i + 1 << " '" << fen << "' ";
+                proto.set_board(fen);
+                
+                // Search best move and test it
+                string best_moves = line.substr(fensep + 4, bmsep - fensep - 4);
+                cout << "bm " << best_moves;
+                string move = proto.search_move(true);
+                cout << " => " << move;
+                istringstream iss(best_moves);
+                bool is_found = false;
+                do {
+                    string best_move;
+                    iss >> best_move;
+                    if (best_move == move) {
+                        is_found = true;
+                        break;
+                    }
+                } while (iss);
 
-		if (is_found) {
-		    cout << " OK" << endl;
-		    ++res;
-		}
-		else {
-		    cout << " KO" << endl;
-		}
-		++i;
-	    }
-	    cout << "Result: " << res << "/" << i << endl;
-	    epdfile.close();
-	}
-	cmd = prompt();
-    }	
+                if (is_found) {
+                    cout << " OK" << endl;
+                    ++res;
+                }
+                else {
+                    cout << " KO" << endl;
+                }
+                ++i;
+            }
+            cout << "Result: " << res << "/" << i << endl;
+            epdfile.close();
+        }
+        cmd = prompt();
+    }        
     return 0;
 }
-

@@ -43,8 +43,8 @@ static const int PIECE_VALUE[] = {
 static const int PAWNS_ADJUSTEMENT[][9] = {
     {     0,   0,   0,   0,   0,   0,   0,   0,   0 }, // Empty
     {     0,   0,   0,   0,   0,   0,   0,   0,   0 }, // Pawns
-    {	-30, -24, -18, -12,  -6,   0,   6,  12,  18 }, // Knights
-    {	-15, -12,  -9,  -6,  -3,   0,   3,   6,   9 }, // Bishops
+    {        -30, -24, -18, -12,  -6,   0,   6,  12,  18 }, // Knights
+    {        -15, -12,  -9,  -6,  -3,   0,   3,   6,   9 }, // Bishops
     {    60,  48,  36,  24,  12,   0, -12, -24, -36 }, // Rooks
     {    30,  24,  18,  12,   6,   0,   0,   0,   0 }, // Queens
     {     0,   0,   0,   0,   0,   0,   0,   0,   0 }  // King
@@ -62,18 +62,18 @@ static const int PHASE_COEF[] = { 0, 1, 2, 2, 4, 8, 0 };
 
 // Opening number
 static const int PHASE_MAX = 16 * PHASE_COEF[PAWN] + 
-		       4 * PHASE_COEF[KNIGHT] +
-		       4 * PHASE_COEF[BISHOP] +
-		       4 * PHASE_COEF[ROOK] +
-		       2 * PHASE_COEF[QUEEN]; // == 64
+                              4 * PHASE_COEF[KNIGHT] +
+                              4 * PHASE_COEF[BISHOP] +
+                              4 * PHASE_COEF[ROOK] +
+                              2 * PHASE_COEF[QUEEN]; // == 64
 
 // PST parameters
 static const int BORDER_MALUS = -5;
 static const int CENTER_BONUS[] = {   
-	0,   0,   1,   2,   2,   1,   0,   0
+      0,   0,   1,   2,   2,   1,   0,   0
 };
-static const int PAWN_FILES_VALUES[]   = { 
-      -15,  -5,   1,   5,   5,   1,  -5, -15
+static const int PAWN_FILES_VALUES[] = { 
+    -15,  -5,   1,   5,   5,   1,  -5, -15
 };
 static const int OPENING_RANKS_BONUS[][8] {
     {   0,   0,   0,   0,   0,   0,   0,   0 }, // Dummy for PieceType EMPTY

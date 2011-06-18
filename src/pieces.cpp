@@ -30,11 +30,11 @@ Pieces::Pieces() {
      */
 
     for (int i = 0; i < 2; ++i) {
-	for (int j = 0; j < 7; ++j) {
-	    nb_pieces[i][j] = 0;
-	    for (int k = 0; k < 9; ++k) {
-		positions[i][j][k] = OUT;
-	    }
-	}
+        for (int j = 0; j < 7; ++j) {
+            nb_pieces[i][j] = 0;
+            for (int k = 0; k < 9; ++k) {
+                positions[i][j][k] = OUT;
+            }
+        }
     }
 }

@@ -26,20 +26,20 @@
 
 static const int XBOARD_NB_FEATURES = 3;
 static const string XBOARD_FEATURES[XBOARD_NB_FEATURES][2] = {
-    { "myname",	"Purple Haze " + string(VERSION) },
-    { "setboard",		"1" },
-    { "done",			"1" },
+    { "myname",   "Purple Haze " + string(VERSION) },
+    { "setboard", "1" },
+    { "done",     "1" },
 };
 
 class Xboard : public Protocol
 {
     private:
-	ofstream log;
-	bool force_mode;
+        ofstream log;
+        bool force_mode;
     public:
-	Xboard();
-	void loop();
-	void think();
+        Xboard();
+        void loop();
+        void think();
 };
 
 #endif /* !XBOARD_H */

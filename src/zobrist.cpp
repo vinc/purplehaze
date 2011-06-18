@@ -23,17 +23,17 @@ Zobrist::Zobrist() {
     
     side_to_move = gen_hash();
     for (int c = 0; c < 2; ++c) {
-	for (int t = 0; t < 7; ++t) {
-	    for (int s = 0; s < BOARD_SIZE; ++s) {
-		pieces_positions[c][t][s] = gen_hash();
-	    }
-	}
+        for (int t = 0; t < 7; ++t) {
+            for (int s = 0; s < BOARD_SIZE; ++s) {
+                pieces_positions[c][t][s] = gen_hash();
+            }
+        }
     }
     for (int i = 0; i < 4; ++i) {
-	castle_rights[i] = gen_hash();
+        castle_rights[i] = gen_hash();
     }
     for (int i = 0; i < BOARD_SIZE; ++i) {
-	en_passants[i] = gen_hash();
+        en_passants[i] = gen_hash();
     }
 }
 
@@ -42,4 +42,3 @@ Hash Zobrist::gen_hash() {
     Hash h = generator() ^ ((Hash) generator() << 32);
     return h;
 }
-

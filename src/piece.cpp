@@ -28,17 +28,16 @@ ostream& operator<<(ostream& out, const Piece piece) {
 string Piece::to_string() const {
     char t;
     switch (get_type()) {
-	case PAWN:   t = 'P'; break;
-	case KNIGHT: t = 'N'; break;
-	case BISHOP: t = 'B'; break;
-	case ROOK:   t = 'R'; break;
-	case QUEEN:  t = 'Q'; break;
-	case KING:   t = 'K'; break;
-	default:     t = ' '; break;
+        case PAWN:   t = 'P'; break;
+        case KNIGHT: t = 'N'; break;
+        case BISHOP: t = 'B'; break;
+        case ROOK:   t = 'R'; break;
+        case QUEEN:  t = 'Q'; break;
+        case KING:   t = 'K'; break;
+        default:     t = ' '; break;
     }
     if (get_color() == BLACK) {
-	t = char(t + 'a' - 'A'); // Lower case for black pieces
+        t = char(t + 'a' - 'A'); // Lower case for black pieces
     }
     return string(1, t);
 }
-

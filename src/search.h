@@ -29,10 +29,10 @@ inline static int R_ADAPT(int d, int n) {
 }
 
 static const int R = 2;
-static const int NMP_DEPTH = 3;		// depth > NMP_DEPTH
-static const int LMR_DEPTH = 2;		// depth > LMR_DEPTH
-static const int IID_DEPTH = 3;		// depth > IID_DEPTH
-static const int FUTILITY_DEPTH = 3;	// depth <= FUTILITY_DEPTH
+static const int NMP_DEPTH = 3;      // depth > NMP_DEPTH
+static const int LMR_DEPTH = 2;      // depth > LMR_DEPTH
+static const int IID_DEPTH = 3;      // depth > IID_DEPTH
+static const int FUTILITY_DEPTH = 3; // depth <= FUTILITY_DEPTH
 
 // Array of pruning margin values indexed by depth. Idea from Crafty
 static const int FUTILITY_MARGINS[FUTILITY_DEPTH + 1] = {

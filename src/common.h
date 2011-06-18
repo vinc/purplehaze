@@ -24,11 +24,11 @@
 #define VERSION "2.0.1"
 #endif
 
-static const int BOARD_SIZE = 128;
-static const int MAX_PLY = 128;
-static const int INF = 29999;
-static const int TT_SIZE = 1024*1024*128;
-static const int MT_SIZE = 1024*1024;
+static const int BOARD_SIZE =  128;
+static const int MAX_PLY =     128;
+static const int INF =         29999;
+static const int TT_SIZE =     1024*1024*128;
+static const int MT_SIZE =     1024*1024;
 static const int MAX_KILLERS = 2;
 
 static const std::string DEFAULT_FEN = 
@@ -69,27 +69,27 @@ enum Rank : unsigned char {
 };
 
 enum Direction {
-	NO_DIR		    = 0,
-	UP		    = 0x10,
-	RIGHT		    = 0x01,
-	DOWN		    = -UP,
-	LEFT		    = -RIGHT,
-	UP_RIGHT	    = UP + RIGHT,
-	DOWN_RIGHT	    = DOWN + RIGHT,
-	DOWN_LEFT	    = DOWN + LEFT,
-	UP_LEFT		    = UP + LEFT,
-	UP_UP_RIGHT	    = UP + UP_RIGHT,
-	RIGHT_UP_RIGHT	    = RIGHT + UP_RIGHT,
-	RIGHT_DOWN_RIGHT    = RIGHT + DOWN_RIGHT,
-	DOWN_DOWN_RIGHT	    = DOWN + DOWN_RIGHT,
-	DOWN_DOWN_LEFT	    = DOWN + DOWN_LEFT,
-	LEFT_DOWN_LEFT	    = LEFT + DOWN_LEFT,
-	LEFT_UP_LEFT	    = LEFT + UP_LEFT,
-	UP_UP_LEFT	    = UP + UP_LEFT
+    NO_DIR           = 0,
+    UP               = 0x10,
+    RIGHT            = 0x01,
+    DOWN             = -UP,
+    LEFT             = -RIGHT,
+    UP_RIGHT         = UP + RIGHT,
+    DOWN_RIGHT       = DOWN + RIGHT,
+    DOWN_LEFT        = DOWN + LEFT,
+    UP_LEFT          = UP + LEFT,
+    UP_UP_RIGHT      = UP + UP_RIGHT,
+    RIGHT_UP_RIGHT   = RIGHT + UP_RIGHT,
+    RIGHT_DOWN_RIGHT = RIGHT + DOWN_RIGHT,
+    DOWN_DOWN_RIGHT  = DOWN + DOWN_RIGHT,
+    DOWN_DOWN_LEFT   = DOWN + DOWN_LEFT,
+    LEFT_DOWN_LEFT   = LEFT + DOWN_LEFT,
+    LEFT_UP_LEFT     = LEFT + UP_LEFT,
+    UP_UP_LEFT       = UP + UP_LEFT
 };
 
 enum Color : bool { 
-    WHITE, 
+    WHITE,
     BLACK
 };
 
@@ -110,8 +110,8 @@ enum MoveType : unsigned char {
     QUEEN_CASTLE,
     CAPTURE,
     EN_PASSANT,
-    NULL_MOVE,		    // warning: is_capture() will return true
-    KNIGHT_PROMOTION = 8,   // is_promotion() { MoveType[3] }
+    NULL_MOVE,            // Warning: is_capture() will return true
+    KNIGHT_PROMOTION = 8, // is_promotion() { MoveType[3] }
     BISHOP_PROMOTION,
     ROOK_PROMOTION,
     QUEEN_PROMOTION,
@@ -124,36 +124,40 @@ enum MoveType : unsigned char {
 // Used in movegen.cpp and attack.cpp
 static const int NB_DIRS[] = { 0, 0, 8, 4, 4, 8, 8 };
 static const Direction PIECES_DIRS[][8] = {
-    {   // Empty
-	NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR
+    { // Empty   
+         NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR
     },
-    {	// Pawns
-	NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR
+    { // Pawns
+        NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR
     },
-    {	// Knights
-	UP_UP_RIGHT, RIGHT_UP_RIGHT, RIGHT_DOWN_RIGHT, DOWN_DOWN_RIGHT, 
-	DOWN_DOWN_LEFT, LEFT_DOWN_LEFT, LEFT_UP_LEFT, UP_UP_LEFT
+    { // Knights
+        UP_UP_RIGHT, RIGHT_UP_RIGHT, RIGHT_DOWN_RIGHT, DOWN_DOWN_RIGHT, 
+        DOWN_DOWN_LEFT, LEFT_DOWN_LEFT, LEFT_UP_LEFT, UP_UP_LEFT
     },
-    {	// Bishops
-	UP_RIGHT, DOWN_RIGHT, DOWN_LEFT, UP_LEFT, 
-	NO_DIR, NO_DIR, NO_DIR, NO_DIR
+    { // Bishops
+        UP_RIGHT, DOWN_RIGHT, DOWN_LEFT, UP_LEFT, 
+        NO_DIR, NO_DIR, NO_DIR, NO_DIR
     },
-    {	// Rooks
-	UP, RIGHT, DOWN, LEFT, NO_DIR, NO_DIR, NO_DIR, NO_DIR
+    { // Rooks
+        UP, RIGHT, DOWN, LEFT, NO_DIR, NO_DIR, NO_DIR, NO_DIR
     },
-    {	// Queens
-	UP, UP_RIGHT, RIGHT, DOWN_RIGHT, DOWN, DOWN_LEFT, LEFT, UP_LEFT
+    { // Queens
+        UP, UP_RIGHT, RIGHT, DOWN_RIGHT, DOWN, DOWN_LEFT, LEFT, UP_LEFT
     },
-    {	// Kings
-	UP, UP_RIGHT, RIGHT, DOWN_RIGHT, DOWN, DOWN_LEFT, LEFT, UP_LEFT
+    { // Kings
+        UP, UP_RIGHT, RIGHT, DOWN_RIGHT, DOWN, DOWN_LEFT, LEFT, UP_LEFT
     }
 };
 
 // Used in movegen.cpp and protocol.cpp
 static const Direction PAWN_PUSH_DIRS[2] = { UP, DOWN };
 static const Direction PAWN_CAPTURE_DIRS[2][2] = {
-    {UP_LEFT, UP_RIGHT},
-    {DOWN_LEFT, DOWN_RIGHT}
+    { 
+        UP_LEFT, UP_RIGHT
+    },
+    {
+        DOWN_LEFT, DOWN_RIGHT
+    }
 };
 
 // Used for debuging

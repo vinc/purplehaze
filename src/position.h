@@ -30,93 +30,93 @@ using namespace std;
 class Position
 {
     private:
-	Hash zobrist_hash;
-	Hash material_zobrist_hash;
-	unsigned short ply;
-	//Move last_move;
-	Piece capture;
-	bitset<4> castle_rights;
-	bitset<2> castle;
-	Square en_passant;
-	unsigned char halfmove_counter;
-	bool null_move_right;
-	Color side_to_move;
+        Hash zobrist_hash;
+        Hash material_zobrist_hash;
+        unsigned short ply;
+        //Move last_move;
+        Piece capture;
+        bitset<4> castle_rights;
+        bitset<2> castle;
+        Square en_passant;
+        unsigned char halfmove_counter;
+        bool null_move_right;
+        Color side_to_move;
 
     public:
-	Position() : 
-	    ply(0),
-	    en_passant(OUT),
-	    halfmove_counter(0),
-	    null_move_right(true),
-	    side_to_move(WHITE) 
-	    {} 
-	
-	Hash& hash() { 
-	    return zobrist_hash;
-	};
-	Hash& material_hash() { 
-	    return material_zobrist_hash; 
-	};
-	Color get_turn_color() const {
-	    return side_to_move;
-	};
-	void change_side() {
-	    side_to_move = Color(!side_to_move);
-	};
-	unsigned short get_ply() const {
-	    return ply;
-	};
-	void set_ply(unsigned short i) {
-	    ply = i;
-	};
-	void inc_ply() {
-	    ++ply;
-	};
-	void dec_ply() {
-	    --ply;
-	};
-	unsigned char get_halfmove() const {
-	    return halfmove_counter;
-	};
-	void set_halfmove(unsigned char i) {
-	    halfmove_counter = i;
-	};
-	void inc_halfmove() {
-	    ++halfmove_counter;
-	};
-	void reset_halfmove() {
-	    halfmove_counter = 0;
-	};
-	Square get_en_passant() const {
-	    return en_passant;
-	};
-	void set_en_passant(Square ep) {
-	    en_passant = ep;
-	};
-	Piece get_capture() const {
-	    return capture;
-	};
-	void set_capture(Piece p) {
-	    capture = p;
-	};
-	bool can_castle(Color c, PieceType t) const {
-	    return castle_rights[2 * c + t - QUEEN];
-	};
-	void set_castle_right(Color c, PieceType t, bool b = true) {
-	    castle_rights.set(2 * c + t - QUEEN, b);
-	};
-	bool has_castle(Color c) const {
-	    return castle[c];
-	};
-	void set_has_castle(Color c, bool b = true) {
-	    castle.set(c, b);
-	};
-	bool get_null_move_right() const {
-	    return null_move_right;
-	};
-	void set_null_move_right(bool b) {
-	    null_move_right = b;
-	};
+        Position() : 
+            ply(0),
+            en_passant(OUT),
+            halfmove_counter(0),
+            null_move_right(true),
+            side_to_move(WHITE) 
+            {} 
+        
+        Hash& hash() { 
+            return zobrist_hash;
+        };
+        Hash& material_hash() { 
+            return material_zobrist_hash; 
+        };
+        Color get_turn_color() const {
+            return side_to_move;
+        };
+        void change_side() {
+            side_to_move = Color(!side_to_move);
+        };
+        unsigned short get_ply() const {
+            return ply;
+        };
+        void set_ply(unsigned short i) {
+            ply = i;
+        };
+        void inc_ply() {
+            ++ply;
+        };
+        void dec_ply() {
+            --ply;
+        };
+        unsigned char get_halfmove() const {
+            return halfmove_counter;
+        };
+        void set_halfmove(unsigned char i) {
+            halfmove_counter = i;
+        };
+        void inc_halfmove() {
+            ++halfmove_counter;
+        };
+        void reset_halfmove() {
+            halfmove_counter = 0;
+        };
+        Square get_en_passant() const {
+            return en_passant;
+        };
+        void set_en_passant(Square ep) {
+            en_passant = ep;
+        };
+        Piece get_capture() const {
+            return capture;
+        };
+        void set_capture(Piece p) {
+            capture = p;
+        };
+        bool can_castle(Color c, PieceType t) const {
+            return castle_rights[2 * c + t - QUEEN];
+        };
+        void set_castle_right(Color c, PieceType t, bool b = true) {
+            castle_rights.set(2 * c + t - QUEEN, b);
+        };
+        bool has_castle(Color c) const {
+            return castle[c];
+        };
+        void set_has_castle(Color c, bool b = true) {
+            castle.set(c, b);
+        };
+        bool get_null_move_right() const {
+            return null_move_right;
+        };
+        void set_null_move_right(bool b) {
+            null_move_right = b;
+        };
 };
 
 #endif /* !NODE_H */

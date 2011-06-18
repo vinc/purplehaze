@@ -27,37 +27,37 @@
 class Protocol
 {
     protected:
-	Game game;
-	int depth;
-	stack<Move> history;
-	unsigned short verbosity;
+        Game game;
+        int depth;
+        stack<Move> history;
+        unsigned short verbosity;
 
     public:
-	Protocol() : depth(MAX_PLY - 1), verbosity(0) {}
-	
-	void new_game();
-	
-	bool set_output_thinking(bool ot = true);
+        Protocol() : depth(MAX_PLY - 1), verbosity(0) {}
+        
+        void new_game();
+        
+        bool set_output_thinking(bool ot = true);
 
-	bool set_board(string fen);
-	
-	bool set_time(int moves, int time);
+        bool set_board(string fen);
+        
+        bool set_time(int moves, int time);
 
-	bool set_remaining_time(int time);
+        bool set_remaining_time(int time);
 
-	bool play_move(string move);
+        bool play_move(string move);
 
-	bool undo_move();
+        bool undo_move();
 
-	string search_move(bool use_san_notation = false);
+        string search_move(bool use_san_notation = false);
 
-	Move parse_move(string move);
+        Move parse_move(string move);
 
-	void set_depth(int d) { depth = d; };
-	
-	void set_verbosity(int v = 0) { verbosity = v; };
-	
-	int get_verbosity() { return verbosity; };
+        void set_depth(int d) { depth = d; };
+        
+        void set_verbosity(int v = 0) { verbosity = v; };
+        
+        int get_verbosity() { return verbosity; };
 };
 
 #endif /* !PROTOCOL_H */

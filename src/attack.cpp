@@ -24,29 +24,29 @@
  */
 bool Board::is_attacked_by(Color c, Square s, const Pieces& pieces) const {
     for (PieceType t = KNIGHT; t <= KING; t = PieceType(t + 1)) {
-	int n = pieces.get_nb_pieces(c, t);
-	for (int i = 0; i < n; ++i) {
-	    Square from = pieces.get_position(c, t, i);
-	    if (!can_attack(t, from, s)) continue;
-	    if (t == KNIGHT || t == KING) return true;
-	    Direction d = get_direction_to(from, s);
-	    Square to = Square(from + d);
-	    while (to != s && is_empty(to)) {
-		to = Square(to + d);
-	    }
-	    if (to == s) return true;
-	}
+        int n = pieces.get_nb_pieces(c, t);
+        for (int i = 0; i < n; ++i) {
+            Square from = pieces.get_position(c, t, i);
+            if (!can_attack(t, from, s)) continue;
+            if (t == KNIGHT || t == KING) return true;
+            Direction d = get_direction_to(from, s);
+            Square to = Square(from + d);
+            while (to != s && is_empty(to)) {
+                to = Square(to + d);
+            }
+            if (to == s) return true;
+        }
     }
     
     // Specific code for pawns
     Direction d = (c == WHITE ? DOWN : UP);
     Direction dirs[2] = { Direction(d + LEFT), Direction(d + RIGHT) };
     for (int i = 0; i < 2; ++i) {
-	Square from = Square(s + dirs[i]);
-	if (get_piece(from).get_type() == PAWN &&
-	    get_piece(from).get_color() == c) {
-	    return true;
-	}
+        Square from = Square(s + dirs[i]);
+        if (get_piece(from).get_type() == PAWN &&
+            get_piece(from).get_color() == c) {
+            return true;
+        }
     }
 
     return false;
@@ -68,30 +68,29 @@ bool Board::can_go(Piece p, Square from, Square to) const {
     Direction push_dir;
     Square s;
     switch (t) {
-	case PAWN:
-	    push_dir = (c == WHITE ? UP : DOWN);
-	    if (!is_empty(to)) { // Capture
-		if (to == Square(from + push_dir + LEFT)) return true;
-		if (to == Square(from + push_dir + RIGHT)) return true;
-	    }
-	    else { // Pawn push (and double push)
-		if (to == Square(from + push_dir)) return true;
-		if (to == Square(from + 2 * push_dir) &&
-		    is_empty(Square(from + push_dir)) &&
-		    is_pawn_begin(c, from)) return true;
-	    }
-	    break;
-	default:
-	    if (!can_attack(t, from, to)) return false;
-	    if (t == KNIGHT || t == KING) return true;
-	    s = Square(from + d);
-	    while (s != to && is_empty(s)) { // Search for a blocker
-		s = Square(s + d);
-		assert(!is_out(s));
-	    }
-	    if (s == to) return true;
-	    break;
+        case PAWN:
+            push_dir = (c == WHITE ? UP : DOWN);
+            if (!is_empty(to)) { // Capture
+                if (to == Square(from + push_dir + LEFT)) return true;
+                if (to == Square(from + push_dir + RIGHT)) return true;
+            }
+            else { // Pawn push (and double push)
+                if (to == Square(from + push_dir)) return true;
+                if (to == Square(from + 2 * push_dir) &&
+                    is_empty(Square(from + push_dir)) &&
+                    is_pawn_begin(c, from)) return true;
+            }
+            break;
+        default:
+            if (!can_attack(t, from, to)) return false;
+            if (t == KNIGHT || t == KING) return true;
+            s = Square(from + d);
+            while (s != to && is_empty(s)) { // Search for a blocker
+                s = Square(s + d);
+                assert(!is_out(s));
+            }
+            if (s == to) return true;
+            break;
     }
     return false;
 }
-

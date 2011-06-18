@@ -26,8 +26,8 @@ using namespace std;
 
 bool Transposition::is_empty() const {
     if (get_hash() != 0 || get_value() != 0 || get_depth() != 0 ||
-	get_bound() != UNDEF_BOUND || !get_best_move().is_null()) {	
-	return false;
+        get_bound() != UNDEF_BOUND || !get_best_move().is_null()) {        
+        return false;
     }
     return true;
 }
@@ -42,7 +42,7 @@ string Transposition::to_string() const {
 
 void Transpositions::clear() {
     for (int i = 0; i < SIZE; ++i) {
-	tt[i] = Transposition();
+        tt[i] = Transposition();
     }
     hits = 0;
     misses = 0;
@@ -55,8 +55,8 @@ Transposition Transpositions::lookup(Hash h) {
     
     // Verbose mode
     if (h && t.get_hash() == h) {
-	++hits;
-	return t;
+        ++hits;
+        return t;
     }
     if (h && !t.is_empty()) ++collisions;
     ++misses;
@@ -70,4 +70,3 @@ int Transpositions::get_usage() const {
     for (int i = 0; i < SIZE; ++i) if (!tt[i].is_empty()) ++res;
     return res;
 }
-

@@ -26,38 +26,38 @@ void Time::start_thinking(int ply) {
     last_poll_nodes_count = 0;
     polling_interval = 1000000;
     if (remaining_time != allocated_time) {
-	int n = allowed_moves;
-	int remaining_moves = n - (((ply + 1) / 2) % n);
-	assert(remaining_moves > 0);
-	allocated_time = remaining_time / remaining_moves;
+        int n = allowed_moves;
+        int remaining_moves = n - (((ply + 1) / 2) % n);
+        assert(remaining_moves > 0);
+        allocated_time = remaining_time / remaining_moves;
     }
     else {
-	assert(allowed_moves > 0);
-	allocated_time = allowed_time / allowed_moves;
+        assert(allowed_moves > 0);
+        allocated_time = allowed_time / allowed_moves;
     }
 
     if (allocated_time > 3000) {
-	coef_1 = 16; coef_2 = 15;
+        coef_1 = 16; coef_2 = 15;
     }
     else if (allocated_time > 1000) {
-	coef_1 = 4; coef_2 = 3;
+        coef_1 = 4; coef_2 = 3;
     }
     else {
-	coef_1 = 5; coef_2 = 3;
+        coef_1 = 5; coef_2 = 3;
     }
 }
 
 bool Time::is_out_of_time() {
     if (coef_1 * get_elapsed_time() > coef_2 * get_allocated_time()) {
-	return true;
+        return true;
     }
     else return false;
 }
 
 bool Time::poll(int nodes_count) {
     if (nodes_count - last_poll_nodes_count > polling_interval) {
-	last_poll_nodes_count = nodes_count;
-	abort_search = is_out_of_time();
+        last_poll_nodes_count = nodes_count;
+        abort_search = is_out_of_time();
     }
     return abort_search;
 }

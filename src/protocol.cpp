@@ -63,38 +63,38 @@ Move Protocol::parse_move(string move) {
     MoveType t = QUIET_MOVE;
 
     if (move.size() == 5) { // Promotion
-	switch (move[4]) {
-	    case 'n': t = KNIGHT_PROMOTION; break;
-	    case 'b': t = BISHOP_PROMOTION; break;
-	    case 'r': t = ROOK_PROMOTION; break;
-	    case 'q': t = QUEEN_PROMOTION; break;
-	    default: return Move();
-	}
+        switch (move[4]) {
+            case 'n': t = KNIGHT_PROMOTION; break;
+            case 'b': t = BISHOP_PROMOTION; break;
+            case 'r': t = ROOK_PROMOTION; break;
+            case 'q': t = QUEEN_PROMOTION; break;
+            default: return Move();
+        }
     }
     if (game.board.get_piece(from).get_type() == PAWN) {
-	if (game.board.is_pawn_begin(c, from) &&
-	    to == Square(from + 2 * PAWN_PUSH_DIRS[c])) {
-		return Move(from, to, DOUBLE_PAWN_PUSH);
-	}
-	else if (game.board.is_empty(to) && 
-	    to != Square(from + PAWN_PUSH_DIRS[c])) {
-		return Move(from, to, EN_PASSANT);
-	}
+        if (game.board.is_pawn_begin(c, from) &&
+            to == Square(from + 2 * PAWN_PUSH_DIRS[c])) {
+                return Move(from, to, DOUBLE_PAWN_PUSH);
+        }
+        else if (game.board.is_empty(to) && 
+            to != Square(from + PAWN_PUSH_DIRS[c])) {
+                return Move(from, to, EN_PASSANT);
+        }
     }
     if (game.board.get_piece(from).get_type() == KING) {
-	if (to == Square(from + RIGHT + RIGHT)) {
-	    return Move(from, to, KING_CASTLE);
-	}
-	else if (to == Square(from + LEFT + LEFT)) {
-	    return Move(from, to, QUEEN_CASTLE);
-	}
+        if (to == Square(from + RIGHT + RIGHT)) {
+            return Move(from, to, KING_CASTLE);
+        }
+        else if (to == Square(from + LEFT + LEFT)) {
+            return Move(from, to, QUEEN_CASTLE);
+        }
     }
 
     // Capture
     if (!game.board.is_empty(to)) {
-	assert((t == QUIET_MOVE) || 
-	       (KNIGHT_PROMOTION <= t && t <= QUEEN_PROMOTION));
-	return Move(from, to, MoveType(t + CAPTURE));
+        assert((t == QUIET_MOVE) || 
+               (KNIGHT_PROMOTION <= t && t <= QUEEN_PROMOTION));
+        return Move(from, to, MoveType(t + CAPTURE));
     }
     else return Move(from, to, t);
 }
@@ -128,25 +128,25 @@ bool Protocol::undo_move() {
 string Protocol::search_move(bool use_san_notation) {
     Move m = game.root(depth + 1);
     if (m.is_null()) {
-	if (game.is_check(game.current_position().get_turn_color())) {
-	    return "LOST";
-	}
-	else {
-	    return "DRAW";
-	}
+        if (game.is_check(game.current_position().get_turn_color())) {
+            return "LOST";
+        }
+        else {
+            return "DRAW";
+        }
     }
     else {
-	if (use_san_notation) {
-	    string res = game.output_move(m);
-	    play_move(m.to_string());
-	    if (game.is_check(game.current_position().get_turn_color())) {
-		res += "+";
-	    }
-	    undo_move();
-	    return res;
-	}
-	else {
-	    return m.to_string();
-	}
+        if (use_san_notation) {
+            string res = game.output_move(m);
+            play_move(m.to_string());
+            if (game.is_check(game.current_position().get_turn_color())) {
+                res += "+";
+            }
+            undo_move();
+            return res;
+        }
+        else {
+            return m.to_string();
+        }
     }
 }

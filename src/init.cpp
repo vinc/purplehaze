@@ -46,32 +46,32 @@ void Game::init(string fen) {
     string positions;
     iss >> positions;
     for (it = positions.begin(); it != positions.end(); ++it) {
-	char sq = *it;
-	if (sq == '/') s = Square(s + DOWN + 8 * LEFT); // New rank
-	else if (int(sq) >= '1' && int(sq) <= '8') { // Empty squares
-	    s = Square(s + sq - '1' + 1); // Next square
-	}
-	else { // Non empty square
-	    Color c = WHITE;
-	    PieceType t = EMPTY;
-	    switch (sq) {
-		case 'p': c = BLACK, t = PAWN; break;
-		case 'n': c = BLACK, t = KNIGHT; break;
-		case 'b': c = BLACK, t = BISHOP; break;
-		case 'r': c = BLACK, t = ROOK; break;
-		case 'q': c = BLACK, t = QUEEN; break;
-		case 'k': c = BLACK, t = KING; break;
-		case 'P': c = WHITE, t = PAWN; break;
-		case 'N': c = WHITE, t = KNIGHT; break;
-		case 'B': c = WHITE, t = BISHOP; break;
-		case 'R': c = WHITE, t = ROOK; break;
-		case 'Q': c = WHITE, t = QUEEN; break;
-		case 'K': c = WHITE, t = KING; break;
-		default: assert(false);
-	    }
-	    add_piece(c, t, s);
-	    s = Square(s + RIGHT); // Next square
-	}
+        char sq = *it;
+        if (sq == '/') s = Square(s + DOWN + 8 * LEFT); // New rank
+        else if (int(sq) >= '1' && int(sq) <= '8') { // Empty squares
+            s = Square(s + sq - '1' + 1); // Next square
+        }
+        else { // Non empty square
+            Color c = WHITE;
+            PieceType t = EMPTY;
+            switch (sq) {
+                case 'p': c = BLACK, t = PAWN; break;
+                case 'n': c = BLACK, t = KNIGHT; break;
+                case 'b': c = BLACK, t = BISHOP; break;
+                case 'r': c = BLACK, t = ROOK; break;
+                case 'q': c = BLACK, t = QUEEN; break;
+                case 'k': c = BLACK, t = KING; break;
+                case 'P': c = WHITE, t = PAWN; break;
+                case 'N': c = WHITE, t = KNIGHT; break;
+                case 'B': c = WHITE, t = BISHOP; break;
+                case 'R': c = WHITE, t = ROOK; break;
+                case 'Q': c = WHITE, t = QUEEN; break;
+                case 'K': c = WHITE, t = KING; break;
+                default: assert(false);
+            }
+            add_piece(c, t, s);
+            s = Square(s + RIGHT); // Next square
+        }
     }
     assert(s == Square(H1 + RIGHT));
 
@@ -80,31 +80,31 @@ void Game::init(string fen) {
     iss >> side;
     assert(current_position().get_turn_color() == WHITE);
     switch(side) {
-	case 'w': break;
-	case 'b': current_position().change_side(); break;
-	default: assert(!"FEN: no side to move!"); break;
+        case 'w': break;
+        case 'b': current_position().change_side(); break;
+        default: assert(!"FEN: no side to move!"); break;
     }
 
     string castling;
     iss >> castling;
     for (it = castling.begin(); it != castling.end(); ++it) {
-	switch(*it) {
-	    case '-': break;
-	    case 'K': current_position().set_castle_right(WHITE, KING); break;
-	    case 'Q': current_position().set_castle_right(WHITE, QUEEN); break;
-	    case 'k': current_position().set_castle_right(BLACK, KING); break;
-	    case 'q': current_position().set_castle_right(BLACK, QUEEN); break;
-	}
+        switch(*it) {
+            case '-': break;
+            case 'K': current_position().set_castle_right(WHITE, KING); break;
+            case 'Q': current_position().set_castle_right(WHITE, QUEEN); break;
+            case 'k': current_position().set_castle_right(BLACK, KING); break;
+            case 'q': current_position().set_castle_right(BLACK, QUEEN); break;
+        }
     }
     
     string ep;
     iss >> ep;
     if (ep != "-") {
-	char file = ep.at(0);
-	char rank = ep.at(1);
-	s = Square((rank - '1') * 16 + file - 'a');
-	assert(!board.is_out(s));    
-	current_position().set_en_passant(s);
+        char file = ep.at(0);
+        char rank = ep.at(1);
+        s = Square((rank - '1') * 16 + file - 'a');
+        assert(!board.is_out(s));    
+        current_position().set_en_passant(s);
     }
 
     int halfmove = 0;

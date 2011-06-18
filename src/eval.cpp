@@ -32,41 +32,41 @@ static int PST[2][2][KING + 1][BOARD_SIZE] = { { { { 0 } } } };
 
 void Game::init_eval() {
     for (int i = 0; i < 64; ++i) {
-	for (PieceType t = PAWN; t <= KING; t = PieceType(t + 1)) {
-	    Square s = board.square_from_index(i);
-	    
-	    int opening_score = 0;
-	    int ending_score = 0;
+        for (PieceType t = PAWN; t <= KING; t = PieceType(t + 1)) {
+            Square s = board.square_from_index(i);
+            
+            int opening_score = 0;
+            int ending_score = 0;
 
-	    switch (t) {
-		case PAWN: 
-		    // Develop central pawns
-		    // But not side pawns
-		    opening_score = PAWN_FILES_VALUES[board.get_file(s)];
+            switch (t) {
+                case PAWN: 
+                    // Develop central pawns
+                    // But not side pawns
+                    opening_score = PAWN_FILES_VALUES[board.get_file(s)];
 
-		    // Run for promotion
-		    ending_score = 10 * board.get_rank(s);
-		    break;
-		case KNIGHT:
-		case BISHOP:
-		    // Develop toward center files
-		    opening_score = CENTER_BONUS[board.get_file(s)];
-		    if (board.is_border(s)) {
-			opening_score = 2 * BORDER_MALUS;
-		    }
-		default:
-		    ending_score = CENTER_BONUS[board.get_file(s)];
-		    ending_score += CENTER_BONUS[board.get_rank(s)];
-		    break;
-	    }
+                    // Run for promotion
+                    ending_score = 10 * board.get_rank(s);
+                    break;
+                case KNIGHT:
+                case BISHOP:
+                    // Develop toward center files
+                    opening_score = CENTER_BONUS[board.get_file(s)];
+                    if (board.is_border(s)) {
+                        opening_score = 2 * BORDER_MALUS;
+                    }
+                default:
+                    ending_score = CENTER_BONUS[board.get_file(s)];
+                    ending_score += CENTER_BONUS[board.get_rank(s)];
+                    break;
+            }
 
-	    // Rank bonus
-	    int bonus = OPENING_RANKS_BONUS[t][board.get_rank(s)];
-	    opening_score += (opening_score * bonus) / 2;
+            // Rank bonus
+            int bonus = OPENING_RANKS_BONUS[t][board.get_rank(s)];
+            opening_score += (opening_score * bonus) / 2;
 
-	    PST[OPENING][WHITE][t][s] = opening_score;
-	    PST[ENDING][WHITE][t][s] = ending_score;
-	}
+            PST[OPENING][WHITE][t][s] = opening_score;
+            PST[ENDING][WHITE][t][s] = ending_score;
+        }
     }
     // Special corrections
     // Urge to develop light pieces during oppening
@@ -87,13 +87,13 @@ void Game::init_eval() {
 
     // Flip scores according to black's side
     for (int i = 0; i < 2; ++i) {
-	for (int j = 0; j < 64; ++j) {
-	    for (PieceType t = PAWN; t <= KING; t = PieceType(t + 1)) {
-		Square ws = board.square_from_index(j);
-		Square bs = board.flip(ws);
-		PST[i][BLACK][t][bs] = PST[i][WHITE][t][ws];
-	    }
-	}
+        for (int j = 0; j < 64; ++j) {
+            for (PieceType t = PAWN; t <= KING; t = PieceType(t + 1)) {
+                Square ws = board.square_from_index(j);
+                Square bs = board.flip(ws);
+                PST[i][BLACK][t][bs] = PST[i][WHITE][t][ws];
+            }
+        }
     }
     
     // Print PST
@@ -101,28 +101,28 @@ void Game::init_eval() {
     cout << endl << "Opening pawn PST";
     string squares[BOARD_SIZE];
     for (int i = 0; i < BOARD_SIZE; ++i) {
-	Square s = Square(i);
-	ostringstream stream;
-	stream << setw(4) << PST[OPENING][WHITE][PAWN][s];
-	squares[i] = stream.str();
+        Square s = Square(i);
+        ostringstream stream;
+        stream << setw(4) << PST[OPENING][WHITE][PAWN][s];
+        squares[i] = stream.str();
     }
     cout << endl << board.to_string(squares); 
 
     cout << endl << "Ending pawn PST";
     for (int i = 0; i < BOARD_SIZE; ++i) {
-	Square s = Square(i);
-	ostringstream stream;
-	stream << setw(4) << PST[ENDING][WHITE][PAWN][s];
-	squares[i] = stream.str();
+        Square s = Square(i);
+        ostringstream stream;
+        stream << setw(4) << PST[ENDING][WHITE][PAWN][s];
+        squares[i] = stream.str();
     }
     cout << endl << board.to_string(squares); 
     
     cout << endl << "Opening knight PST";
     for (int i = 0; i < BOARD_SIZE; ++i) {
-	Square s = Square(i);
-	ostringstream stream;
-	stream << setw(4) << PST[OPENING][WHITE][KNIGHT][s];
-	squares[i] = stream.str();
+        Square s = Square(i);
+        ostringstream stream;
+        stream << setw(4) << PST[OPENING][WHITE][KNIGHT][s];
+        squares[i] = stream.str();
     }
     cout << endl << board.to_string(squares); 
     */
@@ -161,102 +161,102 @@ int Game::material_eval() {
     bool is_empty = true;
     int hash_score = material_table.lookup(pos.material_hash(), is_empty);
     if (!is_empty) {
-	c = pos.get_turn_color();
+        c = pos.get_turn_color();
     }
     
     int material_score[2] = { 0 };
     int material_bonus[2] = { 0 };
     for (int i = 0; i < 2; ++i) {
-	c = Color(i);
-	int nb_pawns = 0;
-	int nb_minors = 0;
-	for (PieceType t = PAWN; t <= KING; t = PieceType(t + 1)) {
-	    int n = pieces.get_nb_pieces(c, t);
-	    // Pieces' standard alues
-	    material_score[c] += n * PIECE_VALUE[t]; 
-	    
-	    // Bonus values depending on material imbalance
-	    int adj;
-	    switch (t) {
-		case PAWN:
-		    nb_pawns = n;
-		    if (n == 0) material_bonus[c] += NO_PAWNS_MALUS;
-		    break;
-		case KNIGHT:
-		    nb_minors = n;
-		    if (n > 1) material_bonus[c] += REDUNDANCY_MALUS;
-		    
-		    // Value adjusted by the number of pawns on the board
-		    adj = PAWNS_ADJUSTEMENT[KNIGHT][nb_pawns];
-		    material_bonus[c] += n * adj;
-		    break;
-		case BISHOP:
-		    nb_minors += n;
-		    // Bishop bonus pair (from +40 to +64):
-		    // less than half a pawn when most or all the pawns are on
-		    // the board, and more than half a pawn when half or more 
-		    // of the pawns are gone. (Kaufman 1999)
-		    //
-		    // No bonus for two bishops controlling the same color
-		    // No bonus for more than two bishops
-		    if (n == 2 && !board.is_same_color(
-			    pieces.get_position(c, t, 0),
-			    pieces.get_position(c, t, 1))) {
-			        material_bonus[c] += BISHOP_PAIR_BONUS + 
-						     (3 * 8 - nb_pawns);
-		    }
+        c = Color(i);
+        int nb_pawns = 0;
+        int nb_minors = 0;
+        for (PieceType t = PAWN; t <= KING; t = PieceType(t + 1)) {
+            int n = pieces.get_nb_pieces(c, t);
+            // Pieces' standard alues
+            material_score[c] += n * PIECE_VALUE[t]; 
+            
+            // Bonus values depending on material imbalance
+            int adj;
+            switch (t) {
+                case PAWN:
+                    nb_pawns = n;
+                    if (n == 0) material_bonus[c] += NO_PAWNS_MALUS;
+                    break;
+                case KNIGHT:
+                    nb_minors = n;
+                    if (n > 1) material_bonus[c] += REDUNDANCY_MALUS;
+                    
+                    // Value adjusted by the number of pawns on the board
+                    adj = PAWNS_ADJUSTEMENT[KNIGHT][nb_pawns];
+                    material_bonus[c] += n * adj;
+                    break;
+                case BISHOP:
+                    nb_minors += n;
+                    // Bishop bonus pair (from +40 to +64):
+                    // less than half a pawn when most or all the pawns are on
+                    // the board, and more than half a pawn when half or more 
+                    // of the pawns are gone. (Kaufman 1999)
+                    //
+                    // No bonus for two bishops controlling the same color
+                    // No bonus for more than two bishops
+                    if (n == 2 && !board.is_same_color(
+                            pieces.get_position(c, t, 0),
+                            pieces.get_position(c, t, 1))) {
+                                material_bonus[c] += BISHOP_PAIR_BONUS + 
+                                                     (3 * 8 - nb_pawns);
+                    }
 
-		    // Value adjusted by the number of pawns on the board
-		    adj = PAWNS_ADJUSTEMENT[BISHOP][nb_pawns];
-		    material_bonus[c] += n * adj;
-		    break;
-		case ROOK:
-		    // Principle of the redundancy (Kaufman 1999)
-		    if (n > 1) material_bonus[c] += REDUNDANCY_MALUS;
-		    
-		    // Value adjusted by the number of pawns on the board
-		    adj = PAWNS_ADJUSTEMENT[ROOK][nb_pawns];
-		    material_bonus[c] += n * adj;
-		    break;
-		case QUEEN:
-		    if (nb_minors > 1) {
-			// With two or more minor pieces, the queen
-			// equal two rooks. (Kaufman 1999)
-			material_bonus[c] += (2 * PIECE_VALUE[ROOK]) -
-					     (PIECE_VALUE[QUEEN]);
-		    }
-		    // Value adjusted by the number of pawns on the board
-		    adj = PAWNS_ADJUSTEMENT[QUEEN][nb_pawns];
-		    material_bonus[c] += n * adj;
-		    break;
-		default:
-		    break;
-	    }
-	}
+                    // Value adjusted by the number of pawns on the board
+                    adj = PAWNS_ADJUSTEMENT[BISHOP][nb_pawns];
+                    material_bonus[c] += n * adj;
+                    break;
+                case ROOK:
+                    // Principle of the redundancy (Kaufman 1999)
+                    if (n > 1) material_bonus[c] += REDUNDANCY_MALUS;
+                    
+                    // Value adjusted by the number of pawns on the board
+                    adj = PAWNS_ADJUSTEMENT[ROOK][nb_pawns];
+                    material_bonus[c] += n * adj;
+                    break;
+                case QUEEN:
+                    if (nb_minors > 1) {
+                        // With two or more minor pieces, the queen
+                        // equal two rooks. (Kaufman 1999)
+                        material_bonus[c] += (2 * PIECE_VALUE[ROOK]) -
+                                             (PIECE_VALUE[QUEEN]);
+                    }
+                    // Value adjusted by the number of pawns on the board
+                    adj = PAWNS_ADJUSTEMENT[QUEEN][nb_pawns];
+                    material_bonus[c] += n * adj;
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     // Insufficiant material
     for (int i = 0; i < 2; ++i) {
-	c = Color(i);
-	// FIDE rules for draw
-	const int K = PIECE_VALUE[KING];
-	const int P = PIECE_VALUE[PAWN];
-	const int N = PIECE_VALUE[KNIGHT];
-	const int B = PIECE_VALUE[BISHOP];
-	if (material_score[c] == PIECE_VALUE[KING]) {
-	    if ((material_score[!c] == K) ||
-		(material_score[!c] == K + B) ||
-		(material_score[!c] == K + N) ||
-		(material_score[!c] == K + N + N)) {
-		    goto return_material_score;
-	    }
+        c = Color(i);
+        // FIDE rules for draw
+        const int K = PIECE_VALUE[KING];
+        const int P = PIECE_VALUE[PAWN];
+        const int N = PIECE_VALUE[KNIGHT];
+        const int B = PIECE_VALUE[BISHOP];
+        if (material_score[c] == PIECE_VALUE[KING]) {
+            if ((material_score[!c] == K) ||
+                (material_score[!c] == K + B) ||
+                (material_score[!c] == K + N) ||
+                (material_score[!c] == K + N + N)) {
+                    goto return_material_score;
+            }
 
-	    // Duplicate with MALUS_NO_PAWNS ?
-	    if (pieces.get_nb_pieces(Color(!c), PAWN) == 0 &&
-		material_score[!c] < K + 4 * P) {
-		    goto return_material_score;
-	    }
-	}
+            // Duplicate with MALUS_NO_PAWNS ?
+            if (pieces.get_nb_pieces(Color(!c), PAWN) == 0 &&
+                material_score[!c] < K + 4 * P) {
+                    goto return_material_score;
+            }
+        }
     }
 
     c = pos.get_turn_color();
@@ -264,22 +264,22 @@ int Game::material_eval() {
     score += material_bonus[c] - material_bonus[Color(!c)];
 
     return_material_score:
-	hash_score = (c == WHITE ? score : -score);
-	material_table.save(pos.material_hash(), hash_score);
-	return score;
+        hash_score = (c == WHITE ? score : -score);
+        material_table.save(pos.material_hash(), hash_score);
+        return score;
 }
 
 int castling_score(const Position& pos, Color c) {
     int score = 0;
     if (pos.has_castle(c)) {
-	score += CASTLE_BONUS;
+        score += CASTLE_BONUS;
     }
     else {
-	for (PieceType t = QUEEN; t <= KING; t = PieceType(t + 1)) {
-	    if (!pos.can_castle(c, t)) { // For each side where no castling
-		score += BREAKING_CASTLE_MALUS; // is possible, add a malus
-	    }
-	}
+        for (PieceType t = QUEEN; t <= KING; t = PieceType(t + 1)) {
+            if (!pos.can_castle(c, t)) { // For each side where no castling
+                score += BREAKING_CASTLE_MALUS; // is possible, add a malus
+            }
+        }
     }
     return score;
 }
@@ -291,40 +291,40 @@ int Game::position_eval() {
     const Position& pos = current_position();
     Color c;
     for (int i = 0; i < 2; ++i) {
-	c = Color(i);
-	for (PieceType t = PAWN; t <= KING; t = PieceType(t + 1)) {
-	    int n = pieces.get_nb_pieces(c, t);
-	    phase += n * PHASE_COEF[t];
-	    for (int j = 0; j < n; ++j) {
-		Square s = pieces.get_position(c, t, j);
-		position_score[OPENING][c] += PST[OPENING][c][t][s];
-		position_score[ENDING][c] += PST[ENDING][c][t][s];
-		if (t == PAWN) pawns_files[c][board.get_file(s)]++;
-	    }
-	}
+        c = Color(i);
+        for (PieceType t = PAWN; t <= KING; t = PieceType(t + 1)) {
+            int n = pieces.get_nb_pieces(c, t);
+            phase += n * PHASE_COEF[t];
+            for (int j = 0; j < n; ++j) {
+                Square s = pieces.get_position(c, t, j);
+                position_score[OPENING][c] += PST[OPENING][c][t][s];
+                position_score[ENDING][c] += PST[ENDING][c][t][s];
+                if (t == PAWN) pawns_files[c][board.get_file(s)]++;
+            }
+        }
 
-	int pawns_score = 0;
-	for (int j = 0; j < 8; ++j) {
-	    pawns_score += MULTI_PAWNS_MALUS[pawns_files[c][j]];
-	}
-	position_score[OPENING][c] += pawns_score;
-	
-	// Rooks' files bonus
-	int rooks_score = 0;
-	int nb_rooks = pieces.get_nb_pieces(c, ROOK);
-	for (int j = 0; j < nb_rooks; ++j) {
-	    Square s = pieces.get_position(c, ROOK, j);
-	    if (pawns_files[!c][board.get_file(s)]) {
-		if (pawns_files[c][board.get_file(s)]) {
-		    rooks_score += OPEN_FILE_BONUS;
-		}
-		else rooks_score += HALF_OPEN_FILE_BONUS;
-	    }
-	}
-	position_score[OPENING][c] += rooks_score;
+        int pawns_score = 0;
+        for (int j = 0; j < 8; ++j) {
+            pawns_score += MULTI_PAWNS_MALUS[pawns_files[c][j]];
+        }
+        position_score[OPENING][c] += pawns_score;
+        
+        // Rooks' files bonus
+        int rooks_score = 0;
+        int nb_rooks = pieces.get_nb_pieces(c, ROOK);
+        for (int j = 0; j < nb_rooks; ++j) {
+            Square s = pieces.get_position(c, ROOK, j);
+            if (pawns_files[!c][board.get_file(s)]) {
+                if (pawns_files[c][board.get_file(s)]) {
+                    rooks_score += OPEN_FILE_BONUS;
+                }
+                else rooks_score += HALF_OPEN_FILE_BONUS;
+            }
+        }
+        position_score[OPENING][c] += rooks_score;
 
-	// Castling bonus/malus
-	position_score[OPENING][c] += castling_score(pos, c);
+        // Castling bonus/malus
+        position_score[OPENING][c] += castling_score(pos, c);
 
     }
     c = pos.get_turn_color();
@@ -337,4 +337,3 @@ int Game::position_eval() {
     phase = (phase > max ? max : (phase < 0 ? 0 : phase));
     return (opening * phase + ending * (max - phase)) / max;
 }
-

@@ -38,9 +38,9 @@ Game::Game() {
 
 void Game::clear_killers() {
     for (int i = 0; i < MAX_PLY; ++i) {
-	for (int j = 0; j < MAX_KILLERS; ++j) {
-	    killer_moves[i][j] = Move();
-	}
+        for (int j = 0; j < MAX_KILLERS; ++j) {
+            killer_moves[i][j] = Move();
+        }
     }
 }
 
@@ -66,16 +66,16 @@ void Game::del_piece(Color c, PieceType t, int i) {
     // Remove the piece, and put in its place the higher index piece of the
     // same color and type in order to avoid holes (idea from Mediocre Chess)
     Square emptied = pieces.get_position(c, t, i); // Get piece's position
-    board.set_piece(Piece(), emptied);		   // Remove it from board
-    pieces.dec_nb_pieces(c, t);			   // and from pieces list
-    pieces.set_position(c, t, i, OUT);		   // TODO: not needed
-    int j = pieces.get_nb_pieces(c, t);		   // Last piece's index
+    board.set_piece(Piece(), emptied);             // Remove it from board
+    pieces.dec_nb_pieces(c, t);                    // and from pieces list
+    pieces.set_position(c, t, i, OUT);             // TODO: not needed
+    int j = pieces.get_nb_pieces(c, t);            // Last piece's index
     if (pieces.get_nb_pieces(c, t) > 0 && i != j) {
-	// Swap i and j and update board
-	Square s = pieces.get_position(c, t, j);   // Last piece's position
-	pieces.set_position(c, t, i, s);	   // Fill the hole left    
-	pieces.set_position(c, t, j, OUT);	   // TODO: not needed
-	board.set_piece(Piece(c, t, i), s);	   // Update board
+        // Swap i and j and update board
+        Square s = pieces.get_position(c, t, j);   // Last piece's position
+        pieces.set_position(c, t, i, s);           // Fill the hole left    
+        pieces.set_position(c, t, j, OUT);         // TODO: not needed
+        board.set_piece(Piece(c, t, i), s);        // Update board
     }
     // Update Zobrist hash
     Position& pos = current_position();
@@ -92,7 +92,7 @@ void Game::new_position() {
 
     // Remove the previous en passant square from the Zobrist hash
     zobrist.update_en_passant(current_position().hash(), 
-			      current_position().get_en_passant());
+                              current_position().get_en_passant());
     
     // Update the position for a new move
     current_position().inc_ply();
@@ -110,8 +110,7 @@ void Game::del_position() {
  */
 void Game::set_killer_move(int depth, Move move) {
     if (move != killer_moves[depth][0]) {
-	killer_moves[depth][1] = killer_moves[depth][0];
-	killer_moves[depth][0] = move;
+        killer_moves[depth][1] = killer_moves[depth][0];
+        killer_moves[depth][0] = move;
     }
 }
-

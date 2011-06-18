@@ -29,31 +29,31 @@ Board::Board() {
 
     // Initialize the direction array
     for (int i = 0; i < 240; ++i) { 
-	dir_array[i] = NO_DIR;
+        dir_array[i] = NO_DIR;
     }
 
     // Initialize the attack array
     for (int i = 0; i < 64; ++i) { 
-	for (int j = 0; j < 64; ++j) { 
-	    Square from = Square(i + (i & ~7));
-	    Square to = Square(j + (j & ~7));
-	    int diff = 0x77 + from - to;
-	    for (PieceType t = KNIGHT; t <= KING; t = PieceType(t + 1)) {
-		const Direction * dirs = PIECES_DIRS[t];
-		for (int d = 0; d < NB_DIRS[t]; ++d) {
-		    Square s = Square(from + dirs[d]);
-		    while (!is_out(s)) {
-			if (s == to) {
-			    attack_array[diff].set(t, true);
-			    dir_array[diff] = dirs[d];
-			    break;
-			}
-			if (t == KNIGHT || t == KING) break; // Leapers
-			s = Square(s + dirs[d]); // Sliders
-		    }
-		}
-	    }
-	}
+        for (int j = 0; j < 64; ++j) { 
+            Square from = Square(i + (i & ~7));
+            Square to = Square(j + (j & ~7));
+            int diff = 0x77 + from - to;
+            for (PieceType t = KNIGHT; t <= KING; t = PieceType(t + 1)) {
+                const Direction * dirs = PIECES_DIRS[t];
+                for (int d = 0; d < NB_DIRS[t]; ++d) {
+                    Square s = Square(from + dirs[d]);
+                    while (!is_out(s)) {
+                        if (s == to) {
+                            attack_array[diff].set(t, true);
+                            dir_array[diff] = dirs[d];
+                            break;
+                        }
+                        if (t == KNIGHT || t == KING) break; // Leapers
+                        s = Square(s + dirs[d]); // Sliders
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -65,42 +65,42 @@ string Board::to_string(string squares[]) const {
     ostringstream stream;
     stream << endl;
     for (Square s = A8; s < OUT; s = Square(s + 1)) {
-	if (is_out(s)) continue;
-	if (get_file(s) == FILE_A) {
-	    stream << "     +";
-	    for (int i = 0; i < 8; ++i) {
-		for (unsigned int j = 0; j < squares[s].size(); ++j) {
-		    stream << "-";
-		}
-		stream << "+";
-	    }
-	    stream << endl;
-	    stream << "   " << get_rank(s) + 1 << " ";
-	}
-	stream << "|";
-	stream << squares[s];
-	if (get_file(s) == FILE_H) {
-	    stream << "|" << endl;
-	    if (s == H1) break; // The loop ends here
-	    else s = Square(s - 0x18);
-	}
+        if (is_out(s)) continue;
+        if (get_file(s) == FILE_A) {
+            stream << "     +";
+            for (int i = 0; i < 8; ++i) {
+                for (unsigned int j = 0; j < squares[s].size(); ++j) {
+                    stream << "-";
+                }
+                stream << "+";
+            }
+            stream << endl;
+            stream << "   " << get_rank(s) + 1 << " ";
+        }
+        stream << "|";
+        stream << squares[s];
+        if (get_file(s) == FILE_H) {
+            stream << "|" << endl;
+            if (s == H1) break; // The loop ends here
+            else s = Square(s - 0x18);
+        }
     }
 
     // Bottom's border of the array
     stream << "     +";
     for (int i = 0; i < 8; ++i) {
-	for (unsigned int j = 0; j < squares[A1].size(); ++j) {
-	    stream << "-";
-	}
-	stream << "+";
+        for (unsigned int j = 0; j < squares[A1].size(); ++j) {
+            stream << "-";
+        }
+        stream << "+";
     }
     stream << endl << "     ";
 
     // Files' names.
     for (char c = 'a'; c <= 'h'; ++c) {
-	int l = squares[A1].size() / 2;
-	int r = squares[A1].size() % 2;
-	stream << setw(l + 2) << c << setw(r) << " ";
+        int l = squares[A1].size() / 2;
+        int r = squares[A1].size() % 2;
+        stream << setw(l + 2) << c << setw(r) << " ";
     }
     stream << endl;
     return stream.str();
@@ -112,12 +112,12 @@ string Board::to_string(string squares[]) const {
 ostream& operator<<(ostream& out, const Board board) {
     string squares[BOARD_SIZE];
     for (int i = 0; i < BOARD_SIZE; ++i) {
-	Square s = Square(i);
-	squares[i] = " ";
-	if (!board.is_empty(s)) squares[i] += board.get_piece(s).to_string();
-	else if (board.is_dark(s)) squares[i] += ".";
-	else squares[i] += " ";
-	squares[i] += " ";
+        Square s = Square(i);
+        squares[i] = " ";
+        if (!board.is_empty(s)) squares[i] += board.get_piece(s).to_string();
+        else if (board.is_dark(s)) squares[i] += ".";
+        else squares[i] += " ";
+        squares[i] += " ";
     }
     out << board.to_string(squares);
     return out;

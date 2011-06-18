@@ -48,7 +48,7 @@ void Game::print_thinking(int depth, int score, Move m) {
     int ply = current_position().get_ply();
     
     if (current_position().get_turn_color() == BLACK) {
-	cout << " " << 1 + (ply / 2) << ". ...";
+        cout << " " << 1 + (ply / 2) << ". ...";
     }
     
     assert(is_legal(m) || assert_msg(debug_move(m)));
@@ -65,7 +65,7 @@ string Game::output_pv(int depth, int score, Move m) {
     stream << " ";
     int ply = current_position().get_ply();
     if (current_position().get_turn_color() == WHITE) {
-	stream << 1 + (ply / 2) << ". ";
+        stream << 1 + (ply / 2) << ". ";
     }
     stream << output_move(m);
     
@@ -77,11 +77,11 @@ string Game::output_pv(int depth, int score, Move m) {
     Transposition trans = tt.lookup(current_position().hash());
     Move move = trans.get_best_move();
     if (depth > 0 && is_legal(move) && trans.get_bound() < 3) {
-	if (is_in_check) stream << "+"; // Check
-	stream << output_pv(depth - 1, trans.get_value(), move);
+        if (is_in_check) stream << "+"; // Check
+        stream << output_pv(depth - 1, trans.get_value(), move);
     }
     else if (move.is_null() && is_mate(score)) {
-	if (is_in_check) stream << "#"; // Mate
+        if (is_in_check) stream << "#"; // Mate
     }
     else if (is_in_check) stream << "+"; // Cut-off
     
@@ -94,8 +94,8 @@ string Game::output_move(Move m) {
 
     // Castling
     if (m.is_castle()) {
-	if (m.get_castle_side() == QUEEN) stream << "O-";
-	return stream.str() + "O-O";
+        if (m.get_castle_side() == QUEEN) stream << "O-";
+        return stream.str() + "O-O";
     }
 
     // Type of piece
@@ -106,27 +106,27 @@ string Game::output_move(Move m) {
 
     // Disambiguation
     if (t != PAWN) {
-	Color c = p.get_color();
-	Square to = m.get_dest();
-	for (int i = 0; i < pieces.get_nb_pieces(c, t); ++i) {
-	    Piece other(c, t, i);
-	    if (other == p) continue;
-	    Square s = pieces.get_position(other);
-	    if (board.can_attack(t, s, to) && board.can_go(other, s, to)) {
-		// If another piece of the same type can theoretically 
-		// attack the destination (fast answer by array lookup)
-		// and can really go to this destination (not so fast
-		// answer) then a disambiguation is needed
-		stream << char('a' + m.get_orig_file());
-		break;
-	    }
-	}
+        Color c = p.get_color();
+        Square to = m.get_dest();
+        for (int i = 0; i < pieces.get_nb_pieces(c, t); ++i) {
+            Piece other(c, t, i);
+            if (other == p) continue;
+            Square s = pieces.get_position(other);
+            if (board.can_attack(t, s, to) && board.can_go(other, s, to)) {
+                // If another piece of the same type can theoretically 
+                // attack the destination (fast answer by array lookup)
+                // and can really go to this destination (not so fast
+                // answer) then a disambiguation is needed
+                stream << char('a' + m.get_orig_file());
+                break;
+            }
+        }
     }
 
     // Capture
     if (m.is_capture()) {
-	if (t == PAWN) stream << char('a' + m.get_orig_file());
-	stream << "x";
+        if (t == PAWN) stream << char('a' + m.get_orig_file());
+        stream << "x";
     }
     
     // Destination
@@ -134,7 +134,7 @@ string Game::output_move(Move m) {
     
     // Promotion
     if (m.is_promotion()) {
-	stream << "=" << Piece(WHITE, m.get_promotion_type());
+        stream << "=" << Piece(WHITE, m.get_promotion_type());
     }
 
     return stream.str();
@@ -150,13 +150,13 @@ void Game::print_tt_stats() {
     long zeros = 0;
     long ones = 0;
     for (int i = 0; i < tt.size(); ++i) {
-	if (tt.at(i).is_empty()) continue;
-	Hash h = tt.at(i).get_hash();
-	bitset<64> b = h;
-	int z = b.count();
-	//cout << "0: " << 64 - z << ", 1: " << z << endl;
-	zeros += 64 - z;
-	ones += z;
+        if (tt.at(i).is_empty()) continue;
+        Hash h = tt.at(i).get_hash();
+        bitset<64> b = h;
+        int z = b.count();
+        //cout << "0: " << 64 - z << ", 1: " << z << endl;
+        zeros += 64 - z;
+        ones += z;
     }
 
     // TODO: change this *very* ugly code...
@@ -176,17 +176,17 @@ void Game::print_tt_stats() {
     
     cout << "Hits:             " << tt.get_nb_hits();
     float percent_hits = (100 * tt.get_nb_hits()) / 
-			 float(tt.get_nb_lookups());
+                         float(tt.get_nb_lookups());
     cout << " (" << percent_hits << "%)" << endl;
     
     cout << "Index Collisions: " << tt.get_nb_collisions();
     float percent_collisions = (100 * tt.get_nb_collisions()) / 
-			       float(tt.get_nb_lookups());
+                               float(tt.get_nb_lookups());
     cout << " (" << percent_collisions << "%)" << endl;
     
     cout << "Misses:           " << tt.get_nb_misses();
     float percent_misses = (100 * tt.get_nb_misses()) / 
-			   float(tt.get_nb_lookups());
+                           float(tt.get_nb_lookups());
     cout << " (" << percent_misses << "%)" << endl;
   
     cout << endl << "Material HashTable" << endl;
@@ -205,17 +205,17 @@ void Game::print_tt_stats() {
     
     cout << "Hits:             " << table.get_nb_hits();
     percent_hits = (100 * table.get_nb_hits()) / 
-			 float(table.get_nb_lookups());
+                         float(table.get_nb_lookups());
     cout << " (" << percent_hits << "%)" << endl;
     
     cout << "Index Collisions: " << table.get_nb_collisions();
     percent_collisions = (100 * table.get_nb_collisions()) / 
-			       float(table.get_nb_lookups());
+                               float(table.get_nb_lookups());
     cout << " (" << percent_collisions << "%)" << endl;
     
     cout << "Misses:           " << table.get_nb_misses();
     percent_misses = (100 * table.get_nb_misses()) / 
-			   float(table.get_nb_lookups());
+                           float(table.get_nb_lookups());
     cout << " (" << percent_misses << "%)" << endl;
 }
 
@@ -223,12 +223,11 @@ string Game::debug_move(Move m) {
     ostringstream stream;
     Color c = current_position().get_turn_color();
     stream << endl << board << endl <<
-	      (c == WHITE ? "White" : "Black") << " to move" << endl <<
-	      "m = " << output_move(m) << " (" << m << ")" << endl <<
-	      "m is en passant: " << m.is_en_passant() << endl <<
-	      "m is promotion: " << m.is_promotion() << endl <<
-	      "m is legal: " << is_legal(m) << endl <<
-	      hex << current_position().hash();
+              (c == WHITE ? "White" : "Black") << " to move" << endl <<
+              "m = " << output_move(m) << " (" << m << ")" << endl <<
+              "m is en passant: " << m.is_en_passant() << endl <<
+              "m is promotion: " << m.is_promotion() << endl <<
+              "m is legal: " << is_legal(m) << endl <<
+              hex << current_position().hash();
     return stream.str();
 }
-

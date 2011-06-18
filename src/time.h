@@ -24,52 +24,52 @@
 class Time
 {
     private:
-	// Set the time to play the game
-	int allowed_moves;
-	int allowed_time; // In centi-seconds
+        // Set the time to play the game
+        int allowed_moves;
+        int allowed_time; // In centi-seconds
 
-	// Set the time to play a move
-	clock_t starting_time;
-	int allocated_time; // Calculated
-	int remaining_time; // Given by protocols like Xboard
-	int coef_1, coef_2;
+        // Set the time to play a move
+        clock_t starting_time;
+        int allocated_time; // Calculated
+        int remaining_time; // Given by protocols like Xboard
+        int coef_1, coef_2;
 
-	int polling_interval;
-	int last_poll_nodes_count;
-	bool abort_search;
+        int polling_interval;
+        int last_poll_nodes_count;
+        bool abort_search;
 
     public:
-	Time() : 
-	    allowed_moves(40), allowed_time(24000), 
-	    allocated_time(allowed_time / allowed_moves), 
-	    remaining_time(allowed_time / allowed_moves),
-	    polling_interval(500000), last_poll_nodes_count(0),
-	    abort_search(false) 
-	    {} 
+        Time() : 
+            allowed_moves(40), allowed_time(24000), 
+            allocated_time(allowed_time / allowed_moves), 
+            remaining_time(allowed_time / allowed_moves),
+            polling_interval(500000), last_poll_nodes_count(0),
+            abort_search(false) 
+            {} 
 
-	Time(int moves, int time) : 
-	    allowed_moves(moves), allowed_time(time), 
-	    allocated_time(allowed_time / allowed_moves), 
-	    remaining_time(allowed_time / allowed_moves),
-	    polling_interval(500000), last_poll_nodes_count(0),
-	    abort_search(false)
-	    {} 
+        Time(int moves, int time) : 
+            allowed_moves(moves), allowed_time(time), 
+            allocated_time(allowed_time / allowed_moves), 
+            remaining_time(allowed_time / allowed_moves),
+            polling_interval(500000), last_poll_nodes_count(0),
+            abort_search(false)
+            {} 
 
-	void set_polling_interval(int nodes) { 
-	    polling_interval = nodes; 
-	};
-	void set_remaining_time(int time) { 
-	    remaining_time = time; 
-	};
-	int get_allocated_time() const {
-	    return allocated_time;
-	};
-	int get_elapsed_time() { 
-	    return (100 * (clock() - starting_time)) / CLOCKS_PER_SEC;
-	};
-	void start_thinking(int ply);
-	bool is_out_of_time();
-	bool poll(int nodes_count);
+        void set_polling_interval(int nodes) { 
+            polling_interval = nodes; 
+        };
+        void set_remaining_time(int time) { 
+            remaining_time = time; 
+        };
+        int get_allocated_time() const {
+            return allocated_time;
+        };
+        int get_elapsed_time() { 
+            return (100 * (clock() - starting_time)) / CLOCKS_PER_SEC;
+        };
+        void start_thinking(int ply);
+        bool is_out_of_time();
+        bool poll(int nodes_count);
 };
 
 #endif /* !TIME_H */

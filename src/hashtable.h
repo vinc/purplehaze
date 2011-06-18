@@ -25,47 +25,47 @@ template <class T>
 class HashTable
 {
     private:
-	int hits;
-	int collisions;
-	int misses;
-    	const int SIZE;
-	struct Entry {
-	    Hash hash;
-	    T value;
-	};
-	Entry* entries;
+        int hits;
+        int collisions;
+        int misses;
+        const int SIZE;
+        struct Entry {
+            Hash hash;
+            T value;
+        };
+        Entry* entries;
 
     public:
-	HashTable(int used_space = MT_SIZE) : 
-	    hits(0),
-	    collisions(0),
-	    misses(0),
-	    SIZE(used_space / sizeof(Entry)),
-	    entries(new Entry[SIZE])
-	    {}
-	~HashTable() {
-	    delete [] entries;
-	    entries = NULL;
-	};
-	T lookup(Hash h, bool& is_empty); /* {
-	    Entry entry = entries[h & (SIZE - 1)];
-	    if (entry.hash == h) return entry.value;
-	    else return T();
-	};*/
-	void save(Hash h, T v) {
-	    entries[h & (SIZE - 1)].hash = h;
-	    entries[h & (SIZE - 1)].value = v;
-	};
-	void clear();
-	
-	// Used to print stats
-	int size() const { return SIZE; };
+        HashTable(int used_space = MT_SIZE) : 
+            hits(0),
+            collisions(0),
+            misses(0),
+            SIZE(used_space / sizeof(Entry)),
+            entries(new Entry[SIZE])
+            {}
+        ~HashTable() {
+            delete [] entries;
+            entries = NULL;
+        };
+        T lookup(Hash h, bool& is_empty); /* {
+            Entry entry = entries[h & (SIZE - 1)];
+            if (entry.hash == h) return entry.value;
+            else return T();
+        };*/
+        void save(Hash h, T v) {
+            entries[h & (SIZE - 1)].hash = h;
+            entries[h & (SIZE - 1)].value = v;
+        };
+        void clear();
 
-	int get_usage() const;
-	int get_nb_lookups() const { return hits + misses; };
-	int get_nb_hits() const { return hits; };
-	int get_nb_collisions() const { return collisions; };
-	int get_nb_misses() const { return misses; };
+        // Used to print stats
+        int size() const { return SIZE; };
+
+        int get_usage() const;
+        int get_nb_lookups() const { return hits + misses; };
+        int get_nb_hits() const { return hits; };
+        int get_nb_collisions() const { return collisions; };
+        int get_nb_misses() const { return misses; };
 };
 
 #endif /* !HASH_TABLE_H */

@@ -24,11 +24,11 @@ bool Tree::has_repetition_draw() {
     Hash& pos = current_position.hash();
     int previous_halfmove = current_position.get_halfmove();
     for (int i = tree_top - 2; i >= 0; i -= 2) {
-	if (tree[i].hash() == pos) return true; // Second repetition
-	if (tree[i].get_halfmove() > previous_halfmove) { // Halfmove reseted
-	    return false; // No previous repetition possible
-	}
-	previous_halfmove = tree[i].get_halfmove();
+        if (tree[i].hash() == pos) return true; // Second repetition
+        if (tree[i].get_halfmove() > previous_halfmove) { // Halfmove reseted
+            return false; // No previous repetition possible
+        }
+        previous_halfmove = tree[i].get_halfmove();
     }
     return false;
 }

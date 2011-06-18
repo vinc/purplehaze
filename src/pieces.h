@@ -26,42 +26,42 @@
 class Pieces
 {
     private:
-	Square positions[2][7][9];
-	unsigned char nb_pieces[2][7];
-	unsigned char sum[2];
+        Square positions[2][7][9];
+        unsigned char nb_pieces[2][7];
+        unsigned char sum[2];
     
     public:
-	Pieces();
-	Square get_position(Piece p) const {
-	    return positions[p.get_color()][p.get_type()][p.get_index()];
-	};
-	Square get_position(Color c, PieceType t, int i) const {
-	    assert(0 <= i && i < 9);
-	    return positions[c][t][i];
-	};
-	void set_position(Piece p, Square s) {
-	    positions[p.get_color()][p.get_type()][p.get_index()] = s;
-	};
-	void set_position(Color c, PieceType t, int i, Square s) { 
-	    assert(0 <= i && i < 9);
-	    positions[c][t][i] = s;
-	};
-	unsigned char get_nb_pieces(Color c, PieceType t) const {
-	    return nb_pieces[c][t];
-	};
-	unsigned char get_nb_pieces(Color c) const {
-	    return sum[c];
-	};
+        Pieces();
+        Square get_position(Piece p) const {
+            return positions[p.get_color()][p.get_type()][p.get_index()];
+        };
+        Square get_position(Color c, PieceType t, int i) const {
+            assert(0 <= i && i < 9);
+            return positions[c][t][i];
+        };
+        void set_position(Piece p, Square s) {
+            positions[p.get_color()][p.get_type()][p.get_index()] = s;
+        };
+        void set_position(Color c, PieceType t, int i, Square s) { 
+            assert(0 <= i && i < 9);
+            positions[c][t][i] = s;
+        };
+        unsigned char get_nb_pieces(Color c, PieceType t) const {
+            return nb_pieces[c][t];
+        };
+        unsigned char get_nb_pieces(Color c) const {
+            return sum[c];
+        };
 
-	// FIXME? No warning if nb < 0 or nb > 9
-	void inc_nb_pieces(Color c, PieceType t) {
-	    ++nb_pieces[c][t];
-	    ++sum[c];
-	};
-	void dec_nb_pieces(Color c, PieceType t) {
-	    --nb_pieces[c][t];
-	    --sum[c];
-	};
+        // FIXME? No warning if nb < 0 or nb > 9
+        void inc_nb_pieces(Color c, PieceType t) {
+            ++nb_pieces[c][t];
+            ++sum[c];
+        };
+        void dec_nb_pieces(Color c, PieceType t) {
+            --nb_pieces[c][t];
+            --sum[c];
+        };
 };
 
 #endif /* !PIECESL_H */

@@ -25,7 +25,6 @@
 
 using namespace std;
 
-
 typedef char Score;
 
 const int MAX_MOVES = 128; // TODO Find the real value
@@ -39,50 +38,51 @@ enum MovesState : unsigned char {
 
 class Moves
 {
-    private:	
-    	ExtendedMove moves[MAX_MOVES];
+    private:        
+        ExtendedMove moves[MAX_MOVES];
 
-	Position& current_position;
-	Board& board;
-	Pieces& pieces;
+        Position& current_position;
+        Board& board;
+        Pieces& pieces;
 
-	MovesState state;
-	unsigned char i, n;
-	unsigned char size[MOVES_STATE_SIZE]; // Moves types counters
+        MovesState state;
+        unsigned char i, n;
+        unsigned char size[MOVES_STATE_SIZE]; // Moves types counters
 
-	bool use_lazy_generation;
+        bool use_lazy_generation;
 
     public:
-	static Score mvv_lva_scores[KING + 1][KING + 1];
-    	Moves(Board& b, Pieces& ps, Position& cn, bool lg = true) : 
-	    current_position(cn), board(b), pieces(ps),
-	    state(BEST),
-	    i(0), n(0),
-	    use_lazy_generation(lg)
-		{ for (int j = 0; j < MOVES_STATE_SIZE; ++j) size[j] = 0; }
+        static Score mvv_lva_scores[KING + 1][KING + 1];
 
-	void generate(MoveType mt = NULL_MOVE); // here NULL_MOVE => ALL_MOVE 
-	void generate_pieces(Color c, PieceType t, MoveType mt);
-	void add(Move m, MovesState mt = UNDEF_MOVES);
-	ExtendedMove next();
-	MovesState get_state() const { return state; };
+        Moves(Board& b, Pieces& ps, Position& cn, bool lg = true) : 
+            current_position(cn), board(b), pieces(ps),
+            state(BEST),
+            i(0), n(0),
+            use_lazy_generation(lg)
+            { for (int j = 0; j < MOVES_STATE_SIZE; ++j) size[j] = 0; }
 
-	static void init_mvv_lva_scores();
-	Score get_mvv_lva_score(Move m);	
+        void generate(MoveType mt = NULL_MOVE); // here NULL_MOVE => ALL_MOVE 
+        void generate_pieces(Color c, PieceType t, MoveType mt);
+        void add(Move m, MovesState mt = UNDEF_MOVES);
+        ExtendedMove next();
+        MovesState get_state() const { return state; };
 
-	// Used for compatibility only
-	/*
-	int size() { 
-	    return n;
-	};
-	Move at(int i) {
-	    assert(i < n);
-	    return moves[i];
-	};
-	*/
+        static void init_mvv_lva_scores();
+        Score get_mvv_lva_score(Move m);        
 
-	// Used in divide
-	void numeric_sort() { /*moves.sort(Move::numeric_comp);*/ };	
+        // Used for compatibility only
+        /*
+        int size() { 
+            return n;
+        };
+        Move at(int i) {
+            assert(i < n);
+            return moves[i];
+        };
+        */
+
+        // Used in divide
+        void numeric_sort() { /*moves.sort(Move::numeric_comp);*/ };        
 };
 
 #endif /* !MOVES_H */

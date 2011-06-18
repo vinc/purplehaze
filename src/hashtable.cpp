@@ -21,9 +21,9 @@ template <class T>
 T HashTable<T>::lookup(Hash h, bool& is_empty) {
     Entry entry = entries[h & (SIZE - 1)];
     if (entry.hash == h) {
-	is_empty = false;
-	++hits;
-	return entry.value;
+        is_empty = false;
+        ++hits;
+        return entry.value;
     }
     else if (entry.hash != 0) ++collisions;
     is_empty = true;
@@ -34,8 +34,8 @@ T HashTable<T>::lookup(Hash h, bool& is_empty) {
 template <class T>
 void HashTable<T>::clear() {
     for (int i = 0; i < SIZE; ++i) {
-	entries[i].hash = 0;
-	entries[i].value = T();
+        entries[i].hash = 0;
+        entries[i].value = T();
     }
     hits = 0;
     misses = 0;

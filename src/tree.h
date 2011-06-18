@@ -25,21 +25,21 @@ static const unsigned int MAX_TREE = 512;
 class Tree
 {
     private:
-	Position tree[MAX_TREE];
-	unsigned int tree_top; // Redondant with current_position().get_ply()
+        Position tree[MAX_TREE];
+        unsigned int tree_top; // Redondant with current_position().get_ply()
     public:
-	Tree() : tree_top(0) {}
-	void push() {
-	    tree[tree_top + 1] = tree[tree_top];
-	    ++tree_top;
-	};
-	void pop() { 
-	    --tree_top;
-	};
-	Position& top() { 
-	    return tree[tree_top]; 
-	};
-	bool has_repetition_draw();
+        Tree() : tree_top(0) {}
+        void push() {
+            tree[tree_top + 1] = tree[tree_top];
+            ++tree_top;
+        };
+        void pop() { 
+            --tree_top;
+        };
+        Position& top() { 
+            return tree[tree_top]; 
+        };
+        bool has_repetition_draw();
 };
 
 #endif /* !TREE_H */

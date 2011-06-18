@@ -36,35 +36,35 @@
  */
 ExtendedMove Moves::next() {
     if (!use_lazy_generation) {
-	if (i == 0) {
-	    generate();
-	}
-	if (i == n) return ExtendedMove();
-	return moves[i++];
+        if (i == 0) {
+            generate();
+        }
+        if (i == n) return ExtendedMove();
+        return moves[i++];
     }
 
     switch (state) {
-	case BEST:
-	    if (i < size[BEST]) return moves[i++];
-	    state = GOOD_CAPTURES;
-	    generate(CAPTURE);
-	    i = size[BEST] + size[KILLERS]; // Jump to the first good capture
-	case GOOD_CAPTURES:
-	    if (i < (size[BEST] + size[KILLERS] + size[GOOD_CAPTURES])) break;
-	    state = KILLERS;
-	    i = size[BEST]; // Jump to the first killer
-	case KILLERS:
-	    if (i < (size[BEST] + size[KILLERS])) return moves[i++];
-	    state = BAD_CAPTURES;
-	    i = size[BEST] + size[KILLERS] + size[GOOD_CAPTURES];
-	case BAD_CAPTURES:
-	    if (i < n) break;
-	    state = QUIET_MOVES;
-	    generate(QUIET_MOVE);
-	case QUIET_MOVES:
-	    if (i < n) return moves[i++];
-	default:
-	    return ExtendedMove();
+        case BEST:
+            if (i < size[BEST]) return moves[i++];
+            state = GOOD_CAPTURES;
+            generate(CAPTURE);
+            i = size[BEST] + size[KILLERS]; // Jump to the first good capture
+        case GOOD_CAPTURES:
+            if (i < (size[BEST] + size[KILLERS] + size[GOOD_CAPTURES])) break;
+            state = KILLERS;
+            i = size[BEST]; // Jump to the first killer
+        case KILLERS:
+            if (i < (size[BEST] + size[KILLERS])) return moves[i++];
+            state = BAD_CAPTURES;
+            i = size[BEST] + size[KILLERS] + size[GOOD_CAPTURES];
+        case BAD_CAPTURES:
+            if (i < n) break;
+            state = QUIET_MOVES;
+            generate(QUIET_MOVE);
+        case QUIET_MOVES:
+            if (i < n) return moves[i++];
+        default:
+            return ExtendedMove();
     }
 
     // If we are here, next() should return a capture
@@ -73,16 +73,16 @@ ExtendedMove Moves::next() {
     // Find the best remaining capture by selection sort
     int max = i;
     for (int j = i + 1; j < n; ++j) {
-	if (moves[j].get_score() > moves[max].get_score()) {
-	    max = j;
-	}
+        if (moves[j].get_score() > moves[max].get_score()) {
+            max = j;
+        }
     }
     
     // Swap it with the current one
     if (max != i) {
-	ExtendedMove tmp = moves[i];
-	moves[i] = moves[max];
-	moves[max] = tmp;
+        ExtendedMove tmp = moves[i];
+        moves[i] = moves[max];
+        moves[max] = tmp;
     }
     
     // Return it
@@ -91,47 +91,47 @@ ExtendedMove Moves::next() {
 
 void Moves::add(Move move, MovesState mt) {
     if (!use_lazy_generation) {
-	moves[n++] = ExtendedMove(move, 0);
-	return;
+        moves[n++] = ExtendedMove(move, 0);
+        return;
     }
     
     if (move.is_null()) return;
 
     // Partial protection against duplicates
     for (int j = 0; j < (size[BEST] + size[KILLERS]); ++j) {
-	if (moves[j] == move) return; // move has been already added
+        if (moves[j] == move) return; // move has been already added
     }
     
     // Calculate the move's score
     Score score = 0;
     switch (mt) {
-	case BEST: 
-	    score = BEST_SCORE;
-	    size[mt]++;
-	    break;
-	case KILLERS:
-	    score = KILLERS_SCORE - size[KILLERS];
-	    size[mt]++;
-	    break;
-	default:
-	    //assert(state > KILLERS);
-	    //size[state]++; // If move is a capture or a quiet move
-	    break;
+        case BEST: 
+            score = BEST_SCORE;
+            size[mt]++;
+            break;
+        case KILLERS:
+            score = KILLERS_SCORE - size[KILLERS];
+            size[mt]++;
+            break;
+        default:
+            //assert(state > KILLERS);
+            //size[state]++; // If move is a capture or a quiet move
+            break;
     }
     switch (state) {
-	case GOOD_CAPTURES:
-	case BAD_CAPTURES:
-	    score = get_mvv_lva_score(move);
-	    size[state]++;
-	    break;
-	case QUIET_MOVES:
-	    score = -BEST_SCORE;
-	    size[state]++;
-	    break;
-	default:
-	    //assert(mt < GOOD_CAPTURES);
-	    //size[mt]++; // If move is a best or killer move
-	    break;
+        case GOOD_CAPTURES:
+        case BAD_CAPTURES:
+            score = get_mvv_lva_score(move);
+            size[state]++;
+            break;
+        case QUIET_MOVES:
+            score = -BEST_SCORE;
+            size[state]++;
+            break;
+        default:
+            //assert(mt < GOOD_CAPTURES);
+            //size[mt]++; // If move is a best or killer move
+            break;
     }
     
     // Add the move and its score to moves list
@@ -150,9 +150,9 @@ Score Moves::mvv_lva_scores[][KING + 1] = { { 0 } };
  */
 void Moves::init_mvv_lva_scores() {
     for (PieceType v = PAWN; v <= KING; v = PieceType(v + 1)) {
-	for (PieceType a = PAWN; a <= KING; a = PieceType(a + 1)) {
-	    mvv_lva_scores[v][a] = (16 * v) - (2 * a);
-	}
+        for (PieceType a = PAWN; a <= KING; a = PieceType(a + 1)) {
+            mvv_lva_scores[v][a] = (16 * v) - (2 * a);
+        }
     }
 }
 
@@ -163,4 +163,3 @@ Score Moves::get_mvv_lva_score(Move move) {
     if (move.is_en_passant()) return mvv_lva_scores[PAWN][a];
     return mvv_lva_scores[v][a];
 }
-
