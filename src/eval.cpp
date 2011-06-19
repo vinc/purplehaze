@@ -28,7 +28,7 @@
 using namespace std;
 
 // PST[Phase][Color][PieceType][Square]
-static int PST[2][2][KING + 1][BOARD_SIZE] = { { { { 0 } } } };
+static int PST[2][2][int(KING) + 1][BOARD_SIZE] = { { { { 0 } } } };
 
 void Game::init_eval() {
     for (int i = 0; i < 64; ++i) {

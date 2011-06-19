@@ -138,7 +138,7 @@ void Moves::add(Move move, MovesState mt) {
     moves[n++] = ExtendedMove(move, score);
 }
 
-Score Moves::mvv_lva_scores[][KING + 1] = { { 0 } };
+Score Moves::mvv_lva_scores[][int(KING) + 1] = { { 0 } };
 
 /*
  * PxK = 94,  NxK = 92,  BxK = 90,  RxK = 88,  QxK = 86,  KxK = 84,  PxQ = 78,
