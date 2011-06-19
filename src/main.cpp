@@ -15,12 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
 #include <assert.h>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
 #include <stdio.h>
+#include <string>
 #include <time.h>
 
 #include "common.h"
@@ -48,6 +49,45 @@ int main() {
             Xboard xboard;
             xboard.loop();
             return 0;
+        }
+        else if (cmd == "help") {
+            int comm_width = 30;
+            int desc_width = 50;
+            cout << left;
+            cout << setw(comm_width) << "help"
+                 << setw(desc_width)
+                 << "display this screen"
+                 << endl;
+            cout << setw(comm_width) << "version"
+                 << setw(desc_width)
+                 << "display the version"
+                 << endl;
+            cout << setw(comm_width) << "setboard <fen>"
+                 << setw(desc_width)
+                 << "set the board according to <fen> position"
+                 << endl;
+            cout << setw(comm_width) << "perft"
+                 << setw(desc_width)
+                 << "count all nodes at each depth from the starting position"
+                 << endl;
+            cout << setw(comm_width) << "divide"
+                 << setw(desc_width)
+                 << "count all nodes from each moves at the starting position"
+                 << endl;
+            cout << setw(comm_width) << "testsuite <epd> [<time>]"
+                 << setw(desc_width)
+                 << "load an <epd> test suite and search each position"
+                 << endl
+                 << setw(comm_width) << ""
+                 << setw(desc_width)
+                 << "for <time> seconds"
+                 << endl;
+            cout << setw(comm_width) << "xboard"
+                 << "start XBoard protocol mode"
+                 << endl;
+            cout << setw(comm_width) << "quit"
+                 << "quit Purple Haze"
+                 << endl;
         }
         else if (cmd == "version") {
             cout << VERSION << endl;
