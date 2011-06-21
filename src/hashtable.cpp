@@ -16,6 +16,7 @@
  */
 
 #include "hashtable.h"
+#include "tt.h"
 
 template <class T>
 T HashTable<T>::lookup(Hash h, bool& is_empty) {
@@ -49,3 +50,4 @@ int HashTable<T>::get_usage() const {
 }
 
 template class HashTable<int>; // To avoid linker errors
+template class HashTable<Transposition>; // To avoid linker errors

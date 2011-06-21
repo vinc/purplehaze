@@ -74,7 +74,8 @@ string Game::output_pv(int depth, int score, Move m) {
     bool is_in_check = is_check(current_position().get_turn_color());
         
     // Find next move in TT
-    Transposition trans = tt.lookup(current_position().hash());
+    bool is_empty;
+    Transposition trans = tt.lookup(current_position().hash(), is_empty);
     Move move = trans.get_best_move();
     if (depth > 0 && is_legal(move) && trans.get_bound() < 3) {
         if (is_in_check) stream << "+"; // Check
@@ -150,8 +151,8 @@ void Game::print_tt_stats() {
     long zeros = 0;
     long ones = 0;
     for (int i = 0; i < tt.size(); ++i) {
-        if (tt.at(i).is_empty()) continue;
-        Hash h = tt.at(i).get_hash();
+        if (tt.get_value_at(i).is_empty()) continue;
+        Hash h = tt.get_hash_at(i);
         bitset<64> b = h;
         int z = b.count();
         //cout << "0: " << 64 - z << ", 1: " << z << endl;
