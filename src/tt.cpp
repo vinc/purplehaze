@@ -25,7 +25,7 @@
 using namespace std;
 
 bool Transposition::is_empty() const {
-    if (get_hash() != 0 || get_value() != 0 || get_depth() != 0 ||
+    if (/*get_hash() != 0 ||*/ get_value() != 0 || get_depth() != 0 ||
         get_bound() != UNDEF_BOUND || !get_best_move().is_null()) {        
         return false;
     }
@@ -34,12 +34,13 @@ bool Transposition::is_empty() const {
 
 string Transposition::to_string() const {
     ostringstream stream;
-    stream << "<" << hex << get_hash();
+    stream << "<" /*<< hex << get_hash()*/;
     stream << ", " << dec << get_value() << ", " << get_depth();
     stream << ", " << get_bound() << ", " << get_best_move() << ">";
     return stream.str();
 }
 
+/*
 void Transpositions::clear() {
     for (int i = 0; i < SIZE; ++i) {
         tt[i] = Transposition();
@@ -70,3 +71,6 @@ int Transpositions::get_usage() const {
     for (int i = 0; i < SIZE; ++i) if (!tt[i].is_empty()) ++res;
     return res;
 }
+*/
+
+template class HashTable<Transposition>; // To avoid linker errors

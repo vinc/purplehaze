@@ -24,7 +24,7 @@
 template <class T>
 class HashTable
 {
-    private:
+    protected:
         int hits;
         int collisions;
         int misses;
