@@ -53,9 +53,8 @@ void Xboard::think() {
         log << " of " << game.time.get_allocated_time() / 100.0f;
         log << " seconds used to play" << endl << endl;
         if (get_verbosity() > 1) {
-            cout << "TT statistics:" << endl;
-            game.print_tt_stats();
             cout << endl;
+            game.print_tt_stats();
         }
         output = "move " + move;
     }

@@ -25,9 +25,9 @@ template <class T>
 class HashTable
 {
     protected:
-        int hits;
-        int collisions;
-        int misses;
+        long hits;
+        long collisions;
+        long misses;
         const int SIZE;
         struct Entry {
             Hash hash;
@@ -61,11 +61,18 @@ class HashTable
         // Used to print stats
         int size() const { return SIZE; };
 
+        T get_value_at(int i) const {
+            return entries[i].value;
+        };
+        Hash get_hash_at(int i) const {
+            return entries[i].hash;
+        };
+
         int get_usage() const;
-        int get_nb_lookups() const { return hits + misses; };
-        int get_nb_hits() const { return hits; };
-        int get_nb_collisions() const { return collisions; };
-        int get_nb_misses() const { return misses; };
+        long get_nb_lookups() const { return hits + misses; };
+        long get_nb_hits() const { return hits; };
+        long get_nb_collisions() const { return collisions; };
+        long get_nb_misses() const { return misses; };
 };
 
 #endif /* !HASH_TABLE_H */

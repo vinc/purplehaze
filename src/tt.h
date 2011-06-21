@@ -74,14 +74,6 @@ class Transpositions : public HashTable<Transposition>
         void save(Hash h, int v, Bound b, int d, Move bm) {
             HashTable<Transposition>::save(h, Transposition(v, b, d, bm));
         };
-
-        // Used only for unit testing
-        Transposition get_value_at(int i) const {
-            return entries[i].value;
-        };
-        Hash get_hash_at(int i) const {
-            return entries[i].hash;
-        };
 };
 
 #endif /* !TT_H */

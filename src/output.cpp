@@ -147,77 +147,81 @@ string Game::output_square(File f, Rank r) {
     return stream.str();
 }
 
-void Game::print_tt_stats() {
+string get_stat(string title, double value, string unit = "") {
+    ostringstream stream;
+    stream << left << "    " << setw(20) << title;
+    int precision = (unit == "%" ? 2 : 0);
+    stream << fixed << setprecision(precision) << value << unit;
+    return stream.str();
+}
+
+string get_meta(double value, string unit) {
+    ostringstream stream;
+    stream << " (" << fixed << setprecision(2) << value << unit << ")";
+    return stream.str();
+}
+
+double get_percent(double a, double b) {
+    return 100 * a / b;
+}
+
+template <class T>
+string print_table_stats(HashTable<T>& table, int table_size) {
     long zeros = 0;
     long ones = 0;
-    for (int i = 0; i < tt.size(); ++i) {
-        if (tt.get_value_at(i).is_empty()) continue;
-        Hash h = tt.get_hash_at(i);
+    for (int i = 0; i < table.size(); ++i) {
+        Hash h = table.get_hash_at(i);
+        if (!h) continue;
         bitset<64> b = h;
         int z = b.count();
-        //cout << "0: " << 64 - z << ", 1: " << z << endl;
         zeros += 64 - z;
         ones += z;
     }
 
-    // TODO: change this *very* ugly code...
-    cout << "Zobrist:          " << hex << current_position().hash();
-    cout << dec << endl;
-    cout << "TT Size:          " << TT_SIZE / 1024 / 1024 << "Mb" << endl;
-    cout << "Entries:          " << tt.size() << endl;
-    cout << "Usage:            " << tt.get_usage();
-    float percent_usage = (100 * tt.get_usage()) / float(tt.size());
-    cout << " (" << percent_usage << "%)" << endl;
-    float percent_zeros = (100.0 * zeros) / (64.0 * tt.get_usage());
-    cout << "0's:              " << percent_zeros << "%" << endl;
-    float percent_ones = (100.0 * ones) / (64.0 * tt.get_usage());
-    cout << "1's:              " << percent_ones << "%" << endl;
+    ostringstream stream;
+    stream << get_stat("Table Size", table_size / 1024 / 1024, "Mb");
+    stream << endl;
+
+    stream << get_stat("Entries", table.size());
+    stream << endl;
     
-    cout << "Lookups:          " << tt.get_nb_lookups() << endl;
+    stream << get_stat("Usage", table.get_usage());
+    stream << get_meta(get_percent(table.get_usage(), table.size()), "%");
+    stream << endl;
+
+    stream << get_stat("0's", get_percent(zeros, 64 * table.get_usage()), "%");
+    stream << endl;
+
+    stream << get_stat("1's", get_percent(ones, 64 * table.get_usage()), "%");
+    stream << endl;
+
+    stream << get_stat("Lookups", table.get_nb_lookups());
+    stream << endl;
     
-    cout << "Hits:             " << tt.get_nb_hits();
-    float percent_hits = (100 * tt.get_nb_hits()) / 
-                         float(tt.get_nb_lookups());
-    cout << " (" << percent_hits << "%)" << endl;
+    stream << get_stat("Hits", table.get_nb_hits());
+    stream << get_meta(get_percent(table.get_nb_hits(),
+                                   table.get_nb_lookups()), "%");
+    stream << endl;
     
-    cout << "Index Collisions: " << tt.get_nb_collisions();
-    float percent_collisions = (100 * tt.get_nb_collisions()) / 
-                               float(tt.get_nb_lookups());
-    cout << " (" << percent_collisions << "%)" << endl;
+    stream << get_stat("Collisions", table.get_nb_collisions());
+    stream << get_meta(get_percent(table.get_nb_collisions(),
+                                   table.get_nb_lookups()), "%");
+    stream << endl;
     
-    cout << "Misses:           " << tt.get_nb_misses();
-    float percent_misses = (100 * tt.get_nb_misses()) / 
-                           float(tt.get_nb_lookups());
-    cout << " (" << percent_misses << "%)" << endl;
-  
-    cout << endl << "Material HashTable" << endl;
-    HashTable<int>& table = material_table;
-    cout << "MT Size:          " << MT_SIZE / 1024 / 1024 << "Mb" << endl;
-    cout << "Entries:          " << table.size() << endl;
-    cout << "Usage:            " << table.get_usage();
-    percent_usage = (100 * table.get_usage()) / float(table.size());
-    cout << " (" << percent_usage << "%)" << endl;
-    percent_zeros = (100.0 * zeros) / (64.0 * table.get_usage());
-    cout << "0's:              " << percent_zeros << "%" << endl;
-    percent_ones = (100.0 * ones) / (64.0 * table.get_usage());
-    cout << "1's:              " << percent_ones << "%" << endl;
-    
-    cout << "Lookups:          " << table.get_nb_lookups() << endl;
-    
-    cout << "Hits:             " << table.get_nb_hits();
-    percent_hits = (100 * table.get_nb_hits()) / 
-                         float(table.get_nb_lookups());
-    cout << " (" << percent_hits << "%)" << endl;
-    
-    cout << "Index Collisions: " << table.get_nb_collisions();
-    percent_collisions = (100 * table.get_nb_collisions()) / 
-                               float(table.get_nb_lookups());
-    cout << " (" << percent_collisions << "%)" << endl;
-    
-    cout << "Misses:           " << table.get_nb_misses();
-    percent_misses = (100 * table.get_nb_misses()) / 
-                           float(table.get_nb_lookups());
-    cout << " (" << percent_misses << "%)" << endl;
+    stream << get_stat("Misses", table.get_nb_misses());
+    stream << get_meta(get_percent(table.get_nb_misses(),
+                                   table.get_nb_lookups()), "%");
+    stream << endl;
+
+    return stream.str();
+}
+
+void Game::print_tt_stats() {
+    cout << "Transposition Table usage:" << endl;
+    cout << print_table_stats(tt, TT_SIZE) << endl;
+
+    cout << "Material Table usage:" << endl;
+    cout << print_table_stats(material_table, MT_SIZE) << endl;
 }
 
 string Game::debug_move(Move m) {

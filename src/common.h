@@ -27,8 +27,8 @@
 static const int BOARD_SIZE =  128;
 static const int MAX_PLY =     128;
 static const int INF =         29999;
-static const int TT_SIZE =     1024*1024*128;
-static const int MT_SIZE =     1024*1024;
+static const int TT_SIZE =     1024 * 1024 * 128;
+static const int MT_SIZE =     1024 * 1024 * 4;
 static const int MAX_KILLERS = 2;
 
 static const std::string DEFAULT_FEN = 
