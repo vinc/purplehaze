@@ -162,6 +162,8 @@ int Game::material_eval() {
     int hash_score = material_table.lookup(pos.material_hash(), is_empty);
     if (!is_empty) {
         c = pos.get_turn_color();
+        // TODO Enable material hash table
+        //return (c == WHITE ? hash_score : -hash_score);
     }
     
     int material_score[2] = { 0 };

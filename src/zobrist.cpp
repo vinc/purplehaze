@@ -18,8 +18,7 @@
 #include "zobrist.h"
 
 Zobrist::Zobrist() {
-    // TODO: find a good seed
-    generator.seed(5489u);
+    generator.seed(); // Use Mersenne twister's default seed
     
     side_to_move = gen_hash();
     for (int c = 0; c < 2; ++c) {

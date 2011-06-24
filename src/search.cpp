@@ -35,7 +35,7 @@ unsigned int Game::perft(int depth) {
     Moves moves(board, pieces, current_position(), use_lazy_generation);
     Move move;
     while (!(move = moves.next()).is_null()) {
-            make_move(move);
+        make_move(move);
         if (!is_check(c)) nodes += perft(depth - 1);
         undo_move(move);
     }
