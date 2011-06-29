@@ -316,8 +316,8 @@ int Game::position_eval() {
         int nb_rooks = pieces.get_nb_pieces(c, ROOK);
         for (int j = 0; j < nb_rooks; ++j) {
             Square s = pieces.get_position(c, ROOK, j);
-            if (pawns_files[!c][board.get_file(s)]) {
-                if (pawns_files[c][board.get_file(s)]) {
+            if (!pawns_files[!c][board.get_file(s)]) {
+                if (!pawns_files[c][board.get_file(s)]) {
                     rooks_score += OPEN_FILE_BONUS;
                 }
                 else rooks_score += HALF_OPEN_FILE_BONUS;
