@@ -97,7 +97,6 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
     Move best_move;
     bool is_pv = (node_type == PV);
 
-#ifdef TT
     // Lookup in Transposition Table
     bool is_empty;
     Transposition trans = tt.lookup(pos.hash(), is_empty);
@@ -116,8 +115,7 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
         Move bm = trans.get_best_move();
         if (!bm.is_null()) best_move = bm; // Save the best move
     }
-#endif
-       
+     
     Color player = pos.get_turn_color();
     bool is_in_check = is_check(player);
     bool is_null_move = !pos.get_null_move_right(); // No more than one
