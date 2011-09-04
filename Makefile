@@ -4,7 +4,6 @@ optimize = yes
 profiler = no
 gdb = no
 null_move_pruning = yes
-transpositions_table = yes
 
 ifndef compiler
     compiler = gcc
@@ -51,10 +50,6 @@ endif
 
 ifeq ($(null_move_pruning),yes)
     CXXFLAGS += -DNMP
-endif
-
-ifeq ($(transpositions_table),yes)
-    CXXFLAGS += -DTT
 endif
 
 SOURCES = $(shell ls src/*.cpp)
