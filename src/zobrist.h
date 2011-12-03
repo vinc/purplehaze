@@ -19,7 +19,7 @@
 #define ZOBRIST_H
 
 #include <iostream>
-#include <boost/random.hpp>
+#include <random>
 
 #include "common.h"
 
@@ -37,7 +37,7 @@ class Zobrist
         Hash side_to_move;
         Hash castle_rights[4];
         Hash en_passants[BOARD_SIZE];
-        boost::mt19937 generator;
+        mt19937 generator;
     public:
         Zobrist();
         void change_side(Hash& h) {
