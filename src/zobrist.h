@@ -37,7 +37,7 @@ class Zobrist
         Hash side_to_move;
         Hash castle_rights[4];
         Hash en_passants[BOARD_SIZE];
-        mt19937 generator;
+        mt19937_64 generator;
     public:
         Zobrist();
         void change_side(Hash& h) {

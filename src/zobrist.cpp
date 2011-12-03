@@ -38,6 +38,6 @@ Zobrist::Zobrist() {
 
 // Generate a random Hash
 Hash Zobrist::gen_hash() {
-    Hash h = generator() ^ ((Hash) generator() << 32);
+    Hash h = generator();
     return h;
 }
