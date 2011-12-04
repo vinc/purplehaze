@@ -43,15 +43,16 @@ void Xboard::think() {
         else {
             output += "1-0 {White mates}";
         }
-    }        
+    }
     else if (move == "DRAW") {
         output = "result 1/2-1/2";
     }
     else if (!force_mode) {
         play_move(move);
-        log << game.time.get_elapsed_time() / 100.0f;
-        log << " of " << game.time.get_allocated_time() / 100.0f;
-        log << " seconds used to play" << endl << endl;
+        log << endl << "  DEBUG: "
+            << game.time.get_elapsed_time() / 100.0f
+            << " of " << game.time.get_allocated_time() / 100.0f
+            << " seconds used to play";
         if (get_verbosity() > 1) {
             cout << endl;
             game.print_tt_stats();
@@ -59,35 +60,40 @@ void Xboard::think() {
         output = "move " + move;
     }
     cout << output << endl;
-    log << output << endl;
+    log << endl << "< " << output;
 }
 
 void Xboard::loop() {
     signal(SIGINT, SIG_IGN);
     cout << endl; // Acknowledge Xboard mode
-    log.open("game.log", ios::app); 
-    log << "DEBUG: PurpleHaze starting" << endl;
+    log.open("game.log", ios::app);
+    log << "  DEBUG: Purple Haze is starting" << endl;
 
     string cmd;
     cin >> cmd;
     while (cmd != "quit") {
-        log << ">" << cmd << endl; 
+        log << "> " << cmd;
         if (cmd == "protover") {
             int n;
             cin >> n;
+            log << " " << n;
             if (n == 2) {
                 for (int i = 0; i < XBOARD_NB_FEATURES; ++i) {
                     cout << "feature " << XBOARD_FEATURES[i][0];
+                    log << endl << "< feature " << XBOARD_FEATURES[i][0];
                     string value = XBOARD_FEATURES[i][1];
                     if (value == "0" || value == "1") {
                         cout << "=" << value << endl;
+                        log << "=" << value;
                     }
                     else {
                         cout << "=\"" << value << "\"" << endl;
+                        log << "=\"" << value << "\"";
                     }
                     string reply, feature;
                     cin >> reply;
                     cin >> feature;
+                    log << endl << "> " << reply << " " << feature;
                     assert(feature == XBOARD_FEATURES[i][0]);
                     if (reply == "accepted") continue;
                     else if (reply == "rejected") assert(false); // FIXME
@@ -106,6 +112,7 @@ void Xboard::loop() {
             fen.erase(0, 1); // Remove the first whitespace
             new_game();
             set_board(fen);
+            log << " " << fen;
             force_mode = false;
         }
         else if (cmd == "go") {
@@ -124,11 +131,13 @@ void Xboard::loop() {
             // Number of moves
             int moves;
             cin >> moves;
+            log << " " << moves;
 
             // Time interval in minutes or minutes:seconds
             int time;
             string str_time;
             cin >> str_time;
+            log << " " << str_time;
             size_t sep = str_time.find(":");
             if (sep == string::npos) {
                 istringstream minutes(str_time);
@@ -147,31 +156,31 @@ void Xboard::loop() {
             // Control character
             int control;
             cin >> control;
+            log << " " << control;
             if (control == 0) {
                 set_time(moves, time);
-                log << "> level " << moves << " " << time << endl;
             }
             else { // Not in Xboard protocol
-                // If not zero, control is a time increment,
+                // TODO If not zero, control is a time increment,
                 // but currently this time is not directly used
                 set_time(moves, time);
-                log << "> level " << moves << " " << time << endl;
             }
         }
         else if (cmd == "time") {
             int time = 0;
             cin >> time;
-            log << time << endl;
+            log << " " << time;
             set_remaining_time(time);
         }
         else if (cmd == "otim") {
             int time = 0;
             cin >> time;
-            log << time << endl;
+            log << " " << time;
         }
         else if (cmd == "sd") {
             int d = 0;
             cin >> d;
+            log << " " << d;
             set_depth(d);
         }
         else if (cmd == "undo") {
@@ -196,19 +205,23 @@ void Xboard::loop() {
                  'a' <= cmd[2] && cmd[2] <= 'h' &&
                  '1' <= cmd[3] && cmd[3] <= '8' &&
                  !parse_move(cmd).is_null()) {
-            log << "DEBUG: move parsed: " << cmd << endl;
-            if (!play_move(cmd)) cout << "Illegal move: " << cmd << endl;
+            log << endl << "  DEBUG: move '" << cmd << "' successfully parsed";
+            if (!play_move(cmd)) {
+                cout << "Illegal move: " << cmd << endl;
+                log << endl << "< Illegal move: " << cmd;
+            }
             if (!force_mode) think();
         }
         else if (cmd == "verbose") { // Debug mode
             verbosity = 2;
         }
         else {
-            log << "DEBUG: ignoring: " << cmd << endl;
+            log << endl << "  DEBUG: ignoring command";
         }
+        log << endl;
         cin >> cmd;
     }
-    log << ">" << cmd << endl; 
-    log << "DEBUG: exiting" << endl; 
+    log << "> " << cmd << endl;
+    log << "  DEBUG: exiting" << endl;
     log.close();
 }
