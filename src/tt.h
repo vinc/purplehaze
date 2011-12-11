@@ -25,8 +25,6 @@
 #include "move.h"
 #include "zobrist.h"
 
-enum Bound : unsigned char { EXACT, LOWER, UPPER, UNDEF_BOUND };
-
 class Transposition
 {
     private:

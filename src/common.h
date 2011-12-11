@@ -165,27 +165,38 @@ static const Direction PAWN_CAPTURE_DIRS[2][2] = {
     }
 };
 
+// Used in tt.h
+enum Bound : unsigned char { EXACT, LOWER, UPPER, UNDEF_BOUND };
+
 // Used for debuging
 #define assert_msg(x) !(std::cerr << "Assertion failed: " << x << std::endl)
 
-// Overload operators to solve ambiguous errors with Clang
+// Overload operators to solve ambiguous errors with Clang < 3.1
 inline bool operator==(int i, Rank r) { return i == int(r); }
+inline bool operator<(Bound b, int i) { return char(b) < i; }
 inline int operator>>(Square s, int i) { return int(s) >> i; }
 inline int operator|(int i, MoveType mt) { return i | int(mt); }
 inline int operator&(Square s, int i) { return int(s) & i; }
 inline int operator*(Rank r, Color c) { return int(r) * int(c); }
 inline int operator*(int i, Rank r) { return i * int(r); }
 inline int operator*(int i, Color c) { return i * int(c); }
+inline int operator*(int i, PieceType pt) { return i * int(pt); }
 inline int operator+(int i, File f) { return i + int(f); }
 inline int operator+(int i, Square s) { return i + int(s); }
 inline int operator+(int i, PieceType pt) { return i + int(pt); }
 inline int operator+(PieceType pt, int i) { return i + int(pt); }
 inline int operator+(Square s, int i) { return i + int(s); }
 inline int operator+(Rank r, int i) { return int(r) + i; }
+inline int operator+(char c, Rank r) { return c + char(r); }
 inline int operator+(Square s, Direction d) { return int(s) + int(d); }
+inline int operator-(Square a, Square b) { return Square(int(a) - int(b)); }
+inline int operator-(Square s, int i) { return int(s) - i; }
 inline int operator-(int i, Square s) { return i - int(s); }
 inline int operator-(int i, PieceType pt) { return i - int(pt); }
 inline int operator-(Rank a, Rank b) { return int(a) - int(b); }
 inline int operator-(Rank r, int i) { return int(r) - i; }
+inline int operator+(MoveType a, MoveType b) {
+    return MoveType(int(a) + int(b));
+}
 
 #endif /* !COMMON_H */
