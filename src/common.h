@@ -25,7 +25,8 @@
 #endif
 
 static const int BOARD_SIZE =  128;
-static const int MAX_PLY =     128;
+static const int MAX_PLY =     128; // Maximum search depth
+static const int MAX_BF =      256; // Maximum number of moves per position
 static const int INF =         29999;
 static const int TT_SIZE =     1024 * 1024 * 128;
 static const int MT_SIZE =     1024 * 1024;

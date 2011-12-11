@@ -28,6 +28,7 @@ Game::Game() {
     tt.clear();
     material_table.clear();
     clear_killers();
+    search_moves.clear();
     
     // Make PST
     init_eval();

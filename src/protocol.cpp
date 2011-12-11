@@ -25,6 +25,7 @@ using namespace std;
 void Protocol::new_game(){
     game.tt.clear();
     game.clear_killers();
+    game.search_moves.clear();
 }
 
 bool Protocol::set_board(string fen){

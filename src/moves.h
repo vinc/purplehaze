@@ -27,7 +27,6 @@ using namespace std;
 
 typedef char Score;
 
-const int MAX_MOVES = 128; // TODO Find the real value
 const Score BEST_SCORE = 127;
 const Score KILLERS_SCORE = 0;
 
@@ -36,10 +35,30 @@ enum MovesState : unsigned char {
     BEST, GOOD_CAPTURES, KILLERS, BAD_CAPTURES, QUIET_MOVES, UNDEF_MOVES
 };
 
+class MoveList
+{
+    private:
+        ExtendedMove list[MAX_PLY * MAX_BF];
+        unsigned int pos;
+
+    public:
+        MoveList() :
+            pos(0)
+            {}
+        //unsigned int get_pos() { return pos };
+        void inc_ply() { pos += MAX_PLY; };
+        void dec_ply() { pos -= MAX_PLY; };
+        void clear() { pos = 0; };
+        //void insert(unsigned char i, ExtendedMove m) { list[pos + i] = m; };
+        //ExtendedMove at(unsigned char i) { return list[pos + i]; };
+        ExtendedMove& operator[] (unsigned char i) { return list[pos + i]; };
+};
+
 class Moves
 {
     private:        
-        ExtendedMove moves[MAX_MOVES];
+        //ExtendedMove moves[MAX_MOVES];
+        MoveList& moves;
 
         Position& current_position;
         Board& board;
@@ -54,12 +73,20 @@ class Moves
     public:
         static Score mvv_lva_scores[int(KING) + 1][int(KING) + 1];
 
-        Moves(Board& b, Pieces& ps, Position& cn, bool lg = true) : 
-            current_position(cn), board(b), pieces(ps),
+        Moves(Board& b, Pieces& ps, Position& cn, MoveList& ml,
+              bool lg = true) :
+            moves(ml), current_position(cn), board(b), pieces(ps),
             state(BEST),
             i(0), n(0),
             use_lazy_generation(lg)
-            { for (int j = 0; j < MOVES_STATE_SIZE; ++j) size[j] = 0; }
+            {
+                moves.inc_ply(); // Increment move list internal counter
+                for (int j = 0; j < MOVES_STATE_SIZE; ++j) size[j] = 0;
+            }
+
+        ~Moves() {
+            moves.dec_ply(); // Decrement move list internal counter
+        }
 
         void generate(MoveType mt = NULL_MOVE); // here NULL_MOVE => ALL_MOVE 
         void generate_pieces(Color c, PieceType t, MoveType mt);
@@ -68,7 +95,7 @@ class Moves
         MovesState get_state() const { return state; };
 
         static void init_mvv_lva_scores();
-        Score get_mvv_lva_score(Move m);        
+        Score get_mvv_lva_score(Move m); 
 
         // Used for compatibility only
         /*

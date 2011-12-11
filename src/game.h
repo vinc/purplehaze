@@ -46,6 +46,7 @@ class Game
         Tree tree;
         Time time;
         Transpositions tt;
+        MoveList search_moves;
         Game();
         void add_piece(Color c, PieceType t, Square s);
         void del_piece(Color c, PieceType t, int i);

@@ -117,7 +117,8 @@ int main() {
             Color c = game.current_position().get_turn_color();
             unsigned int nodes_count = 0;
             unsigned int moves_count = 0;
-            Moves moves(game.board, game.pieces, game.current_position());    
+            Moves moves(game.board, game.pieces, game.current_position(),
+                        game.search_moves);
             Move move;
             while (!(move = moves.next()).is_null()) {
                     game.make_move(move);

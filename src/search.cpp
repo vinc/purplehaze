@@ -31,8 +31,8 @@ unsigned int Game::perft(int depth) {
     if (depth == 0) return 1;
     unsigned int nodes = 0;
     Color c = current_position().get_turn_color();
-    bool use_lazy_generation = false; // Useless overhead in perft()
-    Moves moves(board, pieces, current_position(), use_lazy_generation);
+    bool use_lazy = false; // Lazy moves generation is not usefull in perft()
+    Moves moves(board, pieces, current_position(), search_moves, use_lazy);
     Move move;
     while (!(move = moves.next()).is_null()) {
         make_move(move);
@@ -59,7 +59,7 @@ int Game::q_search(int alpha, int beta, int depth, int ply) {
 
     Color player = current_position().get_turn_color();
     
-    Moves moves(board, pieces, current_position());    
+    Moves moves(board, pieces, current_position(), search_moves);
     Move move;
     while (!(move = moves.next()).is_null()) {
         if (moves.get_state() > GOOD_CAPTURES) break; // Skip bad captures        
@@ -148,7 +148,7 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
 
     // Internal Iterative Deepening
     if (depth > IID_DEPTH && best_move.is_null() && !is_null_move && is_pv) {
-        Moves moves(board, pieces, current_position());
+        Moves moves(board, pieces, current_position(), search_moves);
         int internal_best_score = -INF;
         Move move;
         while (!(move = moves.next()).is_null()) {
@@ -189,7 +189,7 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
     bool legal_move_found = false;
     bool is_principal_variation = true;
     
-    Moves moves(board, pieces, current_position());
+    Moves moves(board, pieces, current_position(), search_moves);
     moves.add(best_move, BEST);
     
     // Killer moves need pseudo legality checking before we can use them,
@@ -338,7 +338,7 @@ Move Game::root(int max_depth) {
             if (is_mate) break; // The position was mate in the 3 previous ply
         }
 
-        Moves moves(board, pieces, current_position());
+        Moves moves(board, pieces, current_position(), search_moves);
         moves.add(best_move, BEST);    
         Move move;
         int nb_moves;
