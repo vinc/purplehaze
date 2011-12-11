@@ -57,7 +57,7 @@ class Move
     public:
         Move() : code(NULL_MOVE) {}
 
-        Move(Square o, Square d, MoveType t){
+        Move(Square o, Square d, MoveType t) {
             code = ((o & 7) << OF_SHIFT) | 
             ((o >> 4) << OR_SHIFT) |
             ((d & 7) << DF_SHIFT) | 

@@ -36,11 +36,10 @@
  */
 ExtendedMove Moves::next() {
     if (!use_lazy_generation) {
-        if (i == 0) {
-            generate();
-        }
+        if (i == 0) generate(); // generate() will change the value of 'n'
+
         if (i == n) return ExtendedMove();
-        return moves[i++];
+        else return moves[i++];
     }
 
     switch (state) {
@@ -68,11 +67,12 @@ ExtendedMove Moves::next() {
     }
 
     // If we are here, next() should return a capture
+    // FIXME: the two conditions are identical
     assert(state == GOOD_CAPTURES || state == GOOD_CAPTURES);
     
     // Find the best remaining capture by selection sort
-    int max = i;
-    for (int j = i + 1; j < n; ++j) {
+    auto max = i;
+    for (auto j = i + 1; j < n; ++j) {
         if (moves[j].get_score() > moves[max].get_score()) {
             max = j;
         }
@@ -94,13 +94,12 @@ void Moves::add(Move move, MovesState mt) {
         moves[n++] = ExtendedMove(move, 0);
         return;
     }
-    
+
     if (move.is_null()) return;
 
-    // Partial protection against duplicates
-    for (int j = 0; j < (size[BEST] + size[KILLERS]); ++j) {
-        if (moves[j] == move) return; // move has been already added
-    }
+    // Don't add again best and killer moves
+    auto end = size[BEST] + size[KILLERS];
+    for (auto j = 0; j < end; ++j) if (moves[j] == move) return;
     
     // Calculate the move's score
     Score score = 0;

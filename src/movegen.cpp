@@ -357,7 +357,7 @@ bool Game::is_legal(Move m) {
     else if (m.is_castle()) {
         Square rook = Square(H1 + A8 * c);
         Color oc = Color(!c); // Opponent's color
-        switch (m.get_castle_side()){
+        switch (m.get_castle_side()) {
             case KING:
                 rook = Square(H1 + A8 * c);
                 if (!(board.is_empty(Square(F1 + A8 * c)) &&

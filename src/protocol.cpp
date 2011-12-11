@@ -22,13 +22,13 @@
 
 using namespace std;
 
-void Protocol::new_game(){
+void Protocol::new_game() {
     game.tt.clear();
     game.clear_killers();
     game.search_moves.clear();
 }
 
-bool Protocol::set_board(string fen){
+bool Protocol::set_board(string fen) {
     // Test if fen is valid?
     
     // Load fen
@@ -41,17 +41,17 @@ bool Protocol::set_board(string fen){
  * Set time control:
  * 'n' moves in 't' time with time in seconds.
  */
-bool Protocol::set_time(int moves, int time){
+bool Protocol::set_time(int moves, int time) {
     game.time = Time(moves, time * 100);
     return true;
 }
 
-bool Protocol::set_remaining_time(int time){
+bool Protocol::set_remaining_time(int time) {
     game.time.set_remaining_time(time);
     return true;
 }
 
-bool Protocol::set_output_thinking(bool ot){
+bool Protocol::set_output_thinking(bool ot) {
     game.output_thinking = ot;
     return true;
 }
