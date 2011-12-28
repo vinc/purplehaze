@@ -254,7 +254,7 @@ int Game::material_eval() {
             if (material_score[!c] == K + N + N) break;
 
             // TODO is this duplicate with MALUS_NO_PAWNS?
-            int nb_opponent_pawns = pieces.get_nb_pieces(Color(!c), PAWN);
+            int nb_opponent_pawns = pieces.get_nb_pieces(!c, PAWN);
             if (nb_opponent_pawns == 0 && material_score[!c] < K + 4 * P) {
                 break;
             }
@@ -264,8 +264,8 @@ int Game::material_eval() {
 
     if (!is_draw) {
         const Color& c = pos.get_turn_color();
-        score = material_score[c] - material_score[Color(!c)];
-        score += material_bonus[c] - material_bonus[Color(!c)];
+        score = material_score[c] - material_score[!c];
+        score += material_bonus[c] - material_bonus[!c];
     }
 
     // TODO Enable material hash table
@@ -334,8 +334,8 @@ int Game::position_eval() {
     }
     const Color& c = pos.get_turn_color();
     int opening, ending; // Score based on opening and ending rules
-    opening = position_score[OPENING][c] - position_score[OPENING][Color(!c)];
-    ending = position_score[ENDING][c] - position_score[ENDING][Color(!c)];
+    opening = position_score[OPENING][c] - position_score[OPENING][!c];
+    ending = position_score[ENDING][c] - position_score[ENDING][!c];
     
     // Tapered Eval (idea from Fruit 2.1)
     int max = PHASE_MAX;

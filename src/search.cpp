@@ -233,7 +233,7 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
         }
         else {
 
-            bool is_giving_check = is_check(Color(!player));
+            bool is_giving_check = is_check(!player);
 
             // Futility Pruning
             if (depth <= FUTILITY_DEPTH && 

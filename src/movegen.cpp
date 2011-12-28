@@ -111,9 +111,9 @@ void Moves::generate(MoveType mt) {
             board.is_empty(to) &&
             board.get_piece(rook).get_type() == ROOK &&
             board.get_piece(rook).get_color() == c &&
-            !board.is_attacked_by(Color(!c), from, pieces) &&
-            !board.is_attacked_by(Color(!c), to, pieces) &&
-            !board.is_attacked_by(Color(!c), Square((F1 + A8 * c)), pieces)
+            !board.is_attacked_by(!c, from, pieces) &&
+            !board.is_attacked_by(!c, to, pieces) &&
+            !board.is_attacked_by(!c, Square((F1 + A8 * c)), pieces)
             ) {
             add(Move(from, to, KING_CASTLE));
         }
@@ -127,9 +127,9 @@ void Moves::generate(MoveType mt) {
             board.is_empty(to) &&
             board.get_piece(rook).get_type() == ROOK &&
             board.get_piece(rook).get_color() == c &&
-            !board.is_attacked_by(Color(!c), from, pieces) &&
-            !board.is_attacked_by(Color(!c), to, pieces) &&
-            !board.is_attacked_by(Color(!c), Square((D1 + A8 * c)), pieces)
+            !board.is_attacked_by(!c, from, pieces) &&
+            !board.is_attacked_by(!c, to, pieces) &&
+            !board.is_attacked_by(!c, Square((D1 + A8 * c)), pieces)
             ) {
             add(Move(from, to, QUEEN_CASTLE));
         }
@@ -183,14 +183,13 @@ void Game::make_move(Move m) {
 
         capture = board.get_piece(s);
         if (capture.get_type() == ROOK) { // Update opponent's castling rights
-            Color oc = Color(!c); // Opponent's color
             if (dest == Square(H1 + A8 * c)) {
-                pos.set_castle_right(oc, KING, false);
-                zobrist.update_castle_right(pos.hash(), oc, KING);
+                pos.set_castle_right(!c, KING, false);
+                zobrist.update_castle_right(pos.hash(), !c, KING);
             }
             else if (dest == Square(A1 + A8 * c)) {
-                pos.set_castle_right(oc, QUEEN, false);
-                zobrist.update_castle_right(pos.hash(), oc, QUEEN);
+                pos.set_castle_right(!c, QUEEN, false);
+                zobrist.update_castle_right(pos.hash(), !c, QUEEN);
             }
         }
         del_piece(capture);
@@ -356,7 +355,6 @@ bool Game::is_legal(Move m) {
     }
     else if (m.is_castle()) {
         Square rook = Square(H1 + A8 * c);
-        Color oc = Color(!c); // Opponent's color
         switch (m.get_castle_side()) {
             case KING:
                 rook = Square(H1 + A8 * c);
@@ -364,9 +362,9 @@ bool Game::is_legal(Move m) {
                     board.is_empty(to) &&
                     board.get_piece(rook).get_type() == ROOK &&
                     board.get_piece(rook).get_color() == c &&
-                    !board.is_attacked_by(oc, from, pieces) &&
-                    !board.is_attacked_by(oc, Square((F1 + A8 * c)), pieces) &&
-                    !board.is_attacked_by(oc, to, pieces))
+                    !board.is_attacked_by(!c, from, pieces) &&
+                    !board.is_attacked_by(!c, Square((F1 + A8 * c)), pieces) &&
+                    !board.is_attacked_by(!c, to, pieces))
                     ) {
                     return false;
                 }
@@ -378,9 +376,9 @@ bool Game::is_legal(Move m) {
                     board.is_empty(to) &&
                     board.get_piece(rook).get_type() == ROOK &&
                     board.get_piece(rook).get_color() == c &&
-                    !board.is_attacked_by(oc, from, pieces) &&
-                    !board.is_attacked_by(oc, Square((D1 + A8 * c)), pieces) &&
-                    !board.is_attacked_by(oc, to, pieces))
+                    !board.is_attacked_by(!c, from, pieces) &&
+                    !board.is_attacked_by(!c, Square((D1 + A8 * c)), pieces) &&
+                    !board.is_attacked_by(!c, to, pieces))
                     ) {
                     return false;
                 }

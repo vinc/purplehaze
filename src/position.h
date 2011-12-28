@@ -61,7 +61,7 @@ class Position
             return side_to_move;
         };
         void change_side() {
-            side_to_move = Color(!side_to_move);
+            side_to_move = !side_to_move;
         };
         unsigned short get_ply() const {
             return ply;

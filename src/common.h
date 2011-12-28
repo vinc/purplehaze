@@ -98,6 +98,9 @@ enum Color : bool {
     BLACK
 };
 static const Color COLORS[] = { WHITE, BLACK };
+inline Color operator!(Color c) {
+    return static_cast<Color>(!static_cast<bool>(c));
+}
 
 enum PieceType : unsigned char { 
     EMPTY,

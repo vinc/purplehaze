@@ -56,7 +56,7 @@ class Piece
         }
         
         Color get_color() const { 
-            return Color((code >> C_SHIFT) & C_MASK); 
+            return static_cast<Color>((code >> C_SHIFT) & C_MASK); 
         };
         PieceType get_type() const { 
             return static_cast<PieceType>((code >> T_SHIFT) & T_MASK); 

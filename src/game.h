@@ -62,7 +62,7 @@ class Game
 
         bool is_check(Color c) const {
             Square s = pieces.get_position(c, KING, 0);
-            return board.is_attacked_by(Color(!c), s, pieces);
+            return board.is_attacked_by(!c, s, pieces);
         }
 
         void make_move(Move m);
