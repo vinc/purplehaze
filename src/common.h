@@ -107,6 +107,7 @@ enum PieceType : unsigned char {
     QUEEN, 
     KING
 };
+static const int NB_PIECE_TYPES = static_cast<int>(KING) + 1;
 
 enum MoveType : unsigned char { 
     QUIET_MOVE, 
@@ -172,31 +173,78 @@ enum Bound : unsigned char { EXACT, LOWER, UPPER, UNDEF_BOUND };
 #define assert_msg(x) !(std::cerr << "Assertion failed: " << x << std::endl)
 
 // Overload operators to solve ambiguous errors with Clang < 3.1
-inline bool operator==(int i, Rank r) { return i == int(r); }
-inline bool operator<(Bound b, int i) { return char(b) < i; }
-inline int operator>>(Square s, int i) { return int(s) >> i; }
-inline int operator|(int i, MoveType mt) { return i | int(mt); }
-inline int operator&(Square s, int i) { return int(s) & i; }
-inline int operator*(Rank r, Color c) { return int(r) * int(c); }
-inline int operator*(int i, Rank r) { return i * int(r); }
-inline int operator*(int i, Color c) { return i * int(c); }
-inline int operator*(int i, PieceType pt) { return i * int(pt); }
-inline int operator+(int i, File f) { return i + int(f); }
-inline int operator+(int i, Square s) { return i + int(s); }
-inline int operator+(int i, PieceType pt) { return i + int(pt); }
-inline int operator+(PieceType pt, int i) { return i + int(pt); }
-inline int operator+(Square s, int i) { return i + int(s); }
-inline int operator+(Rank r, int i) { return int(r) + i; }
-inline int operator+(char c, Rank r) { return c + char(r); }
-inline int operator+(Square s, Direction d) { return int(s) + int(d); }
-inline int operator-(Square a, Square b) { return Square(int(a) - int(b)); }
-inline int operator-(Square s, int i) { return int(s) - i; }
-inline int operator-(int i, Square s) { return i - int(s); }
-inline int operator-(int i, PieceType pt) { return i - int(pt); }
-inline int operator-(Rank a, Rank b) { return int(a) - int(b); }
-inline int operator-(Rank r, int i) { return int(r) - i; }
+// TODO Find out if this could be better done
+inline bool operator==(int i, Rank r) {
+    return i == static_cast<int>(r);
+}
+inline bool operator<(Bound b, int i) {
+    return static_cast<char>(b) < i;
+}
+inline int operator>>(Square s, int i) {
+    return static_cast<int>(s) >> i;
+}
+inline int operator|(int i, MoveType mt) {
+    return i | static_cast<int>(mt);
+}
+inline int operator&(Square s, int i) {
+    return static_cast<int>(s) & i;
+}
+inline int operator*(Rank r, Color c) {
+    return static_cast<int>(r) * static_cast<int>(c);
+}
+inline int operator*(int i, Rank r) {
+    return i * static_cast<int>(r);
+}
+inline int operator*(int i, Color c) {
+    return i * static_cast<int>(c);
+}
+inline int operator*(int i, PieceType pt) {
+    return i * static_cast<int>(pt);
+}
+inline int operator+(int i, File f) {
+    return i + static_cast<int>(f);
+}
+inline int operator+(int i, Square s) {
+    return i + static_cast<int>(s);
+}
+inline int operator+(int i, PieceType pt) {
+    return i + static_cast<int>(pt);
+}
+inline int operator+(PieceType pt, int i) {
+    return i + static_cast<int>(pt);
+}
+inline int operator+(Square s, int i) {
+    return i + static_cast<int>(s);
+}
+inline int operator+(Rank r, int i) {
+    return static_cast<int>(r) + i;
+}
+inline int operator+(char c, Rank r) {
+    return c + static_cast<char>(r);
+}
+inline int operator+(Square s, Direction d) {
+    return static_cast<int>(s) + static_cast<int>(d);
+}
+inline int operator-(Square a, Square b) {
+    return Square(static_cast<int>(a) - static_cast<int>(b));
+}
+inline int operator-(Square s, int i) {
+    return static_cast<int>(s) - i;
+}
+inline int operator-(int i, Square s) {
+    return i - static_cast<int>(s);
+}
+inline int operator-(int i, PieceType pt) {
+    return i - static_cast<int>(pt);
+}
+inline int operator-(Rank a, Rank b) {
+    return static_cast<int>(a) - static_cast<int>(b);
+}
+inline int operator-(Rank r, int i) {
+    return static_cast<int>(r) - i;
+}
 inline int operator+(MoveType a, MoveType b) {
-    return MoveType(int(a) + int(b));
+    return static_cast<MoveType>(static_cast<int>(a) + static_cast<int>(b));
 }
 
 #endif /* !COMMON_H */

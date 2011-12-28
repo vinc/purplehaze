@@ -90,7 +90,7 @@ class Board
 
         // Theoretical answer by array lookup
         bool can_attack(PieceType t, Square from, Square to) const {
-            return bool(attack_array[0x77 + from - to][t]);
+            return static_cast<bool>(attack_array[0x77 + from - to][t]);
         }
         Direction get_direction_to(Square from, Square to) const {
             return dir_array[0x77 + from - to];

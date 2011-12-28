@@ -23,7 +23,7 @@
  * Return true if the square s is attacked by one of the c color's pieces.
  */
 bool Board::is_attacked_by(Color c, Square s, const Pieces& pieces) const {
-    for (PieceType t = KNIGHT; t <= KING; t = PieceType(t + 1)) {
+    for (PieceType t = KNIGHT; t <= KING; t = static_cast<PieceType>(t + 1)) {
         int n = pieces.get_nb_pieces(c, t);
         for (int i = 0; i < n; ++i) {
             Square from = pieces.get_position(c, t, i);

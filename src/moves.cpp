@@ -137,7 +137,7 @@ void Moves::add(Move move, MovesState mt) {
     moves[n++] = ExtendedMove(move, score);
 }
 
-Score Moves::mvv_lva_scores[][int(KING) + 1] = { { 0 } };
+Score Moves::mvv_lva_scores[][NB_PIECE_TYPES] = { { 0 } };
 
 /*
  * PxK = 94,  NxK = 92,  BxK = 90,  RxK = 88,  QxK = 86,  KxK = 84,  PxQ = 78,
@@ -148,8 +148,8 @@ Score Moves::mvv_lva_scores[][int(KING) + 1] = { { 0 } };
  * KxP =  4
  */
 void Moves::init_mvv_lva_scores() {
-    for (PieceType v = PAWN; v <= KING; v = PieceType(v + 1)) {
-        for (PieceType a = PAWN; a <= KING; a = PieceType(a + 1)) {
+    for (PieceType v = PAWN; v <= KING; v = static_cast<PieceType>(v + 1)) {
+        for (PieceType a = PAWN; a <= KING; a = static_cast<PieceType>(a + 1)) {
             mvv_lva_scores[v][a] = (16 * v) - (2 * a);
         }
     }

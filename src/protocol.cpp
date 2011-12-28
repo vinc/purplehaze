@@ -95,7 +95,7 @@ Move Protocol::parse_move(string move) {
     if (!game.board.is_empty(to)) {
         assert((t == QUIET_MOVE) || 
                (KNIGHT_PROMOTION <= t && t <= QUEEN_PROMOTION));
-        return Move(from, to, MoveType(t + CAPTURE));
+        return Move(from, to, static_cast<MoveType>(t + CAPTURE));
     }
     else return Move(from, to, t);
 }

@@ -47,7 +47,7 @@ void Game::init(string fen) {
     for (auto it = positions.begin(); it != positions.end(); ++it) {
         char sq = *it;
         if (sq == '/') s = Square(s + DOWN + 8 * LEFT); // New rank
-        else if (int(sq) >= '1' && int(sq) <= '8') { // Empty squares
+        else if ('1' <= sq && sq <= '8') { // Empty squares
             s = Square(s + sq - '1' + 1); // Next square
         }
         else { // Non empty square

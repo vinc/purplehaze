@@ -102,7 +102,8 @@ int main() {
             for (int i = 1; ; ++i) {
                 clock_t start = clock();
                 unsigned int perft_result = game.perft(i);
-                double perft_time = double(clock() - start) / CLOCKS_PER_SEC;
+                double perft_time = static_cast<double>(clock() - start) /
+                                    CLOCKS_PER_SEC;
                 cout << "Perft(" << i << ") = " << perft_result;
                 cout << " (" << perft_time << " secs, ";
                 cout << perft_result / perft_time << " nps)" << endl;

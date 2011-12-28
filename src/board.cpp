@@ -39,7 +39,7 @@ Board::Board() {
         for (int j = 0; j < 64; ++j) { 
             Square to = get_square(j);
             int diff = 0x77 + from - to;
-            for (PieceType t = KNIGHT; t <= KING; t = PieceType(t + 1)) {
+            for (PieceType t = KNIGHT; t <= KING; t = static_cast<PieceType>(t + 1)) {
                 const Direction * dirs = PIECES_DIRS[t];
                 for (int d = 0; d < NB_DIRS[t]; ++d) {
                     Square s = Square(from + dirs[d]);

@@ -118,7 +118,7 @@ string Game::output_move(Move m) {
                 // attack the destination (fast answer by array lookup)
                 // and can really go to this destination (not so fast
                 // answer) then a disambiguation is needed
-                stream << char('a' + m.get_orig_file());
+                stream << static_cast<char>('a' + m.get_orig_file());
                 break;
             }
         }
@@ -126,7 +126,7 @@ string Game::output_move(Move m) {
 
     // Capture
     if (m.is_capture()) {
-        if (t == PAWN) stream << char('a' + m.get_orig_file());
+        if (t == PAWN) stream << static_cast<char>('a' + m.get_orig_file());
         stream << "x";
     }
     
@@ -143,7 +143,7 @@ string Game::output_move(Move m) {
 
 string Game::output_square(File f, Rank r) {
     ostringstream stream;
-    stream << char('a' + f) << char('1' + r);
+    stream << static_cast<char>('a' + f) << static_cast<char>('1' + r);
     return stream.str();
 }
 

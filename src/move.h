@@ -86,7 +86,7 @@ class Move
             return Square(16 * get_dest_rank() + get_dest_file());
         };
         MoveType get_type() const {
-            return MoveType((code >> MT_SHIFT) & MT_MASK);
+            return static_cast<MoveType>((code >> MT_SHIFT) & MT_MASK);
         };
 
         bool is_capture() const {

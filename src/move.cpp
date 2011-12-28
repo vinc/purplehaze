@@ -57,10 +57,10 @@ ostream& operator<<(ostream& out, const Move move) {
 string Move::to_string() const {
     if (is_null()) return "#";
     string res = "";
-    res += char('a' + get_orig_file());
-    res += char('1' + get_orig_rank());
-    res += char('a' + get_dest_file());
-    res += char('1' + get_dest_rank());
+    res += static_cast<char>('a' + get_orig_file());
+    res += static_cast<char>('1' + get_orig_rank());
+    res += static_cast<char>('a' + get_dest_file());
+    res += static_cast<char>('1' + get_dest_rank());
     if (is_promotion()) {
         res += Piece(BLACK, get_promotion_type()).to_string(); // Lower case
     }

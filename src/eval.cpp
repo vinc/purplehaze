@@ -28,11 +28,11 @@
 using namespace std;
 
 // PST[Phase][Color][PieceType][Square]
-static int PST[2][2][int(KING) + 1][BOARD_SIZE] = { { { { 0 } } } };
+static int PST[2][2][NB_PIECE_TYPES][BOARD_SIZE] = { { { { 0 } } } };
 
 void Game::init_eval() {
     for (int i = 0; i < 64; ++i) {
-        for (PieceType t = PAWN; t <= KING; t = PieceType(t + 1)) {
+        for (PieceType t = PAWN; t <= KING; t = static_cast<PieceType>(t + 1)) {
             Square s = board.get_square(i);
             
             int opening_score = 0;
@@ -89,7 +89,7 @@ void Game::init_eval() {
     // Flip scores according to black's side
     for (int i = 0; i < 2; ++i) {
         for (int j = 0; j < 64; ++j) {
-            for (PieceType t = PAWN; t <= KING; t = PieceType(t + 1)) {
+            for (PieceType t = PAWN; t <= KING; t = static_cast<PieceType>(t + 1)) {
                 Square ws = board.get_square(j);
                 Square bs = board.flip(ws);
                 PST[i][BLACK][t][bs] = PST[i][WHITE][t][ws];
@@ -175,7 +175,7 @@ int Game::material_eval() {
         c = Color(i);
         int nb_pawns = 0;
         int nb_minors = 0;
-        for (PieceType t = PAWN; t <= KING; t = PieceType(t + 1)) {
+        for (PieceType t = PAWN; t <= KING; t = static_cast<PieceType>(t + 1)) {
             int n = pieces.get_nb_pieces(c, t);
             // Pieces' standard alues
             material_score[c] += n * PIECE_VALUE[t]; 
@@ -281,7 +281,7 @@ int castling_score(const Position& pos, Color c) {
         score += CASTLE_BONUS;
     }
     else {
-        for (PieceType t = QUEEN; t <= KING; t = PieceType(t + 1)) {
+        for (PieceType t = QUEEN; t <= KING; t = static_cast<PieceType>(t + 1)) {
             if (!pos.can_castle(c, t)) { // For each side where no castling
                 score += BREAKING_CASTLE_MALUS; // is possible, add a malus
             }
@@ -298,7 +298,7 @@ int Game::position_eval() {
     Color c;
     for (int i = 0; i < 2; ++i) {
         c = Color(i);
-        for (PieceType t = PAWN; t <= KING; t = PieceType(t + 1)) {
+        for (PieceType t = PAWN; t <= KING; t = static_cast<PieceType>(t + 1)) {
             int n = pieces.get_nb_pieces(c, t);
             phase += n * PHASE_COEF[t];
             for (int j = 0; j < n; ++j) {

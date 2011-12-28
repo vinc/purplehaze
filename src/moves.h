@@ -71,7 +71,7 @@ class Moves
         bool use_lazy_generation;
 
     public:
-        static Score mvv_lva_scores[int(KING) + 1][int(KING) + 1];
+        static Score mvv_lva_scores[NB_PIECE_TYPES][NB_PIECE_TYPES];
 
         Moves(Board& b, Pieces& ps, Position& cn, MoveList& ml,
               bool lg = true) :

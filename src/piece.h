@@ -51,15 +51,15 @@ class Piece
 
         Piece(Color c, PieceType t, int i = 0) {
             code = ((i /*& I_MASK*/) << I_SHIFT) | 
-                   ((int(t) /*& T_MASK*/) << T_SHIFT) |
-                   ((int(c) /*& C_MASK*/) << C_SHIFT);
+                   ((static_cast<int>(t) /*& T_MASK*/) << T_SHIFT) |
+                   ((static_cast<int>(c) /*& C_MASK*/) << C_SHIFT);
         }
         
         Color get_color() const { 
             return Color((code >> C_SHIFT) & C_MASK); 
         };
         PieceType get_type() const { 
-            return PieceType((code >> T_SHIFT) & T_MASK); 
+            return static_cast<PieceType>((code >> T_SHIFT) & T_MASK); 
         };
         int get_index() const { 
             return (code >> I_SHIFT) & I_MASK; 
