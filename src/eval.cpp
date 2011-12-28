@@ -157,14 +157,16 @@ int Game::material_eval() {
     int score = 0;
     Position& pos = current_position();
     
+    // TODO Enable material hash table
+    /*
     // Lookup in hash table
     bool is_empty = true;
     int hash_score = material_table.lookup(pos.material_hash(), is_empty);
     if (!is_empty) {
         c = pos.get_turn_color();
-        // TODO Enable material hash table
-        //return (c == WHITE ? hash_score : -hash_score);
+        return (c == WHITE ? hash_score : -hash_score);
     }
+    */
     
     int material_score[2] = { 0 };
     int material_bonus[2] = { 0 };
@@ -266,8 +268,11 @@ int Game::material_eval() {
     score += material_bonus[c] - material_bonus[Color(!c)];
 
     return_material_score:
+        // TODO Enable material hash table
+        /*
         hash_score = (c == WHITE ? score : -score);
         material_table.save(pos.material_hash(), hash_score);
+        */
         return score;
 }
 
