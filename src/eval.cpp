@@ -240,39 +240,43 @@ int Game::material_eval() {
         }
     }
 
-    // Insufficiant material
+    // Draw by insufficiant material detection
+    bool is_draw = false;
     const int K = PIECE_VALUE[KING];
     const int P = PIECE_VALUE[PAWN];
     const int N = PIECE_VALUE[KNIGHT];
     const int B = PIECE_VALUE[BISHOP];
     for (int i = 0; i < 2; ++i) {
         c = Color(i);
+        is_draw = true;
         // FIDE rules for draw
         if (material_score[c] == K) {
-            if (material_score[!c] == K)         goto return_material_score;
-            if (material_score[!c] == K + B)     goto return_material_score;
-            if (material_score[!c] == K + N)     goto return_material_score;
-            if (material_score[!c] == K + N + N) goto return_material_score;
+            if (material_score[!c] == K)         break;
+            if (material_score[!c] == K + B)     break;
+            if (material_score[!c] == K + N)     break;
+            if (material_score[!c] == K + N + N) break;
 
             // TODO is this duplicate with MALUS_NO_PAWNS?
             int nb_opponent_pawns = pieces.get_nb_pieces(Color(!c), PAWN);
             if (nb_opponent_pawns == 0 && material_score[!c] < K + 4 * P) {
-                goto return_material_score;
+                break;
             }
         }
+        is_draw = false; // no break happened
     }
 
-    c = pos.get_turn_color();
-    score = material_score[c] - material_score[Color(!c)];
-    score += material_bonus[c] - material_bonus[Color(!c)];
+    if (!is_draw) {
+        c = pos.get_turn_color();
+        score = material_score[c] - material_score[Color(!c)];
+        score += material_bonus[c] - material_bonus[Color(!c)];
+    }
 
-    return_material_score:
-        // TODO Enable material hash table
-        /*
-        hash_score = (c == WHITE ? score : -score);
-        material_table.save(pos.material_hash(), hash_score);
-        */
-        return score;
+    // TODO Enable material hash table
+    /*
+    hash_score = (c == WHITE ? score : -score);
+    material_table.save(pos.material_hash(), hash_score);
+    */
+    return score;
 }
 
 int castling_score(const Position& pos, Color c) {
