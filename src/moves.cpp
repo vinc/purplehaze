@@ -148,8 +148,8 @@ Score Moves::mvv_lva_scores[][NB_PIECE_TYPES] = { { 0 } };
  * KxP =  4
  */
 void Moves::init_mvv_lva_scores() {
-    for (PieceType v = PAWN; v <= KING; v = static_cast<PieceType>(v + 1)) {
-        for (PieceType a = PAWN; a <= KING; a = static_cast<PieceType>(a + 1)) {
+    for (const PieceType& v : PIECE_TYPES) {
+        for (const PieceType& a : PIECE_TYPES) {
             mvv_lva_scores[v][a] = (16 * v) - (2 * a);
         }
     }

@@ -96,7 +96,7 @@ void Moves::generate(MoveType mt) {
     }
 
     // Standard moves
-    for (PieceType t = KNIGHT; t <= KING; t = static_cast<PieceType>(t + 1)) {
+    for (const PieceType& t : NOT_PAWN_TYPES) {
         generate_pieces(c, t, mt);
     }
 

@@ -109,6 +109,22 @@ enum PieceType : unsigned char {
 };
 static const int NB_PIECE_TYPES = static_cast<int>(KING) + 1;
 
+static const PieceType PIECE_TYPES[] = {
+    PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING
+};
+static const PieceType NOT_PAWN_TYPES[] = {
+    KNIGHT, BISHOP, ROOK, QUEEN, KING
+};
+static const PieceType SIDE_TYPES[] = {
+    QUEEN, KING
+};
+static const PieceType MINOR_TYPES[] = {
+    KNIGHT, BISHOP
+};
+static const PieceType MAJOR_TYPES[] = {
+    ROOK, QUEEN
+};
+
 enum MoveType : unsigned char { 
     QUIET_MOVE, 
     DOUBLE_PAWN_PUSH,
