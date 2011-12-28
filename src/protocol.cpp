@@ -76,8 +76,7 @@ Move Protocol::parse_move(string move) {
         if (game.board.is_pawn_begin(c, from) &&
             to == Square(from + 2 * PAWN_PUSH_DIRS[c])) {
                 return Move(from, to, DOUBLE_PAWN_PUSH);
-        }
-        else if (game.board.is_empty(to) && 
+        } else if (game.board.is_empty(to) && 
             to != Square(from + PAWN_PUSH_DIRS[c])) {
                 return Move(from, to, EN_PASSANT);
         }
@@ -85,8 +84,7 @@ Move Protocol::parse_move(string move) {
     if (game.board.get_piece(from).get_type() == KING) {
         if (to == Square(from + RIGHT + RIGHT)) {
             return Move(from, to, KING_CASTLE);
-        }
-        else if (to == Square(from + LEFT + LEFT)) {
+        } else if (to == Square(from + LEFT + LEFT)) {
             return Move(from, to, QUEEN_CASTLE);
         }
     }
@@ -96,8 +94,9 @@ Move Protocol::parse_move(string move) {
         assert((t == QUIET_MOVE) || 
                (KNIGHT_PROMOTION <= t && t <= QUEEN_PROMOTION));
         return Move(from, to, static_cast<MoveType>(t + CAPTURE));
+    } else {
+        return Move(from, to, t);
     }
-    else return Move(from, to, t);
 }
 
 bool Protocol::play_move(string move) {
@@ -132,11 +131,8 @@ string Protocol::search_move(bool use_san_notation) {
         if (game.is_check(game.current_position().get_turn_color())) {
             return "LOST";
         }
-        else {
-            return "DRAW";
-        }
-    }
-    else {
+        return "DRAW";
+    } else {
         if (use_san_notation) {
             string res = game.output_move(m);
             play_move(m.to_string());
@@ -146,8 +142,6 @@ string Protocol::search_move(bool use_san_notation) {
             undo_move();
             return res;
         }
-        else {
-            return m.to_string();
-        }
+        return m.to_string();
     }
 }

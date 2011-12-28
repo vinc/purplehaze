@@ -80,11 +80,11 @@ string Game::output_pv(int depth, int score, Move m) {
     if (depth > 0 && is_legal(move) && trans.get_bound() < 3) {
         if (is_in_check) stream << "+"; // Check
         stream << output_pv(depth - 1, trans.get_value(), move);
-    }
-    else if (move.is_null() && is_mate(score)) {
+    } else if (move.is_null() && is_mate(score)) {
         if (is_in_check) stream << "#"; // Mate
+    } else if (is_in_check) {
+        stream << "+"; // Cut-off
     }
-    else if (is_in_check) stream << "+"; // Cut-off
     
     undo_move(m);
     return stream.str();

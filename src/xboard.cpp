@@ -39,15 +39,12 @@ void Xboard::think() {
         output = "result ";
         if (game.current_position().get_turn_color() == WHITE) {
             output += "0-1 {Black mates}";
-        }
-        else {
+        } else {
             output += "1-0 {White mates}";
         }
-    }
-    else if (move == "DRAW") {
+    } else if (move == "DRAW") {
         output = "result 1/2-1/2";
-    }
-    else if (!force_mode) {
+    } else if (!force_mode) {
         play_move(move);
         log << endl << "  DEBUG: "
             << game.time.get_elapsed_time() / 100.0f
@@ -85,8 +82,7 @@ void Xboard::loop() {
                     if (value == "0" || value == "1") {
                         cout << "=" << value << endl;
                         log << "=" << value;
-                    }
-                    else {
+                    } else {
                         cout << "=\"" << value << "\"" << endl;
                         log << "=\"" << value << "\"";
                     }
@@ -96,17 +92,15 @@ void Xboard::loop() {
                     log << endl << "> " << reply << " " << feature;
                     assert(feature == XBOARD_FEATURES[i][0]);
                     if (reply == "accepted") continue;
-                    else if (reply == "rejected") assert(false); // FIXME
-                    else assert(false); // FIXME
+                    if (reply == "rejected") assert(false); // FIXME
+                    assert(false); // FIXME
                 }
             }
-        }
-        else if (cmd == "new") {
+        } else if (cmd == "new") {
             new_game();
             set_board(DEFAULT_FEN);
             force_mode = false;
-        }
-        else if (cmd == "setboard") {
+        } else if (cmd == "setboard") {
             string fen;
             getline(cin, fen);
             fen.erase(0, 1); // Remove the first whitespace
@@ -114,20 +108,16 @@ void Xboard::loop() {
             set_board(fen);
             log << " " << fen;
             force_mode = false;
-        }
-        else if (cmd == "go") {
+        } else if (cmd == "go") {
             force_mode = false;
             think();
-        }
-        else if (cmd == "force") {
+        } else if (cmd == "force") {
             force_mode = true;
-        }
-        else if (cmd == "ping") {
+        } else if (cmd == "ping") {
             int n;
             cin >> n;
             cout << "pong " << n << endl;
-        }
-        else if (cmd == "level") {
+        } else if (cmd == "level") {
             // Number of moves
             int moves;
             cin >> moves;
@@ -147,8 +137,7 @@ void Xboard::loop() {
                 istringstream minutes(str_time);
                 minutes >> time;
                 time *= 60;
-            }
-            else {
+            } else {
                 istringstream minutes(str_time.substr(0, sep));
                 istringstream seconds(str_time.substr(sep + 1));
                 seconds >> time;
@@ -163,47 +152,37 @@ void Xboard::loop() {
             log << " " << control;
             if (control == 0) {
                 set_time(moves, time);
-            }
-            else { // Not in Xboard protocol
+            } else { // Not in Xboard protocol
                 // TODO If not zero, control is a time increment,
                 // but currently this time is not directly used
                 set_time(moves, time);
             }
-        }
-        else if (cmd == "time") {
+        } else if (cmd == "time") {
             int time = 0;
             cin >> time;
             log << " " << time;
             set_remaining_time(time);
-        }
-        else if (cmd == "otim") {
+        } else if (cmd == "otim") {
             int time = 0;
             cin >> time;
             log << " " << time;
-        }
-        else if (cmd == "sd") {
+        } else if (cmd == "sd") {
             int d = 0;
             cin >> d;
             log << " " << d;
             set_depth(d);
-        }
-        else if (cmd == "undo") {
+        } else if (cmd == "undo") {
             undo_move();
-        }
-        else if (cmd == "remove") {
+        } else if (cmd == "remove") {
             undo_move();
             undo_move();
-        }
-        else if (cmd == "post") {
+        } else if (cmd == "post") {
             set_output_thinking(true);
-        }
-        else if (cmd == "nopost") {
+        } else if (cmd == "nopost") {
             set_output_thinking(false);
-        }
-        else if (cmd == "hard") {
+        } else if (cmd == "hard") {
 
-        }
-        else if (4 <= cmd.size() && cmd.size() <= 5 &&
+        } else if (4 <= cmd.size() && cmd.size() <= 5 &&
                  'a' <= cmd[0] && cmd[0] <= 'h' &&
                  '1' <= cmd[1] && cmd[1] <= '8' &&
                  'a' <= cmd[2] && cmd[2] <= 'h' &&
@@ -215,11 +194,9 @@ void Xboard::loop() {
                 log << endl << "< Illegal move: " << cmd;
             }
             if (!force_mode) think();
-        }
-        else if (cmd == "verbose") { // Debug mode
+        } else if (cmd == "verbose") { // Debug mode
             verbosity = 2;
-        }
-        else {
+        } else {
             log << endl << "  DEBUG: ignoring command";
         }
         log << endl;

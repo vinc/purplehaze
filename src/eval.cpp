@@ -280,8 +280,7 @@ int castling_score(const Position& pos, Color c) {
     int score = 0;
     if (pos.has_castle(c)) {
         score += CASTLE_BONUS;
-    }
-    else {
+    } else {
         for (const PieceType& t : SIDE_TYPES) { // for QUEEN and KING side
             if (!pos.can_castle(c, t)) {
                 score += BREAKING_CASTLE_MALUS;

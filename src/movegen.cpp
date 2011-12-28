@@ -31,10 +31,13 @@ void Moves::generate_pieces(Color c, PieceType t, MoveType mt) {
             while (!board.is_out(to)) {
                 if (!board.is_empty(to)) {
                     if (board.get_piece(to).get_color() == c) break;
-                    if (mt != QUIET_MOVE) add(Move(from, to, CAPTURE));
+                    if (mt != QUIET_MOVE) {
+                        add(Move(from, to, CAPTURE));
+                    }
                     break;
+                } else if (mt != CAPTURE) {
+                    add(Move(from, to, QUIET_MOVE));
                 }
-                else if (mt != CAPTURE) add(Move(from, to, QUIET_MOVE));
                 if (t == KNIGHT || t == KING) break; // Leapers
                 to = Square(to + dirs[d]); // Sliders
             }
@@ -60,12 +63,10 @@ void Moves::generate(MoveType mt) {
                     add(Move(from, to, BISHOP_PROMOTION_CAPTURE));
                     add(Move(from, to, ROOK_PROMOTION_CAPTURE));
                     add(Move(from, to, QUEEN_PROMOTION_CAPTURE));
-                }
-                else { // Capture
+                } else { // Capture
                     add(Move(from, to, CAPTURE));
                 }
-            }
-            else if (to == current_position.get_en_passant()) { // En passant
+            } else if (to == current_position.get_en_passant()) { // En passant
                 add(Move(from, to, EN_PASSANT));
             }
         }
@@ -152,8 +153,11 @@ void Game::make_move(Move m) {
     Position& pos = current_position();
 
     // Update halfmove counter
-    if (t == PAWN || m.is_capture()) pos.reset_halfmove();
-    else pos.inc_halfmove();
+    if (t == PAWN || m.is_capture()) {
+        pos.reset_halfmove();
+    } else {
+        pos.inc_halfmove();
+    }
     
     // Null Move
     if (m.is_null()) {
@@ -186,8 +190,7 @@ void Game::make_move(Move m) {
             if (dest == Square(H1 + A8 * c)) {
                 pos.set_castle_right(!c, KING, false);
                 zobrist.update_castle_right(pos.hash(), !c, KING);
-            }
-            else if (dest == Square(A1 + A8 * c)) {
+            } else if (dest == Square(A1 + A8 * c)) {
                 pos.set_castle_right(!c, QUEEN, false);
                 zobrist.update_castle_right(pos.hash(), !c, QUEEN);
             }
@@ -225,8 +228,7 @@ void Game::make_move(Move m) {
     if (m.is_promotion()) {
         add_piece(p.get_color(), m.get_promotion_type(), dest);
         del_piece(p);
-    }
-    else {
+    } else {
         board.set_piece(p, dest);
         pieces.set_position(p, dest);
         zobrist.update_piece(pos.hash(), c, t, orig);
@@ -239,8 +241,7 @@ void Game::make_move(Move m) {
         Square new_ep = Square(orig + (dest - orig) / 2);
         pos.set_en_passant(new_ep);
         zobrist.update_en_passant(pos.hash(), new_ep);
-    }
-    else {
+    } else {
         pos.set_en_passant(OUT);
     }
 }
@@ -254,8 +255,7 @@ void Game::undo_move(Move m) {
     if (m.is_promotion()) {
         add_piece(p.get_color(), PAWN, orig);
         del_piece(p);
-    }
-    else if (!m.is_null()) {
+    } else if (!m.is_null()) {
         board.set_piece(p, orig);
         pieces.set_position(p, orig);
     }
@@ -270,8 +270,7 @@ void Game::undo_move(Move m) {
             board.set_piece(Piece(), dest);
         }
         add_piece(capture.get_color(), capture.get_type(), s);
-    }
-    else if (!m.is_null()) {
+    } else if (!m.is_null()) {
         board.set_piece(Piece(), dest);
     }
     del_position();
@@ -352,8 +351,7 @@ bool Game::is_legal(Move m) {
         if (board.is_empty(s)) return false;
         if (c == board.get_piece(s).get_color()) return false;
 
-    }
-    else if (m.is_castle()) {
+    } else if (m.is_castle()) {
         Square rook = Square(H1 + A8 * c);
         switch (m.get_castle_side()) {
             case KING:
@@ -386,11 +384,11 @@ bool Game::is_legal(Move m) {
             default: return false;
         }
         return true;
-    }
-    else if (m.is_double_pawn_push()) {
+    } else if (m.is_double_pawn_push()) {
         if (t != PAWN) return false;
         if (!board.is_pawn_begin(c, from)) return false; // Done by can_go()
+    } else if (!board.is_empty(to)) {
+        return false;
     }
-    else if (!board.is_empty(to)) return false;
     return true;
 }

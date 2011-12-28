@@ -120,9 +120,13 @@ ostream& operator<<(ostream& out, const Board board) {
     for (int i = 0; i < BOARD_SIZE; ++i) {
         Square s = Square(i);
         squares[i] = " ";
-        if (!board.is_empty(s)) squares[i] += board.get_piece(s).to_string();
-        else if (board.is_dark(s)) squares[i] += ".";
-        else squares[i] += " ";
+        if (!board.is_empty(s)) {
+            squares[i] += board.get_piece(s).to_string();
+        } else if (board.is_dark(s)) {
+            squares[i] += ".";
+        } else {
+            squares[i] += " ";
+        }
         squares[i] += " ";
     }
     out << board.to_string(squares, 3);

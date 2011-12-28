@@ -25,8 +25,9 @@ T HashTable<T>::lookup(Hash h, bool& is_empty) {
         is_empty = false;
         ++hits;
         return entry.value;
+    } else if (entry.hash != 0) {
+        ++collisions;
     }
-    else if (entry.hash != 0) ++collisions;
     is_empty = true;
     ++misses;
     return T();

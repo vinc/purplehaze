@@ -49,8 +49,7 @@ int main() {
             Xboard xboard;
             xboard.loop();
             return 0;
-        }
-        else if (cmd == "help") {
+        } else if (cmd == "help") {
             int comm_width = 30;
             int desc_width = 50;
             cout << left;
@@ -88,15 +87,12 @@ int main() {
             cout << setw(comm_width) << "quit"
                  << "quit Purple Haze"
                  << endl;
-        }
-        else if (cmd == "version") {
+        } else if (cmd == "version") {
             cout << VERSION << endl;
-        }
-        else if (cmd == "setboard") { // Get FEN
+        } else if (cmd == "setboard") { // Get FEN
             getline(cin, fen);
             fen.erase(0, 1); // Remove the first whitespace
-        }
-        else if (cmd == "perft") {
+        } else if (cmd == "perft") {
             Game game;
             game.init(fen);
             for (int i = 1; ; ++i) {
@@ -108,8 +104,7 @@ int main() {
                 cout << " (" << perft_time << " secs, ";
                 cout << perft_result / perft_time << " nps)" << endl;
             }
-        }
-        else if (cmd == "divide") {
+        } else if (cmd == "divide") {
             int depth = 0;
             cin >> depth;
             cout << endl;
@@ -134,8 +129,7 @@ int main() {
             cout << endl;
             cout << "Moves: " << moves_count << endl;
             cout << "Positions: " << nodes_count << endl;
-        }
-        else if (cmd == "testsuite") { // Load EPD test suite
+        } else if (cmd == "testsuite") { // Load EPD test suite
             string filename;
             cin >> filename;
             ifstream epdfile;
@@ -198,8 +192,7 @@ int main() {
                 if (is_found) {
                     cout << " OK" << endl;
                     ++res;
-                }
-                else {
+                } else {
                     cout << " KO" << endl;
                 }
                 ++i;

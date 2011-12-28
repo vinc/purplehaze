@@ -39,7 +39,7 @@ ExtendedMove Moves::next() {
         if (i == 0) generate(); // generate() will change the value of 'n'
 
         if (i == n) return ExtendedMove();
-        else return moves[i++];
+        return moves[i++];
     }
 
     switch (state) {

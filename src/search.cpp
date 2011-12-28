@@ -139,8 +139,7 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
             //if (score >= INF - MAX_PLY) return beta;
             return score;
         }
-    }
-    else if (is_null_move) {
+    } else if (is_null_move) {
         // Next move we will again have the right to do another null-move
         pos.set_null_move_right(true);
     }
@@ -230,9 +229,7 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
                 alpha = best_score;
             } 
             is_principal_variation = false;
-        }
-        else {
-
+        } else {
             bool is_giving_check = is_check(!player);
 
             // Futility Pruning
@@ -259,8 +256,7 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
                 
                 // Do the search at a reduced depth
                 score = -pv_search<ALL>(-alpha - 1, -alpha, depth - 2, ply + 1);
-            }
-            else {
+            } else {
                 score = -pv_search<ALL>(-alpha - 1, -alpha, depth - 1, ply + 1);
             }
             
@@ -289,7 +285,7 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
     if (time.poll(nodes_count)) return 0;
     if (!legal_move_found) { // End of game?
         if (is_in_check) return -INF + ply; // Checkmate
-        else return 0; // Stalemate
+        return 0; // Stalemate
     }
     
     // Store the search to Transposition Table
@@ -351,8 +347,11 @@ Move Game::root(int max_depth) {
             }
             //NodeType node_type = (nb_moves ? PV : ALL);
             //score = -pv_search<node_type>(-beta, -alpha, it - 1, 1);
-            if (nb_moves == 1) score = -pv_search<PV>(-beta, -alpha, it - 1, 1);
-            else score = -pv_search<ALL>(-beta, -alpha, it - 1, 1);
+            if (nb_moves == 1) {
+                score = -pv_search<PV>(-beta, -alpha, it - 1, 1);
+            } else {
+                score = -pv_search<ALL>(-beta, -alpha, it - 1, 1);
+            }
             undo_move(move);
             if (time.is_out_of_time()) break; // Discard this move
             if (score > alpha) {

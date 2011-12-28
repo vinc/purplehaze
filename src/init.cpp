@@ -46,11 +46,11 @@ void Game::init(string fen) {
     iss >> positions;
     for (auto it = positions.begin(); it != positions.end(); ++it) {
         char sq = *it;
-        if (sq == '/') s = Square(s + DOWN + 8 * LEFT); // New rank
-        else if ('1' <= sq && sq <= '8') { // Empty squares
+        if (sq == '/') {
+            s = Square(s + DOWN + 8 * LEFT); // New rank
+        } else if ('1' <= sq && sq <= '8') { // Empty squares
             s = Square(s + sq - '1' + 1); // Next square
-        }
-        else { // Non empty square
+        } else { // Non empty square
             Color c = WHITE;
             PieceType t = EMPTY;
             switch (sq) {

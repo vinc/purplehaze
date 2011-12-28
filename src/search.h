@@ -45,14 +45,20 @@ static const int FUTILITY_MARGINS[FUTILITY_DEPTH + 1] = {
 static const bool DEBUG = true;
 
 inline static int value_to_trans(int value, int ply) {
-    if (value < -INF + MAX_PLY) value -= ply;
-    else if (value > INF - MAX_PLY) value += ply;
+    if (value < -INF + MAX_PLY) {
+        value -= ply;
+    } else if (value > INF - MAX_PLY) {
+        value += ply;
+    }
     return value;
 }
 
 inline static int value_from_trans(int value, int ply) {
-    if (value < -INF + MAX_PLY) value += ply;
-    else if (value > INF - MAX_PLY) value -= ply;
+    if (value < -INF + MAX_PLY) {
+        value += ply;
+    } else if (value > INF - MAX_PLY) {
+        value -= ply;
+    }
     return value;
 }
 

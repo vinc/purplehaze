@@ -73,8 +73,7 @@ bool Board::can_go(Piece p, Square from, Square to) const {
             if (!is_empty(to)) { // Capture
                 if (to == Square(from + push_dir + LEFT)) return true;
                 if (to == Square(from + push_dir + RIGHT)) return true;
-            }
-            else { // Pawn push (and double push)
+            } else { // Pawn push (and double push)
                 if (to == Square(from + push_dir)) return true;
                 if (to == Square(from + 2 * push_dir) &&
                     is_empty(Square(from + push_dir)) &&
