@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <assert.h>
 #include <iostream>
 #include <sstream>
 #include <iomanip>
@@ -69,6 +70,11 @@ string Board::to_string(const string squares[], const int sq_width) {
         if (get_file(s) == FILE_A) {
             stream << "     +";
             for (int i = 0; i < 8; ++i) {
+                // Every string representing a square
+                // should have the same size.
+                assert(sq_width > 0);
+                assert(squares[s].size() ==
+                       static_cast<unsigned int>(sq_width));
                 for (int j = 0; j < sq_width; ++j) {
                     stream << "-";
                 }
