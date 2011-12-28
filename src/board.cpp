@@ -34,9 +34,9 @@ Board::Board() {
 
     // Initialize the attack array
     for (int i = 0; i < 64; ++i) { 
+        Square from = get_square(i);
         for (int j = 0; j < 64; ++j) { 
-            Square from = Square(i + (i & ~7));
-            Square to = Square(j + (j & ~7));
+            Square to = get_square(j);
             int diff = 0x77 + from - to;
             for (PieceType t = KNIGHT; t <= KING; t = PieceType(t + 1)) {
                 const Direction * dirs = PIECES_DIRS[t];

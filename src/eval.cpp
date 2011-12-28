@@ -33,7 +33,7 @@ static int PST[2][2][int(KING) + 1][BOARD_SIZE] = { { { { 0 } } } };
 void Game::init_eval() {
     for (int i = 0; i < 64; ++i) {
         for (PieceType t = PAWN; t <= KING; t = PieceType(t + 1)) {
-            Square s = board.square_from_index(i);
+            Square s = board.get_square(i);
             
             int opening_score = 0;
             int ending_score = 0;
@@ -89,7 +89,7 @@ void Game::init_eval() {
     for (int i = 0; i < 2; ++i) {
         for (int j = 0; j < 64; ++j) {
             for (PieceType t = PAWN; t <= KING; t = PieceType(t + 1)) {
-                Square ws = board.square_from_index(j);
+                Square ws = board.get_square(j);
                 Square bs = board.flip(ws);
                 PST[i][BLACK][t][bs] = PST[i][WHITE][t][ws];
             }

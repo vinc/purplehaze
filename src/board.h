@@ -53,9 +53,6 @@ class Board
         bool is_same_color(Square a, Square b) const {
             return (is_dark(a) && is_dark(b)) || (!is_dark(a) && !is_dark(b));
         }
-        Square get_square(Square s, Direction d) const { 
-            return Square(s + d);
-        };
         File get_file(Square s) const { 
             return File(s & 7); 
         };
@@ -77,17 +74,19 @@ class Board
             else return false;
         };
 
-        Square square_from_index(int i) {
+        Square get_square(int i) const {
             return Square(i + (i & ~7));
         };
-
-        Square square_from_coords(File f, Rank r) {
+        Square get_square(File f, Rank r) const {
             return Square(16 * r + f);
+        };
+        Square get_square(Square s, Direction d) const {
+            return Square(s + d);
         };
 
         // Used for PST with black's point of view
         Square flip(Square s) {
-            return square_from_coords(get_file(s), Rank(RANK_8 - get_rank(s)));
+            return get_square(get_file(s), Rank(RANK_8 - get_rank(s)));
         }
 
         // Theoretical answer by array lookup
