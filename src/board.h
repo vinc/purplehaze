@@ -70,8 +70,8 @@ class Board
             File f = get_file(s);
             Rank r = get_rank(s);
             if (f == FILE_A || f == FILE_H) return true;
-            else if (r == RANK_1 || r == RANK_8) return true;
-            else return false;
+            if (r == RANK_1 || r == RANK_8) return true;
+            return false;
         };
         static Square get_square(int i) {
             return Square(i + (i & ~7));

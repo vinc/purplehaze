@@ -88,7 +88,7 @@ string Board::to_string(const string squares[], const int sq_width) {
         if (get_file(s) == FILE_H) {
             stream << "|" << endl;
             if (s == H1) break; // The loop ends here
-            else s = Square(s - 0x18);
+            s = Square(s - 0x18);
         }
     }
 
