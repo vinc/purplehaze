@@ -97,6 +97,7 @@ enum Color : bool {
     WHITE,
     BLACK
 };
+static const Color COLORS[] = { WHITE, BLACK };
 
 enum PieceType : unsigned char { 
     EMPTY,

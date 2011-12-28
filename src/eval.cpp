@@ -154,7 +154,6 @@ int Game::eval(int alpha, int beta) {
 }
 
 int Game::material_eval() {
-    Color c;
     int score = 0;
     Position& pos = current_position();
     
@@ -171,8 +170,7 @@ int Game::material_eval() {
     
     int material_score[2] = { 0 };
     int material_bonus[2] = { 0 };
-    for (int i = 0; i < 2; ++i) {
-        c = Color(i);
+    for (const Color& c : COLORS) { 
         int nb_pawns = 0;
         int nb_minors = 0;
         for (const PieceType& t : PIECE_TYPES) {
@@ -246,8 +244,7 @@ int Game::material_eval() {
     const int P = PIECE_VALUE[PAWN];
     const int N = PIECE_VALUE[KNIGHT];
     const int B = PIECE_VALUE[BISHOP];
-    for (int i = 0; i < 2; ++i) {
-        c = Color(i);
+    for (const Color& c : COLORS) { 
         is_draw = true;
         // FIDE rules for draw
         if (material_score[c] == K) {
@@ -266,7 +263,7 @@ int Game::material_eval() {
     }
 
     if (!is_draw) {
-        c = pos.get_turn_color();
+        const Color& c = pos.get_turn_color();
         score = material_score[c] - material_score[Color(!c)];
         score += material_bonus[c] - material_bonus[Color(!c)];
     }
@@ -299,9 +296,7 @@ int Game::position_eval() {
     int position_score[2][2] = { { 0 } };
     int pawns_files[2][8] = { { 0 } };
     const Position& pos = current_position();
-    Color c;
-    for (int i = 0; i < 2; ++i) {
-        c = Color(i);
+    for (const Color& c : COLORS) { 
         for (const PieceType& t : PIECE_TYPES) {
             int n = pieces.get_nb_pieces(c, t);
             phase += n * PHASE_COEF[t];
@@ -337,7 +332,7 @@ int Game::position_eval() {
         position_score[OPENING][c] += castling_score(pos, c);
 
     }
-    c = pos.get_turn_color();
+    const Color& c = pos.get_turn_color();
     int opening, ending; // Score based on opening and ending rules
     opening = position_score[OPENING][c] - position_score[OPENING][Color(!c)];
     ending = position_score[ENDING][c] - position_score[ENDING][Color(!c)];
