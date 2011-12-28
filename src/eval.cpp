@@ -106,7 +106,7 @@ void Game::init_eval() {
         stream << setw(4) << PST[OPENING][WHITE][PAWN][s];
         squares[i] = stream.str();
     }
-    cout << endl << board.to_string(squares); 
+    cout << endl << board.to_string(squares, 4);
 
     cout << endl << "Ending pawn PST";
     for (int i = 0; i < BOARD_SIZE; ++i) {
@@ -115,7 +115,7 @@ void Game::init_eval() {
         stream << setw(4) << PST[ENDING][WHITE][PAWN][s];
         squares[i] = stream.str();
     }
-    cout << endl << board.to_string(squares); 
+    cout << endl << board.to_string(squares, 4);
     
     cout << endl << "Opening knight PST";
     for (int i = 0; i < BOARD_SIZE; ++i) {
@@ -124,7 +124,7 @@ void Game::init_eval() {
         stream << setw(4) << PST[OPENING][WHITE][KNIGHT][s];
         squares[i] = stream.str();
     }
-    cout << endl << board.to_string(squares); 
+    cout << endl << board.to_string(squares, 4);
     */
 }
 

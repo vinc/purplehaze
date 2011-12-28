@@ -35,7 +35,7 @@ class Board
 
     public:
         Board();
-        string to_string(string squares[]) const;
+        static string to_string(const string squares[], const int sq_width);
         Piece get_piece(Square s) const {
             return board[s];
         };

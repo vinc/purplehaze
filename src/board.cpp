@@ -61,7 +61,7 @@ Board::Board() {
  * Generate a string for pretty printing the content of a 0x88 string array. 
  * This could be the board but also any PST array.
  */
-string Board::to_string(string squares[]) const {
+string Board::to_string(const string squares[], const int sq_width) {
     ostringstream stream;
     stream << endl;
     for (Square s = A8; s < OUT; s = Square(s + 1)) {
@@ -69,7 +69,7 @@ string Board::to_string(string squares[]) const {
         if (get_file(s) == FILE_A) {
             stream << "     +";
             for (int i = 0; i < 8; ++i) {
-                for (unsigned int j = 0; j < squares[s].size(); ++j) {
+                for (int j = 0; j < sq_width; ++j) {
                     stream << "-";
                 }
                 stream << "+";
@@ -89,17 +89,17 @@ string Board::to_string(string squares[]) const {
     // Bottom's border of the array
     stream << "     +";
     for (int i = 0; i < 8; ++i) {
-        for (unsigned int j = 0; j < squares[A1].size(); ++j) {
+        for (int j = 0; j < sq_width; ++j) {
             stream << "-";
         }
         stream << "+";
     }
     stream << endl << "     ";
 
-    // Files' names.
+    // Output files names
     for (char c = 'a'; c <= 'h'; ++c) {
-        int l = squares[A1].size() / 2;
-        int r = squares[A1].size() % 2;
+        int l = sq_width / 2;
+        int r = sq_width % 2;
         stream << setw(l + 2) << c << setw(r) << " ";
     }
     stream << endl;
@@ -119,6 +119,6 @@ ostream& operator<<(ostream& out, const Board board) {
         else squares[i] += " ";
         squares[i] += " ";
     }
-    out << board.to_string(squares);
+    out << board.to_string(squares, 3);
     return out;
 }
