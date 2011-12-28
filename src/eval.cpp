@@ -135,9 +135,9 @@ int Game::eval(int alpha, int beta) {
     int score = material_eval();
 
     // TODO Draws should be catched here
-    /*if (score == 0) return 0; // Draw
-    else*/ if (score > PIECE_VALUE[KING]) return INF; // Win
-    else if (score < -PIECE_VALUE[KING]) return -INF; // Loss
+    // if (score == 0) return 0; // Draw
+    if (score > PIECE_VALUE[KING]) return INF; // Win
+    if (score < -PIECE_VALUE[KING]) return -INF; // Loss
    
     // Lazy evaluation
     if (score + LAZY_EVAL_MARGIN < alpha) return score;
