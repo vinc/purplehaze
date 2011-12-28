@@ -35,6 +35,7 @@ class Board
 
     public:
         Board();
+        string to_string(string squares[]) const;
         Piece get_piece(Square s) const {
             return board[s];
         };
@@ -44,48 +45,46 @@ class Board
         bool is_empty(Square s) const { 
             return board[s].get_type() == EMPTY; 
         };
-        bool is_out(Square s) const { 
+        static bool is_out(Square s) { 
             return s & 0x88; 
         };
-        bool is_dark(Square s) const {
+        static bool is_dark(Square s) {
             return (s & 7) % 2 == (s >> 4) % 2;
         };
-        bool is_same_color(Square a, Square b) const {
+        static bool is_same_color(Square a, Square b) {
             return (is_dark(a) && is_dark(b)) || (!is_dark(a) && !is_dark(b));
         }
-        File get_file(Square s) const { 
+        static File get_file(Square s) { 
             return File(s & 7); 
         };
-        Rank get_rank(Square s) const { 
+        static Rank get_rank(Square s) { 
             return Rank(s >> 4); 
         };
-        bool is_pawn_begin(Color c, Square s) const {
+        static bool is_pawn_begin(Color c, Square s) {
             return (get_rank(s) - RANK_6 * c) == RANK_2;
         };
-        bool is_pawn_end(Color c, Square s) const {
+        static bool is_pawn_end(Color c, Square s) {
             return (get_rank(s) + RANK_8 * c) == RANK_8;
         };
-
-        bool is_border(Square s) {
+        static bool is_border(Square s) {
             File f = get_file(s);
             Rank r = get_rank(s);
             if (f == FILE_A || f == FILE_H) return true;
             else if (r == RANK_1 || r == RANK_8) return true;
             else return false;
         };
-
-        Square get_square(int i) const {
+        static Square get_square(int i) {
             return Square(i + (i & ~7));
         };
-        Square get_square(File f, Rank r) const {
+        static Square get_square(File f, Rank r) {
             return Square(16 * r + f);
         };
-        Square get_square(Square s, Direction d) const {
+        static Square get_square(Square s, Direction d) {
             return Square(s + d);
         };
 
         // Used for PST with black's point of view
-        Square flip(Square s) {
+        static Square flip(Square s) {
             return get_square(get_file(s), Rank(RANK_8 - get_rank(s)));
         }
 
@@ -101,7 +100,6 @@ class Board
         bool is_attacked_by(Color c, Square s, const Pieces& pieces) const;
         bool can_go(Piece p, Square from, Square to) const; 
 
-        string to_string(string squares[]) const;
 };
 
 #endif /* !BOARD_H */
