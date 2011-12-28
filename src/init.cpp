@@ -33,7 +33,6 @@ static const bool FEN_DEBUG = true;
  */
 void Game::init(string fen) {
     assert(fen.length() > 0);
-    string::const_iterator it;
     istringstream iss(fen);
 
     // Initialize objects
@@ -45,7 +44,7 @@ void Game::init(string fen) {
     Square s = A8;
     string positions;
     iss >> positions;
-    for (it = positions.begin(); it != positions.end(); ++it) {
+    for (auto it = positions.begin(); it != positions.end(); ++it) {
         char sq = *it;
         if (sq == '/') s = Square(s + DOWN + 8 * LEFT); // New rank
         else if (int(sq) >= '1' && int(sq) <= '8') { // Empty squares
@@ -87,7 +86,7 @@ void Game::init(string fen) {
 
     string castling;
     iss >> castling;
-    for (it = castling.begin(); it != castling.end(); ++it) {
+    for (auto it = castling.begin(); it != castling.end(); ++it) {
         switch(*it) {
             case '-': break;
             case 'K': current_position().set_castle_right(WHITE, KING); break;
