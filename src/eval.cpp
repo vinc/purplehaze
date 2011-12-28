@@ -54,6 +54,7 @@ void Game::init_eval() {
                     if (board.is_border(s)) {
                         opening_score = 2 * BORDER_MALUS;
                     }
+                    // no break
                 default:
                     ending_score = CENTER_BONUS[board.get_file(s)];
                     ending_score += CENTER_BONUS[board.get_rank(s)];
@@ -206,8 +207,8 @@ int Game::material_eval() {
                     if (n == 2 && !board.is_same_color(
                             pieces.get_position(c, t, 0),
                             pieces.get_position(c, t, 1))) {
-                                material_bonus[c] += BISHOP_PAIR_BONUS + 
-                                                     (3 * 8 - nb_pawns);
+                                material_bonus[c] +=
+                                    BISHOP_PAIR_BONUS + (3 * 8 - nb_pawns);
                     }
 
                     // Value adjusted by the number of pawns on the board
@@ -226,8 +227,8 @@ int Game::material_eval() {
                     if (nb_minors > 1) {
                         // With two or more minor pieces, the queen
                         // equal two rooks. (Kaufman 1999)
-                        material_bonus[c] += (2 * PIECE_VALUE[ROOK]) -
-                                             (PIECE_VALUE[QUEEN]);
+                        material_bonus[c] +=
+                            (2 * PIECE_VALUE[ROOK]) - (PIECE_VALUE[QUEEN]);
                     }
                     // Value adjusted by the number of pawns on the board
                     adj = PAWNS_ADJUSTEMENT[QUEEN][nb_pawns];
@@ -240,25 +241,23 @@ int Game::material_eval() {
     }
 
     // Insufficiant material
+    const int K = PIECE_VALUE[KING];
+    const int P = PIECE_VALUE[PAWN];
+    const int N = PIECE_VALUE[KNIGHT];
+    const int B = PIECE_VALUE[BISHOP];
     for (int i = 0; i < 2; ++i) {
         c = Color(i);
         // FIDE rules for draw
-        const int K = PIECE_VALUE[KING];
-        const int P = PIECE_VALUE[PAWN];
-        const int N = PIECE_VALUE[KNIGHT];
-        const int B = PIECE_VALUE[BISHOP];
-        if (material_score[c] == PIECE_VALUE[KING]) {
-            if ((material_score[!c] == K) ||
-                (material_score[!c] == K + B) ||
-                (material_score[!c] == K + N) ||
-                (material_score[!c] == K + N + N)) {
-                    goto return_material_score;
-            }
+        if (material_score[c] == K) {
+            if (material_score[!c] == K)         goto return_material_score;
+            if (material_score[!c] == K + B)     goto return_material_score;
+            if (material_score[!c] == K + N)     goto return_material_score;
+            if (material_score[!c] == K + N + N) goto return_material_score;
 
-            // Duplicate with MALUS_NO_PAWNS ?
-            if (pieces.get_nb_pieces(Color(!c), PAWN) == 0 &&
-                material_score[!c] < K + 4 * P) {
-                    goto return_material_score;
+            // TODO is this duplicate with MALUS_NO_PAWNS?
+            int nb_opponent_pawns = pieces.get_nb_pieces(Color(!c), PAWN);
+            if (nb_opponent_pawns == 0 && material_score[!c] < K + 4 * P) {
+                goto return_material_score;
             }
         }
     }
