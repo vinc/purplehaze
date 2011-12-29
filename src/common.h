@@ -246,7 +246,7 @@ inline int operator+(Square s, Direction d) {
     return static_cast<int>(s) + static_cast<int>(d);
 }
 inline int operator-(Square a, Square b) {
-    return Square(static_cast<int>(a) - static_cast<int>(b));
+    return static_cast<int>(a) - static_cast<int>(b);
 }
 inline int operator-(Square s, int i) {
     return static_cast<int>(s) - i;
