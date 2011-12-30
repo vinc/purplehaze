@@ -65,7 +65,7 @@ class Transpositions : public HashTable<Transposition>
         void clear() {
             HashTable<Transposition>::clear();
         };
-        Transposition lookup(Hash h, bool& is_empty) {
+        Transposition lookup(Hash h, bool* is_empty) {
             return HashTable<Transposition>::lookup(h, is_empty);
         };
         */

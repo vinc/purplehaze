@@ -47,7 +47,7 @@ class HashTable
             delete [] entries;
             entries = NULL;
         };
-        T lookup(Hash h, bool& is_empty); /* {
+        T lookup(Hash h, bool* is_empty); /* {
             Entry entry = entries[h & (SIZE - 1)];
             if (entry.hash == h) return entry.value;
             else return T();

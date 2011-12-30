@@ -99,7 +99,7 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
 
     // Lookup in Transposition Table
     bool is_empty;
-    Transposition trans = tt.lookup(pos.hash(), is_empty);
+    Transposition trans = tt.lookup(pos.hash(), &is_empty);
     if (!is_empty) {
         if (/*!is_pv &&*/ depth <= trans.get_depth()) {
             //int tr_score = value_from_trans(trans.get_value(), ply);

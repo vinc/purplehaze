@@ -19,16 +19,16 @@
 #include "tt.h"
 
 template <class T>
-T HashTable<T>::lookup(Hash h, bool& is_empty) {
+T HashTable<T>::lookup(Hash h, bool* is_empty) {
     Entry entry = entries[h & (SIZE - 1)];
     if (entry.hash == h) {
-        is_empty = false;
+        *is_empty = false;
         ++hits;
         return entry.value;
     } else if (entry.hash != 0) {
         ++collisions;
     }
-    is_empty = true;
+    *is_empty = true;
     ++misses;
     return T();
 }
