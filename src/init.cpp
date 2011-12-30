@@ -95,21 +95,21 @@ void Game::init(string fen) {
             case 'q': current_position().set_castle_right(BLACK, QUEEN); break;
         }
     }
-    
+
     string ep;
     iss >> ep;
     if (ep != "-") {
         char file = ep.at(0);
         char rank = ep.at(1);
         s = Square((rank - '1') * 16 + file - 'a');
-        assert(!board.is_out(s));    
+        assert(!board.is_out(s));
         current_position().set_en_passant(s);
     }
 
     int halfmove = 0;
     iss >> halfmove;
     current_position().set_halfmove(halfmove);
-    
+
     int fullmove = 1;
     iss >> fullmove;
     int ply = 2 * (fullmove - 1);

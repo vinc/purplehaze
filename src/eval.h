@@ -29,7 +29,7 @@ static const int REDUNDANCY_MALUS      = -10;
 static const int BREAKING_CASTLE_MALUS = -40;
 static const int NO_PAWNS_MALUS        = -50;
 
-static const int PIECE_VALUE[] = { 
+static const int PIECE_VALUE[] = {
         0, // Empty piece
       100, // Pawn
       325, // Knight
@@ -61,7 +61,7 @@ enum Phase : unsigned char { OPENING, ENDING };
 static const int PHASE_COEF[] = { 0, 1, 2, 2, 4, 8, 0 };
 
 // Opening number
-static const int PHASE_MAX = 16 * PHASE_COEF[PAWN] + 
+static const int PHASE_MAX = 16 * PHASE_COEF[PAWN] +
                               4 * PHASE_COEF[KNIGHT] +
                               4 * PHASE_COEF[BISHOP] +
                               4 * PHASE_COEF[ROOK] +
@@ -69,10 +69,10 @@ static const int PHASE_MAX = 16 * PHASE_COEF[PAWN] +
 
 // PST parameters
 static const int BORDER_MALUS = -5;
-static const int CENTER_BONUS[] = {   
+static const int CENTER_BONUS[] = {
       0,   0,   1,   2,   2,   1,   0,   0
 };
-static const int PAWN_FILES_VALUES[] = { 
+static const int PAWN_FILES_VALUES[] = {
     -15,  -5,   1,   5,   5,   1,  -5, -15
 };
 static const int OPENING_RANKS_BONUS[][8] = {
@@ -81,8 +81,8 @@ static const int OPENING_RANKS_BONUS[][8] = {
     {   0,   1,   2,   4,   4,   2,   0,   0 }, // Knights
     {   0,   1,   2,   3,   3,   2,   0,   0 }, // Bishops
     {  30,   0,   0,   0,   0,   0,   0,   0 }, // Rooks
-    {  -5,   1,   2,   3,   3,   2,   1,   0 }, // Queens 
-    {   0, -15, -40, -40, -40, -40, -40, -40,}  // King 
+    {  -5,   1,   2,   3,   3,   2,   1,   0 }, // Queens
+    {   0, -15, -40, -40, -40, -40, -40, -40,}  // King
 };
 
 #endif /* !EVAL_H */

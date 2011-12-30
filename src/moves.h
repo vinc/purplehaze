@@ -31,7 +31,7 @@ const Score BEST_SCORE = 127;
 const Score KILLERS_SCORE = 0;
 
 const int MOVES_STATE_SIZE = 5;
-enum MovesState : unsigned char { 
+enum MovesState : unsigned char {
     BEST, GOOD_CAPTURES, KILLERS, BAD_CAPTURES, QUIET_MOVES, UNDEF_MOVES
 };
 
@@ -56,7 +56,7 @@ class MoveList
 
 class Moves
 {
-    private:        
+    private:
         //ExtendedMove moves[MAX_MOVES];
         MoveList& moves;
 
@@ -88,18 +88,18 @@ class Moves
             moves.dec_ply(); // Decrement move list internal counter
         }
 
-        void generate(MoveType mt = NULL_MOVE); // here NULL_MOVE => ALL_MOVE 
+        void generate(MoveType mt = NULL_MOVE); // here NULL_MOVE => ALL_MOVE
         void generate_pieces(Color c, PieceType t, MoveType mt);
         void add(Move m, MovesState mt = UNDEF_MOVES);
         ExtendedMove next();
         MovesState get_state() const { return state; };
 
         static void init_mvv_lva_scores();
-        Score get_mvv_lva_score(Move m); 
+        Score get_mvv_lva_score(Move m);
 
         // Used for compatibility only
         /*
-        int size() { 
+        int size() {
             return n;
         };
         Move at(int i) {
@@ -109,7 +109,7 @@ class Moves
         */
 
         // Used in divide
-        void numeric_sort() { /*moves.sort(Move::numeric_comp);*/ };        
+        void numeric_sort() { /*moves.sort(Move::numeric_comp);*/ };
 };
 
 #endif /* !MOVES_H */

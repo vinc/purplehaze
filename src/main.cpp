@@ -147,15 +147,15 @@ int main() {
                 istringstream iss(seconds);
                 iss >> time;
             }
-            
-            cout << "Loading '" << filename << "', "; 
+
+            cout << "Loading '" << filename << "', ";
             cout << time << "s per move" << endl; // In seconds
-            
+
             // Load game protocol
             Protocol proto;
             proto.set_output_thinking(false);
             proto.set_time(1, time);
-            
+
             // Read positions in file
             unsigned int res = 0;
             unsigned int i = 0;
@@ -167,12 +167,12 @@ int main() {
                 size_t fensep = line.find(" bm ");
                 size_t bmsep = line.find(";");
                 if (fensep == string::npos || bmsep == string::npos) continue;
-                
+
                 // Load position in game
                 fen = line.substr(0, fensep);
                 cout << "Loading position #" << i + 1 << " '" << fen << "' ";
                 proto.set_board(fen);
-                
+
                 // Search best move and test it
                 string best_moves = line.substr(fensep + 4, bmsep - fensep - 4);
                 cout << "bm " << best_moves;
@@ -201,6 +201,6 @@ int main() {
             epdfile.close();
         }
         cmd = prompt();
-    }        
+    }
     return 0;
 }

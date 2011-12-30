@@ -22,15 +22,15 @@
 /*
  * Use lazy move generation to get the next move.
  *
- * Best and killers moves are added first to the moves array and we start 
+ * Best and killers moves are added first to the moves array and we start
  * with the best move. We then generate the captures but only if there have
  * been no cut-off with the best move.
  *
- * MVV/LVA is used to pickup the best captures first by selection sort and 
- * next we try the killer moves (stored near the begining of the moves array) 
- * before the bad captures. Which are none by the way with MVV/LVA but in 
+ * MVV/LVA is used to pickup the best captures first by selection sort and
+ * next we try the killer moves (stored near the begining of the moves array)
+ * before the bad captures. Which are none by the way with MVV/LVA but in
  * the future SEE will be used for that.
- * 
+ *
  * Finaly when there is no captures left and no cut-off occured we generate
  * the remaining quiets moves and try them with no particular order.
  */
@@ -69,7 +69,7 @@ ExtendedMove Moves::next() {
     // If we are here, next() should return a capture
     // FIXME: the two conditions are identical
     assert(state == GOOD_CAPTURES || state == GOOD_CAPTURES);
-    
+
     // Find the best remaining capture by selection sort
     auto max = i;
     for (auto j = i + 1; j < n; ++j) {
@@ -77,14 +77,14 @@ ExtendedMove Moves::next() {
             max = j;
         }
     }
-    
+
     // Swap it with the current one
     if (max != i) {
         ExtendedMove tmp = moves[i];
         moves[i] = moves[max];
         moves[max] = tmp;
     }
-    
+
     // Return it
     return moves[i++];
 }
@@ -100,11 +100,11 @@ void Moves::add(Move move, MovesState mt) {
     // Don't add again best and killer moves
     auto end = size[BEST] + size[KILLERS];
     for (auto j = 0; j < end; ++j) if (moves[j] == move) return;
-    
+
     // Calculate the move's score
     Score score = 0;
     switch (mt) {
-        case BEST: 
+        case BEST:
             score = BEST_SCORE;
             size[mt]++;
             break;
@@ -132,7 +132,7 @@ void Moves::add(Move move, MovesState mt) {
             //size[mt]++; // If move is a best or killer move
             break;
     }
-    
+
     // Add the move and its score to moves list
     moves[n++] = ExtendedMove(move, score);
 }

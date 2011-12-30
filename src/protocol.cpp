@@ -30,7 +30,7 @@ void Protocol::new_game() {
 
 bool Protocol::set_board(string fen) {
     // Test if fen is valid?
-    
+
     // Load fen
     game.init(fen);
 
@@ -76,7 +76,7 @@ Move Protocol::parse_move(string move) {
         if (game.board.is_pawn_begin(c, from) &&
             to == Square(from + 2 * PAWN_PUSH_DIRS[c])) {
                 return Move(from, to, DOUBLE_PAWN_PUSH);
-        } else if (game.board.is_empty(to) && 
+        } else if (game.board.is_empty(to) &&
             to != Square(from + PAWN_PUSH_DIRS[c])) {
                 return Move(from, to, EN_PASSANT);
         }
@@ -91,7 +91,7 @@ Move Protocol::parse_move(string move) {
 
     // Capture
     if (!game.board.is_empty(to)) {
-        assert((t == QUIET_MOVE) || 
+        assert((t == QUIET_MOVE) ||
                (KNIGHT_PROMOTION <= t && t <= QUEEN_PROMOTION));
         return Move(from, to, static_cast<MoveType>(t + CAPTURE));
     } else {
@@ -102,10 +102,10 @@ Move Protocol::parse_move(string move) {
 bool Protocol::play_move(string move) {
     // Parse move
     Move m = parse_move(move);
-    
+
     // Test legality
     if (!game.is_legal(m)) return false;
-    
+
     // Play move
     game.make_move(m);
 
@@ -117,7 +117,7 @@ bool Protocol::play_move(string move) {
 
 bool Protocol::undo_move() {
     if (history.empty()) return false;
-    Move m = history.top(); 
+    Move m = history.top();
     history.pop();
 
     // Undo move

@@ -43,19 +43,19 @@ class Position
         Color side_to_move;
 
     public:
-        Position() : 
+        Position() :
             ply(0),
             en_passant(OUT),
             halfmove_counter(0),
             null_move_right(true),
-            side_to_move(WHITE) 
-            {} 
-        
-        Hash& hash() { 
+            side_to_move(WHITE)
+            {}
+
+        Hash& hash() {
             return zobrist_hash;
         };
-        Hash& material_hash() { 
-            return material_zobrist_hash; 
+        Hash& material_hash() {
+            return material_zobrist_hash;
         };
         Color get_turn_color() const {
             return side_to_move;

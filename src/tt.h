@@ -36,12 +36,12 @@ class Transposition
 
     public:
         Transposition(/*Hash h,*/ int v, Bound b, int d, Move bm)
-            : /*hash(h),*/ value(v), best_move(bm), depth(d), 
+            : /*hash(h),*/ value(v), best_move(bm), depth(d),
               bound(b) {}
-        Transposition() 
-            : /*hash(Hash()),*/ value(0), best_move(Move()), depth(0), 
+        Transposition()
+            : /*hash(Hash()),*/ value(0), best_move(Move()), depth(0),
               bound(UNDEF_BOUND) {}
-        
+
         /*Hash get_hash() const { return hash; };*/
         int get_value() const { return value; };
         Bound get_bound() const { return bound; };

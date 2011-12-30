@@ -36,7 +36,7 @@ class HashTable
         Entry* entries;
 
     public:
-        HashTable(int used_space = MT_SIZE) : 
+        HashTable(int used_space = MT_SIZE) :
             hits(0),
             collisions(0),
             misses(0),

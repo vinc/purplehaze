@@ -29,10 +29,10 @@ Game::Game() {
     material_table.clear();
     clear_killers();
     search_moves.clear();
-    
+
     // Make PST
     init_eval();
-    
+
     // Initialize MVV/LVA score array
     Moves::init_mvv_lva_scores();
 }
@@ -50,7 +50,7 @@ void Game::add_piece(Color c, PieceType t, Square s) {
     pieces.set_position(c, t, i, s);
     board.set_piece(Piece(c, t, i), s);
     pieces.inc_nb_pieces(c, t);
-    
+
     // Update Zobrist hash
     Position& pos = current_position();
     zobrist.update_piece(pos.hash(), c, t, s);
@@ -74,14 +74,14 @@ void Game::del_piece(Color c, PieceType t, int i) {
     if (pieces.get_nb_pieces(c, t) > 0 && i != j) {
         // Swap i and j and update board
         Square s = pieces.get_position(c, t, j);   // Last piece's position
-        pieces.set_position(c, t, i, s);           // Fill the hole left    
+        pieces.set_position(c, t, i, s);           // Fill the hole left
         pieces.set_position(c, t, j, OUT);         // TODO: not needed
         board.set_piece(Piece(c, t, i), s);        // Update board
     }
     // Update Zobrist hash
     Position& pos = current_position();
     zobrist.update_piece(pos.hash(), c, t, emptied);
-    
+
     // Same hack heare for the material hash than in add_piece()
     zobrist.update_piece(pos.material_hash(), c, t, Square(j + 1));
     zobrist.update_piece(pos.material_hash(), c, t, Square(j));
@@ -92,9 +92,9 @@ void Game::new_position() {
     tree.push();
 
     // Remove the previous en passant square from the Zobrist hash
-    zobrist.update_en_passant(current_position().hash(), 
+    zobrist.update_en_passant(current_position().hash(),
                               current_position().get_en_passant());
-    
+
     // Update the position for a new move
     current_position().inc_ply();
     current_position().change_side();

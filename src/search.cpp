@@ -48,37 +48,37 @@ int Game::q_search(int alpha, int beta, int depth, int ply) {
 
     int stand_pat = eval(alpha, beta);
     if (ply >= MAX_PLY) return stand_pat;
-    
+
     if (stand_pat >= beta) return stand_pat; // Beta cut-off
 
     // Delta pruning
     int delta = PIECE_VALUE[QUEEN]; // TODO: Switch off in late endgame
     if (stand_pat < alpha - delta) return alpha;
-    
+
     if (alpha < stand_pat) alpha = stand_pat; // New alpha
 
     Color player = current_position().get_turn_color();
-    
+
     Moves moves(board, pieces, current_position(), search_moves);
     Move move;
     while (!(move = moves.next()).is_null()) {
-        if (moves.get_state() > GOOD_CAPTURES) break; // Skip bad captures        
+        if (moves.get_state() > GOOD_CAPTURES) break; // Skip bad captures
         make_move(move);
 
         if (is_check(player)) { // Illegal move
             undo_move(move);
             continue;
         }
-        
+
         score = -q_search(-beta, -alpha, depth - 1, ply + 1);
         undo_move(move);
         if (time.poll(nodes_count)) return 0;
         if (score >= beta) {
             return score;
-        } 
+        }
         if (score > alpha) {
             alpha = score;
-        } 
+        }
     }
     if (time.poll(nodes_count)) return 0;
     return alpha;
@@ -115,18 +115,18 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
         Move bm = trans.get_best_move();
         if (!bm.is_null()) best_move = bm; // Save the best move
     }
-     
+
     Color player = pos.get_turn_color();
     bool is_in_check = is_check(player);
     bool is_null_move = !pos.get_null_move_right(); // No more than one
-    
+
     // Check Extension
     if (is_in_check) ++depth;
 
 #ifdef NMP
     // Null Move Pruning
     bool null_move_allowed = !is_in_check && !is_null_move && !is_pv;
-    
+
     int nb_pieces = pieces.get_nb_pieces(player);
     if (null_move_allowed && depth > NMP_DEPTH && nb_pieces < 3) {
         Move null_move;
@@ -187,18 +187,18 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
 
     bool legal_move_found = false;
     bool is_principal_variation = true;
-    
+
     Moves moves(board, pieces, current_position(), search_moves);
     moves.add(best_move, BEST);
-    
+
     // Killer moves need pseudo legality checking before we can use them,
     // but they can cause a cut-off and dispense to generate quiet moves
     // so it's worth it.
-    for (int i = 0; i < MAX_KILLERS; ++i) { 
+    for (int i = 0; i < MAX_KILLERS; ++i) {
         Move killer = get_killer_move(depth, i);
         if (is_legal(killer)) moves.add(killer, KILLERS);
     }
-    
+
     Move move;
     while (!(move = moves.next()).is_null()) {
         if (move.is_capture()) {
@@ -222,18 +222,18 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
                 if (best_score >= beta) { // Beta cut-off
                     // Update killer moves
                     if (!move.is_capture()) set_killer_move(depth, move);
-                    
+
                     best_move = move;
                     goto transposition;
-                } 
+                }
                 alpha = best_score;
-            } 
+            }
             is_principal_variation = false;
         } else {
             bool is_giving_check = is_check(!player);
 
             // Futility Pruning
-            if (depth <= FUTILITY_DEPTH && 
+            if (depth <= FUTILITY_DEPTH &&
                 //!best_move.is_null() &&
                 !is_in_check && !is_giving_check &&
                 !is_killer_move(depth, move) &&
@@ -253,20 +253,20 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
                 !is_in_check && !is_giving_check &&
                 !is_killer_move(depth, move) &&
                 !move.is_capture() && !move.is_promotion()) {
-                
+
                 // Do the search at a reduced depth
                 score = -pv_search<ALL>(-alpha - 1, -alpha, depth - 2, ply + 1);
             } else {
                 score = -pv_search<ALL>(-alpha - 1, -alpha, depth - 1, ply + 1);
             }
-            
+
             // Re-search
             if (alpha < score && score < beta) {
                 score = -pv_search<ALL>(-beta, -alpha, depth - 1, ply + 1);
                 if (alpha < score) {
                     alpha = score;
                 }
-            }        
+            }
 
             undo_move(move);
             if (time.poll(nodes_count)) return 0;
@@ -276,10 +276,10 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
                 if (score >= beta) {// Sufficient to cause a cut-off?
                     // Update killer moves
                     if (!move.is_capture()) set_killer_move(depth, move);
-                    
+
                     goto transposition;
-                } 
-            } 
+                }
+            }
         }
     }
     if (time.poll(nodes_count)) return 0;
@@ -287,7 +287,7 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
         if (is_in_check) return -INF + ply; // Checkmate
         return 0; // Stalemate
     }
-    
+
     // Store the search to Transposition Table
     transposition:
         //assert(!best_move.is_null());
@@ -335,7 +335,7 @@ Move Game::root(int max_depth) {
         }
 
         Moves moves(board, pieces, current_position(), search_moves);
-        moves.add(best_move, BEST);    
+        moves.add(best_move, BEST);
         Move move;
         int nb_moves;
         for (nb_moves = 1; !(move = moves.next()).is_null(); ++nb_moves) {
@@ -361,7 +361,7 @@ Move Game::root(int max_depth) {
                 if (nodes_count > 200000) { // Save CPU time at the beginning
                     print_thinking(it, alpha, best_move);
                 }
-            } 
+            }
         }
         if (time.is_out_of_time()) {
             // TODO: restore best_move and best_score from previous ply?
@@ -371,7 +371,7 @@ Move Game::root(int max_depth) {
             tt.save(current_position().hash(), alpha, EXACT, it, best_move);
         }
         best_scores[it] = best_score;
-        
+
         // If there is only one legal move, no iterative deepening needed
         if (nb_moves == 1) break;
     }

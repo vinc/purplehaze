@@ -34,12 +34,12 @@ void Game::init_eval() {
     for (int i = 0; i < 64; ++i) {
         for (const PieceType& t : PIECE_TYPES) {
             Square s = board.get_square(i);
-            
+
             int opening_score = 0;
             int ending_score = 0;
 
             switch (t) {
-                case PAWN: 
+                case PAWN:
                     // Develop central pawns
                     // But not side pawns
                     opening_score = PAWN_FILES_VALUES[board.get_file(s)];
@@ -83,7 +83,7 @@ void Game::init_eval() {
     PST[OPENING][WHITE][BISHOP][B2] = 3;
     PST[OPENING][WHITE][BISHOP][G2] = 3;
     // Protection against bishop attacks
-    PST[OPENING][WHITE][PAWN][A3] += 3; 
+    PST[OPENING][WHITE][PAWN][A3] += 3;
     PST[OPENING][WHITE][PAWN][H3] += 3;
 
     // Flip scores according to black's side
@@ -96,7 +96,7 @@ void Game::init_eval() {
             }
         }
     }
-    
+
     // Print PST
     /*
     cout << endl << "Opening pawn PST";
@@ -117,7 +117,7 @@ void Game::init_eval() {
         squares[i] = stream.str();
     }
     cout << endl << board.to_string(squares, 4);
-    
+
     cout << endl << "Opening knight PST";
     for (int i = 0; i < BOARD_SIZE; ++i) {
         Square s = Square(i);
@@ -139,7 +139,7 @@ int Game::eval(int alpha, int beta) {
     // if (score == 0) return 0; // Draw
     if (score > PIECE_VALUE[KING]) return INF; // Win
     if (score < -PIECE_VALUE[KING]) return -INF; // Loss
-   
+
     // Lazy evaluation
     if (score + LAZY_EVAL_MARGIN < alpha) return score;
     if (score - LAZY_EVAL_MARGIN > beta) return score;
@@ -149,14 +149,14 @@ int Game::eval(int alpha, int beta) {
 
     // TODO Mobility evaluation
     //score += mobility_eval();
-    
+
     return score;
 }
 
 int Game::material_eval() {
     int score = 0;
     Position& pos = current_position();
-    
+
     // TODO Enable material hash table
     /*
     // Lookup in hash table
@@ -167,17 +167,17 @@ int Game::material_eval() {
         return (c == WHITE ? hash_score : -hash_score);
     }
     */
-    
+
     int material_score[2] = { 0 };
     int material_bonus[2] = { 0 };
-    for (const Color& c : COLORS) { 
+    for (const Color& c : COLORS) {
         int nb_pawns = 0;
         int nb_minors = 0;
         for (const PieceType& t : PIECE_TYPES) {
             int n = pieces.get_nb_pieces(c, t);
             // Pieces' standard alues
-            material_score[c] += n * PIECE_VALUE[t]; 
-            
+            material_score[c] += n * PIECE_VALUE[t];
+
             // Bonus values depending on material imbalance
             int adj;
             switch (t) {
@@ -188,7 +188,7 @@ int Game::material_eval() {
                 case KNIGHT:
                     nb_minors = n;
                     if (n > 1) material_bonus[c] += REDUNDANCY_MALUS;
-                    
+
                     // Value adjusted by the number of pawns on the board
                     adj = PAWNS_ADJUSTEMENT[KNIGHT][nb_pawns];
                     material_bonus[c] += n * adj;
@@ -197,7 +197,7 @@ int Game::material_eval() {
                     nb_minors += n;
                     // Bishop bonus pair (from +40 to +64):
                     // less than half a pawn when most or all the pawns are on
-                    // the board, and more than half a pawn when half or more 
+                    // the board, and more than half a pawn when half or more
                     // of the pawns are gone. (Kaufman 1999)
                     //
                     // No bonus for two bishops controlling the same color
@@ -216,7 +216,7 @@ int Game::material_eval() {
                 case ROOK:
                     // Principle of the redundancy (Kaufman 1999)
                     if (n > 1) material_bonus[c] += REDUNDANCY_MALUS;
-                    
+
                     // Value adjusted by the number of pawns on the board
                     adj = PAWNS_ADJUSTEMENT[ROOK][nb_pawns];
                     material_bonus[c] += n * adj;
@@ -244,7 +244,7 @@ int Game::material_eval() {
     const int P = PIECE_VALUE[PAWN];
     const int N = PIECE_VALUE[KNIGHT];
     const int B = PIECE_VALUE[BISHOP];
-    for (const Color& c : COLORS) { 
+    for (const Color& c : COLORS) {
         is_draw = true;
         // FIDE rules for draw
         if (material_score[c] == K) {
@@ -295,7 +295,7 @@ int Game::position_eval() {
     int position_score[2][2] = { { 0 } };
     int pawns_files[2][8] = { { 0 } };
     const Position& pos = current_position();
-    for (const Color& c : COLORS) { 
+    for (const Color& c : COLORS) {
         for (const PieceType& t : PIECE_TYPES) {
             int n = pieces.get_nb_pieces(c, t);
             phase += n * PHASE_COEF[t];
@@ -312,7 +312,7 @@ int Game::position_eval() {
             pawns_score += MULTI_PAWNS_MALUS[pawns_files[c][j]];
         }
         position_score[OPENING][c] += pawns_score;
-        
+
         // Rooks' files bonus
         int rooks_score = 0;
         int nb_rooks = pieces.get_nb_pieces(c, ROOK);
@@ -335,7 +335,7 @@ int Game::position_eval() {
     int opening, ending; // Score based on opening and ending rules
     opening = position_score[OPENING][c] - position_score[OPENING][!c];
     ending = position_score[ENDING][c] - position_score[ENDING][!c];
-    
+
     // Tapered Eval (idea from Fruit 2.1)
     int max = PHASE_MAX;
     phase = (phase > max ? max : (phase < 0 ? 0 : phase));

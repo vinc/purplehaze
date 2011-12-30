@@ -33,9 +33,9 @@ class Move
          * A move is coded using 16 bits:
          *     4 bits for the type
          *     3 bits for the destination square rank
-         *     3 bits for the destination square file 
+         *     3 bits for the destination square file
          *     3 bits for the origin square rank
-         *     3 bits for the origin square file 
+         *     3 bits for the origin square file
          */
 
         static const int MT_MASK = 0xF;
@@ -58,10 +58,10 @@ class Move
         Move() : code(NULL_MOVE) {}
 
         Move(Square o, Square d, MoveType t) {
-            code = ((o & 7) << OF_SHIFT) | 
+            code = ((o & 7) << OF_SHIFT) |
             ((o >> 4) << OR_SHIFT) |
-            ((d & 7) << DF_SHIFT) | 
-            ((d >> 4) << DR_SHIFT) | 
+            ((d & 7) << DF_SHIFT) |
+            ((d >> 4) << DR_SHIFT) |
             (t);
         };
 
@@ -91,7 +91,7 @@ class Move
 
         bool is_capture() const {
             return is_set(2) && !is_null();
-        }; 
+        };
         bool is_castle() const {
             return !is_set(3) && !is_set(2) && is_set(1);
         };

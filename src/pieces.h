@@ -29,7 +29,7 @@ class Pieces
         Square positions[2][7][9];
         unsigned char nb_pieces[2][7];
         unsigned char sum[2];
-    
+
     public:
         Pieces();
         Square get_position(Piece p) const {
@@ -42,7 +42,7 @@ class Pieces
         void set_position(Piece p, Square s) {
             positions[p.get_color()][p.get_type()][p.get_index()] = s;
         };
-        void set_position(Color c, PieceType t, int i, Square s) { 
+        void set_position(Color c, PieceType t, int i, Square s) {
             assert(0 <= i && i < 9);
             positions[c][t][i] = s;
         };

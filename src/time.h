@@ -39,32 +39,32 @@ class Time
         bool abort_search;
 
     public:
-        Time() : 
-            allowed_moves(40), allowed_time(24000), 
-            allocated_time(allowed_time / allowed_moves), 
-            remaining_time(allowed_time / allowed_moves),
-            polling_interval(500000), last_poll_nodes_count(0),
-            abort_search(false) 
-            {} 
-
-        Time(int moves, int time) : 
-            allowed_moves(moves), allowed_time(time), 
-            allocated_time(allowed_time / allowed_moves), 
+        Time() :
+            allowed_moves(40), allowed_time(24000),
+            allocated_time(allowed_time / allowed_moves),
             remaining_time(allowed_time / allowed_moves),
             polling_interval(500000), last_poll_nodes_count(0),
             abort_search(false)
-            {} 
+            {}
 
-        void set_polling_interval(int nodes) { 
-            polling_interval = nodes; 
+        Time(int moves, int time) :
+            allowed_moves(moves), allowed_time(time),
+            allocated_time(allowed_time / allowed_moves),
+            remaining_time(allowed_time / allowed_moves),
+            polling_interval(500000), last_poll_nodes_count(0),
+            abort_search(false)
+            {}
+
+        void set_polling_interval(int nodes) {
+            polling_interval = nodes;
         };
-        void set_remaining_time(int time) { 
-            remaining_time = time; 
+        void set_remaining_time(int time) {
+            remaining_time = time;
         };
         int get_allocated_time() const {
             return allocated_time;
         };
-        int get_elapsed_time() { 
+        int get_elapsed_time() {
             return (100 * (clock() - starting_time)) / CLOCKS_PER_SEC;
         };
         void start_thinking(int ply);

@@ -34,13 +34,13 @@ class Protocol
 
     public:
         Protocol() : depth(MAX_PLY - 1), verbosity(0) {}
-        
+
         void new_game();
-        
+
         bool set_output_thinking(bool ot = true);
 
         bool set_board(string fen);
-        
+
         bool set_time(int moves, int time);
 
         bool set_remaining_time(int time);
@@ -54,9 +54,9 @@ class Protocol
         Move parse_move(string move);
 
         void set_depth(int d) { depth = d; };
-        
+
         void set_verbosity(int v = 0) { verbosity = v; };
-        
+
         int get_verbosity() { return verbosity; };
 };
 

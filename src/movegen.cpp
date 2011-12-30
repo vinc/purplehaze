@@ -47,7 +47,7 @@ void Moves::generate_pieces(Color c, PieceType t, MoveType mt) {
 
 void Moves::generate(MoveType mt) {
     Color c = current_position.get_turn_color();
-    
+
     // Pawns moves
     for (int j = 0; j < pieces.get_nb_pieces(c, PAWN); ++j) {
         Square from = pieces.get_position(c, PAWN, j);
@@ -70,12 +70,12 @@ void Moves::generate(MoveType mt) {
                 add(Move(from, to, EN_PASSANT));
             }
         }
-        
+
         if (mt == CAPTURE) continue;
         Square to = Square(from + PAWN_PUSH_DIRS[c]);
         assert(!board.is_out(to)); // Should never happend
         if (!board.is_empty(to)) continue;
-        
+
         // Promotion
         if (board.is_pawn_end(c, to)) {
             add(Move(from, to, KNIGHT_PROMOTION));
@@ -87,7 +87,7 @@ void Moves::generate(MoveType mt) {
 
         // Pawn push
         add(Move(from, to, QUIET_MOVE));
-        
+
         // Double pawn push
         if (board.is_pawn_begin(c, from)) {
             to = Square(to + PAWN_PUSH_DIRS[c]);
@@ -102,7 +102,7 @@ void Moves::generate(MoveType mt) {
     }
 
     if (mt == CAPTURE) return;
-    
+
     // Castling
     if (current_position.can_castle(c, KING)) {
         Square from = Square(E1 + A8 * c);
@@ -158,7 +158,7 @@ void Game::make_move(Move m) {
     } else {
         pos.inc_halfmove();
     }
-    
+
     // Null Move
     if (m.is_null()) {
         pos.set_en_passant(OUT);
@@ -166,17 +166,17 @@ void Game::make_move(Move m) {
     }
 
     // Update castling rights
-    if ((pos.can_castle(c, KING)) && 
+    if ((pos.can_castle(c, KING)) &&
         (t == KING || (t == ROOK && orig == Square(H1 + A8 * c)))) {
         pos.set_castle_right(c, KING, false);
         zobrist.update_castle_right(pos.hash(), c, KING);
     }
-    if ((pos.can_castle(c, QUEEN)) && 
+    if ((pos.can_castle(c, QUEEN)) &&
         (t == KING || (t == ROOK && orig == Square(A1 + A8 * c)))) {
         pos.set_castle_right(c, QUEEN, false);
         zobrist.update_castle_right(pos.hash(), c, QUEEN);
     }
-    
+
     // Capture
     if (m.is_capture()) {
         Square s = dest;
@@ -204,12 +204,12 @@ void Game::make_move(Move m) {
         Square rook_orig, rook_dest;
         switch (m.get_castle_side()) {
             case KING:
-                rook_orig = Square(H1 + A8 * c); 
-                rook_dest = Square(F1 + A8 * c); 
+                rook_orig = Square(H1 + A8 * c);
+                rook_dest = Square(F1 + A8 * c);
                 break;
             case QUEEN:
-                rook_orig = Square(A1 + A8 * c); 
-                rook_dest = Square(D1 + A8 * c); 
+                rook_orig = Square(A1 + A8 * c);
+                rook_dest = Square(D1 + A8 * c);
                 break;
             default:
                 assert(false);
@@ -234,7 +234,7 @@ void Game::make_move(Move m) {
         zobrist.update_piece(pos.hash(), c, t, orig);
         zobrist.update_piece(pos.hash(), c, t, dest);
     }
-    
+
     // Update en passant
     pos.set_capture(capture);
     if (m.is_double_pawn_push()) {
@@ -249,7 +249,7 @@ void Game::make_move(Move m) {
 void Game::undo_move(Move m) {
     Square orig = m.get_orig();
     Square dest = m.get_dest();
-    
+
     // Move back the piece to its origin
     Piece p = board.get_piece(dest);
     if (m.is_promotion()) {
@@ -259,7 +259,7 @@ void Game::undo_move(Move m) {
         board.set_piece(p, orig);
         pieces.set_position(p, orig);
     }
-    
+
     // Restore captured piece
     if (m.is_capture()) {
         Piece capture = current_position().get_capture();
@@ -280,12 +280,12 @@ void Game::undo_move(Move m) {
         Color c = current_position().get_turn_color();
         switch (m.get_castle_side()) {
             case KING:
-                rook_orig = Square(H1 + A8 * c); 
-                rook_dest = Square(F1 + A8 * c); 
+                rook_orig = Square(H1 + A8 * c);
+                rook_dest = Square(F1 + A8 * c);
                 break;
             case QUEEN:
-                rook_orig = Square(A1 + A8 * c); 
-                rook_dest = Square(D1 + A8 * c); 
+                rook_orig = Square(A1 + A8 * c);
+                rook_dest = Square(D1 + A8 * c);
                 break;
             default: assert(false);
         }
@@ -302,10 +302,10 @@ void Game::undo_move(Move m) {
 bool Game::is_legal(Move m) {
     // Null-move is obviously wrong
     if (m.is_null()) return false;
-    
+
     Square from = m.get_orig();
     Square to = m.get_dest();
-    
+
     // There must be a piece to move on the board
     if (board.is_empty(from)) return false;
 
@@ -315,12 +315,12 @@ bool Game::is_legal(Move m) {
 
     // The piece cannot be one of the opponent
     if (c != current_position().get_turn_color()) return false;
-    
+
     // It must be able to do the move
-    if (!m.is_en_passant() && 
-        !m.is_castle() && 
+    if (!m.is_en_passant() &&
+        !m.is_castle() &&
         !board.can_go(p, from, to)) return false;
-    
+
     // Promotion
     if (t == PAWN && board.is_pawn_end(c, to) && !m.is_promotion()) {
         return false;
@@ -341,9 +341,9 @@ bool Game::is_legal(Move m) {
             // After a double push
             Square ep = current_position().get_en_passant();
             if (to != ep) return false;
-            
+
             // from another pawn, the later being captured by the former
-            s = (c == BLACK ? Square(ep + UP) : Square(ep + DOWN));   
+            s = (c == BLACK ? Square(ep + UP) : Square(ep + DOWN));
             if (board.get_piece(s).get_type() != PAWN) return false;
         }
 

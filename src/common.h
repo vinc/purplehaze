@@ -32,7 +32,7 @@ static const int TT_SIZE =     1024 * 1024 * 128;
 static const int MT_SIZE =     1024 * 1024;
 static const int MAX_KILLERS = 2;
 
-static const std::string DEFAULT_FEN = 
+static const std::string DEFAULT_FEN =
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
 enum Square : unsigned char {
@@ -47,26 +47,26 @@ enum Square : unsigned char {
     OUT
 };
 
-enum File : unsigned char { 
-    FILE_A, 
-    FILE_B, 
-    FILE_C, 
-    FILE_D, 
-    FILE_E, 
-    FILE_F, 
-    FILE_G, 
-    FILE_H 
+enum File : unsigned char {
+    FILE_A,
+    FILE_B,
+    FILE_C,
+    FILE_D,
+    FILE_E,
+    FILE_F,
+    FILE_G,
+    FILE_H
 };
 
-enum Rank : unsigned char { 
-    RANK_1, 
-    RANK_2, 
-    RANK_3, 
-    RANK_4, 
-    RANK_5, 
-    RANK_6, 
-    RANK_7, 
-    RANK_8 
+enum Rank : unsigned char {
+    RANK_1,
+    RANK_2,
+    RANK_3,
+    RANK_4,
+    RANK_5,
+    RANK_6,
+    RANK_7,
+    RANK_8
 };
 
 enum Direction {
@@ -102,13 +102,13 @@ inline Color operator!(Color c) {
     return static_cast<Color>(!static_cast<bool>(c));
 }
 
-enum PieceType : unsigned char { 
+enum PieceType : unsigned char {
     EMPTY,
-    PAWN, 
-    KNIGHT, 
-    BISHOP, 
-    ROOK, 
-    QUEEN, 
+    PAWN,
+    KNIGHT,
+    BISHOP,
+    ROOK,
+    QUEEN,
     KING
 };
 static const int NB_PIECE_TYPES = static_cast<int>(KING) + 1;
@@ -129,8 +129,8 @@ static const PieceType MAJOR_TYPES[] = {
     ROOK, QUEEN
 };
 
-enum MoveType : unsigned char { 
-    QUIET_MOVE, 
+enum MoveType : unsigned char {
+    QUIET_MOVE,
     DOUBLE_PAWN_PUSH,
     KING_CASTLE,
     QUEEN_CASTLE,
@@ -150,18 +150,18 @@ enum MoveType : unsigned char {
 // Used in movegen.cpp and attack.cpp
 static const int NB_DIRS[] = { 0, 0, 8, 4, 4, 8, 8 };
 static const Direction PIECES_DIRS[][8] = {
-    { // Empty   
+    { // Empty
          NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR
     },
     { // Pawns
         NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR
     },
     { // Knights
-        UP_UP_RIGHT, RIGHT_UP_RIGHT, RIGHT_DOWN_RIGHT, DOWN_DOWN_RIGHT, 
+        UP_UP_RIGHT, RIGHT_UP_RIGHT, RIGHT_DOWN_RIGHT, DOWN_DOWN_RIGHT,
         DOWN_DOWN_LEFT, LEFT_DOWN_LEFT, LEFT_UP_LEFT, UP_UP_LEFT
     },
     { // Bishops
-        UP_RIGHT, DOWN_RIGHT, DOWN_LEFT, UP_LEFT, 
+        UP_RIGHT, DOWN_RIGHT, DOWN_LEFT, UP_LEFT,
         NO_DIR, NO_DIR, NO_DIR, NO_DIR
     },
     { // Rooks
@@ -178,7 +178,7 @@ static const Direction PIECES_DIRS[][8] = {
 // Used in movegen.cpp and protocol.cpp
 static const Direction PAWN_PUSH_DIRS[2] = { UP, DOWN };
 static const Direction PAWN_CAPTURE_DIRS[2][2] = {
-    { 
+    {
         UP_LEFT, UP_RIGHT
     },
     {

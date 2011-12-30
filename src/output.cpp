@@ -46,11 +46,11 @@ void Game::print_thinking(int depth, int score, Move m) {
     cout << setw(WIDE + 3) << nodes_count;
     cout << setw(WIDE - 3) << " ";
     int ply = current_position().get_ply();
-    
+
     if (current_position().get_turn_color() == BLACK) {
         cout << " " << 1 + (ply / 2) << ". ...";
     }
-    
+
     assert(is_legal(m) || assert_msg(debug_move(m)));
     cout << output_pv(depth, score, m) << endl;
 }
@@ -68,11 +68,11 @@ string Game::output_pv(int depth, int score, Move m) {
         stream << 1 + (ply / 2) << ". ";
     }
     stream << output_move(m);
-    
+
     make_move(m);
-    
+
     bool is_in_check = is_check(current_position().get_turn_color());
-        
+
     // Find next move in TT
     bool is_empty;
     Transposition trans = tt.lookup(current_position().hash(), is_empty);
@@ -85,7 +85,7 @@ string Game::output_pv(int depth, int score, Move m) {
     } else if (is_in_check) {
         stream << "+"; // Cut-off
     }
-    
+
     undo_move(m);
     return stream.str();
 }
@@ -114,7 +114,7 @@ string Game::output_move(Move m) {
             if (other == p) continue;
             Square s = pieces.get_position(other);
             if (board.can_attack(t, s, to) && board.can_go(other, s, to)) {
-                // If another piece of the same type can theoretically 
+                // If another piece of the same type can theoretically
                 // attack the destination (fast answer by array lookup)
                 // and can really go to this destination (not so fast
                 // answer) then a disambiguation is needed
@@ -129,10 +129,10 @@ string Game::output_move(Move m) {
         if (t == PAWN) stream << static_cast<char>('a' + m.get_orig_file());
         stream << "x";
     }
-    
+
     // Destination
     stream << output_square(m.get_dest_file(), m.get_dest_rank());
-    
+
     // Promotion
     if (m.is_promotion()) {
         stream << "=" << Piece(WHITE, m.get_promotion_type());
@@ -184,7 +184,7 @@ string print_table_stats(HashTable<T>& table, int table_size) {
 
     stream << get_stat("Entries", table.size());
     stream << endl;
-    
+
     stream << get_stat("Usage", table.get_usage());
     stream << get_meta(get_percent(table.get_usage(), table.size()), "%");
     stream << endl;
@@ -197,17 +197,17 @@ string print_table_stats(HashTable<T>& table, int table_size) {
 
     stream << get_stat("Lookups", table.get_nb_lookups());
     stream << endl;
-    
+
     stream << get_stat("Hits", table.get_nb_hits());
     stream << get_meta(get_percent(table.get_nb_hits(),
                                    table.get_nb_lookups()), "%");
     stream << endl;
-    
+
     stream << get_stat("Collisions", table.get_nb_collisions());
     stream << get_meta(get_percent(table.get_nb_collisions(),
                                    table.get_nb_lookups()), "%");
     stream << endl;
-    
+
     stream << get_stat("Misses", table.get_nb_misses());
     stream << get_meta(get_percent(table.get_nb_misses(),
                                    table.get_nb_lookups()), "%");

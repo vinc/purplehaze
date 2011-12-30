@@ -19,7 +19,7 @@
 
 Zobrist::Zobrist() {
     generator.seed(); // Use Mersenne twister's default seed
-    
+
     side_to_move = gen_hash();
     for (int c = 0; c < 2; ++c) {
         for (int t = 0; t < 7; ++t) {

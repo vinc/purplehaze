@@ -39,14 +39,14 @@ class Board
         Piece get_piece(Square s) const {
             return board[s];
         };
-        void set_piece(Piece p, Square s) { 
+        void set_piece(Piece p, Square s) {
             board[s] = p;
         };
-        bool is_empty(Square s) const { 
-            return board[s].get_type() == EMPTY; 
+        bool is_empty(Square s) const {
+            return board[s].get_type() == EMPTY;
         };
-        static bool is_out(Square s) { 
-            return s & 0x88; 
+        static bool is_out(Square s) {
+            return s & 0x88;
         };
         static bool is_dark(Square s) {
             return (s & 7) % 2 == (s >> 4) % 2;
@@ -54,11 +54,11 @@ class Board
         static bool is_same_color(Square a, Square b) {
             return (is_dark(a) && is_dark(b)) || (!is_dark(a) && !is_dark(b));
         }
-        static File get_file(Square s) { 
-            return File(s & 7); 
+        static File get_file(Square s) {
+            return File(s & 7);
         };
-        static Rank get_rank(Square s) { 
-            return Rank(s >> 4); 
+        static Rank get_rank(Square s) {
+            return Rank(s >> 4);
         };
         static bool is_pawn_begin(Color c, Square s) {
             return (get_rank(s) - RANK_6 * c) == RANK_2;
@@ -98,7 +98,7 @@ class Board
 
         // Practical answer
         bool is_attacked_by(Color c, Square s, const Pieces& pieces) const;
-        bool can_go(Piece p, Square from, Square to) const; 
+        bool can_go(Piece p, Square from, Square to) const;
 
 };
 

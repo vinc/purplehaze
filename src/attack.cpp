@@ -37,7 +37,7 @@ bool Board::is_attacked_by(Color c, Square s, const Pieces& pieces) const {
             if (to == s) return true;
         }
     }
-    
+
     // Specific code for pawns
     Direction d = (c == WHITE ? DOWN : UP);
     Direction dirs[2] = { Direction(d + LEFT), Direction(d + RIGHT) };
@@ -61,10 +61,10 @@ bool Board::can_go(Piece p, Square from, Square to) const {
     PieceType t = p.get_type();
     Color c = p.get_color();
     Direction d = get_direction_to(from, to);
-    
+
     // A piece cannot capture another piece of the same color
     if (!is_empty(to) && get_piece(to).get_color() == c) return false;
-    
+
     Direction push_dir;
     Square s;
     switch (t) {

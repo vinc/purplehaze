@@ -33,11 +33,11 @@ class Tree
             tree[tree_top + 1] = tree[tree_top];
             ++tree_top;
         };
-        void pop() { 
+        void pop() {
             --tree_top;
         };
-        Position& top() { 
-            return tree[tree_top]; 
+        Position& top() {
+            return tree[tree_top];
         };
         bool has_repetition_draw();
 };

@@ -53,7 +53,7 @@ class Game
         void del_piece(Piece p) {
             del_piece(p.get_color(), p.get_type(), p.get_index());
         };
-        
+
         void new_position();
         void del_position();
         Position& current_position() { return tree.top(); };
@@ -68,7 +68,7 @@ class Game
         void make_move(Move m);
         void undo_move(Move m);
         bool is_legal(Move m);
-        
+
         // Search
         unsigned int perft(int depth);
         int q_search(int alpha, int beta, int depth, int ply);
@@ -83,10 +83,10 @@ class Game
         }
         void set_killer_move(int depth, Move move);
         bool is_killer_move(int depth, Move move) {
-            return (move == killer_moves[depth][0] || 
+            return (move == killer_moves[depth][0] ||
                     move == killer_moves[depth][1]);
         };
-        
+
         // Position's evaluation
         void init_eval();
         int eval(int alpha, int beta);
@@ -98,7 +98,7 @@ class Game
         void print_thinking(int depth, int score, Move m);
         string output_pv(int depth, int score, Move m);
         string output_move(Move m);
-        string output_square(Square s) { 
+        string output_square(Square s) {
             return output_square(board.get_file(s), board.get_rank(s));
         };
         string output_square(File f, Rank r);
