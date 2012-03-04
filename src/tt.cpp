@@ -22,8 +22,6 @@
 
 #include "tt.h"
 
-using namespace std;
-
 string Transposition::to_string() const {
     ostringstream stream;
     stream << "<";

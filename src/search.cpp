@@ -25,9 +25,6 @@
 #include "search.h"
 #include "eval.h"
 
-using namespace std;
-
-
 unsigned int Game::perft(int depth) {
     if (depth == 0) return 1;
     unsigned int nodes = 0;

@@ -21,8 +21,6 @@
 #include "move.h"
 #include "piece.h"
 
-using namespace std;
-
 PieceType Move::get_promotion_type() const {
     switch (get_type()) {
         case KNIGHT_PROMOTION:

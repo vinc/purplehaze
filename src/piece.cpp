@@ -19,8 +19,6 @@
 
 #include "piece.h"
 
-using namespace std;
-
 ostream& operator<<(ostream& out, const Piece piece) {
     return (out << piece.to_string());
 }

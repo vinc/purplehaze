@@ -24,8 +24,6 @@
 
 #include "game.h"
 
-using namespace std;
-
 static const int WIDE = 10;
 
 void Game::print_thinking_header() {

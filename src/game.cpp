@@ -20,8 +20,6 @@
 
 #include "game.h"
 
-using namespace std;
-
 Game::Game() {
     nodes_count = 0;
     output_thinking = false;

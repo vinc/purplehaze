@@ -22,8 +22,6 @@
 
 #include "board.h"
 
-using namespace std;
-
 Board::Board() {
     // Initialize the board's squares
     for (int i = 0; i < BOARD_SIZE; ++i) board[i] = Piece();

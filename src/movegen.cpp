@@ -20,8 +20,6 @@
 
 #include "game.h"
 
-using namespace std;
-
 void Moves::generate_pieces(Color c, PieceType t, MoveType mt) {
     const Direction * dirs = PIECES_DIRS[t];
     for (int j = 0; j < pieces.get_nb_pieces(c, t); ++j) {

@@ -28,8 +28,6 @@
 #include "game.h"
 #include "xboard.h"
 
-using namespace std;
-
 string prompt() {
     string cmd;
     cout << "> ";

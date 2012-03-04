@@ -25,8 +25,6 @@
 #include "eval.h"
 #include "hashtable.h"
 
-using namespace std;
-
 // PST[Phase][Color][PieceType][Square]
 static int PST[2][2][NB_PIECE_TYPES][BOARD_SIZE] = { { { { 0 } } } };
 

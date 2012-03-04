@@ -22,8 +22,6 @@
 
 #include "game.h"
 
-using namespace std;
-
 static const bool FEN_DEBUG = true;
 
 /*

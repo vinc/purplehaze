@@ -23,8 +23,6 @@
 
 #include "xboard.h"
 
-using namespace std;
-
 Xboard::Xboard() {
     force_mode = true;
     verbosity = 1;

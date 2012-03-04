@@ -20,8 +20,6 @@
 
 #include "protocol.h"
 
-using namespace std;
-
 void Protocol::new_game() {
     game.tt.clear();
     game.clear_killers();
