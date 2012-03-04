@@ -42,10 +42,17 @@ class Transposition
               bound(UNDEF_BOUND) {}
 
         int get_value() const { return value; };
-        Bound get_bound() const { return bound; };
         int get_depth() const { return depth; };
+        Bound get_bound() const { return bound; };
         Move get_best_move() const { return best_move; };
-        bool is_empty() const;
+
+        bool is_empty() const {
+            return value == 0 &&
+                   depth == 0 &&
+                   bound == UNDEF_BOUND &&
+                   best_move.is_null();
+        };
+
         string to_string() const;
 };
 

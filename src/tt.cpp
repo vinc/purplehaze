@@ -24,14 +24,6 @@
 
 using namespace std;
 
-bool Transposition::is_empty() const {
-    if (get_value() != 0 || get_depth() != 0 ||
-        get_bound() != UNDEF_BOUND || !get_best_move().is_null()) {
-        return false;
-    }
-    return true;
-}
-
 string Transposition::to_string() const {
     ostringstream stream;
     stream << "<";
