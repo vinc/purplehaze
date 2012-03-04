@@ -24,8 +24,6 @@
 #include "move.h"
 #include "zobrist.h"
 
-using namespace std;
-
 class Position
 {
     private:
@@ -33,8 +31,8 @@ class Position
         Hash material_zobrist_hash;
         unsigned short ply;
         Piece capture;
-        bitset<4> castle_rights;
-        bitset<2> castle;
+        std::bitset<4> castle_rights;
+        std::bitset<2> castle;
         Square en_passant;
         unsigned char halfmove_counter;
         bool null_move_right;

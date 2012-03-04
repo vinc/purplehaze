@@ -57,7 +57,7 @@ class Game
         void del_position();
         Position& current_position() { return tree.top(); };
 
-        void init(string fen);
+        void init(std::string fen);
 
         bool is_check(Color c) const {
             Square s = pieces.get_position(c, KING, 0);
@@ -95,14 +95,14 @@ class Game
         // Output
         void print_thinking_header();
         void print_thinking(int depth, int score, Move m);
-        string output_pv(int depth, int score, Move m);
-        string output_move(Move m);
-        string output_square(Square s) {
+        std::string output_pv(int depth, int score, Move m);
+        std::string output_move(Move m);
+        std::string output_square(Square s) {
             return output_square(board.get_file(s), board.get_rank(s));
         };
-        string output_square(File f, Rank r);
+        std::string output_square(File f, Rank r);
         void print_tt_stats();
-        string debug_move(Move m);
+        std::string debug_move(Move m);
 };
 
 #endif /* !GAME_H */

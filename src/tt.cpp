@@ -21,10 +21,10 @@
 
 #include "tt.h"
 
-string Transposition::to_string() const {
-    ostringstream stream;
+std::string Transposition::to_string() const {
+    std::ostringstream stream;
     stream << "<";
-    stream << ", " << dec << get_value() << ", " << get_depth();
+    stream << ", " << std::dec << get_value() << ", " << get_depth();
     stream << ", " << get_bound() << ", " << get_best_move() << ">";
     return stream.str();
 }

@@ -52,7 +52,7 @@ class Transposition
                    best_move.is_null();
         };
 
-        string to_string() const;
+        std::string to_string() const;
 };
 
 class Transpositions : public HashTable<Transposition>

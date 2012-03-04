@@ -28,9 +28,9 @@ static const bool FEN_DEBUG = true;
  * For example the starting position in chess is:
  * rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
  */
-void Game::init(string fen) {
+void Game::init(std::string fen) {
     assert(fen.length() > 0);
-    istringstream iss(fen);
+    std::istringstream iss(fen);
 
     // Initialize objects
     board = Board();
@@ -39,7 +39,7 @@ void Game::init(string fen) {
 
     // Parse board positions
     Square s = A8;
-    string positions;
+    std::string positions;
     iss >> positions;
     for (auto it = positions.begin(); it != positions.end(); ++it) {
         char sq = *it;
@@ -81,7 +81,7 @@ void Game::init(string fen) {
         default: assert(!"FEN: no side to move!"); break;
     }
 
-    string castling;
+    std::string castling;
     iss >> castling;
     for (auto it = castling.begin(); it != castling.end(); ++it) {
         switch(*it) {
@@ -93,7 +93,7 @@ void Game::init(string fen) {
         }
     }
 
-    string ep;
+    std::string ep;
     iss >> ep;
     if (ep != "-") {
         char file = ep.at(0);

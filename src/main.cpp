@@ -27,86 +27,94 @@
 #include "game.h"
 #include "xboard.h"
 
-string prompt() {
-    string cmd;
-    cout << "> ";
-    cin >> cmd;
+static const std::string OPTIONS[][2] = {
+    {
+        "help",
+        "display this screen"
+    },
+    {
+        "version",
+        "display the version"
+    },
+    {
+        "setboard",
+        "set the board according to <fen> position"
+    },
+    {
+        "perft",
+        "count all nodes at each depth from the starting position"
+    },
+    {
+        "divide",
+        "count all nodes from each moves at the starting position"
+    },
+    {
+        "testsuite <epd> [<time>]",
+        "search each position of <epd> for <time> seconds"
+    },
+    {
+        "xboard",
+        "start XBoard protocole mode"
+    },
+    {
+        "quit",
+        "exit Purple Haze"
+    }
+};
+
+std::string prompt() {
+    std::cout << "> ";
+    std::string cmd;
+    std::cin >> cmd;
     return cmd;
 }
 
 int main() {
-    cout << "Purple Haze " << VERSION << endl;
-    cout << endl;
+    std::cout << "Purple Haze " << VERSION << std::endl;
+    std::cout << std::endl;
 
     // Parse commands from CLI
-    string fen(DEFAULT_FEN);
-    string cmd = prompt();
+    std::string init_fen(DEFAULT_FEN);
+    std::string cmd = prompt();
     while (cmd != "quit" && cmd != "exit") {
         if (cmd == "xboard") { // Xboard protocol mode
             Xboard xboard;
             xboard.loop();
             return 0;
         } else if (cmd == "help") {
+            std::cout << std::left;
             int comm_width = 30;
             int desc_width = 50;
-            cout << left;
-            cout << setw(comm_width) << "help"
-                 << setw(desc_width)
-                 << "display this screen"
-                 << endl;
-            cout << setw(comm_width) << "version"
-                 << setw(desc_width)
-                 << "display the version"
-                 << endl;
-            cout << setw(comm_width) << "setboard <fen>"
-                 << setw(desc_width)
-                 << "set the board according to <fen> position"
-                 << endl;
-            cout << setw(comm_width) << "perft"
-                 << setw(desc_width)
-                 << "count all nodes at each depth from the starting position"
-                 << endl;
-            cout << setw(comm_width) << "divide"
-                 << setw(desc_width)
-                 << "count all nodes from each moves at the starting position"
-                 << endl;
-            cout << setw(comm_width) << "testsuite <epd> [<time>]"
-                 << setw(desc_width)
-                 << "load an <epd> test suite and search each position"
-                 << endl
-                 << setw(comm_width) << ""
-                 << setw(desc_width)
-                 << "for <time> seconds"
-                 << endl;
-            cout << setw(comm_width) << "xboard"
-                 << "start XBoard protocol mode"
-                 << endl;
-            cout << setw(comm_width) << "quit"
-                 << "quit Purple Haze"
-                 << endl;
+            for (const std::string (&option)[2] : OPTIONS) {
+                std::string name = option[0];
+                std::string usage = option[1];
+                std::cout << std::setw(comm_width) << name
+                          << std::setw(desc_width) << usage
+                          << std::endl;
+            }
         } else if (cmd == "version") {
-            cout << VERSION << endl;
+            std::cout << VERSION << std::endl;
         } else if (cmd == "setboard") { // Get FEN
-            getline(cin, fen);
-            fen.erase(0, 1); // Remove the first whitespace
+            getline(std::cin, init_fen);
+            init_fen.erase(0, 1); // Remove the first whitespace
         } else if (cmd == "perft") {
             Game game;
-            game.init(fen);
+            game.init(init_fen);
             for (int i = 1; ; ++i) {
                 clock_t start = clock();
                 unsigned int perft_result = game.perft(i);
                 double perft_time = static_cast<double>(clock() - start) /
                                     CLOCKS_PER_SEC;
-                cout << "Perft(" << i << ") = " << perft_result;
-                cout << " (" << perft_time << " secs, ";
-                cout << perft_result / perft_time << " nps)" << endl;
+                std::cout << "Perft(" << i << ") = " << perft_result;
+                std::cout << " (" << perft_time << " secs, ";
+                std::cout << perft_result / perft_time << " nps)" << std::endl;
             }
         } else if (cmd == "divide") {
             int depth = 0;
-            cin >> depth;
-            cout << endl;
+            std::cin >> depth;
+            std::cout << std::endl;
             Game game;
-            game.init(fen);
+            game.init(init_fen);
             Color c = game.current_position().get_turn_color();
             unsigned int nodes_count = 0;
             unsigned int moves_count = 0;
@@ -119,34 +127,34 @@ int main() {
                     unsigned int cnt = game.perft(depth - 1);
                     nodes_count += cnt;
                     ++moves_count;
-                    cout << move << " " << cnt << endl;
+                    std::cout << move << " " << cnt << std::endl;
                 }
                 game.undo_move(move);
             }
-            cout << endl;
-            cout << "Moves: " << moves_count << endl;
-            cout << "Positions: " << nodes_count << endl;
+            std::cout << std::endl;
+            std::cout << "Moves: " << moves_count << std::endl;
+            std::cout << "Positions: " << nodes_count << std::endl;
         } else if (cmd == "testsuite") { // Load EPD test suite
-            string filename;
-            cin >> filename;
-            ifstream epdfile;
+            std::string filename;
+            std::cin >> filename;
+            std::ifstream epdfile;
             epdfile.open(filename.c_str());
             if (!epdfile.is_open()) {
-                cerr << "Cannot open '" << filename;
-                cerr << "': No such file or directory" << endl;
+                std::cerr << "Cannot open '" << filename;
+                std::cerr << "': No such file or directory" << std::endl;
             }
 
             // Get time per move (optional)
-            string seconds;
-            getline(cin, seconds);
+            std::string seconds;
+            getline(std::cin, seconds);
             int time = 10;
             if (seconds != "") {
-                istringstream iss(seconds);
+                std::istringstream iss(seconds);
                 iss >> time;
             }
 
-            cout << "Loading '" << filename << "', ";
-            cout << time << "s per move" << endl; // In seconds
+            std::cout << "Loading '" << filename << "', ";
+            std::cout << time << "s per move" << std::endl; // In seconds
 
             // Load game protocol
             Protocol proto;
@@ -158,27 +166,30 @@ int main() {
             unsigned int i = 0;
             while (epdfile.good()) {
                 proto.new_game();
-                string line;
+                std::string line;
                 getline(epdfile, line);
                 // TODO: add am (avoid move)
                 size_t fensep = line.find(" bm ");
                 size_t bmsep = line.find(";");
-                if (fensep == string::npos || bmsep == string::npos) continue;
+                size_t not_found = std::string::npos;
+                if (fensep == not_found || bmsep == not_found) continue;
 
                 // Load position in game
-                fen = line.substr(0, fensep);
-                cout << "Loading position #" << i + 1 << " '" << fen << "' ";
-                proto.set_board(fen);
+                init_fen = line.substr(0, fensep);
+                std::cout << "Loading position #" << i + 1
+                          << " '" << init_fen << "' ";
+                proto.set_board(init_fen);
 
                 // Search best move and test it
-                string best_moves = line.substr(fensep + 4, bmsep - fensep - 4);
-                cout << "bm " << best_moves;
-                string move = proto.search_move(true);
-                cout << " => " << move;
-                istringstream iss(best_moves);
+                std::string best_moves = line.substr(fensep + 4,
+                                                     bmsep - fensep - 4);
+                std::cout << "bm " << best_moves;
+                std::string move = proto.search_move(true);
+                std::cout << " => " << move;
+                std::istringstream iss(best_moves);
                 bool is_found = false;
                 do {
-                    string best_move;
+                    std::string best_move;
                     iss >> best_move;
                     if (best_move == move) {
                         is_found = true;
@@ -187,14 +198,14 @@ int main() {
                 } while (iss);
 
                 if (is_found) {
-                    cout << " OK" << endl;
+                    std::cout << " OK" << std::endl;
                     ++res;
                 } else {
-                    cout << " KO" << endl;
+                    std::cout << " KO" << std::endl;
                 }
                 ++i;
             }
-            cout << "Result: " << res << "/" << i << endl;
+            std::cout << "Result: " << res << "/" << i << std::endl;
             epdfile.close();
         }
         cmd = prompt();

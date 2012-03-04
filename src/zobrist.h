@@ -22,13 +22,11 @@
 
 #include "common.h"
 
-using namespace std;
-
 typedef uint64_t Hash;
 
 class Zobrist
 {
-    friend ostream& operator<<(ostream& out, const Zobrist& zobrist);
+    friend std::ostream& operator<<(std::ostream& out, const Zobrist& zobrist);
 
     private:
         Hash gen_hash();
@@ -36,7 +34,7 @@ class Zobrist
         Hash side_to_move;
         Hash castle_rights[4];
         Hash en_passants[BOARD_SIZE];
-        mt19937_64 generator;
+        std::mt19937_64 generator;
     public:
         Zobrist();
         void change_side(Hash& h) {

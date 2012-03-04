@@ -22,11 +22,9 @@
 
 #include "common.h"
 
-using namespace std;
-
 class Piece
 {
-    friend ostream& operator<<(ostream& out, const Piece piece);
+    friend std::ostream& operator<<(std::ostream& out, const Piece piece);
     private:
         /*
          * A piece is coded using 8 bits:
@@ -73,7 +71,7 @@ class Piece
         bool operator!=(const Piece& other) const {
             return !(*this == other);
         }
-        string to_string() const;
+        std::string to_string() const;
 };
 
 #endif /* !PIECE_H */

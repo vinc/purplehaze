@@ -24,8 +24,8 @@
 #include "protocol.h"
 
 static const int XBOARD_NB_FEATURES = 3;
-static const string XBOARD_FEATURES[XBOARD_NB_FEATURES][2] = {
-    { "myname",   "Purple Haze " + string(VERSION) },
+static const std::string XBOARD_FEATURES[XBOARD_NB_FEATURES][2] = {
+    { "myname",   "Purple Haze " + static_cast<std::string>(VERSION) },
     { "setboard", "1" },
     { "done",     "1" },
 };
@@ -33,7 +33,7 @@ static const string XBOARD_FEATURES[XBOARD_NB_FEATURES][2] = {
 class Xboard : public Protocol
 {
     private:
-        ofstream log;
+        std::ofstream log;
         bool force_mode;
     public:
         Xboard();

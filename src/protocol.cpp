@@ -25,7 +25,7 @@ void Protocol::new_game() {
     game.search_moves.clear();
 }
 
-bool Protocol::set_board(string fen) {
+bool Protocol::set_board(std::string fen) {
     // TODO Test if fen is valid?
 
     // Load fen
@@ -53,7 +53,7 @@ bool Protocol::set_output_thinking(bool ot) {
     return true;
 }
 
-Move Protocol::parse_move(string move) {
+Move Protocol::parse_move(std::string move) {
     Square from = Square(move[0] - 'a' + 16 * (move[1] - '1'));
     Square to = Square(move[2] - 'a' + 16 * (move[3] - '1'));
     if (game.board.is_out(from) || game.board.is_out(to)) return Move();
@@ -96,7 +96,7 @@ Move Protocol::parse_move(string move) {
     }
 }
 
-bool Protocol::play_move(string move) {
+bool Protocol::play_move(std::string move) {
     // Parse move
     Move m = parse_move(move);
 
@@ -122,7 +122,7 @@ bool Protocol::undo_move() {
     return true;
 }
 
-string Protocol::search_move(bool use_san_notation) {
+std::string Protocol::search_move(bool use_san_notation) {
     Move m = game.root(depth + 1);
     if (m.is_null()) {
         if (game.is_check(game.current_position().get_turn_color())) {
@@ -131,7 +131,7 @@ string Protocol::search_move(bool use_san_notation) {
         return "DRAW";
     } else {
         if (use_san_notation) {
-            string res = game.output_move(m);
+            std::string res = game.output_move(m);
             play_move(m.to_string());
             if (game.is_check(game.current_position().get_turn_color())) {
                 res += "+";

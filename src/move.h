@@ -21,11 +21,9 @@
 
 #include "common.h"
 
-using namespace std;
-
 class Move
 {
-    friend ostream& operator<<(ostream& out, const Move move);
+    friend std::ostream& operator<<(std::ostream& out, const Move move);
 
     protected:
         /*
@@ -120,7 +118,7 @@ class Move
         bool operator!=(const Move& other) const {
             return !(*this == other);
         }
-        string to_string() const;
+        std::string to_string() const;
 };
 
 class ExtendedMove : public Move

@@ -18,11 +18,11 @@
 
 #include "piece.h"
 
-ostream& operator<<(ostream& out, const Piece piece) {
+std::ostream& operator<<(std::ostream& out, const Piece piece) {
     return (out << piece.to_string());
 }
 
-string Piece::to_string() const {
+std::string Piece::to_string() const {
     char t;
     switch (get_type()) {
         case PAWN:   t = 'P'; break;
@@ -36,5 +36,5 @@ string Piece::to_string() const {
     if (get_color() == BLACK) {
         t = static_cast<char>(t + 'a' - 'A'); // Lower case for black pieces
     }
-    return string(1, t);
+    return std::string(1, t);
 }

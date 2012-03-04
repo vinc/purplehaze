@@ -25,16 +25,17 @@
 
 class Board
 {
-    friend ostream& operator<<(ostream& out, const Board board);
+    friend std::ostream& operator<<(std::ostream& out, const Board board);
 
     private:
         Piece board[BOARD_SIZE];
-        bitset<7> attack_array[240];
+        std::bitset<7> attack_array[240];
         Direction dir_array[240];
 
     public:
         Board();
-        static string to_string(const string squares[], const int sq_width);
+        static std::string to_string(const std::string squares[], 
+                                     const int sq_width);
         Piece get_piece(Square s) const {
             return board[s];
         };

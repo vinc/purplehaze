@@ -22,8 +22,6 @@
 #include "board.h"
 #include "position.h"
 
-using namespace std;
-
 typedef char Score;
 
 const Score BEST_SCORE = 127;

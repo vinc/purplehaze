@@ -59,9 +59,9 @@ Board::Board() {
  * Generate a string for pretty printing the content of a 0x88 string array.
  * This could be the board but also any PST array.
  */
-string Board::to_string(const string squares[], const int sq_width) {
-    ostringstream stream;
-    stream << endl;
+std::string Board::to_string(const std::string squares[], const int sq_width) {
+    std::ostringstream stream;
+    stream << std::endl;
     for (Square s = A8; s < OUT; s = Square(s + 1)) {
         if (is_out(s)) continue;
         if (get_file(s) == FILE_A) {
@@ -77,13 +77,13 @@ string Board::to_string(const string squares[], const int sq_width) {
                 }
                 stream << "+";
             }
-            stream << endl;
+            stream << std::endl;
             stream << "   " << get_rank(s) + 1 << " ";
         }
         stream << "|";
         stream << squares[s];
         if (get_file(s) == FILE_H) {
-            stream << "|" << endl;
+            stream << "|" << std::endl;
             if (s == H1) break; // The loop ends here
             s = Square(s - 0x18);
         }
@@ -97,23 +97,23 @@ string Board::to_string(const string squares[], const int sq_width) {
         }
         stream << "+";
     }
-    stream << endl << "     ";
+    stream << std::endl << "     ";
 
     // Output files names
     for (char c = 'a'; c <= 'h'; ++c) {
         int l = sq_width / 2;
         int r = sq_width % 2;
-        stream << setw(l + 2) << c << setw(r) << " ";
+        stream << std::setw(l + 2) << c << std::setw(r) << " ";
     }
-    stream << endl;
+    stream << std::endl;
     return stream.str();
 }
 
 /*
  * Pretty print the board
  */
-ostream& operator<<(ostream& out, const Board board) {
-    string squares[BOARD_SIZE];
+std::ostream& operator<<(std::ostream& out, const Board board) {
+    std::string squares[BOARD_SIZE];
     for (int i = 0; i < BOARD_SIZE; ++i) {
         Square s = Square(i);
         squares[i] = " ";

@@ -28,7 +28,7 @@ class Protocol
     protected:
         Game game;
         int depth;
-        stack<Move> history;
+        std::stack<Move> history;
         unsigned short verbosity;
 
     public:
@@ -38,19 +38,19 @@ class Protocol
 
         bool set_output_thinking(bool ot = true);
 
-        bool set_board(string fen);
+        bool set_board(std::string fen);
 
         bool set_time(int moves, int time);
 
         bool set_remaining_time(int time);
 
-        bool play_move(string move);
+        bool play_move(std::string move);
 
         bool undo_move();
 
-        string search_move(bool use_san_notation = false);
+        std::string search_move(bool use_san_notation = false);
 
-        Move parse_move(string move);
+        Move parse_move(std::string move);
 
         void set_depth(int d) { depth = d; };
 

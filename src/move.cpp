@@ -47,13 +47,13 @@ PieceType Move::get_castle_side() const {
     }
 }
 
-ostream& operator<<(ostream& out, const Move move) {
+std::ostream& operator<<(std::ostream& out, const Move move) {
     return (out << move.to_string());
 }
 
-string Move::to_string() const {
+std::string Move::to_string() const {
     if (is_null()) return "#";
-    string res = "";
+    std::string res = "";
     res += static_cast<char>('a' + get_orig_file());
     res += static_cast<char>('1' + get_orig_rank());
     res += static_cast<char>('a' + get_dest_file());
