@@ -26,7 +26,7 @@ class Tree
 {
     private:
         Position tree[MAX_TREE];
-        unsigned int tree_top; // Redondant with current_position().get_ply()
+        unsigned int tree_top; // TODO Redondant? current_position().get_ply()
     public:
         Tree() : tree_top(0) {}
         void push() {

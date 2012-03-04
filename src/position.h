@@ -33,7 +33,6 @@ class Position
         Hash zobrist_hash;
         Hash material_zobrist_hash;
         unsigned short ply;
-        //Move last_move;
         Piece capture;
         bitset<4> castle_rights;
         bitset<2> castle;

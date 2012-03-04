@@ -102,7 +102,6 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
     Transposition trans = tt.lookup(pos.hash(), &is_empty);
     if (!is_empty) {
         if (/*!is_pv &&*/ depth <= trans.get_depth()) {
-            //int tr_score = value_from_trans(trans.get_value(), ply);
             int tr_score = trans.get_value();
             switch (trans.get_bound()) {
                 case EXACT: return tr_score; // Already searched node
@@ -136,7 +135,6 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
         score = -pv_search<node_type>(-beta, -beta + 1, r_depth, ply + 1);
         undo_move(null_move);
         if (score >= beta) {
-            //if (score >= INF - MAX_PLY) return beta;
             return score;
         }
     } else if (is_null_move) {
@@ -292,7 +290,6 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
     transposition:
         //assert(!best_move.is_null());
         if (depth >= trans.get_depth() /*&& !is_null_move*/) {
-            //int value = value_to_trans(best_score, ply);
             int value = best_score;
             Bound bound = (best_score >= beta ? LOWER :
                           (best_score <= old_alpha ? UPPER : EXACT));
@@ -345,6 +342,7 @@ Move Game::root(int max_depth) {
                 --nb_moves;
                 continue;
             }
+            // FIXME
             //NodeType node_type = (nb_moves ? PV : ALL);
             //score = -pv_search<node_type>(-beta, -alpha, it - 1, 1);
             if (nb_moves == 1) {

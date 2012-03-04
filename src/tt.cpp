@@ -25,7 +25,7 @@
 using namespace std;
 
 bool Transposition::is_empty() const {
-    if (/*get_hash() != 0 ||*/ get_value() != 0 || get_depth() != 0 ||
+    if (get_value() != 0 || get_depth() != 0 ||
         get_bound() != UNDEF_BOUND || !get_best_move().is_null()) {
         return false;
     }
@@ -34,43 +34,10 @@ bool Transposition::is_empty() const {
 
 string Transposition::to_string() const {
     ostringstream stream;
-    stream << "<" /*<< hex << get_hash()*/;
+    stream << "<";
     stream << ", " << dec << get_value() << ", " << get_depth();
     stream << ", " << get_bound() << ", " << get_best_move() << ">";
     return stream.str();
 }
-
-/*
-void Transpositions::clear() {
-    for (int i = 0; i < SIZE; ++i) {
-        tt[i] = Transposition();
-    }
-    hits = 0;
-    misses = 0;
-}
-
-Transposition Transpositions::lookup(Hash h) {
-    //assert(SIZE > 0);
-    //assert(null_entry.is_empty());
-    Transposition t = tt[h & (SIZE - 1)];
-
-    // Verbose mode
-    if (h && t.get_hash() == h) {
-        ++hits;
-        return t;
-    }
-    if (h && !t.is_empty()) ++collisions;
-    ++misses;
-    return NULL_ENTRY;
-
-    //return ((h && t.get_hash() == h) ? t : NULL_ENTRY);
-}
-
-int Transpositions::get_usage() const {
-    int res = 0;
-    for (int i = 0; i < SIZE; ++i) if (!tt[i].is_empty()) ++res;
-    return res;
-}
-*/
 
 template class HashTable<Transposition>; // To avoid linker errors

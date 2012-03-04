@@ -29,7 +29,7 @@ void Protocol::new_game() {
 }
 
 bool Protocol::set_board(string fen) {
-    // Test if fen is valid?
+    // TODO Test if fen is valid?
 
     // Load fen
     game.init(fen);

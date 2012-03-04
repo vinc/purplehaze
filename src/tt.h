@@ -28,21 +28,19 @@
 class Transposition
 {
     private:
-        //Hash hash;           // 64 bits needed
         short value;         // 16 bits needed
         Move best_move;      // 16 bits needed
         unsigned char depth; // 10 bits needed (depth < 512)
         Bound bound;         // 3 bits needed
 
     public:
-        Transposition(/*Hash h,*/ int v, Bound b, int d, Move bm)
-            : /*hash(h),*/ value(v), best_move(bm), depth(d),
+        Transposition(int v, Bound b, int d, Move bm)
+            : value(v), best_move(bm), depth(d),
               bound(b) {}
         Transposition()
-            : /*hash(Hash()),*/ value(0), best_move(Move()), depth(0),
+            : value(0), best_move(Move()), depth(0),
               bound(UNDEF_BOUND) {}
 
-        /*Hash get_hash() const { return hash; };*/
         int get_value() const { return value; };
         Bound get_bound() const { return bound; };
         int get_depth() const { return depth; };
@@ -51,24 +49,14 @@ class Transposition
         string to_string() const;
 };
 
-//template <class Transposition>
 class Transpositions : public HashTable<Transposition>
 {
     private:
         const Transposition NULL_ENTRY;
-        //using HashTable<Transposition>::entries;
 
     public:
         Transpositions(int n = TT_SIZE) : HashTable<Transposition>(n) {}
 
-        /*
-        void clear() {
-            HashTable<Transposition>::clear();
-        };
-        Transposition lookup(Hash h, bool* is_empty) {
-            return HashTable<Transposition>::lookup(h, is_empty);
-        };
-        */
         void save(Hash h, int v, Bound b, int d, Move bm) {
             HashTable<Transposition>::save(h, Transposition(v, b, d, bm));
         };

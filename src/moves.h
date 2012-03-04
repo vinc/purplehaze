@@ -45,19 +45,15 @@ class MoveList
         MoveList() :
             pos(0)
             {}
-        //unsigned int get_pos() { return pos };
         void inc_ply() { pos += MAX_PLY; };
         void dec_ply() { pos -= MAX_PLY; };
         void clear() { pos = 0; };
-        //void insert(unsigned char i, ExtendedMove m) { list[pos + i] = m; };
-        //ExtendedMove at(unsigned char i) { return list[pos + i]; };
         ExtendedMove& operator[] (unsigned char i) { return list[pos + i]; };
 };
 
 class Moves
 {
     private:
-        //ExtendedMove moves[MAX_MOVES];
         MoveList& moves;
 
         Position& current_position;
@@ -97,19 +93,8 @@ class Moves
         static void init_mvv_lva_scores();
         Score get_mvv_lva_score(Move m);
 
-        // Used for compatibility only
-        /*
-        int size() {
-            return n;
-        };
-        Move at(int i) {
-            assert(i < n);
-            return moves[i];
-        };
-        */
-
         // Used in divide
-        void numeric_sort() { /*moves.sort(Move::numeric_comp);*/ };
+        void numeric_sort();
 };
 
 #endif /* !MOVES_H */
