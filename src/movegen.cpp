@@ -213,6 +213,9 @@ void Game::make_move(Move m) {
                 break;
             default:
                 assert(false);
+                rook_orig = OUT;
+                rook_dest = OUT;
+                break;
         }
         Piece rook = board.get_piece(rook_orig);
         board.set_piece(Piece(), rook_orig);
@@ -287,7 +290,11 @@ void Game::undo_move(Move m) {
                 rook_orig = Square(A1 + A8 * c);
                 rook_dest = Square(D1 + A8 * c);
                 break;
-            default: assert(false);
+            default:
+                assert(false);
+                rook_orig = OUT;
+                rook_dest = OUT;
+                break;
         }
         Piece rook = board.get_piece(rook_dest);
         board.set_piece(Piece(), rook_dest);
