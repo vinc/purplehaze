@@ -75,8 +75,7 @@ int main() {
 
     // Parse commands from CLI
     std::string init_fen(DEFAULT_FEN);
-    std::string cmd = prompt();
-    while (cmd != "quit" && cmd != "exit") {
+    for (std::string cmd = prompt(); cmd != "quit"; cmd = prompt()) {
         if (cmd == "xboard") { // Xboard protocol mode
             Xboard xboard;
             xboard.loop();
@@ -208,7 +207,6 @@ int main() {
             std::cout << "Result: " << res << "/" << i << std::endl;
             epdfile.close();
         }
-        cmd = prompt();
     }
     return 0;
 }
