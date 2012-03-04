@@ -64,7 +64,8 @@ class Time
             return allocated_time;
         };
         int get_elapsed_time() {
-            return (100 * (clock() - starting_time)) / CLOCKS_PER_SEC;
+            return 100 * static_cast<unsigned int>(clock() - starting_time) /
+                   CLOCKS_PER_SEC;
         };
         void start_thinking(int ply);
         bool is_out_of_time();
