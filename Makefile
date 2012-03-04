@@ -4,6 +4,7 @@ optimize = yes
 profiler = no
 gdb = no
 null_move_pruning = yes
+debug = no
 
 ifndef compiler
     compiler = gcc
@@ -50,6 +51,10 @@ endif
 
 ifeq ($(null_move_pruning),yes)
     CXXFLAGS += -DNMP
+endif
+
+ifeq ($(debug),no)
+    CXXFLAGS += -DNDEBUG
 endif
 
 SOURCES = $(shell ls src/*.cpp)
