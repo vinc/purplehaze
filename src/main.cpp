@@ -136,6 +136,8 @@ int main() {
         } else if (cmd == "testsuite") { // Load EPD test suite
             std::string filename;
             std::cin >> filename;
+
+            // Check if filename exists
             std::ifstream epdfile;
             epdfile.open(filename.c_str());
             if (!epdfile.is_open()) {
@@ -163,10 +165,9 @@ int main() {
             // Read positions in file
             unsigned int res = 0;
             unsigned int i = 0;
-            while (epdfile.good()) {
+            std::string line;
+            while (getline(epdfile, line)) {
                 proto.new_game();
-                std::string line;
-                getline(epdfile, line);
                 // TODO: add am (avoid move)
                 size_t fensep = line.find(" bm ");
                 size_t bmsep = line.find(";");
