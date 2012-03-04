@@ -27,6 +27,7 @@
 
 using namespace std;
 
+
 unsigned int Game::perft(int depth) {
     if (depth == 0) return 1;
     unsigned int nodes = 0;
@@ -35,9 +36,17 @@ unsigned int Game::perft(int depth) {
     Moves moves(board, pieces, current_position(), search_moves, use_lazy);
     Move move;
     while (!(move = moves.next()).is_null()) {
-        make_move(move);
-        if (!is_check(c)) nodes += perft(depth - 1);
-        undo_move(move);
+#ifdef LEGAL
+        if (depth == 1) {
+            if (is_legal(move)) ++nodes; // TODO: Finish is_legal()
+        } else {
+#endif
+            make_move(move);
+            if (!is_check(c)) nodes += perft(depth - 1);
+            undo_move(move);
+#ifdef LEGAL
+        }
+#endif
     }
     return nodes;
 }

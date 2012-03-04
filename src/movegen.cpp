@@ -324,9 +324,9 @@ bool Game::is_legal(Move m) {
     if (c != current_position().get_turn_color()) return false;
 
     // It must be able to do the move
-    if (!m.is_en_passant() &&
-        !m.is_castle() &&
-        !board.can_go(p, from, to)) return false;
+    if (!m.is_en_passant() && !m.is_castle()) {
+        if (!board.can_go(p, from, to)) return false;
+    }
 
     // Promotion
     if (t == PAWN && board.is_pawn_end(c, to) && !m.is_promotion()) {
@@ -363,29 +363,27 @@ bool Game::is_legal(Move m) {
         switch (m.get_castle_side()) {
             case KING:
                 rook = Square(H1 + A8 * c);
-                if (!(board.is_empty(Square(F1 + A8 * c)) &&
-                    board.is_empty(to) &&
-                    board.get_piece(rook).get_type() == ROOK &&
-                    board.get_piece(rook).get_color() == c &&
-                    !board.is_attacked_by(!c, from, pieces) &&
-                    !board.is_attacked_by(!c, Square((F1 + A8 * c)), pieces) &&
-                    !board.is_attacked_by(!c, to, pieces))
-                    ) {
-                    return false;
+                if (!board.is_empty(Square(F1 + A8 * c)) ||
+                    !board.is_empty(to) ||
+                    board.get_piece(rook).get_type() != ROOK ||
+                    board.get_piece(rook).get_color() != c ||
+                    board.is_attacked_by(!c, from, pieces) ||
+                    board.is_attacked_by(!c, Square((F1 + A8 * c)), pieces) ||
+                    board.is_attacked_by(!c, to, pieces)) {
+                        return false;
                 }
                 break;
             case QUEEN:
                 rook = Square(A1 + A8 * c);
-                if (!(board.is_empty(Square(B1 + A8 * c)) &&
-                    board.is_empty(Square(D1 + A8 * c)) &&
-                    board.is_empty(to) &&
-                    board.get_piece(rook).get_type() == ROOK &&
-                    board.get_piece(rook).get_color() == c &&
-                    !board.is_attacked_by(!c, from, pieces) &&
-                    !board.is_attacked_by(!c, Square((D1 + A8 * c)), pieces) &&
-                    !board.is_attacked_by(!c, to, pieces))
-                    ) {
-                    return false;
+                if (!board.is_empty(Square(B1 + A8 * c)) ||
+                    !board.is_empty(Square(D1 + A8 * c)) ||
+                    !board.is_empty(to) ||
+                    board.get_piece(rook).get_type() != ROOK ||
+                    board.get_piece(rook).get_color() != c ||
+                    board.is_attacked_by(!c, from, pieces) ||
+                    board.is_attacked_by(!c, Square((D1 + A8 * c)), pieces) ||
+                    board.is_attacked_by(!c, to, pieces)) {
+                        return false;
                 }
                 break;
             default: return false;
@@ -397,5 +395,7 @@ bool Game::is_legal(Move m) {
     } else if (!board.is_empty(to)) {
         return false;
     }
+
+    // TODO: Add check
     return true;
 }
