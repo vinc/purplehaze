@@ -19,14 +19,14 @@
 #include "time.h"
 #include "assert.h"
 
-void Time::start_thinking(int ply) {
+void Time::start_thinking(unsigned int ply) {
     starting_time = clock();
     abort_search = false;
     last_poll_nodes_count = 0;
     polling_interval = 1000000;
     if (remaining_time != allocated_time) {
-        int n = allowed_moves;
-        int remaining_moves = n - (((ply + 1) / 2) % n);
+        unsigned int n = allowed_moves;
+        unsigned int remaining_moves = n - (((ply + 1) / 2) % n);
         assert(remaining_moves > 0);
         allocated_time = remaining_time / remaining_moves;
     } else {
@@ -50,7 +50,7 @@ bool Time::is_out_of_time() {
     return false;
 }
 
-bool Time::poll(int nodes_count) {
+bool Time::poll(unsigned int nodes_count) {
     if (nodes_count - last_poll_nodes_count > polling_interval) {
         last_poll_nodes_count = nodes_count;
         abort_search = is_out_of_time();

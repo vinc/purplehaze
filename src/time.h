@@ -24,17 +24,17 @@ class Time
 {
     private:
         // Set the time to play the game
-        int allowed_moves;
-        int allowed_time; // In centi-seconds
+        unsigned int allowed_moves;
+        unsigned int allowed_time; // In centi-seconds
 
         // Set the time to play a move
         clock_t starting_time;
-        int allocated_time; // Calculated
-        int remaining_time; // Given by protocols like Xboard
+        unsigned long long int allocated_time; // Calculated
+        unsigned int remaining_time; // Given by protocols like Xboard
         int coef_1, coef_2;
 
-        int polling_interval;
-        int last_poll_nodes_count;
+        unsigned int polling_interval;
+        unsigned int last_poll_nodes_count;
         bool abort_search;
 
     public:
@@ -46,7 +46,7 @@ class Time
             abort_search(false)
             {}
 
-        Time(int moves, int time) :
+        Time(unsigned int moves, unsigned int time) :
             allowed_moves(moves), allowed_time(time),
             allocated_time(allowed_time / allowed_moves),
             remaining_time(allowed_time / allowed_moves),
@@ -54,22 +54,22 @@ class Time
             abort_search(false)
             {}
 
-        void set_polling_interval(int nodes) {
+        void set_polling_interval(unsigned int nodes) {
             polling_interval = nodes;
         };
-        void set_remaining_time(int time) {
+        void set_remaining_time(unsigned int time) {
             remaining_time = time;
         };
-        int get_allocated_time() const {
+        unsigned long long int get_allocated_time() const {
             return allocated_time;
         };
-        int get_elapsed_time() {
-            return 100 * static_cast<unsigned int>(clock() - starting_time) /
-                   CLOCKS_PER_SEC;
+        unsigned long long int get_elapsed_time() {
+            unsigned long long int elapsed = clock() - starting_time;
+            return 100 * elapsed / CLOCKS_PER_SEC;
         };
-        void start_thinking(int ply);
+        void start_thinking(unsigned int ply);
         bool is_out_of_time();
-        bool poll(int nodes_count);
+        bool poll(unsigned int nodes_count);
 };
 
 #endif /* !TIME_H */
