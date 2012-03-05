@@ -69,7 +69,7 @@ class Game
         bool is_legal(Move m);
 
         // Search
-        unsigned int perft(int depth);
+        unsigned long long int perft(unsigned int depth);
         int q_search(int alpha, int beta, int depth, int ply);
         template<NodeType node_type>
         int pv_search(int alpha, int beta, int depth, int ply);

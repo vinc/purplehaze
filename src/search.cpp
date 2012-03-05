@@ -24,7 +24,7 @@
 #include "search.h"
 #include "eval.h"
 
-unsigned int Game::perft(int depth) {
+unsigned long long int Game::perft(unsigned int depth) {
     if (depth == 0) return 1;
     unsigned int nodes = 0;
     Color c = current_position().get_turn_color();

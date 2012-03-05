@@ -99,11 +99,11 @@ int main() {
         } else if (cmd == "perft") {
             Game game;
             game.init(init_fen);
-            for (int i = 1; ; ++i) {
-                clock_t start = clock();
-                unsigned int perft_result = game.perft(i);
-                double perft_time = static_cast<double>(clock() - start) /
-                                    CLOCKS_PER_SEC;
+            for (unsigned int i = 1; ; ++i) {
+                clock_t starting_time = clock();
+                unsigned long long int perft_result = game.perft(i);
+                long double elapsed = clock() - starting_time;
+                long double perft_time = elapsed / CLOCKS_PER_SEC;
                 std::cout << "Perft(" << i << ") = " << perft_result;
                 std::cout << " (" << perft_time << " secs, ";
                 std::cout << perft_result / perft_time << " nps)" << std::endl;
