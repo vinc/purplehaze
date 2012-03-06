@@ -53,6 +53,10 @@ static const std::string OPTIONS[][2] = {
         "search each position of <epd> for <time> seconds"
     },
     {
+        "perftsuite <epd>",
+        "compare perft results to each position of <epd>"
+    },
+    {
         "xboard",
         "start XBoard protocole mode"
     },
@@ -206,6 +210,41 @@ int main() {
                 ++i;
             }
             std::cout << "Result: " << res << "/" << i << std::endl;
+            epdfile.close();
+        } else if (cmd == "perftsuite") { // Load perft test suite
+            std::string filename;
+            std::cin >> filename;
+            std::ifstream epdfile;
+            epdfile.open(filename.c_str());
+            if (!epdfile.is_open()) {
+                std::cerr << "Cannot open '" << filename << "': "
+                          << "No such file or directory" << std::endl;
+            }
+            const size_t npos = std::string::npos;
+            std::string line;
+            while (getline(epdfile, line)) {
+                std::string fen;
+                Game game;
+                for (int i = 0; line.length() > 0; ++i) {
+
+                    const size_t pos = line.find(" ;");
+                    std::string sub = line.substr(0, pos);
+                    line = (pos != npos ? line.substr(pos + 2, npos) : "");
+
+                    if (i == 0) {
+                        fen = sub;
+                        game.init(fen);
+                        std::cout << "FEN '" << fen << "': " << std::flush;
+                    } else {
+                        sub = sub.substr(3, npos); // Skip /^D\d /
+                        unsigned int moves;
+                        std::istringstream(sub) >> moves;
+                        std::cout << (game.perft(i) == moves ? "." : "x")
+                                  << std::flush;
+                    }
+                }
+                std::cout << std::endl;
+            }
             epdfile.close();
         }
     }
