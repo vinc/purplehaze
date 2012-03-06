@@ -184,10 +184,10 @@ void Game::make_move(Move m) {
 
         capture = board.get_piece(s);
         if (capture.get_type() == ROOK) { // Update opponent's castling rights
-            if (dest == Square(H1 + A8 * c)) {
+            if (dest == Square(H1 + A8 * !c)) {
                 pos.set_castle_right(!c, KING, false);
                 zobrist.update_castle_right(pos.hash(), !c, KING);
-            } else if (dest == Square(A1 + A8 * c)) {
+            } else if (dest == Square(A1 + A8 * !c)) {
                 pos.set_castle_right(!c, QUEEN, false);
                 zobrist.update_castle_right(pos.hash(), !c, QUEEN);
             }
