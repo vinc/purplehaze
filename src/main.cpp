@@ -135,7 +135,7 @@ int main(int argc, char *argv[]) {
                         game.search_moves);
             Move move;
             while (!(move = moves.next()).is_null()) {
-                    game.make_move(move);
+                game.make_move(move);
                 if (!game.is_check(c)) {
                     unsigned int cnt = game.perft(depth - 1);
                     nodes_count += cnt;
