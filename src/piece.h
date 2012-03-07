@@ -61,10 +61,12 @@ class Piece
         int get_index() const {
             return (code >> I_SHIFT) & I_MASK;
         };
+        /*
         void set_index(int i) {
             code &= I_MASK;
             code |= (i << I_SHIFT);
         }
+        */
         bool operator==(const Piece& other) const {
             return this->code == other.code;
         }
