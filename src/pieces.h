@@ -27,7 +27,7 @@ class Pieces
     private:
         Square positions[2][7][9];
         unsigned char nb_pieces[2][7];
-        unsigned char sum[2];
+        unsigned char total[2];
 
     public:
         Pieces();
@@ -49,17 +49,17 @@ class Pieces
             return nb_pieces[c][t];
         };
         unsigned char get_nb_pieces(Color c) const {
-            return sum[c];
+            return total[c];
         };
 
         // FIXME? No warning if nb < 0 or nb > 9
         void inc_nb_pieces(Color c, PieceType t) {
             ++nb_pieces[c][t];
-            ++sum[c];
+            ++total[c];
         };
         void dec_nb_pieces(Color c, PieceType t) {
             --nb_pieces[c][t];
-            --sum[c];
+            --total[c];
         };
 };
 
