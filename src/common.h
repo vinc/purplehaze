@@ -266,4 +266,9 @@ inline int operator+(MoveType a, MoveType b) {
     return static_cast<MoveType>(static_cast<int>(a) + static_cast<int>(b));
 }
 
+// ANSI Color
+static const std::string color_red = "\x1b[31m";
+static const std::string color_green = "\x1b[32m";
+static const std::string color_reset = "\x1b[0m";
+
 #endif /* !COMMON_H */

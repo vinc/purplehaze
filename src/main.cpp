@@ -16,6 +16,7 @@
 
 #include <assert.h>
 #include <fstream>
+#include <getopt.h>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -73,7 +74,16 @@ std::string prompt() {
     return cmd;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+    bool option_color = false;
+    char opt;
+    while ((opt = getopt(argc, argv, "c")) != -1) {
+        switch (opt) {
+            case 'c':
+                option_color = true;
+                break;
+        }
+    }
     std::cout << "Purple Haze " << VERSION << std::endl;
     std::cout << std::endl;
 
@@ -202,11 +212,15 @@ int main() {
                 } while (iss);
 
                 if (is_found) {
-                    std::cout << " OK" << std::endl;
+                    if (option_color) std::cout << color_green;
+                    std::cout << " OK";
                     ++res;
                 } else {
-                    std::cout << " KO" << std::endl;
+                    if (option_color) std::cout << color_red;
+                    std::cout << " KO";
                 }
+                if (option_color) std::cout << color_reset;
+                std::cout << std::endl;
                 ++i;
             }
             std::cout << "Result: " << res << "/" << i << std::endl;
@@ -237,9 +251,15 @@ int main() {
                         std::cout << "FEN '" << fen << "': " << std::flush;
                     } else {
                         sub = sub.substr(3, npos); // Skip /^D\d /
-                        unsigned int moves;
-                        std::istringstream(sub) >> moves;
-                        std::cout << (game.perft(i) == moves ? "." : "x")
+                        unsigned int moves = game.perft(i);
+                        unsigned int expected;
+                        std::istringstream(sub) >> expected;
+                        if (option_color) {
+                            std::cout << (moves == expected ? color_green
+                                                            : color_red);
+                        }
+                        std::cout << (moves == expected ? "." : "x")
+                                  << (option_color ? color_reset : "")
                                   << std::flush;
                     }
                 }
