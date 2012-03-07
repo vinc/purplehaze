@@ -29,6 +29,7 @@ Pieces::Pieces() {
      */
 
     for (int i = 0; i < 2; ++i) {
+        total[i] = 0;
         for (int j = 0; j < 7; ++j) {
             nb_pieces[i][j] = 0;
             for (int k = 0; k < 9; ++k) {
