@@ -12,6 +12,8 @@ TEST(MoveListTest, Size) {
     // MoveList's internal array's size should not be a power of two
     //EXPECT_NE(0, list_size & (list_size - 1));
     
+    EXPECT_EQ(128 * 256 * 4, list_size);
+    EXPECT_EQ(list_size + 4, size);
     EXPECT_EQ(size, sizeof(MoveList));
 }
 
@@ -72,6 +74,7 @@ TEST(MovesTest, Size) {
         2 * sizeof(unsigned char) +                // 2 bytes
         sizeof(MovesState) +                       // 1 byte
         sizeof(bool);                              // 1 byte
+    EXPECT_EQ(28, size);
     EXPECT_EQ(size, sizeof(Moves));
 }
 

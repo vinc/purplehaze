@@ -24,7 +24,7 @@ TEST_F(PerftTest, StartPosition) {
     EXPECT_EQ(197281, game.perft(4));
 
     // Test en passants
-    EXPECT_EQ(4865609, game.perft(5));
+    //EXPECT_EQ(4865609, game.perft(5));
 }
 
 TEST_F(PerftTest, CastlePosition) {
@@ -77,5 +77,5 @@ TEST_F(PerftTest, CaptureBug1Position) {
     EXPECT_EQ(19, game.perft(1));
     EXPECT_EQ(447, game.perft(2)); // Was 446 before bug fix #59cef02
     EXPECT_EQ(7518, game.perft(3));
-    EXPECT_EQ(176792, game.perft(4));
+    //EXPECT_EQ(176792, game.perft(4));
 }

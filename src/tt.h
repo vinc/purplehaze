@@ -27,10 +27,10 @@
 class Transposition
 {
     private:
-        short value;         // 16 bits needed
-        Move best_move;      // 16 bits needed
-        unsigned char depth; // 10 bits needed (depth < 512)
-        Bound bound;         // 3 bits needed
+        short value;         // 2 bytes / 16 bits used
+        Move best_move;      // 2 bytes / 16 bits used
+        unsigned char depth; // 1 byte  /  8 bits used: depth < 256
+        Bound bound;         // 1 byte  /  2 bits used
 
     public:
         Transposition(int v, Bound b, int d, Move bm)
