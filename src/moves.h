@@ -35,17 +35,17 @@ enum MovesState : unsigned char {
 class MoveList
 {
     private:
-        ExtendedMove list[MAX_PLY * MAX_BF];
-        unsigned int pos;
+        ExtendedMove list[MAX_PLY][MAX_BF];
+        unsigned int ply;
 
     public:
         MoveList() :
-            pos(0)
+            ply(0)
             {}
-        void inc_ply() { pos += MAX_PLY; };
-        void dec_ply() { pos -= MAX_PLY; };
-        void clear() { pos = 0; };
-        ExtendedMove& operator[] (unsigned char i) { return list[pos + i]; };
+        void inc_ply() { ++ply; };
+        void dec_ply() { --ply; };
+        void clear() { ply = 0; };
+        ExtendedMove& operator[] (unsigned char i) { return list[ply][i]; };
 };
 
 class Moves
