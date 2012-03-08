@@ -56,10 +56,10 @@ class Move
 
         Move(Square o, Square d, MoveType t) {
             code = ((o & 7) << OF_SHIFT) |
-            ((o >> 4) << OR_SHIFT) |
-            ((d & 7) << DF_SHIFT) |
-            ((d >> 4) << DR_SHIFT) |
-            (t);
+                   ((o >> 4) << OR_SHIFT) |
+                   ((d & 7) << DF_SHIFT) |
+                   ((d >> 4) << DR_SHIFT) |
+                   t;
         };
 
         friend class ExtendedMove;
