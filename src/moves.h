@@ -90,8 +90,10 @@ class Moves
         static void init_mvv_lva_scores();
         Score get_mvv_lva_score(Move m);
 
+        /*
         // Used in divide
         void numeric_sort();
+        */
 };
 
 #endif /* !MOVES_H */
