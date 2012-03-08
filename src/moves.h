@@ -51,6 +51,8 @@ class MoveList
 class Moves
 {
     private:
+        static Score mvv_lva_scores[NB_PIECE_TYPES][NB_PIECE_TYPES];
+
         MoveList& moves;
 
         Position& current_position;
@@ -64,8 +66,6 @@ class Moves
         bool use_lazy_generation;
 
     public:
-        static Score mvv_lva_scores[NB_PIECE_TYPES][NB_PIECE_TYPES];
-
         Moves(Board& b, Pieces& ps, Position& cn, MoveList& ml,
               bool lg = true) :
             moves(ml), current_position(cn), board(b), pieces(ps),
