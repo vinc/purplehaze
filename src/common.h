@@ -187,8 +187,8 @@ static const Direction PIECES_DIRS[][8] = {
 };
 
 // Used in movegen.cpp and protocol.cpp
-static const Direction PAWN_PUSH_DIRS[2] = { UP, DOWN };
-static const Direction PAWN_CAPTURE_DIRS[2][2] = {
+static const Direction PAWN_PUSH_DIRS[] = { UP, DOWN };
+static const Direction PAWN_CAPTURE_DIRS[][2] = {
     {
         UP_LEFT, UP_RIGHT
     },
