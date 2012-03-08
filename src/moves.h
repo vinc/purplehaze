@@ -54,23 +54,21 @@ class Moves
         static Score mvv_lva_scores[NB_PIECE_TYPES][NB_PIECE_TYPES];
 
         MoveList& moves;
-
         Position& current_position;
         Board& board;
         Pieces& pieces;
 
-        MovesState state;
-        unsigned char i, n;
         unsigned char size[MOVES_STATE_SIZE]; // Moves types counters
-
+        unsigned char i, n;
+        MovesState state;
         bool use_lazy_generation;
 
     public:
         Moves(Board& b, Pieces& ps, Position& cn, MoveList& ml,
               bool lg = true) :
             moves(ml), current_position(cn), board(b), pieces(ps),
-            state(BEST),
             i(0), n(0),
+            state(BEST),
             use_lazy_generation(lg)
             {
                 moves.inc_ply(); // Increment move list internal counter
