@@ -57,6 +57,7 @@ TEST(MoveTest, Size) {
 }
 
 TEST(MoveTest, Constructor) {
+    EXPECT_TRUE(Move().is_null());
     for (const Square &o : SQUARES) {
         if (o == OUT) continue;
         for (const Square &d : SQUARES) {
@@ -157,6 +158,7 @@ TEST(ExtendedMoveTest, Size) {
 
 TEST(ExtendedMoveTest, Constructor) {
     EXPECT_EQ(Move(), ExtendedMove());
+    EXPECT_EQ(0, ExtendedMove().get_score());
 
     for (const Square &o : SQUARES) {
         if (o == OUT) continue;

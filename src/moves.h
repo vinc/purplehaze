@@ -41,7 +41,13 @@ class MoveList
     public:
         MoveList() :
             ply(0)
-            {}
+            {
+                for (int i = 0; i < MAX_PLY; ++i) {
+                    for (int j = 0; j < MAX_BF; ++j) {
+                        list[i][j] = ExtendedMove();
+                    }
+                }
+            }
         void inc_ply() { ++ply; };
         void dec_ply() { --ply; };
         void clear() { ply = 0; };
