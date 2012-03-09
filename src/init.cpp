@@ -21,8 +21,6 @@
 
 #include "game.h"
 
-static const bool FEN_DEBUG = true;
-
 /*
  * Initialise the game according to a FEN record.
  * For example the starting position in chess is:

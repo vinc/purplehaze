@@ -20,7 +20,7 @@
 #include "common.h"
 #include "eval.h"
 
-enum NodeType : unsigned char {PV, CUT, ALL};
+enum NodeType : unsigned char { PV, CUT, ALL };
 
 // Adaptive Null-Move Pruning (Heinz 1999)
 inline static int R_ADAPT(int d, int n) {
@@ -40,8 +40,6 @@ static const int FUTILITY_MARGINS[FUTILITY_DEPTH + 1] = {
     PIECE_VALUE[KNIGHT],
     PIECE_VALUE[ROOK]
 };
-
-static const bool DEBUG = true;
 
 inline static int value_to_trans(int value, int ply) {
     if (value < -INF + MAX_PLY) {
