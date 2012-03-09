@@ -54,6 +54,10 @@ class TranspositionsTest : public testing::Test
 {
     protected:
         Transpositions tt;
+
+        Hash hash_from_index(int i) const {
+            return static_cast<Hash>(i & (tt.size() - 1));
+        }
 };
 
 TEST_F(TranspositionsTest, Size) {
@@ -64,7 +68,7 @@ TEST_F(TranspositionsTest, Size) {
                      2;                      // 2 bytes (padding)
     int size = TT_SIZE / entry_size;
 
-    // Internal array size should not be a power of two?
+    // TODO Internal array size should not be a power of two?
     //EXPECT_NE(0, TT_SIZE & (TT_SIZE - 1));
     
     // But internal array entries number should be a power of two
@@ -86,25 +90,26 @@ TEST_F(TranspositionsTest, Lookup) {
     tt.clear();
     int n = tt.size();
     for (int i = 0; i < n; ++i) {
-        Hash h = static_cast<Hash>(i);
+        Hash h = hash_from_index(i);
         bool is_empty;
         Transposition trans = tt.lookup(h, &is_empty);
         if (i == 0) {
             // FIXME
             EXPECT_FALSE(is_empty);
+            EXPECT_EQ(UNDEF_BOUND, trans.get_bound());
         } else {
             EXPECT_TRUE(is_empty);
         }
     }
-    /*
-    for (int i = 0; i < n; ++i) {
+    for (int i = -1; i < n; ++i) {
         for (int s = SHRT_MIN; s <= SHRT_MAX; s += 1000) {
             for (int d = 0; d <= UCHAR_MAX; ++d) {
                 for (const Bound &b : BOUNDS) {
+                    if (++i >= n) break;
                     // Create transposition
                     Move m(E2, E4, QUIET_MOVE);
                     int v = s + i;
-                    Hash h = static_cast<Hash>(i);
+                    Hash h = hash_from_index(i);
                     Transposition trans_sent(v, b, d, m);
 
                     // Save transposition
@@ -114,21 +119,19 @@ TEST_F(TranspositionsTest, Lookup) {
                     EXPECT_FALSE(tt.get_value_at(i).is_empty());
                     EXPECT_EQ(trans_sent, tt.get_value_at(i));
                     EXPECT_EQ(h, tt.get_hash_at(i));
-
-                    ++i;
                 }
             }
         }
     }
-
-    for (int i = 0; i < n; ++i) {
+    for (int i = -1; i < n; ++i) {
         for (int s = SHRT_MIN; s <= SHRT_MAX; s += 1000) {
             for (int d = 0; d <= UCHAR_MAX; ++d) {
                 for (const Bound &b : BOUNDS) {
+                    if (++i >= n) break;
                     // Create transposition
                     Move m(E2, E4, QUIET_MOVE);
                     int v = s + i;
-                    Hash h = static_cast<Hash>(i);
+                    Hash h = hash_from_index(i);
                     Transposition trans_sent(v, b, d, m);
 
                     // Lookup transposition
@@ -136,11 +139,8 @@ TEST_F(TranspositionsTest, Lookup) {
                     Transposition trans_received = tt.lookup(h, &is_empty);
                     EXPECT_FALSE(is_empty);
                     EXPECT_EQ(trans_sent, trans_received);
-
-                    ++i;
                 }
             }
         }
     }
-    */
 }
