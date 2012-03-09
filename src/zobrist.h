@@ -26,8 +26,6 @@ typedef uint64_t Hash;
 
 class Zobrist
 {
-    friend std::ostream& operator<<(std::ostream& out, const Zobrist& zobrist);
-
     private:
         Hash gen_hash();
         Hash pieces_positions[2][7][BOARD_SIZE];
@@ -35,6 +33,7 @@ class Zobrist
         Hash castle_rights[4];
         Hash en_passants[BOARD_SIZE];
         std::mt19937_64 generator;
+
     public:
         Zobrist();
         void change_side(Hash& h) {
@@ -49,6 +48,7 @@ class Zobrist
         void update_en_passant(Hash& h, Square s) {
             h ^= en_passants[s];
         };
+        friend std::ostream& operator<<(std::ostream& out, const Zobrist& zobrist);
 };
 
 #endif /* !ZOBRIST_H */

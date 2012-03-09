@@ -24,7 +24,6 @@
 
 class Piece
 {
-    friend std::ostream& operator<<(std::ostream& out, const Piece piece);
     private:
         /*
          * A piece is coded using 8 bits:
@@ -74,6 +73,8 @@ class Piece
             return !(*this == other);
         }
         std::string to_string() const;
+
+        friend std::ostream& operator<<(std::ostream& out, const Piece piece);
 };
 
 #endif /* !PIECE_H */

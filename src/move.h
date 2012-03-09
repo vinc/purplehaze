@@ -23,8 +23,6 @@
 
 class Move
 {
-    friend std::ostream& operator<<(std::ostream& out, const Move move);
-
     protected:
         /*
          * A move is coded using 16 bits:
@@ -61,8 +59,6 @@ class Move
                    ((d >> 4) << DR_SHIFT) |
                    t;
         };
-
-        friend class ExtendedMove;
 
         File get_orig_file() const {
             return File((code >> OF_SHIFT) & OF_MASK);
@@ -121,6 +117,9 @@ class Move
             return !(*this == other);
         }
         std::string to_string() const;
+
+        friend std::ostream& operator<<(std::ostream& out, const Move move);
+        friend class ExtendedMove;
 };
 
 class ExtendedMove : public Move

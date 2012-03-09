@@ -25,8 +25,6 @@
 
 class Board
 {
-    friend std::ostream& operator<<(std::ostream& out, const Board board);
-
     private:
         Piece board[BOARD_SIZE];
         std::bitset<7> attack_array[240];
@@ -100,6 +98,7 @@ class Board
         bool is_attacked_by(Color c, Square s, const Pieces& pieces) const;
         bool can_go(Piece p, Square from, Square to) const;
 
+        friend std::ostream& operator<<(std::ostream& out, const Board board);
 };
 
 #endif /* !BOARD_H */
