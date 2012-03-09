@@ -1,4 +1,3 @@
-#include <fstream>
 #include <climits>
 
 #include "../../src/tt.h"

@@ -1,5 +1,3 @@
-#include <fstream>
-
 #include "../../src/common.h"
 #include "../../src/game.h"
 #include "gtest/gtest.h"

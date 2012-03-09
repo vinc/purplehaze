@@ -1,5 +1,3 @@
-#include <fstream>
-
 #include "../../src/protocol.h"
 #include "gtest/gtest.h"
 

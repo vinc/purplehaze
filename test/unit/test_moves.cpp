@@ -1,5 +1,3 @@
-#include <fstream>
-
 #include "../../src/moves.h"
 #include "../../src/board.h"
 #include "../../src/position.h"

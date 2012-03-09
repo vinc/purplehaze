@@ -1,5 +1,3 @@
-#include <fstream>
-
 #include "../../src/pieces.h"
 #include "gtest/gtest.h"
 
