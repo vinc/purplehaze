@@ -58,7 +58,7 @@ class Transposition
 class Transpositions : public HashTable<Transposition>
 {
     private:
-        const Transposition NULL_ENTRY;
+        static const Transposition NULL_ENTRY;
 
     public:
         Transpositions(int n = TT_SIZE) : HashTable<Transposition>(n) {}
