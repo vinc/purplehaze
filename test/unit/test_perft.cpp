@@ -77,3 +77,28 @@ TEST_F(PerftTest, CaptureBug1Position) {
     EXPECT_EQ(7518, game.perft(3));
     //EXPECT_EQ(176792, game.perft(4));
 }
+
+TEST_F(PerftTest, MaxMoves1Position) {
+    fen = "3Q4/1Q4Q1/4Q3/2Q4R/Q4Q2/3Q4/1Q4Rp/1K1BBNNk w - - 0 1";
+    game.init(fen);
+    EXPECT_EQ(218, game.perft(1)); // Need MAX_PLY > 218
+    EXPECT_EQ(20, game.perft(2));
+    EXPECT_EQ(4072, game.perft(3));
+    EXPECT_EQ(15903, game.perft(4));
+}
+
+TEST_F(PerftTest, MaxMoves2Position) {
+    fen = "n1r1r1b1/1P1P1P1P/1Q6/3NBNK1/R7/4p1p1/3PBPkP/2R5 w - - 0 1";
+    game.init(fen);
+    EXPECT_EQ(144, game.perft(1));
+    EXPECT_EQ(3283, game.perft(2));
+    EXPECT_EQ(407751, game.perft(3));
+}
+
+TEST_F(PerftTest, MaxCapturesPosition) {
+    fen = "r1n1n1b1/1P1P1P1P/1N1N1N2/2RnQrRq/2pKp3/3BNQbQ/k7/4Bq2 w - - 0 1";
+    game.init(fen);
+    EXPECT_EQ(127, game.perft(1));
+    EXPECT_EQ(6926, game.perft(2));
+    EXPECT_EQ(767038, game.perft(3));
+}

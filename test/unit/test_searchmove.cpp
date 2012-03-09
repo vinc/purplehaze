@@ -48,3 +48,22 @@ TEST_F(SearchMoveTest, CastlePosition) {
     fen = "r1bqkb1r/1ppp1ppp/p1n2n2/4p3/B3P3/5N2/PPPP1PPP/RNBQK2R w KQkq -";
     EXPECT_EQ("O-O", search());
 }
+
+TEST_F(SearchMoveTest, Mate1Position) {
+    // Mate in 1
+    fen = "8/2r4p/p4p1Q/1p2bp2/8/6k1/P5P1/3B2K1 w - -";
+    EXPECT_EQ("Qh2+", search());
+}
+
+TEST_F(SearchMoveTest, Mate2Position) {
+    // Mate in 3
+    fen = "7k/1p5p/5b2/p3pr2/4n3/4B1rP/PP1N3K/3R1R2 b - -";
+    EXPECT_EQ("Rh5", search());
+}
+
+TEST_F(SearchMoveTest, Lose1Position) {
+    // Lose in 2
+    fen = "7k/1p5p/5b2/p3p2r/4n3/4B1rP/PP1N3K/3R1R2 w - -";
+    EXPECT_EQ("Nxe4", search());
+}
+
