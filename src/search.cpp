@@ -294,16 +294,16 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
         return 0; // Stalemate
     }
 
+transposition:
     // Store the search to Transposition Table
-    transposition:
-        //assert(!best_move.is_null());
-        if (depth >= trans.get_depth() /*&& !is_null_move*/) {
-            int value = best_score;
-            Bound bound = (best_score >= beta ? LOWER :
-                          (best_score <= old_alpha ? UPPER : EXACT));
-            if (bound == UPPER) best_move = Move(); // Don't store best move
-            tt.save(pos.hash(), value, bound, depth, best_move);
-        }
+    //assert(!best_move.is_null());
+    if (depth >= trans.get_depth() /*&& !is_null_move*/) {
+        int value = best_score;
+        Bound bound = (best_score >= beta ? LOWER :
+                      (best_score <= old_alpha ? UPPER : EXACT));
+        if (bound == UPPER) best_move = Move(); // Don't store best move
+        tt.save(pos.hash(), value, bound, depth, best_move);
+    }
 
     return best_score;
 }
