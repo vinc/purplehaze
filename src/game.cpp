@@ -79,7 +79,7 @@ void Game::del_piece(Color c, PieceType t, int i) {
     Position& pos = current_position();
     zobrist.update_piece(pos.hash(), c, t, emptied);
 
-    // Same hack heare for the material hash than in add_piece()
+    // Same hack here for the material hash than in add_piece()
     zobrist.update_piece(pos.material_hash(), c, t, Square(j + 1));
     zobrist.update_piece(pos.material_hash(), c, t, Square(j));
 }

@@ -67,7 +67,7 @@ void Game::init_eval() {
         }
     }
     // Special corrections
-    // Urge to develop light pieces during oppening
+    // Urge to develop light pieces during opening
     PST[OPENING][WHITE][KNIGHT][B1] = -20;
     PST[OPENING][WHITE][KNIGHT][G1] = -20;
     PST[OPENING][WHITE][BISHOP][C1] = -15;
@@ -101,7 +101,7 @@ int Game::eval(int alpha, int beta) {
     // Material evaluation
     int score = material_eval();
 
-    // TODO Draws should be catched here
+    // TODO Draws should be caught here
     // if (score == 0) return 0; // Draw
     if (score > PIECE_VALUE[KING]) return INF; // Win
     if (score < -PIECE_VALUE[KING]) return -INF; // Loss
@@ -110,7 +110,7 @@ int Game::eval(int alpha, int beta) {
     if (score + LAZY_EVAL_MARGIN < alpha) return score;
     if (score - LAZY_EVAL_MARGIN > beta) return score;
 
-    // TODO Positionnal evaluation
+    // TODO Positional evaluation
     score += position_eval();
 
     // TODO Mobility evaluation
@@ -141,7 +141,7 @@ int Game::material_eval() {
         int nb_minors = 0;
         for (const PieceType& t : PIECE_TYPES) {
             int n = pieces.get_nb_pieces(c, t);
-            // Pieces' standard alues
+            // Pieces' standard values
             material_score[c] += n * PIECE_VALUE[t];
 
             // Bonus values depending on material imbalance
@@ -204,7 +204,7 @@ int Game::material_eval() {
         }
     }
 
-    // Draw by insufficiant material detection
+    // Draw by insufficient material detection
     bool is_draw = false;
     const int K = PIECE_VALUE[KING];
     const int P = PIECE_VALUE[PAWN];

@@ -26,11 +26,11 @@
  * been no cut-off with the best move.
  *
  * MVV/LVA is used to pickup the best captures first by selection sort and
- * next we try the killer moves (stored near the begining of the moves array)
+ * next we try the killer moves (stored near the beginning of the moves array)
  * before the bad captures. Which are none by the way with MVV/LVA but in
  * the future SEE will be used for that.
  *
- * Finaly when there is no captures left and no cut-off occured we generate
+ * Finally when there is no captures left and no cut-off occurred we generate
  * the remaining quiets moves and try them with no particular order.
  */
 ExtendedMove Moves::next() {

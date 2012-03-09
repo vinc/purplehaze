@@ -38,7 +38,7 @@ static const int PIECE_VALUE[] = {
     10000, // King
 };
 
-// Pieces' values adjustement based on the number of pawns
+// Pieces values adjustments based on the number of pawns
 static const int PAWNS_ADJUSTEMENT[][9] = {
     {     0,   0,   0,   0,   0,   0,   0,   0,   0 }, // Empty
     {     0,   0,   0,   0,   0,   0,   0,   0,   0 }, // Pawns
@@ -56,7 +56,7 @@ static const int MULTI_PAWNS_MALUS[] = { // Pawns on the same file
 // Game phase used in tapered evaluation
 enum Phase : unsigned char { OPENING, ENDING };
 
-// Coeficient of each type of piece to determine the game phase
+// Coefficient of each type of piece to determine the game phase
 static const int PHASE_COEF[] = { 0, 1, 2, 2, 4, 8, 0 };
 
 // Opening number

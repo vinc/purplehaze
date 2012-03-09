@@ -200,7 +200,7 @@ static const Direction PAWN_CAPTURE_DIRS[][2] = {
 // Used in tt.h
 enum Bound : unsigned char { EXACT, LOWER, UPPER, UNDEF_BOUND };
 
-// Used for debuging
+// Used for debugging
 #define assert_msg(x) !(std::cerr << "Assertion failed: " << x << std::endl)
 
 // Overload operators to solve ambiguous errors with Clang < 3.1

@@ -34,7 +34,7 @@ class Board
 
     public:
         Board();
-        static std::string to_string(const std::string squares[], 
+        static std::string to_string(const std::string squares[],
                                      const int sq_width);
         Piece get_piece(Square s) const {
             return board[s];
