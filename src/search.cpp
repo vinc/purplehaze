@@ -107,7 +107,7 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
     Transposition trans = tt.lookup(pos.hash(), &is_empty);
     if (!is_empty) {
         // FIXME Avoid a potential bug with tt.lookup()
-        bool discard = pos.hash() == 0 && trans.get_bound == UNDEF_BOUND;
+        bool discard = pos.hash() == 0 && trans.get_bound() == UNDEF_BOUND;
 
         if (/*!is_pv &&*/ depth <= trans.get_depth() && !discard) {
             int tr_score = trans.get_value();
