@@ -21,6 +21,8 @@ template <class T>
 T HashTable<T>::lookup(Hash h, bool* is_empty) {
     Entry entry = entries[h & (SIZE - 1)];
     if (entry.hash == h) {
+        // FIXME 'entry.hash' is initialized to '0'
+        // Problem when 'h == 0' and 'entry.value' is empty.
         *is_empty = false;
         ++hits;
         return entry.value;

@@ -106,13 +106,16 @@ int Game::pv_search(int alpha, int beta, int depth, int ply) {
     bool is_empty;
     Transposition trans = tt.lookup(pos.hash(), &is_empty);
     if (!is_empty) {
-        if (/*!is_pv &&*/ depth <= trans.get_depth()) {
+        // FIXME Avoid a potential bug with tt.lookup()
+        bool discard = pos.hash() == 0 && trans.get_bound == UNDEF_BOUND;
+
+        if (/*!is_pv &&*/ depth <= trans.get_depth() && !discard) {
             int tr_score = trans.get_value();
             switch (trans.get_bound()) {
                 case EXACT: return tr_score; // Already searched node
                 case UPPER: if (tr_score < beta) beta = tr_score; break;
                 case LOWER: if (tr_score > alpha) alpha = tr_score; break;
-                default: assert(!"Corrupted Transposition Table");
+                default: assert(false);
             }
             if (alpha >= beta) return tr_score; // TT cause a cut-off
         }
