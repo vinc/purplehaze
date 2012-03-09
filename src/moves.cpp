@@ -33,7 +33,8 @@
  * Finally when there is no captures left and no cut-off occurred we generate
  * the remaining quiets moves and try them with no particular order.
  */
-ExtendedMove Moves::next() {
+ExtendedMove Moves::next()
+{
     if (!use_lazy_generation) {
         if (i == 0) generate(); // generate() will change the value of 'n'
 
@@ -88,7 +89,8 @@ ExtendedMove Moves::next() {
     return moves[i++];
 }
 
-void Moves::add(Move move, MovesState mt) {
+void Moves::add(Move move, MovesState mt)
+{
     if (!use_lazy_generation) {
         moves[n++] = ExtendedMove(move, 0);
         return;
@@ -146,7 +148,8 @@ Score Moves::mvv_lva_scores[][NB_PIECE_TYPES] = { { 0 } };
  * QxN = 22,  KxN = 20,  PxP = 14,  NxP = 12,  BxP = 10,  RxP =  8,  QxP =  6,
  * KxP =  4
  */
-void Moves::init_mvv_lva_scores() {
+void Moves::init_mvv_lva_scores()
+{
     for (const PieceType& v : PIECE_TYPES) {
         for (const PieceType& a : PIECE_TYPES) {
             mvv_lva_scores[v][a] = (16 * v) - (2 * a);
@@ -154,7 +157,8 @@ void Moves::init_mvv_lva_scores() {
     }
 }
 
-Score Moves::get_mvv_lva_score(Move move) {
+Score Moves::get_mvv_lva_score(Move move)
+{
     assert(move.is_capture());
     PieceType a = board.get_piece(move.get_orig()).get_type();
     PieceType v = board.get_piece(move.get_dest()).get_type();

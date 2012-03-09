@@ -19,7 +19,8 @@
 
 #include "game.h"
 
-void Moves::generate_pieces(Color c, PieceType t, MoveType mt) {
+void Moves::generate_pieces(Color c, PieceType t, MoveType mt)
+{
     const Direction * dirs = PIECES_DIRS[t];
     for (int j = 0; j < pieces.get_nb_pieces(c, t); ++j) {
         Square from = pieces.get_position(c, t, j);
@@ -42,7 +43,8 @@ void Moves::generate_pieces(Color c, PieceType t, MoveType mt) {
     }
 }
 
-void Moves::generate(MoveType mt) {
+void Moves::generate(MoveType mt)
+{
     Color c = current_position.get_turn_color();
 
     // Pawns moves
@@ -134,7 +136,8 @@ void Moves::generate(MoveType mt) {
     }
 }
 
-void Game::make_move(Move m) {
+void Game::make_move(Move m)
+{
     Square orig = m.get_orig();
     Square dest = m.get_dest();
     Square ep = current_position().get_en_passant();
@@ -246,7 +249,8 @@ void Game::make_move(Move m) {
     }
 }
 
-void Game::undo_move(Move m) {
+void Game::undo_move(Move m)
+{
     Square orig = m.get_orig();
     Square dest = m.get_dest();
 
@@ -303,7 +307,8 @@ void Game::undo_move(Move m) {
 /*
  * Check the pseudo legality of a move m
  */
-bool Game::is_legal(Move m) {
+bool Game::is_legal(Move m)
+{
     // Null-move is obviously wrong
     if (m.is_null()) return false;
 

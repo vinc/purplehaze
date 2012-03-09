@@ -22,12 +22,14 @@
 
 #include "xboard.h"
 
-Xboard::Xboard() {
+Xboard::Xboard()
+{
     force_mode = true;
     verbosity = 1;
 }
 
-void Xboard::think() {
+void Xboard::think()
+{
     if (get_verbosity() > 1) std::cout << game.board << std::endl;
 
     std::string move = search_move();
@@ -57,7 +59,8 @@ void Xboard::think() {
     log << std::endl << "< " << output;
 }
 
-void Xboard::loop() {
+void Xboard::loop()
+{
     signal(SIGINT, SIG_IGN);
     std::cout << std::endl; // Acknowledge Xboard mode
     log.open("game.log", std::ios::app);

@@ -3,19 +3,21 @@
 #include "../../src/position.h"
 #include "gtest/gtest.h"
 
-TEST(MoveListTest, Size) {
+TEST(MoveListTest, Size)
+{
     int list_size = (MAX_PLY * MAX_BF) * sizeof(ExtendedMove);
     int size = list_size + sizeof(unsigned int);
-    
+
     // MoveList's internal array's size should not be a power of two
     //EXPECT_NE(0, list_size & (list_size - 1));
-    
+
     EXPECT_EQ(128 * 256 * 4, list_size);
     EXPECT_EQ(list_size + 4, size);
     EXPECT_EQ(size, sizeof(MoveList));
 }
 
-TEST(MoveListTest, Constructor) {
+TEST(MoveListTest, Constructor)
+{
     MoveList moves;
     for (int i = 0; i < MAX_PLY; ++i) {
         for (int j = 0; j < MAX_BF; ++j) {
@@ -29,7 +31,8 @@ TEST(MoveListTest, Constructor) {
     }
 }
 
-TEST(MoveListTest, Assignement) {
+TEST(MoveListTest, Assignement)
+{
     MoveList moves;
     Move m;
     for (int i = 0; i < MAX_PLY; ++i) {
@@ -61,7 +64,8 @@ TEST(MoveListTest, Assignement) {
 }
 
 
-TEST(MovesTest, Size) {
+TEST(MovesTest, Size)
+{
     int size =
         MOVES_STATE_SIZE * sizeof(unsigned char) + // 5 bytes
         3 +                                        // 3 bytes (padding)
@@ -76,7 +80,8 @@ TEST(MovesTest, Size) {
     EXPECT_EQ(size, sizeof(Moves));
 }
 
-TEST(MovesTest, Constructor) {
+TEST(MovesTest, Constructor)
+{
     Position position;
     MoveList list;
     Board board;
@@ -86,7 +91,7 @@ TEST(MovesTest, Constructor) {
     ExtendedMove em(m, 50);
     list[0] = em;
     EXPECT_EQ(em.get_score(), list[0].get_score());
-    
+
     Moves moves(board, pieces, position, list);
 
     EXPECT_EQ(BEST, moves.get_state());

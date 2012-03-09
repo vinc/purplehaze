@@ -18,7 +18,8 @@
 #include "tt.h"
 
 template <class T>
-T HashTable<T>::lookup(Hash h, bool* is_empty) {
+T HashTable<T>::lookup(Hash h, bool* is_empty)
+{
     Entry entry = entries[h & (SIZE - 1)];
     if (entry.hash == h) {
         // FIXME 'entry.hash' is initialized to '0'
@@ -41,7 +42,8 @@ T HashTable<T>::lookup(Hash h, bool* is_empty) {
 }
 
 template <class T>
-void HashTable<T>::clear() {
+void HashTable<T>::clear()
+{
     for (int i = 0; i < SIZE; ++i) {
         entries[i].hash = 0;
         entries[i].value = T();
@@ -51,7 +53,8 @@ void HashTable<T>::clear() {
 }
 
 template <class T>
-int HashTable<T>::get_usage() const {
+int HashTable<T>::get_usage() const
+{
     int res = 0;
     for (int i = 0; i < SIZE; ++i) if (entries[i].hash) ++res;
     return res;

@@ -25,7 +25,8 @@
 
 static const int WIDE = 10;
 
-void Game::print_thinking_header() {
+void Game::print_thinking_header()
+{
     if (!output_thinking) return;
     std::cout << std::setw(4) << "ply"
               << std::setw(WIDE - 1) << "score"
@@ -35,7 +36,8 @@ void Game::print_thinking_header() {
               << std::endl;
 }
 
-void Game::print_thinking(int depth, int score, Move m) {
+void Game::print_thinking(int depth, int score, Move m)
+{
     if (!output_thinking) return;
     std::cout << std::setw(4) << depth
               << std::setw(WIDE - 1) << score
@@ -52,12 +54,14 @@ void Game::print_thinking(int depth, int score, Move m) {
     std::cout << output_pv(depth, score, m) << std::endl;
 }
 
-bool is_mate(int score) {
+bool is_mate(int score)
+{
     if ((score < -INF + MAX_PLY) || (INF - MAX_PLY < score)) return true;
     return false;
 }
 
-std::string Game::output_pv(int depth, int score, Move m) {
+std::string Game::output_pv(int depth, int score, Move m)
+{
     std::ostringstream stream;
     stream << " ";
     int ply = current_position().get_ply();
@@ -87,7 +91,8 @@ std::string Game::output_pv(int depth, int score, Move m) {
     return stream.str();
 }
 
-std::string Game::output_move(Move m) {
+std::string Game::output_move(Move m)
+{
     std::ostringstream stream;
 
     // Castling
@@ -138,13 +143,15 @@ std::string Game::output_move(Move m) {
     return stream.str();
 }
 
-std::string Game::output_square(File f, Rank r) {
+std::string Game::output_square(File f, Rank r)
+{
     std::ostringstream stream;
     stream << static_cast<char>('a' + f) << static_cast<char>('1' + r);
     return stream.str();
 }
 
-std::string get_stat(std::string title, double value, std::string unit = "") {
+std::string get_stat(std::string title, double value, std::string unit = "")
+{
     std::ostringstream stream;
     stream << std::left << "    " << std::setw(20) << title;
     int precision = (unit == "%" ? 2 : 0);
@@ -152,7 +159,8 @@ std::string get_stat(std::string title, double value, std::string unit = "") {
     return stream.str();
 }
 
-std::string get_meta(double value, std::string unit) {
+std::string get_meta(double value, std::string unit)
+{
     std::ostringstream stream;
     stream << " ("
            << std::fixed << std::setprecision(2) << value << unit
@@ -160,12 +168,14 @@ std::string get_meta(double value, std::string unit) {
     return stream.str();
 }
 
-double get_percent(double a, double b) {
+double get_percent(double a, double b)
+{
     return 100 * a / b;
 }
 
 template <class T>
-std::string print_table_stats(HashTable<T>& table, int table_size) {
+std::string print_table_stats(HashTable<T>& table, int table_size)
+{
     long zeros = 0;
     long ones = 0;
     for (int i = 0; i < table.size(); ++i) {
@@ -215,7 +225,8 @@ std::string print_table_stats(HashTable<T>& table, int table_size) {
     return stream.str();
 }
 
-void Game::print_tt_stats() {
+void Game::print_tt_stats()
+{
     std::cout << "Transposition Table usage:" << std::endl;
     std::cout << print_table_stats(tt, TT_SIZE) << std::endl;
 
@@ -223,7 +234,8 @@ void Game::print_tt_stats() {
     std::cout << print_table_stats(material_table, MT_SIZE) << std::endl;
 }
 
-std::string Game::debug_move(Move m) {
+std::string Game::debug_move(Move m)
+{
     std::ostringstream stream;
     Color c = current_position().get_turn_color();
     stream << std::endl << board << std::endl

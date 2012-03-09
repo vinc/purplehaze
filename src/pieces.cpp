@@ -16,7 +16,8 @@
 
 #include "pieces.h"
 
-Pieces::Pieces() {
+Pieces::Pieces()
+{
     /*
      * Unused array entries should not be expected to remain equal to OUT
      * during the game, but rather to the position of the previous piece

@@ -67,14 +67,16 @@ static const std::string OPTIONS[][2] = {
     }
 };
 
-std::string prompt() {
+std::string prompt()
+{
     std::cout << "> ";
     std::string cmd;
     std::cin >> cmd;
     return cmd;
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     bool option_color = false;
     char opt;
     while ((opt = getopt(argc, argv, "c")) != -1) {

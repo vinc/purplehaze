@@ -16,7 +16,8 @@
 
 #include "tree.h"
 
-bool Tree::has_repetition_draw() {
+bool Tree::has_repetition_draw()
+{
     Position& current_position = tree[tree_top];
     if (current_position.get_halfmove() >= 99) return 0; // Fifty-move rule
     if (tree_top < 4) return false;

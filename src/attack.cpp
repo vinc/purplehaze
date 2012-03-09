@@ -21,7 +21,8 @@
 /*
  * Return true if the square s is attacked by one of the c color's pieces.
  */
-bool Board::is_attacked_by(Color c, Square s, const Pieces& pieces) const {
+bool Board::is_attacked_by(Color c, Square s, const Pieces& pieces) const
+{
     for (const PieceType& t : NOT_PAWN_TYPES) {
         int n = pieces.get_nb_pieces(c, t);
         for (int i = 0; i < n; ++i) {
@@ -56,7 +57,8 @@ bool Board::is_attacked_by(Color c, Square s, const Pieces& pieces) const {
  * to square to on the board. This method does not say if the move is a legal
  * one.
  */
-bool Board::can_go(Piece p, Square from, Square to) const {
+bool Board::can_go(Piece p, Square from, Square to) const
+{
     PieceType t = p.get_type();
     Color c = p.get_color();
     Direction d = get_direction_to(from, to);

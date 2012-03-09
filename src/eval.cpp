@@ -27,7 +27,8 @@
 // PST[Phase][Color][PieceType][Square]
 static int PST[2][2][NB_PIECE_TYPES][BOARD_SIZE] = { { { { 0 } } } };
 
-void Game::init_eval() {
+void Game::init_eval()
+{
     for (int i = 0; i < 64; ++i) {
         for (const PieceType& t : PIECE_TYPES) {
             Square s = board.get_square(i);
@@ -97,7 +98,8 @@ void Game::init_eval() {
 
 static const int LAZY_EVAL_MARGIN = PIECE_VALUE[ROOK];
 
-int Game::eval(int alpha, int beta) {
+int Game::eval(int alpha, int beta)
+{
     // Material evaluation
     int score = material_eval();
 
@@ -119,7 +121,8 @@ int Game::eval(int alpha, int beta) {
     return score;
 }
 
-int Game::material_eval() {
+int Game::material_eval()
+{
     int score = 0;
     Position& pos = current_position();
 
@@ -242,7 +245,8 @@ int Game::material_eval() {
     return score;
 }
 
-int castling_score(const Position& pos, Color c) {
+int castling_score(const Position& pos, Color c)
+{
     int score = 0;
     if (pos.has_castle(c)) {
         score += CASTLE_BONUS;
@@ -256,7 +260,8 @@ int castling_score(const Position& pos, Color c) {
     return score;
 }
 
-int Game::position_eval() {
+int Game::position_eval()
+{
     int phase = 0;
     int position_score[2][2] = { { 0 } };
     int pawns_files[2][8] = { { 0 } };

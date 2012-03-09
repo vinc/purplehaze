@@ -24,7 +24,8 @@
 #include "search.h"
 #include "eval.h"
 
-unsigned long long int Game::perft(unsigned int depth) {
+unsigned long long int Game::perft(unsigned int depth)
+{
     if (depth == 0) return 1;
     unsigned int nodes = 0;
     Color c = current_position().get_turn_color();
@@ -47,7 +48,8 @@ unsigned long long int Game::perft(unsigned int depth) {
     return nodes;
 }
 
-int Game::q_search(int alpha, int beta, int depth, int ply) {
+int Game::q_search(int alpha, int beta, int depth, int ply)
+{
     int score;
     if (time.poll(nodes_count)) return 0;
 
@@ -90,7 +92,8 @@ int Game::q_search(int alpha, int beta, int depth, int ply) {
 }
 
 template<NodeType node_type>
-int Game::pv_search(int alpha, int beta, int depth, int ply) {
+int Game::pv_search(int alpha, int beta, int depth, int ply)
+{
     if (time.poll(nodes_count)) return 0;
     if (depth <= 0) return q_search(alpha, beta, 0, ply + 1); // Quiescence
     if (tree.has_repetition_draw()) return 0; // Repetition draw rules
@@ -308,7 +311,8 @@ transposition:
     return best_score;
 }
 
-Move Game::root(int max_depth) {
+Move Game::root(int max_depth)
+{
     time.start_thinking(current_position().get_ply());
     Color player = current_position().get_turn_color();
     print_thinking_header();

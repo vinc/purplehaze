@@ -1,7 +1,8 @@
 #include "../../src/piece.h"
 #include "gtest/gtest.h"
 
-TEST(PieceTest, Constructor) {
+TEST(PieceTest, Constructor)
+{
     for (const Color &c : COLORS) {
         for (const PieceType &t : PIECE_TYPES) {
             for (int i = 0; i < 9; ++i) {
@@ -30,6 +31,7 @@ TEST(PieceTest, Constructor) {
     }
 }
 
-TEST(PieceTest, Size) {
+TEST(PieceTest, Size)
+{
     EXPECT_EQ(sizeof(unsigned char), sizeof(Piece));
 }

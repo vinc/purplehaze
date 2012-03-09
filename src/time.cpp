@@ -19,7 +19,8 @@
 #include "time.h"
 #include "assert.h"
 
-void Time::start_thinking(unsigned int ply) {
+void Time::start_thinking(unsigned int ply)
+{
     starting_time = clock();
     abort_search = false;
     last_poll_nodes_count = 0;
@@ -43,14 +44,16 @@ void Time::start_thinking(unsigned int ply) {
     }
 }
 
-bool Time::is_out_of_time() {
+bool Time::is_out_of_time()
+{
     if (coef_1 * get_elapsed_time() > coef_2 * get_allocated_time()) {
         return true;
     }
     return false;
 }
 
-bool Time::poll(unsigned int nodes_count) {
+bool Time::poll(unsigned int nodes_count)
+{
     if (nodes_count - last_poll_nodes_count > polling_interval) {
         last_poll_nodes_count = nodes_count;
         abort_search = is_out_of_time();

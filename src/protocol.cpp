@@ -19,13 +19,15 @@
 
 #include "protocol.h"
 
-void Protocol::new_game() {
+void Protocol::new_game()
+{
     game.tt.clear();
     game.clear_killers();
     game.search_moves.clear();
 }
 
-bool Protocol::set_board(std::string fen) {
+bool Protocol::set_board(std::string fen)
+{
     // TODO Test if fen is valid?
 
     // Load fen
@@ -38,22 +40,26 @@ bool Protocol::set_board(std::string fen) {
  * Set time control:
  * 'n' moves in 't' time with time in seconds.
  */
-bool Protocol::set_time(int moves, int time) {
+bool Protocol::set_time(int moves, int time)
+{
     game.time = Time(moves, time * 100);
     return true;
 }
 
-bool Protocol::set_remaining_time(int time) {
+bool Protocol::set_remaining_time(int time)
+{
     game.time.set_remaining_time(time);
     return true;
 }
 
-bool Protocol::set_output_thinking(bool ot) {
+bool Protocol::set_output_thinking(bool ot)
+{
     game.output_thinking = ot;
     return true;
 }
 
-Move Protocol::parse_move(std::string move) {
+Move Protocol::parse_move(std::string move)
+{
     Square from = Square(move[0] - 'a' + 16 * (move[1] - '1'));
     Square to = Square(move[2] - 'a' + 16 * (move[3] - '1'));
     if (game.board.is_out(from) || game.board.is_out(to)) return Move();
@@ -96,7 +102,8 @@ Move Protocol::parse_move(std::string move) {
     }
 }
 
-bool Protocol::play_move(std::string move) {
+bool Protocol::play_move(std::string move)
+{
     // Parse move
     Move m = parse_move(move);
 
@@ -112,7 +119,8 @@ bool Protocol::play_move(std::string move) {
     return true;
 }
 
-bool Protocol::undo_move() {
+bool Protocol::undo_move()
+{
     if (history.empty()) return false;
     Move m = history.top();
     history.pop();
@@ -122,7 +130,8 @@ bool Protocol::undo_move() {
     return true;
 }
 
-std::string Protocol::search_move(bool use_san_notation) {
+std::string Protocol::search_move(bool use_san_notation)
+{
     Move m = game.root(depth + 1);
     if (m.is_null()) {
         if (game.is_check(game.current_position().get_turn_color())) {

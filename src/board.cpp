@@ -21,7 +21,8 @@
 
 #include "board.h"
 
-Board::Board() {
+Board::Board()
+{
     // Initialize the board's squares
     for (int i = 0; i < BOARD_SIZE; ++i) board[i] = Piece();
 
@@ -59,7 +60,8 @@ Board::Board() {
  * Generate a string for pretty printing the content of a 0x88 string array.
  * This could be the board but also any PST array.
  */
-std::string Board::to_string(const std::string squares[], const int sq_width) {
+std::string Board::to_string(const std::string squares[], const int sq_width)
+{
     std::ostringstream stream;
     stream << std::endl;
     for (Square s = A8; s < OUT; s = Square(s + 1)) {
@@ -112,7 +114,8 @@ std::string Board::to_string(const std::string squares[], const int sq_width) {
 /*
  * Pretty print the board
  */
-std::ostream& operator<<(std::ostream& out, const Board board) {
+std::ostream& operator<<(std::ostream& out, const Board board)
+{
     std::string squares[BOARD_SIZE];
     for (int i = 0; i < BOARD_SIZE; ++i) {
         Square s = Square(i);

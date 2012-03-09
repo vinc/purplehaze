@@ -16,7 +16,8 @@
 
 #include "zobrist.h"
 
-Zobrist::Zobrist() {
+Zobrist::Zobrist()
+{
     generator.seed(); // Use Mersenne twister's default seed
 
     side_to_move = gen_hash();
@@ -36,7 +37,8 @@ Zobrist::Zobrist() {
 }
 
 // Generate a random Hash
-Hash Zobrist::gen_hash() {
+Hash Zobrist::gen_hash()
+{
     Hash h = generator();
     return h;
 }

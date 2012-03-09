@@ -26,7 +26,8 @@
  * For example the starting position in chess is:
  * rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
  */
-void Game::init(std::string fen) {
+void Game::init(std::string fen)
+{
     assert(fen.length() > 0);
     std::istringstream iss(fen);
 

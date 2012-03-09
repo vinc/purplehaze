@@ -5,7 +5,8 @@
 
 static const Bound BOUNDS[] = { EXACT, LOWER, UPPER };
 
-TEST(TranspositionTest, Size) {
+TEST(TranspositionTest, Size)
+{
     int size = sizeof(short) +          // 2 bytes
                sizeof(Move) +           // 2 bytes
                sizeof(unsigned char) +  // 1 byte
@@ -14,7 +15,8 @@ TEST(TranspositionTest, Size) {
     EXPECT_EQ(size, sizeof(Transposition));
 }
 
-TEST(TranspositionTest, Constructor) {
+TEST(TranspositionTest, Constructor)
+{
     Transposition t1;
     EXPECT_TRUE(t1.is_empty());
     EXPECT_EQ(0, t1.get_value());
@@ -59,7 +61,8 @@ class TranspositionsTest : public testing::Test
         }
 };
 
-TEST_F(TranspositionsTest, Size) {
+TEST_F(TranspositionsTest, Size)
+{
     HashTable<Transposition> ht(TT_SIZE);
     EXPECT_EQ(sizeof(ht), sizeof(tt));
     int entry_size = sizeof(Hash) +          // 8 bytes
@@ -76,7 +79,8 @@ TEST_F(TranspositionsTest, Size) {
     EXPECT_EQ(size, tt.size());
 }
 
-TEST_F(TranspositionsTest, Constructor) {
+TEST_F(TranspositionsTest, Constructor)
+{
     tt.clear();
     int n = tt.size();
     for (int i = 0; i < n; ++i) {
@@ -85,7 +89,8 @@ TEST_F(TranspositionsTest, Constructor) {
     }
 }
 
-TEST_F(TranspositionsTest, Lookup) {
+TEST_F(TranspositionsTest, Lookup)
+{
     tt.clear();
     int n = tt.size();
     for (int i = 0; i < n; ++i) {

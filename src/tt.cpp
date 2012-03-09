@@ -21,7 +21,8 @@
 
 #include "tt.h"
 
-std::string Transposition::to_string() const {
+std::string Transposition::to_string() const
+{
     std::ostringstream stream;
     stream << "<";
     stream << ", " << std::dec << get_value() << ", " << get_depth();

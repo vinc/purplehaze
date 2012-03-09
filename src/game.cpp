@@ -19,7 +19,8 @@
 
 #include "game.h"
 
-Game::Game() {
+Game::Game()
+{
     nodes_count = 0;
     output_thinking = false;
     tt.clear();
@@ -34,7 +35,8 @@ Game::Game() {
     Moves::init_mvv_lva_scores();
 }
 
-void Game::clear_killers() {
+void Game::clear_killers()
+{
     for (int i = 0; i < MAX_PLY; ++i) {
         for (int j = 0; j < MAX_KILLERS; ++j) {
             killer_moves[i][j] = Move();
@@ -42,7 +44,8 @@ void Game::clear_killers() {
     }
 }
 
-void Game::add_piece(Color c, PieceType t, Square s) {
+void Game::add_piece(Color c, PieceType t, Square s)
+{
     int i = pieces.get_nb_pieces(c, t);
     pieces.set_position(c, t, i, s);
     board.set_piece(Piece(c, t, i), s);
@@ -60,7 +63,8 @@ void Game::add_piece(Color c, PieceType t, Square s) {
     zobrist.update_piece(pos.material_hash(), c, t, Square(i + 1));
 }
 
-void Game::del_piece(Color c, PieceType t, int i) {
+void Game::del_piece(Color c, PieceType t, int i)
+{
     // Remove the piece, and put in its place the higher index piece of the
     // same color and type in order to avoid holes (idea from Mediocre Chess)
     Square emptied = pieces.get_position(c, t, i); // Get piece's position
@@ -84,7 +88,8 @@ void Game::del_piece(Color c, PieceType t, int i) {
     zobrist.update_piece(pos.material_hash(), c, t, Square(j));
 }
 
-void Game::new_position() {
+void Game::new_position()
+{
     // Take a "snapshot" of the current position
     tree.push();
 
@@ -98,7 +103,8 @@ void Game::new_position() {
     zobrist.change_side(current_position().hash());
 }
 
-void Game::del_position() {
+void Game::del_position()
+{
     // Take back the previous "snapshot"
     tree.pop();
 }
@@ -106,7 +112,8 @@ void Game::del_position() {
 /*
  * Killer move setter for the Killer Heuristic in move ordering.
  */
-void Game::set_killer_move(int depth, Move move) {
+void Game::set_killer_move(int depth, Move move)
+{
     if (move != killer_moves[depth][0]) {
         killer_moves[depth][1] = killer_moves[depth][0];
         killer_moves[depth][0] = move;

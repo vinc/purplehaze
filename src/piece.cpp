@@ -18,11 +18,13 @@
 
 #include "piece.h"
 
-std::ostream& operator<<(std::ostream& out, const Piece piece) {
+std::ostream& operator<<(std::ostream& out, const Piece piece)
+{
     return (out << piece.to_string());
 }
 
-std::string Piece::to_string() const {
+std::string Piece::to_string() const
+{
     char t;
     switch (get_type()) {
         case PAWN:   t = 'P'; break;

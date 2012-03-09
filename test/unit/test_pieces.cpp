@@ -1,7 +1,8 @@
 #include "../../src/pieces.h"
 #include "gtest/gtest.h"
 
-TEST(PiecesTest, Constructor) {
+TEST(PiecesTest, Constructor)
+{
     Pieces pieces;
     for (const Color &c : COLORS) {
         EXPECT_EQ(0, pieces.get_nb_pieces(c));
@@ -16,7 +17,8 @@ TEST(PiecesTest, Constructor) {
     }
 }
 
-TEST(PiecesTest, Positions) {
+TEST(PiecesTest, Positions)
+{
     Pieces pieces;
     for (const Color &c : COLORS) {
         for (const PieceType &t : PIECE_TYPES) {
@@ -41,7 +43,8 @@ TEST(PiecesTest, Positions) {
     }
 }
 
-TEST(PiecesTest, Count) {
+TEST(PiecesTest, Count)
+{
     Pieces pieces;
     for (const Color &c : COLORS) {
         EXPECT_EQ(0, pieces.get_nb_pieces(c));
@@ -63,7 +66,8 @@ TEST(PiecesTest, Count) {
     }
 }
 
-TEST(PiecesTest, Size) {
+TEST(PiecesTest, Size)
+{
     int size = (sizeof(Square) * 2 * 7 * 9) +
                (sizeof(unsigned char) * 2 * 7) +
                (sizeof(unsigned char) * 2);

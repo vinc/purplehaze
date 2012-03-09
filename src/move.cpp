@@ -20,7 +20,8 @@
 #include "move.h"
 #include "piece.h"
 
-PieceType Move::get_promotion_type() const {
+PieceType Move::get_promotion_type() const
+{
     switch (get_type()) {
         case KNIGHT_PROMOTION:
         case KNIGHT_PROMOTION_CAPTURE:
@@ -39,7 +40,8 @@ PieceType Move::get_promotion_type() const {
     }
 }
 
-PieceType Move::get_castle_side() const {
+PieceType Move::get_castle_side() const
+{
     switch (get_type()) {
         case KING_CASTLE: return KING;
         case QUEEN_CASTLE: return QUEEN;
@@ -47,11 +49,13 @@ PieceType Move::get_castle_side() const {
     }
 }
 
-std::ostream& operator<<(std::ostream& out, const Move move) {
+std::ostream& operator<<(std::ostream& out, const Move move)
+{
     return (out << move.to_string());
 }
 
-std::string Move::to_string() const {
+std::string Move::to_string() const
+{
     if (is_null()) return "#";
     std::string res = "";
     res += static_cast<char>('a' + get_orig_file());

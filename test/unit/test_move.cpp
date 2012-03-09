@@ -7,7 +7,8 @@
 
 // Helper template returning the size of a one dimension array at compile time
 template<typename T, size_t N>
-constexpr size_t array_size(const T (&)[N]) {
+constexpr size_t array_size(const T (&)[N])
+{
     return N;
 }
 
@@ -51,12 +52,14 @@ static const MoveType CAPTURES[] = {
 };
 static const int NB_CAPTURES = array_size(CAPTURES);
 
-TEST(MoveTest, Size) {
+TEST(MoveTest, Size)
+{
     EXPECT_EQ(2, sizeof(short));
     EXPECT_EQ(sizeof(short), sizeof(Move));
 }
 
-TEST(MoveTest, Constructor) {
+TEST(MoveTest, Constructor)
+{
     EXPECT_TRUE(Move().is_null());
     for (const Square &o : SQUARES) {
         if (o == OUT) continue;
@@ -95,7 +98,8 @@ TEST(MoveTest, Constructor) {
     }
 }
 
-TEST(MoveTest, Type) {
+TEST(MoveTest, Type)
+{
     for (const MoveType &t : MOVES) {
         // Define move types
         bool is_null = t == NULL_MOVE;
@@ -151,13 +155,15 @@ TEST(MoveTest, Type) {
 }
 
 
-TEST(ExtendedMoveTest, Size) {
+TEST(ExtendedMoveTest, Size)
+{
     int size = sizeof(short) + sizeof(char) + 1; // 1 byte of padding
     EXPECT_EQ(4, size);
     EXPECT_EQ(size, sizeof(ExtendedMove));
 }
 
-TEST(ExtendedMoveTest, Constructor) {
+TEST(ExtendedMoveTest, Constructor)
+{
     EXPECT_EQ(Move(), ExtendedMove());
     EXPECT_EQ(0, ExtendedMove().get_score());
 
@@ -180,7 +186,8 @@ TEST(ExtendedMoveTest, Constructor) {
     }
 }
 
-TEST(ExtendedMoveTest, Score) {
+TEST(ExtendedMoveTest, Score)
+{
     Move m;
     for (int i = SCHAR_MIN; i <= SCHAR_MAX; ++i) {
         ExtendedMove em1(m, i);
@@ -196,7 +203,8 @@ TEST(ExtendedMoveTest, Score) {
     }
 }
 
-TEST(ExtendedMoveTest, Comp) {
+TEST(ExtendedMoveTest, Comp)
+{
     Move m;
     ExtendedMove em1(m, 0);
     ExtendedMove em2(m, SCHAR_MAX);
