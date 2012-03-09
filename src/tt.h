@@ -52,6 +52,16 @@ class Transposition
                    best_move.is_null();
         };
 
+        bool operator==(const Transposition& other) const {
+            return this->value == other.value &&
+                   this->depth == other.depth &&
+                   this->bound == other.bound &&
+                   this->best_move == other.best_move;
+        }
+        bool operator!=(const Transposition& other) const {
+            return !(*this == other);
+        }
+
         std::string to_string() const;
 };
 
