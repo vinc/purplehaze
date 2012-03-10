@@ -48,7 +48,7 @@ unsigned long long int Game::perft(unsigned int depth)
     return nodes;
 }
 
-int Game::q_search(int alpha, int beta, int depth, int ply)
+int Game::quiescence(int alpha, int beta, int depth, int ply)
 {
     int score;
     if (time.poll(nodes_count)) return 0;
@@ -77,7 +77,7 @@ int Game::q_search(int alpha, int beta, int depth, int ply)
             continue;
         }
 
-        score = -q_search(-beta, -alpha, depth - 1, ply + 1);
+        score = -quiescence(-beta, -alpha, depth - 1, ply + 1);
         undo_move(move);
         if (time.poll(nodes_count)) return 0;
         if (score >= beta) {
@@ -95,7 +95,7 @@ template<NodeType node_type>
 int Game::pv_search(int alpha, int beta, int depth, int ply)
 {
     if (time.poll(nodes_count)) return 0;
-    if (depth <= 0) return q_search(alpha, beta, 0, ply + 1); // Quiescence
+    if (depth <= 0) return quiescence(alpha, beta, 0, ply + 1); // Quiescence
     if (tree.has_repetition_draw()) return 0; // Repetition draw rules
 
     int score = -INF;
