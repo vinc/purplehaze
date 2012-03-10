@@ -48,18 +48,17 @@ unsigned long long int Game::perft(unsigned int depth)
     return nodes;
 }
 
-int Game::quiescence(int alpha, int beta, int depth, int ply)
+int Game::quiescence(int alpha, int beta, int depth, const int ply)
 {
-    int score;
     if (time.poll(nodes_count)) return 0;
 
-    int stand_pat = eval(alpha, beta);
+    const int stand_pat = eval(alpha, beta);
     if (ply >= MAX_PLY) return stand_pat;
 
     if (stand_pat >= beta) return stand_pat; // Beta cut-off
 
     // Delta pruning
-    int delta = PIECE_VALUE[QUEEN]; // TODO: Switch off in late endgame
+    const int delta = PIECE_VALUE[QUEEN]; // TODO: Switch off in late endgame
     if (stand_pat < alpha - delta) return alpha;
 
     if (alpha < stand_pat) alpha = stand_pat; // New alpha
@@ -77,7 +76,7 @@ int Game::quiescence(int alpha, int beta, int depth, int ply)
             continue;
         }
 
-        score = -quiescence(-beta, -alpha, depth - 1, ply + 1);
+        const int score = -quiescence(-beta, -alpha, depth - 1, ply + 1);
         undo_move(move);
         if (time.poll(nodes_count)) return 0;
         if (score >= beta) {
@@ -92,28 +91,29 @@ int Game::quiescence(int alpha, int beta, int depth, int ply)
 }
 
 template<NodeType node_type>
-int Game::search(int alpha, int beta, int depth, int ply)
+int Game::search(int alpha, int beta, int depth, const int ply)
 {
     if (time.poll(nodes_count)) return 0;
     if (depth <= 0) return quiescence(alpha, beta, 0, ply + 1); // Quiescence
     if (tree.has_repetition_draw()) return 0; // Repetition draw rules
 
     int score = -INF;
-    int old_alpha = alpha;
+    const int old_alpha = alpha;
     Position pos = current_position();
     int best_score = -INF;
     Move best_move;
-    bool is_pv = (node_type == PV);
+    const bool is_pv = (node_type == PV);
 
     // Lookup in Transposition Table
     bool is_empty;
     Transposition trans = tt.lookup(pos.hash(), &is_empty);
     if (!is_empty) {
         // FIXME Avoid a potential bug with tt.lookup()
-        bool discard = pos.hash() == 0 && trans.get_bound() == UNDEF_BOUND;
+        const bool discard = pos.hash() == 0 &&
+                             trans.get_bound() == UNDEF_BOUND;
 
         if (/*!is_pv &&*/ depth <= trans.get_depth() && !discard) {
-            int tr_score = trans.get_value();
+            const int tr_score = trans.get_value();
             switch (trans.get_bound()) {
                 case EXACT: return tr_score; // Already searched node
                 case UPPER: if (tr_score < beta) beta = tr_score; break;
@@ -126,23 +126,23 @@ int Game::search(int alpha, int beta, int depth, int ply)
         if (!bm.is_null()) best_move = bm; // Save the best move
     }
 
-    Color player = pos.get_turn_color();
-    bool is_in_check = is_check(player);
-    bool is_null_move = !pos.get_null_move_right(); // No more than one
+    const Color player = pos.get_turn_color();
+    const bool is_in_check = is_check(player);
+    const bool is_null_move = !pos.get_null_move_right(); // No more than one
 
     // Check Extension
     if (is_in_check) ++depth;
 
 #ifdef NMP
     // Null Move Pruning
-    bool null_move_allowed = !is_in_check && !is_null_move && !is_pv;
+    const bool null_move_allowed = !is_in_check && !is_null_move && !is_pv;
 
-    int nb_pieces = pieces.get_nb_pieces(player);
+    const int nb_pieces = pieces.get_nb_pieces(player);
     if (null_move_allowed && depth > NMP_DEPTH && nb_pieces < 3) {
         Move null_move;
         make_move(null_move);
         current_position().set_null_move_right(false); // No consecutive NM
-        int r_depth = depth - R_ADAPT(depth, nb_pieces) - 1;
+        const int r_depth = depth - R_ADAPT(depth, nb_pieces) - 1;
         score = -search<node_type>(-beta, -beta + 1, r_depth, ply + 1);
         undo_move(null_move);
         if (score >= beta) {
@@ -239,7 +239,7 @@ int Game::search(int alpha, int beta, int depth, int ply)
             }
             is_principal_variation = false;
         } else {
-            bool is_giving_check = is_check(!player);
+            const bool is_giving_check = is_check(!player);
 
             // Futility Pruning
             if (depth <= FUTILITY_DEPTH &&
@@ -301,9 +301,9 @@ transposition:
     // Store the search to Transposition Table
     //assert(!best_move.is_null());
     if (depth >= trans.get_depth() /*&& !is_null_move*/) {
-        int value = best_score;
-        Bound bound = (best_score >= beta ? LOWER :
-                      (best_score <= old_alpha ? UPPER : EXACT));
+        const int value = best_score;
+        const Bound bound = (best_score >= beta ? LOWER :
+                                (best_score <= old_alpha ? UPPER : EXACT));
         if (bound == UPPER) best_move = Move(); // Don't store best move
         tt.save(pos.hash(), value, bound, depth, best_move);
     }

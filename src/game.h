@@ -71,10 +71,10 @@ class Game
         // Search
         unsigned long long int perft(unsigned int depth);
 
-        int quiescence(int alpha, int beta, int depth, int ply);
+        int quiescence(int alpha, int beta, int depth, const int ply);
 
         template<NodeType node_type>
-        int search(int alpha, int beta, int depth, int ply);
+        int search(int alpha, int beta, int depth, const int ply);
 
         Move root(int max_depth);
 
