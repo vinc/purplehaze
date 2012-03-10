@@ -143,7 +143,7 @@ int Game::material_eval()
         int nb_pawns = 0;
         int nb_minors = 0;
         for (const PieceType& t : PIECE_TYPES) {
-            int n = pieces.get_nb_pieces(c, t);
+            const int n = pieces.get_nb_pieces(c, t);
             // Pieces' standard values
             material_score[c] += n * PIECE_VALUE[t];
 
@@ -223,7 +223,7 @@ int Game::material_eval()
             if (material_score[!c] == K + N + N) break;
 
             // TODO is this duplicate with MALUS_NO_PAWNS?
-            int nb_opponent_pawns = pieces.get_nb_pieces(!c, PAWN);
+            const int nb_opponent_pawns = pieces.get_nb_pieces(!c, PAWN);
             if (nb_opponent_pawns == 0 && material_score[!c] < K + 4 * P) {
                 break;
             }
@@ -268,7 +268,7 @@ int Game::position_eval()
     const Position& pos = current_position();
     for (const Color& c : COLORS) {
         for (const PieceType& t : PIECE_TYPES) {
-            int n = pieces.get_nb_pieces(c, t);
+            const int n = pieces.get_nb_pieces(c, t);
             phase += n * PHASE_COEF[t];
             for (int j = 0; j < n; ++j) {
                 Square s = pieces.get_position(c, t, j);
@@ -286,7 +286,7 @@ int Game::position_eval()
 
         // Rooks' files bonus
         int rooks_score = 0;
-        int nb_rooks = pieces.get_nb_pieces(c, ROOK);
+        const int nb_rooks = pieces.get_nb_pieces(c, ROOK);
         for (int j = 0; j < nb_rooks; ++j) {
             Square s = pieces.get_position(c, ROOK, j);
             if (!pawns_files[!c][board.get_file(s)]) {
@@ -302,13 +302,16 @@ int Game::position_eval()
         position_score[OPENING][c] += castling_score(pos, c);
 
     }
+
+    // Retrieve opening and ending score
     const Color& c = pos.get_turn_color();
-    int opening, ending; // Score based on opening and ending rules
-    opening = position_score[OPENING][c] - position_score[OPENING][!c];
-    ending = position_score[ENDING][c] - position_score[ENDING][!c];
+    const int opening = position_score[OPENING][c] -
+                        position_score[OPENING][!c];
+    const int ending = position_score[ENDING][c] -
+                       position_score[ENDING][!c];
 
     // Tapered Eval (idea from Fruit 2.1)
-    int max = PHASE_MAX;
+    const int max = PHASE_MAX;
     phase = (phase > max ? max : (phase < 0 ? 0 : phase));
     return (opening * phase + ending * (max - phase)) / max;
 }
