@@ -80,9 +80,9 @@ ExtendedMove Moves::next()
 
     // Swap it with the current one
     if (max != i) {
-        ExtendedMove tmp = moves[i];
-        moves[i] = moves[max];
-        moves[max] = tmp;
+        ExtendedMove tmp = std::move(moves[i]);
+        moves[i] = std::move(moves[max]);
+        moves[max] = std::move(tmp);
     }
 
     // Return it
