@@ -40,13 +40,13 @@ static const int PIECE_VALUE[] = {
 
 // Pieces values adjustments based on the number of pawns
 static const int PAWNS_ADJUSTEMENT[][9] = {
-    {     0,   0,   0,   0,   0,   0,   0,   0,   0 }, // Empty
-    {     0,   0,   0,   0,   0,   0,   0,   0,   0 }, // Pawns
-    {        -30, -24, -18, -12,  -6,   0,   6,  12,  18 }, // Knights
-    {        -15, -12,  -9,  -6,  -3,   0,   3,   6,   9 }, // Bishops
-    {    60,  48,  36,  24,  12,   0, -12, -24, -36 }, // Rooks
-    {    30,  24,  18,  12,   6,   0,   0,   0,   0 }, // Queens
-    {     0,   0,   0,   0,   0,   0,   0,   0,   0 }  // King
+    {   0,   0,   0,   0,   0,   0,   0,   0,   0 }, // Empty
+    {   0,   0,   0,   0,   0,   0,   0,   0,   0 }, // Pawns
+    { -30, -24, -18, -12,  -6,   0,   6,  12,  18 }, // Knights
+    { -15, -12,  -9,  -6,  -3,   0,   3,   6,   9 }, // Bishops
+    {  60,  48,  36,  24,  12,   0, -12, -24, -36 }, // Rooks
+    {  30,  24,  18,  12,   6,   0,   0,   0,   0 }, // Queens
+    {   0,   0,   0,   0,   0,   0,   0,   0,   0 }  // King
 };
 
 static const int MULTI_PAWNS_MALUS[] = { // Pawns on the same file
@@ -69,19 +69,19 @@ static const int PHASE_MAX = 16 * PHASE_COEF[PAWN] +
 // PST parameters
 static const int BORDER_MALUS = -5;
 static const int CENTER_BONUS[] = {
-      0,   0,   1,   2,   2,   1,   0,   0
+    0,   0,   1,   2,   2,   1,   0,   0
 };
 static const int PAWN_FILES_VALUES[] = {
     -15,  -5,   1,   5,   5,   1,  -5, -15
 };
 static const int OPENING_RANKS_BONUS[][8] = {
-    {   0,   0,   0,   0,   0,   0,   0,   0 }, // Dummy for PieceType EMPTY
-    {   0, -10,  -5,   5,   4,   3,   0,   0 }, // Pawns
-    {   0,   1,   2,   4,   4,   2,   0,   0 }, // Knights
-    {   0,   1,   2,   3,   3,   2,   0,   0 }, // Bishops
-    {  30,   0,   0,   0,   0,   0,   0,   0 }, // Rooks
-    {  -5,   1,   2,   3,   3,   2,   1,   0 }, // Queens
-    {   0, -15, -40, -40, -40, -40, -40, -40,}  // King
+    {  0,   0,   0,   0,   0,   0,   0,   0 }, // Dummy for PieceType EMPTY
+    {  0, -10,  -5,   5,   4,   3,   0,   0 }, // Pawns
+    {  0,   1,   2,   4,   4,   2,   0,   0 }, // Knights
+    {  0,   1,   2,   3,   3,   2,   0,   0 }, // Bishops
+    { 30,   0,   0,   0,   0,   0,   0,   0 }, // Rooks
+    { -5,   1,   2,   3,   3,   2,   1,   0 }, // Queens
+    {  0, -15, -40, -40, -40, -40, -40, -40,}  // King
 };
 
 #endif /* !EVAL_H */
