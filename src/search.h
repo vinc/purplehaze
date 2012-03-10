@@ -23,7 +23,8 @@
 enum NodeType : unsigned char { PV, CUT, ALL };
 
 // Adaptive Null-Move Pruning (Heinz 1999)
-inline static int R_ADAPT(int d, int n) {
+inline static int R_ADAPT(int d, int n)
+{
     return 2 + (d > (6 + ((n < 3) ? 2 : 0)));
 }
 
@@ -41,7 +42,8 @@ static const int FUTILITY_MARGINS[FUTILITY_DEPTH + 1] = {
     PIECE_VALUE[ROOK]
 };
 
-inline static int value_to_trans(int value, int ply) {
+inline static int value_to_trans(int value, int ply)
+{
     if (value < -INF + MAX_PLY) {
         value -= ply;
     } else if (value > INF - MAX_PLY) {
@@ -50,7 +52,8 @@ inline static int value_to_trans(int value, int ply) {
     return value;
 }
 
-inline static int value_from_trans(int value, int ply) {
+inline static int value_from_trans(int value, int ply)
+{
     if (value < -INF + MAX_PLY) {
         value += ply;
     } else if (value > INF - MAX_PLY) {

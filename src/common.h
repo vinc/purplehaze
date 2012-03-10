@@ -109,7 +109,8 @@ enum Color : bool {
     BLACK
 };
 static const Color COLORS[] = { WHITE, BLACK };
-inline Color operator!(Color c) {
+inline Color operator!(Color c)
+{
     return static_cast<Color>(!static_cast<bool>(c));
 }
 
@@ -205,76 +206,100 @@ enum Bound : unsigned char { EXACT, LOWER, UPPER, UNDEF_BOUND };
 
 // Overload operators to solve ambiguous errors with Clang < 3.1
 // TODO Find out if this could be better done
-inline bool operator==(int i, Rank r) {
+inline bool operator==(int i, Rank r)
+{
     return i == static_cast<int>(r);
 }
-inline bool operator<(Bound b, int i) {
+inline bool operator<(Bound b, int i)
+{
     return static_cast<char>(b) < i;
 }
-inline int operator>>(Square s, int i) {
+inline int operator>>(Square s, int i)
+{
     return static_cast<int>(s) >> i;
 }
-inline int operator|(int i, MoveType mt) {
+inline int operator|(int i, MoveType mt)
+{
     return i | static_cast<int>(mt);
 }
-inline int operator&(Square s, int i) {
+inline int operator&(Square s, int i)
+{
     return static_cast<int>(s) & i;
 }
-inline int operator*(Rank r, Color c) {
+inline int operator*(Rank r, Color c)
+{
     return static_cast<int>(r) * static_cast<int>(c);
 }
-inline int operator*(int i, Rank r) {
+inline int operator*(int i, Rank r)
+{
     return i * static_cast<int>(r);
 }
-inline int operator*(int i, Color c) {
+inline int operator*(int i, Color c)
+{
     return i * static_cast<int>(c);
 }
-inline int operator*(int i, PieceType pt) {
+inline int operator*(int i, PieceType pt)
+{
     return i * static_cast<int>(pt);
 }
-inline int operator+(int i, File f) {
+inline int operator+(int i, File f)
+{
     return i + static_cast<int>(f);
 }
-inline int operator+(int i, Square s) {
+inline int operator+(int i, Square s)
+{
     return i + static_cast<int>(s);
 }
-inline int operator+(int i, PieceType pt) {
+inline int operator+(int i, PieceType pt)
+{
     return i + static_cast<int>(pt);
 }
-inline int operator+(PieceType pt, int i) {
+inline int operator+(PieceType pt, int i)
+{
     return i + static_cast<int>(pt);
 }
-inline int operator+(Square s, int i) {
+inline int operator+(Square s, int i)
+{
     return i + static_cast<int>(s);
 }
-inline int operator+(Rank r, int i) {
+inline int operator+(Rank r, int i)
+{
     return static_cast<int>(r) + i;
 }
-inline int operator+(char c, Rank r) {
+inline int operator+(char c, Rank r)
+{
     return c + static_cast<char>(r);
 }
-inline int operator+(Square s, Direction d) {
+inline int operator+(Square s, Direction d)
+{
     return static_cast<int>(s) + static_cast<int>(d);
 }
-inline int operator-(Square a, Square b) {
+inline int operator-(Square a, Square b)
+{
     return static_cast<int>(a) - static_cast<int>(b);
 }
-inline int operator-(Square s, int i) {
+inline int operator-(Square s, int i)
+{
     return static_cast<int>(s) - i;
 }
-inline int operator-(int i, Square s) {
+inline int operator-(int i, Square s)
+{
     return i - static_cast<int>(s);
 }
-inline int operator-(int i, PieceType pt) {
+inline int operator-(int i, PieceType pt)
+{
     return i - static_cast<int>(pt);
 }
-inline int operator-(Rank a, Rank b) {
+inline int operator-(Rank a, Rank b)
+{
     return static_cast<int>(a) - static_cast<int>(b);
 }
-inline int operator-(Rank r, int i) {
+inline int operator-(Rank r, int i)
+{
     return static_cast<int>(r) - i;
 }
-inline int operator+(MoveType a, MoveType b) {
+inline int operator+(MoveType a, MoveType b)
+{
     return static_cast<MoveType>(static_cast<int>(a) + static_cast<int>(b));
 }
 
