@@ -92,7 +92,7 @@ int Game::quiescence(int alpha, int beta, int depth, int ply)
 }
 
 template<NodeType node_type>
-int Game::pv_search(int alpha, int beta, int depth, int ply)
+int Game::search(int alpha, int beta, int depth, int ply)
 {
     if (time.poll(nodes_count)) return 0;
     if (depth <= 0) return quiescence(alpha, beta, 0, ply + 1); // Quiescence
@@ -143,7 +143,7 @@ int Game::pv_search(int alpha, int beta, int depth, int ply)
         make_move(null_move);
         current_position().set_null_move_right(false); // No consecutive NM
         int r_depth = depth - R_ADAPT(depth, nb_pieces) - 1;
-        score = -pv_search<node_type>(-beta, -beta + 1, r_depth, ply + 1);
+        score = -search<node_type>(-beta, -beta + 1, r_depth, ply + 1);
         undo_move(null_move);
         if (score >= beta) {
             return score;
@@ -165,22 +165,22 @@ int Game::pv_search(int alpha, int beta, int depth, int ply)
                 undo_move(move);
                 continue;
             }
-            score = -pv_search<PV>(-beta, -alpha, depth / 2, ply + 1);
+            score = -search<PV>(-beta, -alpha, depth / 2, ply + 1);
             undo_move(move);
             if (score > internal_best_score) {
                 internal_best_score = score;
                 best_move = move;
             }
         }
-        // TODO Call pv_search directly and find the best move in TT?
+        // TODO Call search directly and find the best move in TT?
         /*
         tt.save(pos.hash(), 0, UNDEF_BOUND, 0, Move());
         Transposition trans_test = tt.lookup(pos.hash());
         pos.set_null_move_right(false);
-        score = pv_search<PV>(alpha, beta, depth / 2, ply);
+        score = search<PV>(alpha, beta, depth / 2, ply);
         if (score <= alpha) {
             // Avoid storing lower bound in TT
-            score = pv_search<PV>(-INF, beta, depth / 2, ply);
+            score = search<PV>(-INF, beta, depth / 2, ply);
         }
         pos.set_null_move_right(true);
         Move trans_move = tt.lookup(pos.hash()).get_best_move();
@@ -224,7 +224,7 @@ int Game::pv_search(int alpha, int beta, int depth, int ply)
 
         // PVS code from http://www.talkchess.com/forum/viewtopic.php?t=26974
         if (is_principal_variation) {
-            best_score = -pv_search<PV>(-beta, -alpha, depth - 1, ply + 1);
+            best_score = -search<PV>(-beta, -alpha, depth - 1, ply + 1);
 
             undo_move(move);
             if (best_score > alpha) {
@@ -264,14 +264,14 @@ int Game::pv_search(int alpha, int beta, int depth, int ply)
                 !move.is_capture() && !move.is_promotion()) {
 
                 // Do the search at a reduced depth
-                score = -pv_search<ALL>(-alpha - 1, -alpha, depth - 2, ply + 1);
+                score = -search<ALL>(-alpha - 1, -alpha, depth - 2, ply + 1);
             } else {
-                score = -pv_search<ALL>(-alpha - 1, -alpha, depth - 1, ply + 1);
+                score = -search<ALL>(-alpha - 1, -alpha, depth - 1, ply + 1);
             }
 
             // Re-search
             if (alpha < score && score < beta) {
-                score = -pv_search<ALL>(-beta, -alpha, depth - 1, ply + 1);
+                score = -search<ALL>(-beta, -alpha, depth - 1, ply + 1);
                 if (alpha < score) {
                     alpha = score;
                 }
@@ -356,11 +356,11 @@ Move Game::root(int max_depth)
             }
             // FIXME
             //NodeType node_type = (nb_moves ? PV : ALL);
-            //score = -pv_search<node_type>(-beta, -alpha, it - 1, 1);
+            //score = -search<node_type>(-beta, -alpha, it - 1, 1);
             if (nb_moves == 1) {
-                score = -pv_search<PV>(-beta, -alpha, it - 1, 1);
+                score = -search<PV>(-beta, -alpha, it - 1, 1);
             } else {
-                score = -pv_search<ALL>(-beta, -alpha, it - 1, 1);
+                score = -search<ALL>(-beta, -alpha, it - 1, 1);
             }
             undo_move(move);
             if (time.is_out_of_time()) break; // Discard this move

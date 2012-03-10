@@ -74,7 +74,7 @@ class Game
         int quiescence(int alpha, int beta, int depth, int ply);
 
         template<NodeType node_type>
-        int pv_search(int alpha, int beta, int depth, int ply);
+        int search(int alpha, int beta, int depth, int ply);
 
         Move root(int max_depth);
 
