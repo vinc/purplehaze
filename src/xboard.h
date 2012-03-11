@@ -35,6 +35,7 @@ class Xboard : public Protocol
     private:
         std::ofstream log;
         bool force_mode;
+        bool debug_mode;
     public:
         Xboard();
         void loop();

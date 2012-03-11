@@ -25,6 +25,7 @@
 Xboard::Xboard()
 {
     force_mode = true;
+    debug_mode = false;
     verbosity = 1;
 }
 
@@ -45,10 +46,12 @@ void Xboard::think()
         output = "result 1/2-1/2";
     } else if (!force_mode) {
         play_move(move);
-        log << std::endl << "  DEBUG: "
-            << game.time.get_elapsed_time() / 100.0f
-            << " of " << game.time.get_allocated_time() / 100.0f
-            << " seconds used to play";
+        if (debug_mode) {
+            log << std::endl << "  DEBUG: "
+                << game.time.get_elapsed_time() / 100.0f
+                << " of " << game.time.get_allocated_time() / 100.0f
+                << " seconds used to play";
+        }
         if (get_verbosity() > 1) {
             std::cout << std::endl;
             game.print_tt_stats();
@@ -56,45 +59,64 @@ void Xboard::think()
         output = "move " + move;
     }
     std::cout << output << std::endl;
-    log << std::endl << "< " << output;
+    if (debug_mode) {
+        log << std::endl << "< " << output;
+    }
 }
 
 void Xboard::loop()
 {
     signal(SIGINT, SIG_IGN);
     std::cout << std::endl; // Acknowledge Xboard mode
-    log.open("game.log", std::ios::app);
-    log << "  DEBUG: Purple Haze is starting" << std::endl;
 
     std::string cmd;
     std::cin >> cmd;
     while (cmd != "quit") {
-        log << "> " << cmd;
+        if (debug_mode) {
+            log << "> " << cmd;
+        }
         if (cmd == "protover") {
             int n;
             std::cin >> n;
-            log << " " << n;
+            if (debug_mode) {
+                log << " " << n;
+            }
             if (n == 2) {
                 for (int i = 0; i < XBOARD_NB_FEATURES; ++i) {
                     std::cout << "feature " << XBOARD_FEATURES[i][0];
-                    log << std::endl << "< feature " << XBOARD_FEATURES[i][0];
+                    if (debug_mode) {
+                        log << std::endl
+                            << "< feature " << XBOARD_FEATURES[i][0];
+                    }
                     std::string value = XBOARD_FEATURES[i][1];
                     if (value == "0" || value == "1") {
                         std::cout << "=" << value << std::endl;
-                        log << "=" << value;
+                        if (debug_mode) {
+                            log << "=" << value;
+                        }
                     } else {
                         std::cout << "=\"" << value << "\"" << std::endl;
-                        log << "=\"" << value << "\"";
+                        if (debug_mode) {
+                            log << "=\"" << value << "\"";
+                        }
                     }
                     std::string reply, feature;
                     std::cin >> reply;
                     std::cin >> feature;
-                    log << std::endl << "> " << reply << " " << feature;
+                    if (debug_mode) {
+                        log << std::endl << "> " << reply << " " << feature;
+                    }
                     assert(feature == XBOARD_FEATURES[i][0]);
                     if (reply == "accepted") continue;
                     if (reply == "rejected") assert(false); // FIXME
                     assert(false); // FIXME
                 }
+            }
+        } else if (cmd == "debug") {
+            if (!debug_mode) {
+                debug_mode = true;
+                log.open("game.log", std::ios::app);
+                log << "  DEBUG: Starting log" << std::endl;
             }
         } else if (cmd == "new") {
             new_game();
@@ -106,7 +128,9 @@ void Xboard::loop()
             fen.erase(0, 1); // Remove the first whitespace
             new_game();
             set_board(fen);
-            log << " " << fen;
+            if (debug_mode) {
+                log << " " << fen;
+            }
             force_mode = false;
         } else if (cmd == "go") {
             force_mode = false;
@@ -121,7 +145,9 @@ void Xboard::loop()
             // Number of moves
             int moves;
             std::cin >> moves;
-            log << " " << moves;
+            if (debug_mode) {
+                log << " " << moves;
+            }
 
             // TODO "level 0 m 0" means play the entire game in 'm' minutes,
             // but the current time management don't support it.
@@ -131,7 +157,9 @@ void Xboard::loop()
             int time;
             std::string str_time;
             std::cin >> str_time;
-            log << " " << str_time;
+            if (debug_mode) {
+                log << " " << str_time;
+            }
             size_t sep = str_time.find(":");
             if (sep == std::string::npos) {
                 std::istringstream minutes(str_time);
@@ -149,7 +177,9 @@ void Xboard::loop()
             // Control character
             int control;
             std::cin >> control;
-            log << " " << control;
+            if (debug_mode) {
+                log << " " << control;
+            }
             if (control == 0) {
                 set_time(moves, time);
             } else { // Not in Xboard protocol
@@ -160,16 +190,22 @@ void Xboard::loop()
         } else if (cmd == "time") {
             int time = 0;
             std::cin >> time;
-            log << " " << time;
+            if (debug_mode) {
+                log << " " << time;
+            }
             set_remaining_time(time);
         } else if (cmd == "otim") {
             int time = 0;
             std::cin >> time;
-            log << " " << time;
+            if (debug_mode) {
+                log << " " << time;
+            }
         } else if (cmd == "sd") {
             int d = 0;
             std::cin >> d;
-            log << " " << d;
+            if (debug_mode) {
+                log << " " << d;
+            }
             set_depth(d);
         } else if (cmd == "undo") {
             undo_move();
@@ -188,21 +224,31 @@ void Xboard::loop()
                  'a' <= cmd[2] && cmd[2] <= 'h' &&
                  '1' <= cmd[3] && cmd[3] <= '8' &&
                  !parse_move(cmd).is_null()) {
-            log << std::endl << "  DEBUG: move '" << cmd << "' successfully parsed";
+            if (debug_mode) {
+                log << std::endl << "  DEBUG: move '" << cmd << "' successfully parsed";
+            }
             if (!play_move(cmd)) {
                 std::cout << "Illegal move: " << cmd << std::endl;
-                log << std::endl << "< Illegal move: " << cmd;
+                if (debug_mode) {
+                    log << std::endl << "< Illegal move: " << cmd;
+                }
             }
             if (!force_mode) think();
         } else if (cmd == "verbose") { // Debug mode
             verbosity = 2;
         } else {
-            log << std::endl << "  DEBUG: ignoring command";
+            if (debug_mode) {
+                log << std::endl << "  DEBUG: unrecognized command:" << cmd;
+            }
         }
-        log << std::endl;
+        if (debug_mode) {
+            log << std::endl;
+        }
         std::cin >> cmd;
     }
-    log << "> " << cmd << std::endl;
-    log << "  DEBUG: exiting" << std::endl;
-    log.close();
+    if (debug_mode) {
+        log << "> " << cmd << std::endl;
+        log << "  DEBUG: Closing log" << std::endl;
+        log.close();
+    }
 }
