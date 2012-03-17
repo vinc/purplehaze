@@ -7,7 +7,11 @@ optimize = yes
 use_asserts = no
 
 # Search options
+use_check_extension = yes
 use_null_move_pruning = yes
+use_internal_iterative_deepening = yes
+use_futility_pruning = yes
+use_late_move_reduction = yes
 
 # Debug options
 use_profiler = no
@@ -52,6 +56,18 @@ endif
 ifeq ($(use_asserts),no)
     CXXFLAGS += -DNDEBUG
 endif
-ifeq ($(use_null_move_pruning),yes)
-    CXXFLAGS += -DNMP
+ifeq ($(use_check_extension),no)
+    CXXFLAGS += -DNCE
+endif
+ifeq ($(use_null_move_pruning),no)
+    CXXFLAGS += -DNNMP
+endif
+ifeq ($(use_internal_iterative_deepening),no)
+    CXXFLAGS += -DNIID
+endif
+ifeq ($(use_futility_pruning),no)
+    CXXFLAGS += -DNFP
+endif
+ifeq ($(use_late_move_reduction),no)
+    CXXFLAGS += -DNLMR
 endif

@@ -130,10 +130,12 @@ int Game::search(int alpha, int beta, int depth, const int ply)
     const bool is_in_check = is_check(player);
     const bool is_null_move = !pos.get_null_move_right(); // No more than one
 
+#ifndef NCE
     // Check Extension
     if (is_in_check) ++depth;
+#endif
 
-#ifdef NMP
+#ifndef NNMP
     // Null Move Pruning
     const bool null_move_allowed = !is_in_check && !is_null_move && !is_pv;
 
@@ -154,6 +156,7 @@ int Game::search(int alpha, int beta, int depth, const int ply)
     }
 #endif
 
+#ifndef NIID
     // Internal Iterative Deepening
     if (depth > IID_DEPTH && best_move.is_null() && !is_null_move && is_pv) {
         Moves moves(board, pieces, current_position(), search_moves);
@@ -193,6 +196,7 @@ int Game::search(int alpha, int beta, int depth, const int ply)
         //assert(trans_move == best_move); // trans_move is sometime null
         */
     }
+#endif
 
     bool legal_move_found = false;
     bool is_principal_variation = true;
@@ -241,6 +245,7 @@ int Game::search(int alpha, int beta, int depth, const int ply)
         } else {
             const bool is_giving_check = is_check(!player);
 
+#ifndef NFP
             // Futility Pruning
             if (depth <= FUTILITY_DEPTH &&
                 //!best_move.is_null() &&
@@ -255,7 +260,11 @@ int Game::search(int alpha, int beta, int depth, const int ply)
                         continue;
                     }
             }
+#endif
 
+            int r = 0; // Reduced depth
+
+#ifndef NLMR
             // Late Move Reduction
             if (depth > LMR_DEPTH && // TODO find the best minimal depth
                 //!best_move.is_null() &&
@@ -264,10 +273,12 @@ int Game::search(int alpha, int beta, int depth, const int ply)
                 !move.is_capture() && !move.is_promotion()) {
 
                 // Do the search at a reduced depth
-                score = -search<ALL>(-alpha - 1, -alpha, depth - 2, ply + 1);
-            } else {
-                score = -search<ALL>(-alpha - 1, -alpha, depth - 1, ply + 1);
+                ++r;
             }
+#endif
+
+            // Search
+            score = -search<ALL>(-alpha - 1, -alpha, depth - r - 1, ply + 1);
 
             // Re-search
             if (alpha < score && score < beta) {
