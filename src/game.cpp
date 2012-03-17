@@ -46,7 +46,7 @@ void Game::clear_killers()
 
 void Game::add_piece(Color c, PieceType t, Square s)
 {
-    int i = pieces.get_nb_pieces(c, t);
+    int i = pieces.count(c, t);
     pieces.set_position(c, t, i, s);
     board.set_piece(Piece(c, t, i), s);
     pieces.inc_nb_pieces(c, t);
@@ -71,8 +71,8 @@ void Game::del_piece(Color c, PieceType t, int i)
     board.set_piece(Piece(), emptied);             // Remove it from board
     pieces.dec_nb_pieces(c, t);                    // and from pieces list
     pieces.set_position(c, t, i, OUT);             // TODO: not needed
-    int j = pieces.get_nb_pieces(c, t);            // Last piece's index
-    if (pieces.get_nb_pieces(c, t) > 0 && i != j) {
+    int j = pieces.count(c, t);                    // Last piece's index
+    if (pieces.count(c, t) > 0 && i != j) {
         // Swap i and j and update board
         Square s = pieces.get_position(c, t, j);   // Last piece's position
         pieces.set_position(c, t, i, s);           // Fill the hole left

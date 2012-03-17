@@ -137,7 +137,7 @@ int Game::search(int alpha, int beta, int depth, const int ply)
     // Null Move Pruning
     const bool null_move_allowed = !is_in_check && !is_null_move && !is_pv;
 
-    const int nb_pieces = pieces.get_nb_pieces(player);
+    const int nb_pieces = pieces.count(player);
     if (null_move_allowed && depth > NMP_DEPTH && nb_pieces > 3) {
         Move null_move;
         make_move(null_move);

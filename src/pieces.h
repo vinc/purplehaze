@@ -45,10 +45,10 @@ class Pieces
             assert(0 <= i && i < 9);
             positions[c][t][i] = s;
         };
-        unsigned char get_nb_pieces(Color c, PieceType t) const {
+        unsigned char count(Color c, PieceType t) const {
             return nb_pieces[c][t];
         };
-        unsigned char get_nb_pieces(Color c) const {
+        unsigned char count(Color c) const {
             return total[c];
         };
 

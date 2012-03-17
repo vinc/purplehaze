@@ -5,9 +5,9 @@ TEST(PiecesTest, Constructor)
 {
     Pieces pieces;
     for (const Color &c : COLORS) {
-        EXPECT_EQ(0, pieces.get_nb_pieces(c));
+        EXPECT_EQ(0, pieces.count(c));
         for (const PieceType &t : PIECE_TYPES) {
-            EXPECT_EQ(0, pieces.get_nb_pieces(c, t));
+            EXPECT_EQ(0, pieces.count(c, t));
             for (int i = 0; i < 9; ++i) {
                 Piece p(c, t, i);
                 EXPECT_EQ(OUT, pieces.get_position(p));
@@ -35,8 +35,8 @@ TEST(PiecesTest, Positions)
                     EXPECT_EQ(s, pieces.get_position(c, t, i));
 
                     // Internal counters are not implicitly changed
-                    EXPECT_EQ(0, pieces.get_nb_pieces(c));
-                    EXPECT_EQ(0, pieces.get_nb_pieces(c, t));
+                    EXPECT_EQ(0, pieces.count(c));
+                    EXPECT_EQ(0, pieces.count(c, t));
                 }
             }
         }
@@ -47,22 +47,22 @@ TEST(PiecesTest, Count)
 {
     Pieces pieces;
     for (const Color &c : COLORS) {
-        EXPECT_EQ(0, pieces.get_nb_pieces(c));
+        EXPECT_EQ(0, pieces.count(c));
         for (const PieceType &t : PIECE_TYPES) {
-            EXPECT_EQ(0, pieces.get_nb_pieces(c, t));
+            EXPECT_EQ(0, pieces.count(c, t));
             for (int i = 0; i < 9; ++i) {
-                EXPECT_EQ(i, pieces.get_nb_pieces(c, t));
+                EXPECT_EQ(i, pieces.count(c, t));
                 pieces.inc_nb_pieces(c, t);
-                EXPECT_EQ(i + 1, pieces.get_nb_pieces(c, t));
+                EXPECT_EQ(i + 1, pieces.count(c, t));
             }
             for (int i = 9; i > 0; --i) {
-                EXPECT_EQ(i, pieces.get_nb_pieces(c, t));
+                EXPECT_EQ(i, pieces.count(c, t));
                 pieces.dec_nb_pieces(c, t);
-                EXPECT_EQ(i - 1, pieces.get_nb_pieces(c, t));
+                EXPECT_EQ(i - 1, pieces.count(c, t));
             }
-            EXPECT_EQ(0, pieces.get_nb_pieces(c, t));
+            EXPECT_EQ(0, pieces.count(c, t));
         }
-        EXPECT_EQ(0, pieces.get_nb_pieces(c));
+        EXPECT_EQ(0, pieces.count(c));
     }
 }
 

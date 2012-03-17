@@ -140,7 +140,7 @@ int Game::material_eval()
         int nb_pawns = 0;
         int nb_minors = 0;
         for (const PieceType& t : PIECE_TYPES) {
-            const int n = pieces.get_nb_pieces(c, t);
+            const int n = pieces.count(c, t);
             // Pieces' standard values
             material_score[c] += n * PIECE_VALUE[t];
 
@@ -220,7 +220,7 @@ int Game::material_eval()
             if (material_score[!c] == K + N + N) break;
 
             // TODO is this duplicate with MALUS_NO_PAWNS?
-            const int nb_opponent_pawns = pieces.get_nb_pieces(!c, PAWN);
+            const int nb_opponent_pawns = pieces.count(!c, PAWN);
             if (nb_opponent_pawns == 0 && material_score[!c] < K + 4 * P) {
                 break;
             }
@@ -265,7 +265,7 @@ int Game::position_eval()
     const Position& pos = current_position();
     for (const Color& c : COLORS) {
         for (const PieceType& t : PIECE_TYPES) {
-            const int n = pieces.get_nb_pieces(c, t);
+            const int n = pieces.count(c, t);
             phase += n * PHASE_COEF[t];
             for (int j = 0; j < n; ++j) {
                 Square s = pieces.get_position(c, t, j);
@@ -283,7 +283,7 @@ int Game::position_eval()
 
         // Rooks' files bonus
         int rooks_score = 0;
-        const int nb_rooks = pieces.get_nb_pieces(c, ROOK);
+        const int nb_rooks = pieces.count(c, ROOK);
         for (int j = 0; j < nb_rooks; ++j) {
             Square s = pieces.get_position(c, ROOK, j);
             if (!pawns_files[!c][board.get_file(s)]) {

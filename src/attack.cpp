@@ -24,7 +24,7 @@
 bool Board::is_attacked_by(Color c, Square s, const Pieces& pieces) const
 {
     for (const PieceType& t : NOT_PAWN_TYPES) {
-        int n = pieces.get_nb_pieces(c, t);
+        int n = pieces.count(c, t);
         for (int i = 0; i < n; ++i) {
             Square from = pieces.get_position(c, t, i);
             if (!can_attack(t, from, s)) continue;
