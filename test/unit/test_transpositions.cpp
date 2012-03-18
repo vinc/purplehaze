@@ -1,6 +1,7 @@
 #include <climits>
 
 #include "../../src/tt.h"
+#include "../../src/game.h"
 #include "gtest/gtest.h"
 
 static const Bound BOUNDS[] = { EXACT, LOWER, UPPER };
@@ -147,4 +148,25 @@ TEST_F(TranspositionsTest, Lookup)
             }
         }
     }
+}
+
+/**
+ * Test case for retrieving the best move from TT after a search
+ */
+TEST(TTTest, LookupAfterSearch)
+{
+    Game game;
+    game.tt.clear();
+    game.clear_killers();
+    game.search_moves.clear();
+
+    game.init("7K/8/k1P5/7p/8/8/8/8 w - -");
+    game.time = Time(1, 50); // Search 1 move in 50 ms
+    Move m1 = game.root(MAX_PLY);
+    EXPECT_EQ("Kg7", game.output_move(m1));
+
+    bool is_empty;
+    Position &pos = game.current_position();
+    Move m2 = game.tt.lookup(pos.hash(), &is_empty).get_best_move();
+    EXPECT_EQ(m1, m2);
 }
