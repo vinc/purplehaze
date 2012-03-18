@@ -122,8 +122,10 @@ int Game::search(int alpha, int beta, int depth, const int ply)
             }
             if (alpha >= beta) return tr_score; // TT cause a cut-off
         }
-        Move bm = trans.get_best_move();
-        if (!bm.is_null()) best_move = bm; // Save the best move
+
+        // If the transposition does not contain the best move,
+        // best_move.is_null() will be true.
+        best_move = trans.get_best_move();
     }
 
     const Color player = pos.get_turn_color();

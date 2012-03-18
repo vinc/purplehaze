@@ -60,7 +60,10 @@ TEST(MoveTest, Size)
 
 TEST(MoveTest, Constructor)
 {
+    Move null_move;
+    EXPECT_TRUE(null_move.is_null());
     EXPECT_TRUE(Move().is_null());
+
     for (const Square &o : SQUARES) {
         if (o == OUT) continue;
         for (const Square &d : SQUARES) {
