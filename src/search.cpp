@@ -160,43 +160,10 @@ int Game::search(int alpha, int beta, int depth, const int ply)
 
 #ifndef NIID
     // Internal Iterative Deepening
-    if (depth > IID_DEPTH && best_move.is_null() && !is_null_move && is_pv) {
-        Moves moves(board, pieces, current_position(), search_moves);
-        int internal_best_score = -INF;
-        Move move;
-        while (!(move = moves.next()).is_null()) {
-            make_move(move);
-            if (is_check(player)) {
-                undo_move(move);
-                continue;
-            }
-            score = -search<PV>(-beta, -alpha, depth / 2, ply + 1);
-            undo_move(move);
-            if (score > internal_best_score) {
-                internal_best_score = score;
-                best_move = move;
-            }
-        }
-        // TODO Call search directly and find the best move in TT?
-        /*
-        tt.save(pos.hash(), 0, UNDEF_BOUND, 0, Move());
-        Transposition trans_test = tt.lookup(pos.hash());
-        pos.set_null_move_right(false);
-        score = search<PV>(alpha, beta, depth / 2, ply);
-        if (score <= alpha) {
-            // Avoid storing lower bound in TT
-            score = search<PV>(-INF, beta, depth / 2, ply);
-        }
-        pos.set_null_move_right(true);
-        Move trans_move = tt.lookup(pos.hash()).get_best_move();
-        if (trans_move != best_move) {
-            cout << "score=" << score << " alpha=" << alpha << " ";
-            cout << trans_test.to_string() << " ";
-            cout << internal_best_score << " " << best_move << " ";
-            cout << tt.lookup(pos.hash()).to_string() << endl;
-        }
-        //assert(trans_move == best_move); // trans_move is sometime null
-        */
+    const bool iid_allowed = !is_null_move && is_pv;
+    if (iid_allowed && depth > IID_DEPTH && best_move.is_null()) {
+        search<PV>(alpha, beta, depth / 2, ply);
+        best_move = tt.lookup(pos.hash(), &is_empty).get_best_move();
     }
 #endif
 
