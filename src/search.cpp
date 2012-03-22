@@ -27,7 +27,7 @@
 unsigned long long int Game::perft(unsigned int depth)
 {
     if (depth == 0) return 1;
-    unsigned int nodes = 0;
+    unsigned long long int nodes = 0;
     Color c = current_position().get_turn_color();
     bool use_lazy = false; // Lazy moves generation is not usefull in perft()
     Moves moves(board, pieces, current_position(), search_moves, use_lazy);
