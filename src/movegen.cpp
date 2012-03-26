@@ -1,18 +1,17 @@
-/* PurpleHaze 2.0.0
- * Copyright (C) 2007-2011  Vincent Ollivier
+/* Copyright (C) 2007-2011 Vincent Ollivier
  *
- * This program is free software: you can redistribute it and/or modify
+ * Purple Haze is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * Purple Haze is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <assert.h>
@@ -20,21 +19,23 @@
 
 #include "game.h"
 
-using namespace std;
-
-void Moves::generate_pieces(Color c, PieceType t, MoveType mt) {
+void Moves::generate_pieces(Color c, PieceType t, MoveType mt)
+{
     const Direction * dirs = PIECES_DIRS[t];
-    for (int j = 0; j < pieces.get_nb_pieces(c, t); ++j) {
+    for (int j = 0; j < pieces.count(c, t); ++j) {
         Square from = pieces.get_position(c, t, j);
         for (int d = 0; d < NB_DIRS[t]; ++d) {
             Square to = Square(from + dirs[d]);
             while (!board.is_out(to)) {
                 if (!board.is_empty(to)) {
                     if (board.get_piece(to).get_color() == c) break;
-                    if (mt != QUIET_MOVE) add(Move(from, to, CAPTURE));
+                    if (mt != QUIET_MOVE) {
+                        add(Move(from, to, CAPTURE));
+                    }
                     break;
+                } else if (mt != CAPTURE) {
+                    add(Move(from, to, QUIET_MOVE));
                 }
-                else if (mt != CAPTURE) add(Move(from, to, QUIET_MOVE));
                 if (t == KNIGHT || t == KING) break; // Leapers
                 to = Square(to + dirs[d]); // Sliders
             }
@@ -42,11 +43,12 @@ void Moves::generate_pieces(Color c, PieceType t, MoveType mt) {
     }
 }
 
-void Moves::generate(MoveType mt) {
+void Moves::generate(MoveType mt)
+{
     Color c = current_position.get_turn_color();
-    
+
     // Pawns moves
-    for (int j = 0; j < pieces.get_nb_pieces(c, PAWN); ++j) {
+    for (int j = 0; j < pieces.count(c, PAWN); ++j) {
         Square from = pieces.get_position(c, PAWN, j);
 
         // Pawn captures
@@ -60,21 +62,19 @@ void Moves::generate(MoveType mt) {
                     add(Move(from, to, BISHOP_PROMOTION_CAPTURE));
                     add(Move(from, to, ROOK_PROMOTION_CAPTURE));
                     add(Move(from, to, QUEEN_PROMOTION_CAPTURE));
-                }
-                else { // Capture
+                } else { // Capture
                     add(Move(from, to, CAPTURE));
                 }
-            }
-            else if (to == current_position.get_en_passant()) { // En passant
+            } else if (to == current_position.get_en_passant()) { // En passant
                 add(Move(from, to, EN_PASSANT));
             }
         }
-        
+
         if (mt == CAPTURE) continue;
         Square to = Square(from + PAWN_PUSH_DIRS[c]);
         assert(!board.is_out(to)); // Should never happend
         if (!board.is_empty(to)) continue;
-        
+
         // Promotion
         if (board.is_pawn_end(c, to)) {
             add(Move(from, to, KNIGHT_PROMOTION));
@@ -86,7 +86,7 @@ void Moves::generate(MoveType mt) {
 
         // Pawn push
         add(Move(from, to, QUIET_MOVE));
-        
+
         // Double pawn push
         if (board.is_pawn_begin(c, from)) {
             to = Square(to + PAWN_PUSH_DIRS[c]);
@@ -96,12 +96,12 @@ void Moves::generate(MoveType mt) {
     }
 
     // Standard moves
-    for (PieceType t = KNIGHT; t <= KING; t = PieceType(t + 1)) {
+    for (const PieceType& t : NOT_PAWN_TYPES) {
         generate_pieces(c, t, mt);
     }
 
     if (mt == CAPTURE) return;
-    
+
     // Castling
     if (current_position.can_castle(c, KING)) {
         Square from = Square(E1 + A8 * c);
@@ -111,9 +111,9 @@ void Moves::generate(MoveType mt) {
             board.is_empty(to) &&
             board.get_piece(rook).get_type() == ROOK &&
             board.get_piece(rook).get_color() == c &&
-            !board.is_attacked_by(Color(!c), from, pieces) &&
-            !board.is_attacked_by(Color(!c), to, pieces) &&
-            !board.is_attacked_by(Color(!c), Square((F1 + A8 * c)), pieces)
+            !board.is_attacked_by(!c, from, pieces) &&
+            !board.is_attacked_by(!c, to, pieces) &&
+            !board.is_attacked_by(!c, Square((F1 + A8 * c)), pieces)
             ) {
             add(Move(from, to, KING_CASTLE));
         }
@@ -127,16 +127,17 @@ void Moves::generate(MoveType mt) {
             board.is_empty(to) &&
             board.get_piece(rook).get_type() == ROOK &&
             board.get_piece(rook).get_color() == c &&
-            !board.is_attacked_by(Color(!c), from, pieces) &&
-            !board.is_attacked_by(Color(!c), to, pieces) &&
-            !board.is_attacked_by(Color(!c), Square((D1 + A8 * c)), pieces)
+            !board.is_attacked_by(!c, from, pieces) &&
+            !board.is_attacked_by(!c, to, pieces) &&
+            !board.is_attacked_by(!c, Square((D1 + A8 * c)), pieces)
             ) {
             add(Move(from, to, QUEEN_CASTLE));
         }
     }
 }
 
-void Game::make_move(Move m) {
+void Game::make_move(Move m)
+{
     Square orig = m.get_orig();
     Square dest = m.get_dest();
     Square ep = current_position().get_en_passant();
@@ -152,9 +153,12 @@ void Game::make_move(Move m) {
     Position& pos = current_position();
 
     // Update halfmove counter
-    if (t == PAWN || m.is_capture()) pos.reset_halfmove();
-    else pos.inc_halfmove();
-    
+    if (t == PAWN || m.is_capture()) {
+        pos.reset_halfmove();
+    } else {
+        pos.inc_halfmove();
+    }
+
     // Null Move
     if (m.is_null()) {
         pos.set_en_passant(OUT);
@@ -162,17 +166,17 @@ void Game::make_move(Move m) {
     }
 
     // Update castling rights
-    if ((pos.can_castle(c, KING)) && 
+    if ((pos.can_castle(c, KING)) &&
         (t == KING || (t == ROOK && orig == Square(H1 + A8 * c)))) {
         pos.set_castle_right(c, KING, false);
         zobrist.update_castle_right(pos.hash(), c, KING);
     }
-    if ((pos.can_castle(c, QUEEN)) && 
+    if ((pos.can_castle(c, QUEEN)) &&
         (t == KING || (t == ROOK && orig == Square(A1 + A8 * c)))) {
         pos.set_castle_right(c, QUEEN, false);
         zobrist.update_castle_right(pos.hash(), c, QUEEN);
     }
-    
+
     // Capture
     if (m.is_capture()) {
         Square s = dest;
@@ -183,14 +187,12 @@ void Game::make_move(Move m) {
 
         capture = board.get_piece(s);
         if (capture.get_type() == ROOK) { // Update opponent's castling rights
-            Color oc = Color(!c); // Opponent's color
-            if (dest == Square(H1 + A8 * c)) {
-                pos.set_castle_right(oc, KING, false);
-                zobrist.update_castle_right(pos.hash(), oc, KING);
-            }
-            else if (dest == Square(A1 + A8 * c)) {
-                pos.set_castle_right(oc, QUEEN, false);
-                zobrist.update_castle_right(pos.hash(), oc, QUEEN);
+            if (dest == Square(H1 + A8 * !c)) {
+                pos.set_castle_right(!c, KING, false);
+                zobrist.update_castle_right(pos.hash(), !c, KING);
+            } else if (dest == Square(A1 + A8 * !c)) {
+                pos.set_castle_right(!c, QUEEN, false);
+                zobrist.update_castle_right(pos.hash(), !c, QUEEN);
             }
         }
         del_piece(capture);
@@ -202,15 +204,18 @@ void Game::make_move(Move m) {
         Square rook_orig, rook_dest;
         switch (m.get_castle_side()) {
             case KING:
-                rook_orig = Square(H1 + A8 * c); 
-                rook_dest = Square(F1 + A8 * c); 
+                rook_orig = Square(H1 + A8 * c);
+                rook_dest = Square(F1 + A8 * c);
                 break;
             case QUEEN:
-                rook_orig = Square(A1 + A8 * c); 
-                rook_dest = Square(D1 + A8 * c); 
+                rook_orig = Square(A1 + A8 * c);
+                rook_dest = Square(D1 + A8 * c);
                 break;
             default:
                 assert(false);
+                rook_orig = OUT;
+                rook_dest = OUT;
+                break;
         }
         Piece rook = board.get_piece(rook_orig);
         board.set_piece(Piece(), rook_orig);
@@ -226,41 +231,39 @@ void Game::make_move(Move m) {
     if (m.is_promotion()) {
         add_piece(p.get_color(), m.get_promotion_type(), dest);
         del_piece(p);
-    }
-    else {
+    } else {
         board.set_piece(p, dest);
         pieces.set_position(p, dest);
         zobrist.update_piece(pos.hash(), c, t, orig);
         zobrist.update_piece(pos.hash(), c, t, dest);
     }
-    
+
     // Update en passant
     pos.set_capture(capture);
     if (m.is_double_pawn_push()) {
         Square new_ep = Square(orig + (dest - orig) / 2);
         pos.set_en_passant(new_ep);
         zobrist.update_en_passant(pos.hash(), new_ep);
-    }
-    else {
+    } else {
         pos.set_en_passant(OUT);
     }
 }
 
-void Game::undo_move(Move m) {
+void Game::undo_move(Move m)
+{
     Square orig = m.get_orig();
     Square dest = m.get_dest();
-    
+
     // Move back the piece to its origin
     Piece p = board.get_piece(dest);
     if (m.is_promotion()) {
         add_piece(p.get_color(), PAWN, orig);
         del_piece(p);
-    }
-    else if (!m.is_null()) {
+    } else if (!m.is_null()) {
         board.set_piece(p, orig);
         pieces.set_position(p, orig);
     }
-    
+
     // Restore captured piece
     if (m.is_capture()) {
         Piece capture = current_position().get_capture();
@@ -271,8 +274,7 @@ void Game::undo_move(Move m) {
             board.set_piece(Piece(), dest);
         }
         add_piece(capture.get_color(), capture.get_type(), s);
-    }
-    else if (!m.is_null()) {
+    } else if (!m.is_null()) {
         board.set_piece(Piece(), dest);
     }
     del_position();
@@ -282,14 +284,18 @@ void Game::undo_move(Move m) {
         Color c = current_position().get_turn_color();
         switch (m.get_castle_side()) {
             case KING:
-                rook_orig = Square(H1 + A8 * c); 
-                rook_dest = Square(F1 + A8 * c); 
+                rook_orig = Square(H1 + A8 * c);
+                rook_dest = Square(F1 + A8 * c);
                 break;
             case QUEEN:
-                rook_orig = Square(A1 + A8 * c); 
-                rook_dest = Square(D1 + A8 * c); 
+                rook_orig = Square(A1 + A8 * c);
+                rook_dest = Square(D1 + A8 * c);
                 break;
-            default: assert(false);
+            default:
+                assert(false);
+                rook_orig = OUT;
+                rook_dest = OUT;
+                break;
         }
         Piece rook = board.get_piece(rook_dest);
         board.set_piece(Piece(), rook_dest);
@@ -301,13 +307,14 @@ void Game::undo_move(Move m) {
 /*
  * Check the pseudo legality of a move m
  */
-bool Game::is_legal(Move m) {
+bool Game::is_legal(Move m)
+{
     // Null-move is obviously wrong
     if (m.is_null()) return false;
-    
+
     Square from = m.get_orig();
     Square to = m.get_dest();
-    
+
     // There must be a piece to move on the board
     if (board.is_empty(from)) return false;
 
@@ -317,12 +324,12 @@ bool Game::is_legal(Move m) {
 
     // The piece cannot be one of the opponent
     if (c != current_position().get_turn_color()) return false;
-    
+
     // It must be able to do the move
-    if (!m.is_en_passant() && 
-        !m.is_castle() && 
-        !board.can_go(p, from, to)) return false;
-    
+    if (!m.is_en_passant() && !m.is_castle()) {
+        if (!board.can_go(p, from, to)) return false;
+    }
+
     // Promotion
     if (t == PAWN && board.is_pawn_end(c, to) && !m.is_promotion()) {
         return false;
@@ -343,9 +350,9 @@ bool Game::is_legal(Move m) {
             // After a double push
             Square ep = current_position().get_en_passant();
             if (to != ep) return false;
-            
+
             // from another pawn, the later being captured by the former
-            s = (c == BLACK ? Square(ep + UP) : Square(ep + DOWN));   
+            s = (c == BLACK ? Square(ep + UP) : Square(ep + DOWN));
             if (board.get_piece(s).get_type() != PAWN) return false;
         }
 
@@ -353,46 +360,44 @@ bool Game::is_legal(Move m) {
         if (board.is_empty(s)) return false;
         if (c == board.get_piece(s).get_color()) return false;
 
-    }
-    else if (m.is_castle()) {
+    } else if (m.is_castle()) {
         Square rook = Square(H1 + A8 * c);
-        Color oc = Color(!c); // Opponent's color
-        switch (m.get_castle_side()){
+        switch (m.get_castle_side()) {
             case KING:
                 rook = Square(H1 + A8 * c);
-                if (!(board.is_empty(Square(F1 + A8 * c)) &&
-                    board.is_empty(to) &&
-                    board.get_piece(rook).get_type() == ROOK &&
-                    board.get_piece(rook).get_color() == c &&
-                    !board.is_attacked_by(oc, from, pieces) &&
-                    !board.is_attacked_by(oc, Square((F1 + A8 * c)), pieces) &&
-                    !board.is_attacked_by(oc, to, pieces))
-                    ) {
-                    return false;
+                if (!board.is_empty(Square(F1 + A8 * c)) ||
+                    !board.is_empty(to) ||
+                    board.get_piece(rook).get_type() != ROOK ||
+                    board.get_piece(rook).get_color() != c ||
+                    board.is_attacked_by(!c, from, pieces) ||
+                    board.is_attacked_by(!c, Square((F1 + A8 * c)), pieces) ||
+                    board.is_attacked_by(!c, to, pieces)) {
+                        return false;
                 }
                 break;
             case QUEEN:
                 rook = Square(A1 + A8 * c);
-                if (!(board.is_empty(Square(B1 + A8 * c)) &&
-                    board.is_empty(Square(D1 + A8 * c)) &&
-                    board.is_empty(to) &&
-                    board.get_piece(rook).get_type() == ROOK &&
-                    board.get_piece(rook).get_color() == c &&
-                    !board.is_attacked_by(oc, from, pieces) &&
-                    !board.is_attacked_by(oc, Square((D1 + A8 * c)), pieces) &&
-                    !board.is_attacked_by(oc, to, pieces))
-                    ) {
-                    return false;
+                if (!board.is_empty(Square(B1 + A8 * c)) ||
+                    !board.is_empty(Square(D1 + A8 * c)) ||
+                    !board.is_empty(to) ||
+                    board.get_piece(rook).get_type() != ROOK ||
+                    board.get_piece(rook).get_color() != c ||
+                    board.is_attacked_by(!c, from, pieces) ||
+                    board.is_attacked_by(!c, Square((D1 + A8 * c)), pieces) ||
+                    board.is_attacked_by(!c, to, pieces)) {
+                        return false;
                 }
                 break;
             default: return false;
         }
         return true;
-    }
-    else if (m.is_double_pawn_push()) {
+    } else if (m.is_double_pawn_push()) {
         if (t != PAWN) return false;
         if (!board.is_pawn_begin(c, from)) return false; // Done by can_go()
+    } else if (!board.is_empty(to)) {
+        return false;
     }
-    else if (!board.is_empty(to)) return false;
+
+    // TODO: Add check
     return true;
 }

@@ -1,18 +1,17 @@
-/* PurpleHaze 2.0.0
- * Copyright (C) 2007-2011  Vincent Ollivier
+/* Copyright (C) 2007-2011 Vincent Ollivier
  *
- * This program is free software: you can redistribute it and/or modify
+ * Purple Haze is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * Purple Haze is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef XBOARD_H
@@ -25,8 +24,8 @@
 #include "protocol.h"
 
 static const int XBOARD_NB_FEATURES = 3;
-static const string XBOARD_FEATURES[XBOARD_NB_FEATURES][2] = {
-    { "myname",   "Purple Haze " + string(VERSION) },
+static const std::string XBOARD_FEATURES[XBOARD_NB_FEATURES][2] = {
+    { "myname",   "Purple Haze " + static_cast<std::string>(VERSION) },
     { "setboard", "1" },
     { "done",     "1" },
 };
@@ -34,8 +33,9 @@ static const string XBOARD_FEATURES[XBOARD_NB_FEATURES][2] = {
 class Xboard : public Protocol
 {
     private:
-        ofstream log;
+        std::ofstream log;
         bool force_mode;
+        bool debug_mode;
     public:
         Xboard();
         void loop();

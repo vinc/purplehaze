@@ -1,8 +1,10 @@
-include configure.mk
+include ../../configure.mk
 
-SOURCES = $(shell ls src/*.cpp)
+CXXFLAGS += -lgtest
+
+SOURCES = $(shell ls {../../src,.}/*.cpp | grep -v 'src/main.cpp')
 OBJECTS = $(SOURCES:.cpp=.o)
-EXECUTABLE = purplehaze
+EXECUTABLE = test_purplehaze
 
 all: $(SOURCES) $(EXECUTABLE)
 

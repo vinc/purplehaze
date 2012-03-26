@@ -1,18 +1,17 @@
-/* PurpleHaze 2.0.0
- * Copyright (C) 2007-2011  Vincent Ollivier
+/* Copyright (C) 2007-2011 Vincent Ollivier
  *
- * This program is free software: you can redistribute it and/or modify
+ * Purple Haze is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * Purple Haze is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef MOVE_H
@@ -22,20 +21,16 @@
 
 #include "common.h"
 
-using namespace std;
-
 class Move
 {
-    friend ostream& operator<<(ostream& out, const Move move);
-
     protected:
         /*
          * A move is coded using 16 bits:
          *     4 bits for the type
          *     3 bits for the destination square rank
-         *     3 bits for the destination square file 
+         *     3 bits for the destination square file
          *     3 bits for the origin square rank
-         *     3 bits for the origin square file 
+         *     3 bits for the origin square file
          */
 
         static const int MT_MASK = 0xF;
@@ -57,15 +52,13 @@ class Move
     public:
         Move() : code(NULL_MOVE) {}
 
-        Move(Square o, Square d, MoveType t){
-            code = ((o & 7) << OF_SHIFT) | 
-            ((o >> 4) << OR_SHIFT) |
-            ((d & 7) << DF_SHIFT) | 
-            ((d >> 4) << DR_SHIFT) | 
-            (t);
+        Move(Square o, Square d, MoveType t) {
+            code = ((o & 7) << OF_SHIFT) |
+                   ((o >> 4) << OR_SHIFT) |
+                   ((d & 7) << DF_SHIFT) |
+                   ((d >> 4) << DR_SHIFT) |
+                   t;
         };
-
-        friend class ExtendedMove;
 
         File get_orig_file() const {
             return File((code >> OF_SHIFT) & OF_MASK);
@@ -86,12 +79,12 @@ class Move
             return Square(16 * get_dest_rank() + get_dest_file());
         };
         MoveType get_type() const {
-            return MoveType((code >> MT_SHIFT) & MT_MASK);
+            return static_cast<MoveType>((code >> MT_SHIFT) & MT_MASK);
         };
 
         bool is_capture() const {
             return is_set(2) && !is_null();
-        }; 
+        };
         bool is_castle() const {
             return !is_set(3) && !is_set(2) && is_set(1);
         };
@@ -110,10 +103,12 @@ class Move
         PieceType get_promotion_type() const;
         PieceType get_castle_side() const;
 
+        /*
         // Static member function for sorting move in natural order
         static bool numeric_comp(Move a, Move b) {
             return (a.code < b.code);
         };
+        */
 
         bool operator==(const Move& other) const {
             return this->code == other.code;
@@ -121,7 +116,10 @@ class Move
         bool operator!=(const Move& other) const {
             return !(*this == other);
         }
-        string to_string() const;
+        std::string to_string() const;
+
+        friend std::ostream& operator<<(std::ostream& out, const Move move);
+        friend class ExtendedMove;
 };
 
 class ExtendedMove : public Move

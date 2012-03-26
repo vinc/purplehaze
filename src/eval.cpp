@@ -1,18 +1,17 @@
-/* PurpleHaze 2.0.0
- * Copyright (C) 2007-2011  Vincent Ollivier
+/* Copyright (C) 2007-2011 Vincent Ollivier
  *
- * This program is free software: you can redistribute it and/or modify
+ * Purple Haze is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * Purple Haze is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <assert.h>
@@ -25,21 +24,20 @@
 #include "eval.h"
 #include "hashtable.h"
 
-using namespace std;
-
 // PST[Phase][Color][PieceType][Square]
-static int PST[2][2][int(KING) + 1][BOARD_SIZE] = { { { { 0 } } } };
+static int PST[2][2][NB_PIECE_TYPES][BOARD_SIZE] = { { { { 0 } } } };
 
-void Game::init_eval() {
+void Game::init_eval()
+{
     for (int i = 0; i < 64; ++i) {
-        for (PieceType t = PAWN; t <= KING; t = PieceType(t + 1)) {
-            Square s = board.square_from_index(i);
-            
+        for (const PieceType& t : PIECE_TYPES) {
+            Square s = board.get_square(i);
+
             int opening_score = 0;
             int ending_score = 0;
 
             switch (t) {
-                case PAWN: 
+                case PAWN:
                     // Develop central pawns
                     // But not side pawns
                     opening_score = PAWN_FILES_VALUES[board.get_file(s)];
@@ -54,6 +52,7 @@ void Game::init_eval() {
                     if (board.is_border(s)) {
                         opening_score = 2 * BORDER_MALUS;
                     }
+                    // no break
                 default:
                     ending_score = CENTER_BONUS[board.get_file(s)];
                     ending_score += CENTER_BONUS[board.get_rank(s)];
@@ -69,7 +68,7 @@ void Game::init_eval() {
         }
     }
     // Special corrections
-    // Urge to develop light pieces during oppening
+    // Urge to develop light pieces during opening
     PST[OPENING][WHITE][KNIGHT][B1] = -20;
     PST[OPENING][WHITE][KNIGHT][G1] = -20;
     PST[OPENING][WHITE][BISHOP][C1] = -15;
@@ -82,99 +81,69 @@ void Game::init_eval() {
     PST[OPENING][WHITE][BISHOP][B2] = 3;
     PST[OPENING][WHITE][BISHOP][G2] = 3;
     // Protection against bishop attacks
-    PST[OPENING][WHITE][PAWN][A3] += 3; 
+    PST[OPENING][WHITE][PAWN][A3] += 3;
     PST[OPENING][WHITE][PAWN][H3] += 3;
 
     // Flip scores according to black's side
     for (int i = 0; i < 2; ++i) {
         for (int j = 0; j < 64; ++j) {
-            for (PieceType t = PAWN; t <= KING; t = PieceType(t + 1)) {
-                Square ws = board.square_from_index(j);
+            for (const PieceType& t : PIECE_TYPES) {
+                Square ws = board.get_square(j);
                 Square bs = board.flip(ws);
                 PST[i][BLACK][t][bs] = PST[i][WHITE][t][ws];
             }
         }
     }
-    
-    // Print PST
-    /*
-    cout << endl << "Opening pawn PST";
-    string squares[BOARD_SIZE];
-    for (int i = 0; i < BOARD_SIZE; ++i) {
-        Square s = Square(i);
-        ostringstream stream;
-        stream << setw(4) << PST[OPENING][WHITE][PAWN][s];
-        squares[i] = stream.str();
-    }
-    cout << endl << board.to_string(squares); 
-
-    cout << endl << "Ending pawn PST";
-    for (int i = 0; i < BOARD_SIZE; ++i) {
-        Square s = Square(i);
-        ostringstream stream;
-        stream << setw(4) << PST[ENDING][WHITE][PAWN][s];
-        squares[i] = stream.str();
-    }
-    cout << endl << board.to_string(squares); 
-    
-    cout << endl << "Opening knight PST";
-    for (int i = 0; i < BOARD_SIZE; ++i) {
-        Square s = Square(i);
-        ostringstream stream;
-        stream << setw(4) << PST[OPENING][WHITE][KNIGHT][s];
-        squares[i] = stream.str();
-    }
-    cout << endl << board.to_string(squares); 
-    */
 }
 
 static const int LAZY_EVAL_MARGIN = PIECE_VALUE[ROOK];
 
-int Game::eval(int alpha, int beta) {
+int Game::eval(int alpha, int beta)
+{
     // Material evaluation
     int score = material_eval();
 
-    // TODO Draws should be catched here
-    /*if (score == 0) return 0; // Draw
-    else*/ if (score > PIECE_VALUE[KING]) return INF; // Win
-    else if (score < -PIECE_VALUE[KING]) return -INF; // Loss
-   
+    // TODO Draws should be caught here
+    // if (score == 0) return 0; // Draw
+    if (score > PIECE_VALUE[KING]) return INF; // Win
+    if (score < -PIECE_VALUE[KING]) return -INF; // Loss
+
     // Lazy evaluation
     if (score + LAZY_EVAL_MARGIN < alpha) return score;
     if (score - LAZY_EVAL_MARGIN > beta) return score;
 
-    // TODO Positionnal evaluation
+    // TODO Positional evaluation
     score += position_eval();
 
     // TODO Mobility evaluation
     //score += mobility_eval();
-    
+
     return score;
 }
 
-int Game::material_eval() {
-    Color c;
+int Game::material_eval()
+{
     int score = 0;
     Position& pos = current_position();
-    
-    // Lookup in hash table
+
+    // Lookup position in material hash table
     bool is_empty = true;
-    int hash_score = material_table.lookup(pos.material_hash(), is_empty);
+    int hash_score = material_table.lookup(pos.material_hash(), &is_empty);
     if (!is_empty) {
-        c = pos.get_turn_color();
+        const Color c = pos.get_turn_color();
+        return (c == WHITE ? hash_score : -hash_score);
     }
-    
+
     int material_score[2] = { 0 };
     int material_bonus[2] = { 0 };
-    for (int i = 0; i < 2; ++i) {
-        c = Color(i);
+    for (const Color& c : COLORS) {
         int nb_pawns = 0;
         int nb_minors = 0;
-        for (PieceType t = PAWN; t <= KING; t = PieceType(t + 1)) {
-            int n = pieces.get_nb_pieces(c, t);
-            // Pieces' standard alues
-            material_score[c] += n * PIECE_VALUE[t]; 
-            
+        for (const PieceType& t : PIECE_TYPES) {
+            const int n = pieces.count(c, t);
+            // Pieces' standard values
+            material_score[c] += n * PIECE_VALUE[t];
+
             // Bonus values depending on material imbalance
             int adj;
             switch (t) {
@@ -185,7 +154,7 @@ int Game::material_eval() {
                 case KNIGHT:
                     nb_minors = n;
                     if (n > 1) material_bonus[c] += REDUNDANCY_MALUS;
-                    
+
                     // Value adjusted by the number of pawns on the board
                     adj = PAWNS_ADJUSTEMENT[KNIGHT][nb_pawns];
                     material_bonus[c] += n * adj;
@@ -194,7 +163,7 @@ int Game::material_eval() {
                     nb_minors += n;
                     // Bishop bonus pair (from +40 to +64):
                     // less than half a pawn when most or all the pawns are on
-                    // the board, and more than half a pawn when half or more 
+                    // the board, and more than half a pawn when half or more
                     // of the pawns are gone. (Kaufman 1999)
                     //
                     // No bonus for two bishops controlling the same color
@@ -202,8 +171,8 @@ int Game::material_eval() {
                     if (n == 2 && !board.is_same_color(
                             pieces.get_position(c, t, 0),
                             pieces.get_position(c, t, 1))) {
-                                material_bonus[c] += BISHOP_PAIR_BONUS + 
-                                                     (3 * 8 - nb_pawns);
+                                material_bonus[c] +=
+                                    BISHOP_PAIR_BONUS + (3 * 8 - nb_pawns);
                     }
 
                     // Value adjusted by the number of pawns on the board
@@ -213,7 +182,7 @@ int Game::material_eval() {
                 case ROOK:
                     // Principle of the redundancy (Kaufman 1999)
                     if (n > 1) material_bonus[c] += REDUNDANCY_MALUS;
-                    
+
                     // Value adjusted by the number of pawns on the board
                     adj = PAWNS_ADJUSTEMENT[ROOK][nb_pawns];
                     material_bonus[c] += n * adj;
@@ -222,8 +191,8 @@ int Game::material_eval() {
                     if (nb_minors > 1) {
                         // With two or more minor pieces, the queen
                         // equal two rooks. (Kaufman 1999)
-                        material_bonus[c] += (2 * PIECE_VALUE[ROOK]) -
-                                             (PIECE_VALUE[QUEEN]);
+                        material_bonus[c] +=
+                            (2 * PIECE_VALUE[ROOK]) - (PIECE_VALUE[QUEEN]);
                     }
                     // Value adjusted by the number of pawns on the board
                     adj = PAWNS_ADJUSTEMENT[QUEEN][nb_pawns];
@@ -235,65 +204,68 @@ int Game::material_eval() {
         }
     }
 
-    // Insufficiant material
-    for (int i = 0; i < 2; ++i) {
-        c = Color(i);
+    // Draw by insufficient material detection
+    bool is_draw = false;
+    const int K = PIECE_VALUE[KING];
+    const int P = PIECE_VALUE[PAWN];
+    const int N = PIECE_VALUE[KNIGHT];
+    const int B = PIECE_VALUE[BISHOP];
+    for (const Color& c : COLORS) {
+        is_draw = true;
         // FIDE rules for draw
-        const int K = PIECE_VALUE[KING];
-        const int P = PIECE_VALUE[PAWN];
-        const int N = PIECE_VALUE[KNIGHT];
-        const int B = PIECE_VALUE[BISHOP];
-        if (material_score[c] == PIECE_VALUE[KING]) {
-            if ((material_score[!c] == K) ||
-                (material_score[!c] == K + B) ||
-                (material_score[!c] == K + N) ||
-                (material_score[!c] == K + N + N)) {
-                    goto return_material_score;
-            }
+        if (material_score[c] == K) {
+            if (material_score[!c] == K)         break;
+            if (material_score[!c] == K + B)     break;
+            if (material_score[!c] == K + N)     break;
+            if (material_score[!c] == K + N + N) break;
 
-            // Duplicate with MALUS_NO_PAWNS ?
-            if (pieces.get_nb_pieces(Color(!c), PAWN) == 0 &&
-                material_score[!c] < K + 4 * P) {
-                    goto return_material_score;
+            // TODO is this duplicate with MALUS_NO_PAWNS?
+            const int nb_opponent_pawns = pieces.count(!c, PAWN);
+            if (nb_opponent_pawns == 0 && material_score[!c] < K + 4 * P) {
+                break;
             }
         }
+        is_draw = false; // no break happened
     }
 
-    c = pos.get_turn_color();
-    score = material_score[c] - material_score[Color(!c)];
-    score += material_bonus[c] - material_bonus[Color(!c)];
+    const Color c = pos.get_turn_color();
 
-    return_material_score:
-        hash_score = (c == WHITE ? score : -score);
-        material_table.save(pos.material_hash(), hash_score);
-        return score;
+    if (!is_draw) {
+        score = material_score[c] - material_score[!c];
+        score += material_bonus[c] - material_bonus[!c];
+    }
+
+    // Save score to material hash table
+    hash_score = (c == WHITE ? score : -score);
+    material_table.save(pos.material_hash(), hash_score);
+
+    return score;
 }
 
-int castling_score(const Position& pos, Color c) {
+int castling_score(const Position& pos, Color c)
+{
     int score = 0;
     if (pos.has_castle(c)) {
         score += CASTLE_BONUS;
-    }
-    else {
-        for (PieceType t = QUEEN; t <= KING; t = PieceType(t + 1)) {
-            if (!pos.can_castle(c, t)) { // For each side where no castling
-                score += BREAKING_CASTLE_MALUS; // is possible, add a malus
+    } else {
+        for (const PieceType& t : SIDE_TYPES) { // for QUEEN and KING side
+            if (!pos.can_castle(c, t)) {
+                score += BREAKING_CASTLE_MALUS;
             }
         }
     }
     return score;
 }
 
-int Game::position_eval() {
+int Game::position_eval()
+{
     int phase = 0;
     int position_score[2][2] = { { 0 } };
     int pawns_files[2][8] = { { 0 } };
     const Position& pos = current_position();
-    Color c;
-    for (int i = 0; i < 2; ++i) {
-        c = Color(i);
-        for (PieceType t = PAWN; t <= KING; t = PieceType(t + 1)) {
-            int n = pieces.get_nb_pieces(c, t);
+    for (const Color& c : COLORS) {
+        for (const PieceType& t : PIECE_TYPES) {
+            const int n = pieces.count(c, t);
             phase += n * PHASE_COEF[t];
             for (int j = 0; j < n; ++j) {
                 Square s = pieces.get_position(c, t, j);
@@ -308,14 +280,14 @@ int Game::position_eval() {
             pawns_score += MULTI_PAWNS_MALUS[pawns_files[c][j]];
         }
         position_score[OPENING][c] += pawns_score;
-        
+
         // Rooks' files bonus
         int rooks_score = 0;
-        int nb_rooks = pieces.get_nb_pieces(c, ROOK);
+        const int nb_rooks = pieces.count(c, ROOK);
         for (int j = 0; j < nb_rooks; ++j) {
             Square s = pieces.get_position(c, ROOK, j);
-            if (pawns_files[!c][board.get_file(s)]) {
-                if (pawns_files[c][board.get_file(s)]) {
+            if (!pawns_files[!c][board.get_file(s)]) {
+                if (!pawns_files[c][board.get_file(s)]) {
                     rooks_score += OPEN_FILE_BONUS;
                 }
                 else rooks_score += HALF_OPEN_FILE_BONUS;
@@ -327,13 +299,16 @@ int Game::position_eval() {
         position_score[OPENING][c] += castling_score(pos, c);
 
     }
-    c = pos.get_turn_color();
-    int opening, ending; // Score based on opening and ending rules
-    opening = position_score[OPENING][c] - position_score[OPENING][Color(!c)];
-    ending = position_score[ENDING][c] - position_score[ENDING][Color(!c)];
-    
+
+    // Retrieve opening and ending score
+    const Color& c = pos.get_turn_color();
+    const int opening = position_score[OPENING][c] -
+                        position_score[OPENING][!c];
+    const int ending = position_score[ENDING][c] -
+                       position_score[ENDING][!c];
+
     // Tapered Eval (idea from Fruit 2.1)
-    int max = PHASE_MAX;
+    const int max = PHASE_MAX;
     phase = (phase > max ? max : (phase < 0 ? 0 : phase));
     return (opening * phase + ending * (max - phase)) / max;
 }

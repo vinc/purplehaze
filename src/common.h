@@ -1,18 +1,17 @@
-/* PurpleHaze 2.0.0
- * Copyright (C) 2007-2011  Vincent Ollivier
+/* Copyright (C) 2007-2011 Vincent Ollivier
  *
- * This program is free software: you can redistribute it and/or modify
+ * Purple Haze is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * Purple Haze is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef COMMON_H
@@ -25,13 +24,14 @@
 #endif
 
 static const int BOARD_SIZE =  128;
-static const int MAX_PLY =     128;
+static const int MAX_PLY =     128; // Maximum search depth
+static const int MAX_BF =      256; // Maximum number of moves per position
 static const int INF =         29999;
-static const int TT_SIZE =     1024*1024*128;
-static const int MT_SIZE =     1024*1024;
+static const int TT_SIZE =     1024 * 1024 * 128;
+static const int MT_SIZE =     1024 * 1024;
 static const int MAX_KILLERS = 2;
 
-static const std::string DEFAULT_FEN = 
+static const std::string DEFAULT_FEN =
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
 enum Square : unsigned char {
@@ -46,26 +46,38 @@ enum Square : unsigned char {
     OUT
 };
 
-enum File : unsigned char { 
-    FILE_A, 
-    FILE_B, 
-    FILE_C, 
-    FILE_D, 
-    FILE_E, 
-    FILE_F, 
-    FILE_G, 
-    FILE_H 
+static const Square SQUARES[] = {
+    A1, C1, D1, E1, F1, G1, H1,
+    A2, C2, D2, E2, F2, G2, H2,
+    A3, C3, D3, E3, F3, G3, H3,
+    A4, C4, D4, E4, F4, G4, H4,
+    A5, C5, D5, E5, F5, G5, H5,
+    A6, C6, D6, E6, F6, G6, H6,
+    A7, C7, D7, E7, F7, G7, H7,
+    A8, C8, D8, E8, F8, G8, H8,
+    OUT
 };
 
-enum Rank : unsigned char { 
-    RANK_1, 
-    RANK_2, 
-    RANK_3, 
-    RANK_4, 
-    RANK_5, 
-    RANK_6, 
-    RANK_7, 
-    RANK_8 
+enum File : unsigned char {
+    FILE_A,
+    FILE_B,
+    FILE_C,
+    FILE_D,
+    FILE_E,
+    FILE_F,
+    FILE_G,
+    FILE_H
+};
+
+enum Rank : unsigned char {
+    RANK_1,
+    RANK_2,
+    RANK_3,
+    RANK_4,
+    RANK_5,
+    RANK_6,
+    RANK_7,
+    RANK_8
 };
 
 enum Direction {
@@ -96,19 +108,41 @@ enum Color : bool {
     WHITE,
     BLACK
 };
+static const Color COLORS[] = { WHITE, BLACK };
+inline Color operator!(Color c)
+{
+    return static_cast<Color>(!static_cast<bool>(c));
+}
 
-enum PieceType : unsigned char { 
+enum PieceType : unsigned char {
     EMPTY,
-    PAWN, 
-    KNIGHT, 
-    BISHOP, 
-    ROOK, 
-    QUEEN, 
+    PAWN,
+    KNIGHT,
+    BISHOP,
+    ROOK,
+    QUEEN,
     KING
 };
+static const int NB_PIECE_TYPES = static_cast<int>(KING) + 1;
 
-enum MoveType : unsigned char { 
-    QUIET_MOVE, 
+static const PieceType PIECE_TYPES[] = {
+    PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING
+};
+static const PieceType NOT_PAWN_TYPES[] = {
+    KNIGHT, BISHOP, ROOK, QUEEN, KING
+};
+static const PieceType SIDE_TYPES[] = {
+    QUEEN, KING
+};
+static const PieceType MINOR_TYPES[] = {
+    KNIGHT, BISHOP
+};
+static const PieceType MAJOR_TYPES[] = {
+    ROOK, QUEEN
+};
+
+enum MoveType : unsigned char {
+    QUIET_MOVE,
     DOUBLE_PAWN_PUSH,
     KING_CASTLE,
     QUEEN_CASTLE,
@@ -128,18 +162,18 @@ enum MoveType : unsigned char {
 // Used in movegen.cpp and attack.cpp
 static const int NB_DIRS[] = { 0, 0, 8, 4, 4, 8, 8 };
 static const Direction PIECES_DIRS[][8] = {
-    { // Empty   
+    { // Empty
          NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR
     },
     { // Pawns
         NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR
     },
     { // Knights
-        UP_UP_RIGHT, RIGHT_UP_RIGHT, RIGHT_DOWN_RIGHT, DOWN_DOWN_RIGHT, 
+        UP_UP_RIGHT, RIGHT_UP_RIGHT, RIGHT_DOWN_RIGHT, DOWN_DOWN_RIGHT,
         DOWN_DOWN_LEFT, LEFT_DOWN_LEFT, LEFT_UP_LEFT, UP_UP_LEFT
     },
     { // Bishops
-        UP_RIGHT, DOWN_RIGHT, DOWN_LEFT, UP_LEFT, 
+        UP_RIGHT, DOWN_RIGHT, DOWN_LEFT, UP_LEFT,
         NO_DIR, NO_DIR, NO_DIR, NO_DIR
     },
     { // Rooks
@@ -154,9 +188,9 @@ static const Direction PIECES_DIRS[][8] = {
 };
 
 // Used in movegen.cpp and protocol.cpp
-static const Direction PAWN_PUSH_DIRS[2] = { UP, DOWN };
-static const Direction PAWN_CAPTURE_DIRS[2][2] = {
-    { 
+static const Direction PAWN_PUSH_DIRS[] = { UP, DOWN };
+static const Direction PAWN_CAPTURE_DIRS[][2] = {
+    {
         UP_LEFT, UP_RIGHT
     },
     {
@@ -164,27 +198,114 @@ static const Direction PAWN_CAPTURE_DIRS[2][2] = {
     }
 };
 
-// Used for debuging
+// Used in tt.h
+enum Bound : unsigned char { EXACT, LOWER, UPPER, UNDEF_BOUND };
+
+// Used for debugging
 #define assert_msg(x) !(std::cerr << "Assertion failed: " << x << std::endl)
 
-// Overload operators to solve ambiguous errors with Clang
-inline bool operator==(int i, Rank r) { return i == int(r); }
-inline int operator>>(Square s, int i) { return int(s) >> i; }
-inline int operator|(int i, MoveType mt) { return i | int(mt); }
-inline int operator&(Square s, int i) { return int(s) & i; }
-inline int operator*(Rank r, Color c) { return int(r) * int(c); }
-inline int operator*(int i, Rank r) { return i * int(r); }
-inline int operator*(int i, Color c) { return i * int(c); }
-inline int operator+(int i, File f) { return i + int(f); }
-inline int operator+(int i, Square s) { return i + int(s); }
-inline int operator+(int i, PieceType pt) { return i + int(pt); }
-inline int operator+(PieceType pt, int i) { return i + int(pt); }
-inline int operator+(Square s, int i) { return i + int(s); }
-inline int operator+(Rank r, int i) { return int(r) + i; }
-inline int operator+(Square s, Direction d) { return int(s) + int(d); }
-inline int operator-(int i, Square s) { return i - int(s); }
-inline int operator-(int i, PieceType pt) { return i - int(pt); }
-inline int operator-(Rank a, Rank b) { return int(a) - int(b); }
-inline int operator-(Rank r, int i) { return int(r) - i; }
+// Overload operators to solve ambiguous errors with Clang < 3.1
+// TODO Find out if this could be better done
+inline bool operator==(int i, Rank r)
+{
+    return i == static_cast<int>(r);
+}
+inline bool operator<(Bound b, int i)
+{
+    return static_cast<char>(b) < i;
+}
+inline int operator>>(Square s, int i)
+{
+    return static_cast<int>(s) >> i;
+}
+inline int operator|(int i, MoveType mt)
+{
+    return i | static_cast<int>(mt);
+}
+inline int operator&(Square s, int i)
+{
+    return static_cast<int>(s) & i;
+}
+inline int operator*(Rank r, Color c)
+{
+    return static_cast<int>(r) * static_cast<int>(c);
+}
+inline int operator*(int i, Rank r)
+{
+    return i * static_cast<int>(r);
+}
+inline int operator*(int i, Color c)
+{
+    return i * static_cast<int>(c);
+}
+inline int operator*(int i, PieceType pt)
+{
+    return i * static_cast<int>(pt);
+}
+inline int operator+(int i, File f)
+{
+    return i + static_cast<int>(f);
+}
+inline int operator+(int i, Square s)
+{
+    return i + static_cast<int>(s);
+}
+inline int operator+(int i, PieceType pt)
+{
+    return i + static_cast<int>(pt);
+}
+inline int operator+(PieceType pt, int i)
+{
+    return i + static_cast<int>(pt);
+}
+inline int operator+(Square s, int i)
+{
+    return i + static_cast<int>(s);
+}
+inline int operator+(Rank r, int i)
+{
+    return static_cast<int>(r) + i;
+}
+inline int operator+(char c, Rank r)
+{
+    return c + static_cast<char>(r);
+}
+inline int operator+(Square s, Direction d)
+{
+    return static_cast<int>(s) + static_cast<int>(d);
+}
+inline int operator-(Square a, Square b)
+{
+    return static_cast<int>(a) - static_cast<int>(b);
+}
+inline int operator-(Square s, int i)
+{
+    return static_cast<int>(s) - i;
+}
+inline int operator-(int i, Square s)
+{
+    return i - static_cast<int>(s);
+}
+inline int operator-(int i, PieceType pt)
+{
+    return i - static_cast<int>(pt);
+}
+inline int operator-(Rank a, Rank b)
+{
+    return static_cast<int>(a) - static_cast<int>(b);
+}
+inline int operator-(Rank r, int i)
+{
+    return static_cast<int>(r) - i;
+}
+inline int operator+(MoveType a, MoveType b)
+{
+    return static_cast<MoveType>(static_cast<int>(a) + static_cast<int>(b));
+}
+
+// ANSI Color
+static const std::string color_red = "\x1b[31m";
+static const std::string color_green = "\x1b[32m";
+static const std::string color_reset = "\x1b[0m";
 
 #endif /* !COMMON_H */

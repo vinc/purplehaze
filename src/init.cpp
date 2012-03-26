@@ -1,18 +1,17 @@
-/* PurpleHaze 2.0.0
- * Copyright (C) 2007-2011  Vincent Ollivier
+/* Copyright (C) 2007-2011 Vincent Ollivier
  *
- * This program is free software: you can redistribute it and/or modify
+ * Purple Haze is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * Purple Haze is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <assert.h>
@@ -22,19 +21,15 @@
 
 #include "game.h"
 
-using namespace std;
-
-static const bool FEN_DEBUG = true;
-
 /*
  * Initialise the game according to a FEN record.
  * For example the starting position in chess is:
  * rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
  */
-void Game::init(string fen) {
+void Game::init(std::string fen)
+{
     assert(fen.length() > 0);
-    string::const_iterator it;
-    istringstream iss(fen);
+    std::istringstream iss(fen);
 
     // Initialize objects
     board = Board();
@@ -43,15 +38,15 @@ void Game::init(string fen) {
 
     // Parse board positions
     Square s = A8;
-    string positions;
+    std::string positions;
     iss >> positions;
-    for (it = positions.begin(); it != positions.end(); ++it) {
+    for (auto it = positions.begin(); it != positions.end(); ++it) {
         char sq = *it;
-        if (sq == '/') s = Square(s + DOWN + 8 * LEFT); // New rank
-        else if (int(sq) >= '1' && int(sq) <= '8') { // Empty squares
+        if (sq == '/') {
+            s = Square(s + DOWN + 8 * LEFT); // New rank
+        } else if ('1' <= sq && sq <= '8') { // Empty squares
             s = Square(s + sq - '1' + 1); // Next square
-        }
-        else { // Non empty square
+        } else { // Non empty square
             Color c = WHITE;
             PieceType t = EMPTY;
             switch (sq) {
@@ -85,9 +80,9 @@ void Game::init(string fen) {
         default: assert(!"FEN: no side to move!"); break;
     }
 
-    string castling;
+    std::string castling;
     iss >> castling;
-    for (it = castling.begin(); it != castling.end(); ++it) {
+    for (auto it = castling.begin(); it != castling.end(); ++it) {
         switch(*it) {
             case '-': break;
             case 'K': current_position().set_castle_right(WHITE, KING); break;
@@ -96,21 +91,21 @@ void Game::init(string fen) {
             case 'q': current_position().set_castle_right(BLACK, QUEEN); break;
         }
     }
-    
-    string ep;
+
+    std::string ep;
     iss >> ep;
     if (ep != "-") {
         char file = ep.at(0);
         char rank = ep.at(1);
         s = Square((rank - '1') * 16 + file - 'a');
-        assert(!board.is_out(s));    
+        assert(!board.is_out(s));
         current_position().set_en_passant(s);
     }
 
     int halfmove = 0;
     iss >> halfmove;
     current_position().set_halfmove(halfmove);
-    
+
     int fullmove = 1;
     iss >> fullmove;
     int ply = 2 * (fullmove - 1);

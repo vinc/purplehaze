@@ -1,18 +1,17 @@
-/* PurpleHaze 2.0.0
- * Copyright (C) 2007-2011  Vincent Ollivier
+/* Copyright (C) 2007-2011 Vincent Ollivier
  *
- * This program is free software: you can redistribute it and/or modify
+ * Purple Haze is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * Purple Haze is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef NODE_H
@@ -25,43 +24,40 @@
 #include "move.h"
 #include "zobrist.h"
 
-using namespace std;
-
 class Position
 {
     private:
         Hash zobrist_hash;
         Hash material_zobrist_hash;
         unsigned short ply;
-        //Move last_move;
         Piece capture;
-        bitset<4> castle_rights;
-        bitset<2> castle;
+        std::bitset<4> castle_rights;
+        std::bitset<2> castle;
         Square en_passant;
         unsigned char halfmove_counter;
         bool null_move_right;
         Color side_to_move;
 
     public:
-        Position() : 
+        Position() :
             ply(0),
             en_passant(OUT),
             halfmove_counter(0),
             null_move_right(true),
-            side_to_move(WHITE) 
-            {} 
-        
-        Hash& hash() { 
+            side_to_move(WHITE)
+            {}
+
+        Hash& hash() {
             return zobrist_hash;
         };
-        Hash& material_hash() { 
-            return material_zobrist_hash; 
+        Hash& material_hash() {
+            return material_zobrist_hash;
         };
         Color get_turn_color() const {
             return side_to_move;
         };
         void change_side() {
-            side_to_move = Color(!side_to_move);
+            side_to_move = !side_to_move;
         };
         unsigned short get_ply() const {
             return ply;

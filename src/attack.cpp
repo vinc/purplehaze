@@ -1,18 +1,17 @@
-/* PurpleHaze 2.0.0
- * Copyright (C) 2007-2011  Vincent Ollivier
+/* Copyright (C) 2007-2011 Vincent Ollivier
  *
- * This program is free software: you can redistribute it and/or modify
+ * Purple Haze is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * Purple Haze is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <assert.h>
@@ -22,9 +21,10 @@
 /*
  * Return true if the square s is attacked by one of the c color's pieces.
  */
-bool Board::is_attacked_by(Color c, Square s, const Pieces& pieces) const {
-    for (PieceType t = KNIGHT; t <= KING; t = PieceType(t + 1)) {
-        int n = pieces.get_nb_pieces(c, t);
+bool Board::is_attacked_by(Color c, Square s, const Pieces& pieces) const
+{
+    for (const PieceType& t : NOT_PAWN_TYPES) {
+        int n = pieces.count(c, t);
         for (int i = 0; i < n; ++i) {
             Square from = pieces.get_position(c, t, i);
             if (!can_attack(t, from, s)) continue;
@@ -37,12 +37,10 @@ bool Board::is_attacked_by(Color c, Square s, const Pieces& pieces) const {
             if (to == s) return true;
         }
     }
-    
+
     // Specific code for pawns
-    Direction d = (c == WHITE ? DOWN : UP);
-    Direction dirs[2] = { Direction(d + LEFT), Direction(d + RIGHT) };
     for (int i = 0; i < 2; ++i) {
-        Square from = Square(s + dirs[i]);
+        Square from = Square(s + PAWN_CAPTURE_DIRS[!c][i]);
         if (get_piece(from).get_type() == PAWN &&
             get_piece(from).get_color() == c) {
             return true;
@@ -57,14 +55,15 @@ bool Board::is_attacked_by(Color c, Square s, const Pieces& pieces) const {
  * to square to on the board. This method does not say if the move is a legal
  * one.
  */
-bool Board::can_go(Piece p, Square from, Square to) const {
+bool Board::can_go(Piece p, Square from, Square to) const
+{
     PieceType t = p.get_type();
     Color c = p.get_color();
     Direction d = get_direction_to(from, to);
-    
+
     // A piece cannot capture another piece of the same color
     if (!is_empty(to) && get_piece(to).get_color() == c) return false;
-    
+
     Direction push_dir;
     Square s;
     switch (t) {
@@ -73,8 +72,7 @@ bool Board::can_go(Piece p, Square from, Square to) const {
             if (!is_empty(to)) { // Capture
                 if (to == Square(from + push_dir + LEFT)) return true;
                 if (to == Square(from + push_dir + RIGHT)) return true;
-            }
-            else { // Pawn push (and double push)
+            } else { // Pawn push (and double push)
                 if (to == Square(from + push_dir)) return true;
                 if (to == Square(from + 2 * push_dir) &&
                     is_empty(Square(from + push_dir)) &&
