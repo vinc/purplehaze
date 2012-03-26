@@ -1,3 +1,21 @@
+26 Mar 2012 v2.0.2 - General clean up
+    * New features
+        * Global move list
+        * Better Xboard support
+        * New internal iterative deepening implementation
+        * Working material hash table
+    * Code improvements
+        * Clean up
+        * Optimizations
+        * Lot of bug fixes
+        * No more dependency to Boost C++ Libraries
+    * New tests
+        * EPD Perft suites
+        * Unit Tests
+    * New compilers support
+        * Clang
+        * Intel C++ Compiler
+
 20 Feb 2011 v2.0.1 - First public release
     * New evaluation function
 	* Hash table for material
