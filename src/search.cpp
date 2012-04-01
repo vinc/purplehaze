@@ -139,15 +139,19 @@ int Game::search(int alpha, int beta, int depth, const int ply)
 
 #ifndef NNMP
     // Null Move Pruning
-    const bool null_move_allowed = !is_in_check && !is_null_move && !is_pv;
-
     const int nb_pieces = pieces.count(player);
-    if (null_move_allowed && depth > NMP_DEPTH && nb_pieces > 3) {
+    const int nb_pawns = pieces.count(player, PAWN);
+    const bool is_pawn_ending = nb_pieces == nb_pawns + 1; // Pawns + king
+    const bool nmp_allowed = !is_in_check &&
+                             !is_null_move &&
+                             !is_pv &&
+                             !is_pawn_ending;
+    if (nmp_allowed && depth > NMP_DEPTH && nb_pieces > 3) {
         Move null_move;
         make_move(null_move);
         current_position().set_null_move_right(false); // No consecutive NM
-        const int r_depth = depth - R_ADAPT(depth, nb_pieces) - 1;
-        score = -search<node_type>(-beta, -beta + 1, r_depth, ply + 1);
+        const int r = R_ADAPT(depth, nb_pieces);
+        score = -search<node_type>(-beta, -beta + 1, depth - r - 1, ply + 1);
         undo_move(null_move);
         if (score >= beta) {
             return score;
