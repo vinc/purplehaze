@@ -142,10 +142,13 @@ int Game::search(int alpha, int beta, int depth, const int ply)
     const int nb_pieces = pieces.count(player);
     const int nb_pawns = pieces.count(player, PAWN);
     const bool is_pawn_ending = nb_pieces == nb_pawns + 1; // Pawns + king
-    const bool nmp_allowed = !is_in_check &&
-                             !is_null_move &&
-                             !is_pv &&
-                             !is_pawn_ending;
+
+    const bool nmp_allowed =
+        !is_in_check &&
+        !is_null_move &&
+        !is_pv &&
+        !is_pawn_ending;
+
     if (nmp_allowed && depth > NMP_DEPTH && nb_pieces > 3) {
         Move null_move;
         make_move(null_move);
@@ -182,7 +185,9 @@ int Game::search(int alpha, int beta, int depth, const int ply)
     // so it's worth it.
     for (int i = 0; i < MAX_KILLERS; ++i) {
         Move killer = get_killer_move(depth, i);
-        if (is_legal(killer)) moves.add(killer, KILLERS);
+        if (is_legal(killer)) {
+            moves.add(killer, KILLERS);
+        }
     }
 
     Move move;
@@ -207,7 +212,9 @@ int Game::search(int alpha, int beta, int depth, const int ply)
             if (best_score > alpha) {
                 if (best_score >= beta) { // Beta cut-off
                     // Update killer moves
-                    if (!move.is_capture()) set_killer_move(depth, move);
+                    if (!move.is_capture()) {
+                        set_killer_move(depth, move);
+                    }
 
                     best_move = move;
                     goto transposition;
@@ -220,33 +227,39 @@ int Game::search(int alpha, int beta, int depth, const int ply)
 
 #ifndef NFP
             // Futility Pruning
-            if (depth <= FUTILITY_DEPTH &&
-                //!best_move.is_null() &&
-                !is_in_check && !is_giving_check &&
+            const bool fp_allowed =
+                !is_in_check &&
+                !is_giving_check &&
                 !is_killer_move(depth, move) &&
-                !move.is_capture() && !move.is_promotion()) {
-                    // Using an array of margins is an idea from Crafty
-                    score = material_eval() + FUTILITY_MARGINS[depth];
-                    if (score < alpha) {
-                        if (score > best_score) best_score = score;
-                        undo_move(move);
-                        continue;
+                !move.is_capture() &&
+                !move.is_promotion();
+
+            if (fp_allowed && depth <= FUTILITY_DEPTH) {
+                // Using an array of margins is an idea from Crafty
+                score = material_eval() + FUTILITY_MARGINS[depth];
+                if (score < alpha) {
+                    if (score > best_score) {
+                        best_score = score;
                     }
+                    undo_move(move);
+                    continue;
+                }
             }
 #endif
 
-            int r = 0; // Reduced depth
+            int r = 0; // Depth reduction
 
 #ifndef NLMR
             // Late Move Reduction
-            if (depth > LMR_DEPTH && // TODO find the best minimal depth
-                //!best_move.is_null() &&
-                !is_in_check && !is_giving_check &&
+            const bool lmr_allowed =
+                !is_in_check &&
+                !is_giving_check &&
                 !is_killer_move(depth, move) &&
-                !move.is_capture() && !move.is_promotion()) {
+                !move.is_capture() &&
+                !move.is_promotion();
 
-                // Do the search at a reduced depth
-                ++r;
+            if (lmr_allowed && depth > LMR_DEPTH) {
+                ++r; // Do the search at a reduced depth
             }
 #endif
 
@@ -266,9 +279,10 @@ int Game::search(int alpha, int beta, int depth, const int ply)
             if (score > best_score) { // Found a new best move
                 best_score = score;
                 best_move = move;
-                if (score >= beta) {// Sufficient to cause a cut-off?
-                    // Update killer moves
-                    if (!move.is_capture()) set_killer_move(depth, move);
+                if (score >= beta) { // Sufficient to cause a cut-off?
+                    if (!move.is_capture()) {
+                        set_killer_move(depth, move); // Update killer moves
+                    }
 
                     goto transposition;
                 }
