@@ -56,8 +56,7 @@ void Game::print_thinking(int depth, int score, Move m)
 
 bool is_mate(int score)
 {
-    if ((score < -INF + MAX_PLY) || (INF - MAX_PLY < score)) return true;
-    return false;
+    return ((score < -INF + MAX_PLY) || (INF - MAX_PLY < score));
 }
 
 std::string Game::output_pv(int depth, int score, Move m)
