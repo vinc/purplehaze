@@ -8,7 +8,7 @@ static const Bound BOUNDS[] = { EXACT, LOWER, UPPER };
 
 TEST(TranspositionTest, Size)
 {
-    int size = sizeof(short) +          // 2 bytes
+    int size = sizeof(int16_t) +        // 2 bytes
                sizeof(Move) +           // 2 bytes
                sizeof(unsigned char) +  // 1 byte
                sizeof(Bound);           // 1 byte

@@ -26,7 +26,7 @@
 class Transposition
 {
     private:
-        short value;         // 2 bytes / 16 bits used
+        int16_t value;       // 2 bytes / 16 bits used
         Move best_move;      // 2 bytes / 16 bits used
         unsigned char depth; // 1 byte  /  8 bits used: depth < 256
         Bound bound;         // 1 byte  /  2 bits used
