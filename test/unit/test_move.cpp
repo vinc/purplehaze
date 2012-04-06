@@ -54,8 +54,8 @@ static const int NB_CAPTURES = array_size(CAPTURES);
 
 TEST(MoveTest, Size)
 {
-    EXPECT_EQ(2, sizeof(short));
-    EXPECT_EQ(sizeof(short), sizeof(Move));
+    EXPECT_EQ(2, sizeof(uint16_t));
+    EXPECT_EQ(sizeof(uint16_t), sizeof(Move));
 }
 
 TEST(MoveTest, Constructor)
@@ -160,7 +160,7 @@ TEST(MoveTest, Type)
 
 TEST(ExtendedMoveTest, Size)
 {
-    int size = sizeof(short) + sizeof(char) + 1; // 1 byte of padding
+    int size = sizeof(uint16_t) + sizeof(char) + 1; // 1 byte of padding
     EXPECT_EQ(4, size);
     EXPECT_EQ(size, sizeof(ExtendedMove));
 }

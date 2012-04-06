@@ -45,7 +45,7 @@ class Move
         static const int OR_SHIFT = 10;
         static const int OF_SHIFT = 13;
 
-        short code;
+        uint16_t code;
 
         bool is_set(int i) const {
             return code & ( 1 << i);
