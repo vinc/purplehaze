@@ -67,6 +67,7 @@ class Game
         void make_move(Move m);
         void undo_move(Move m);
         bool is_legal(Move m);
+        bool is_dangerous(Move m);
 
         // Search
         unsigned long long int perft(unsigned int depth);

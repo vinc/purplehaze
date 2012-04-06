@@ -24,6 +24,26 @@
 #include "search.h"
 #include "eval.h"
 
+inline bool Game::is_dangerous(Move m)
+{
+    // current_position() is used assuming
+    // that the move as already been made.
+
+    /*
+    if (board.get_piece(m.get_dest()).get_type() == PAWN) {
+        const Color c = !current_position().get_turn_color();
+        if (m.get_dest_rank() + RANK_6 * c == RANK_7) return true;
+    }
+    if (m.is_capture()) {
+        const Piece capture = current_position().get_capture();
+        if (capture.get_type() != PAWN) return true;
+    }
+    return m.is_promotion();
+    */
+
+    return m.is_capture() || m.is_promotion();
+}
+
 unsigned long long int Game::perft(unsigned int depth)
 {
     if (depth == 0) return 1;
@@ -231,8 +251,7 @@ int Game::search(int alpha, int beta, int depth, const int ply)
                 !is_in_check &&
                 !is_giving_check &&
                 !is_killer_move(depth, move) &&
-                !move.is_capture() &&
-                !move.is_promotion();
+                !is_dangerous(move);
 
             if (fp_allowed && depth <= FUTILITY_DEPTH) {
                 // Using an array of margins is an idea from Crafty
