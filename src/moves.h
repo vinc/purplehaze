@@ -70,9 +70,9 @@ class Moves
         static Score mvv_lva_scores[NB_PIECE_TYPES][NB_PIECE_TYPES];
 
         MoveList& moves;
-        Position& current_position;
-        Board& board;
-        Pieces& pieces;
+        const Position& current_position;
+        const Board& board;
+        const Pieces& pieces;
 
         unsigned char size[MOVES_STATE_SIZE]; // Moves types counters
         unsigned char i, n;
@@ -80,8 +80,8 @@ class Moves
         bool use_lazy_generation;
 
     public:
-        Moves(Board& b, Pieces& ps, Position& cn, MoveList& ml,
-              bool lg = true) :
+        Moves(const Board& b, const Pieces& ps, const Position& cn,
+              MoveList& ml, bool lg = true) :
             moves(ml), current_position(cn), board(b), pieces(ps),
             i(0), n(0),
             state(BEST),

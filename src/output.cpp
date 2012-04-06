@@ -173,7 +173,7 @@ double get_percent(double a, double b)
 }
 
 template <class T>
-std::string print_table_stats(HashTable<T>& table, int table_size)
+std::string print_table_stats(const HashTable<T>& table, int table_size)
 {
     long zeros = 0;
     long ones = 0;
