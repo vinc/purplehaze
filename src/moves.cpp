@@ -17,6 +17,8 @@
 #include <assert.h>
 
 #include "moves.h"
+#include "board.h"
+#include "position.h"
 
 /*
  * Use lazy move generation to get the next move.

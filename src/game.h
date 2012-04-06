@@ -22,13 +22,14 @@
 #include "pieces.h"
 #include "board.h"
 #include "moves.h"
-#include "position.h"
 #include "tt.h"
 #include "hashtable.h"
 #include "time.h"
 #include "tree.h"
 #include "zobrist.h"
 #include "search.h"
+
+class Position;
 
 class Game
 {

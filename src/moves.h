@@ -19,8 +19,10 @@
 
 #include "common.h"
 #include "move.h"
-#include "board.h"
-#include "position.h"
+
+class Board;
+class Pieces;
+class Position;
 
 typedef char Score;
 
