@@ -20,8 +20,7 @@
 #include <bitset>
 
 #include "common.h"
-#include "pieces.h"
-#include "move.h"
+#include "piece.h"
 #include "zobrist.h"
 
 class Position

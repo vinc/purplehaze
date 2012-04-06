@@ -22,7 +22,6 @@
 #include "common.h"
 #include "hashtable.h"
 #include "move.h"
-#include "zobrist.h"
 
 class Transposition
 {
