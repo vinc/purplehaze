@@ -50,10 +50,18 @@ class MoveList
                     }
                 }
             }
-        void inc_ply() { ++ply; };
-        void dec_ply() { --ply; };
-        void clear() { ply = 0; };
-        ExtendedMove& operator[] (unsigned char i) { return list[ply][i]; };
+        void inc_ply() {
+            ++ply;
+        };
+        void dec_ply() {
+            --ply;
+        };
+        void clear() {
+            ply = 0;
+        };
+        ExtendedMove& operator[] (unsigned char i) {
+            return list[ply][i];
+        };
 };
 
 class Moves
@@ -91,7 +99,9 @@ class Moves
         void generate_pieces(Color c, PieceType t, MoveType mt);
         void add(Move m, MovesState mt = UNDEF_MOVES);
         ExtendedMove next();
-        MovesState get_state() const { return state; };
+        MovesState get_state() const {
+            return state;
+        };
 
         static void init_mvv_lva_scores();
         Score get_mvv_lva_score(Move m);

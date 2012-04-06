@@ -52,11 +52,17 @@ class Protocol
 
         Move parse_move(std::string move);
 
-        void set_depth(int d) { depth = d; };
+        void set_depth(int d) {
+            depth = d;
+        };
 
-        void set_verbosity(int v = 0) { verbosity = v; };
+        void set_verbosity(int v = 0) {
+            verbosity = v;
+        };
 
-        int get_verbosity() { return verbosity; };
+        int get_verbosity() {
+            return verbosity;
+        };
 };
 
 #endif /* !PROTOCOL_H */

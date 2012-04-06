@@ -47,7 +47,9 @@ class Move
 
         short code;
 
-        bool is_set(int i) const { return code & ( 1 << i); };
+        bool is_set(int i) const {
+            return code & ( 1 << i);
+        };
 
     public:
         Move() : code(NULL_MOVE) {}
@@ -131,8 +133,12 @@ class ExtendedMove : public Move
         ExtendedMove() : score(0) { code = NULL_MOVE; }
         ExtendedMove(Move m, int s = 0) : score(s) { code = m.code; }
 
-        char get_score() const { return score; };
-        void set_score(int s) { score = s; };
+        char get_score() const {
+            return score;
+        };
+        void set_score(int s) {
+            score = s;
+        };
         bool operator<(const ExtendedMove& other) const {
             return this->score > other.score;
         }

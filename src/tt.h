@@ -39,10 +39,18 @@ class Transposition
             : value(0), best_move(Move()), depth(0),
               bound(UNDEF_BOUND) {}
 
-        int get_value() const { return value; };
-        int get_depth() const { return depth; };
-        Bound get_bound() const { return bound; };
-        Move get_best_move() const { return best_move; };
+        int get_value() const {
+            return value;
+        };
+        int get_depth() const {
+            return depth;
+        };
+        Bound get_bound() const {
+            return bound;
+        };
+        Move get_best_move() const {
+            return best_move;
+        };
 
         bool is_empty() const {
             return value == 0 &&

@@ -56,7 +56,9 @@ class Game
 
         void new_position();
         void del_position();
-        Position& current_position() { return tree.top(); };
+        Position& current_position() {
+            return tree.top();
+        };
 
         void init(std::string fen);
 
