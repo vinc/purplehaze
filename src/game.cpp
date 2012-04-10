@@ -98,7 +98,6 @@ void Game::new_position()
                               current_position().get_en_passant());
 
     // Update the position for a new move
-    current_position().inc_ply();
     current_position().change_side();
     zobrist.change_side(current_position().hash());
 }

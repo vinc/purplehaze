@@ -110,5 +110,5 @@ void Game::init(std::string fen)
     iss >> fullmove;
     int ply = 2 * (fullmove - 1);
     if (current_position().get_turn_color() == BLACK) ++ply;
-    current_position().set_ply(ply);
+    tree.set_ply(ply);
 }

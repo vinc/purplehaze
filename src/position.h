@@ -28,7 +28,6 @@ class Position
     private:
         Hash zobrist_hash;
         Hash material_zobrist_hash;
-        uint16_t ply;
         Piece capture;
         std::bitset<4> castle_rights;
         std::bitset<2> castle;
@@ -39,7 +38,6 @@ class Position
 
     public:
         Position() :
-            ply(0),
             en_passant(OUT),
             halfmove_counter(0),
             null_move_right(true),
@@ -57,18 +55,6 @@ class Position
         };
         void change_side() {
             side_to_move = !side_to_move;
-        };
-        uint16_t get_ply() const {
-            return ply;
-        };
-        void set_ply(uint16_t i) {
-            ply = i;
-        };
-        void inc_ply() {
-            ++ply;
-        };
-        void dec_ply() {
-            --ply;
         };
         unsigned char get_halfmove() const {
             return halfmove_counter;
