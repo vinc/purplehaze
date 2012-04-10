@@ -257,9 +257,6 @@ int Game::search(int alpha, int beta, int depth, const int ply)
                 // Using an array of margins is an idea from Crafty
                 score = material_eval() + FUTILITY_MARGINS[depth];
                 if (score < alpha) {
-                    if (score > best_score) {
-                        best_score = score;
-                    }
                     undo_move(move);
                     continue;
                 }
