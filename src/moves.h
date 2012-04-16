@@ -76,7 +76,7 @@ class Moves
 
         unsigned char size[MOVES_STATE_SIZE]; // Moves types counters
         unsigned char i, n;
-        MovesState state;
+        MovesState generation_state;
         bool use_lazy_generation;
 
     public:
@@ -84,7 +84,7 @@ class Moves
               MoveList& ml, bool lg = true) :
             moves(ml), current_position(cn), board(b), pieces(ps),
             i(0), n(0),
-            state(BEST),
+            generation_state(BEST),
             use_lazy_generation(lg)
             {
                 moves.inc_ply(); // Increment move list internal counter
@@ -99,8 +99,8 @@ class Moves
         void generate_pieces(Color c, PieceType t, MoveType mt);
         void add(Move m, MovesState mt = UNDEF_MOVES);
         ExtendedMove next();
-        MovesState get_state() const {
-            return state;
+        MovesState state() const {
+            return generation_state;
         };
 
         static void init_mvv_lva_scores();

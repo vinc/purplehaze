@@ -94,7 +94,7 @@ TEST(MovesTest, Constructor)
 
     Moves moves(board, pieces, position, list);
 
-    EXPECT_EQ(BEST, moves.get_state());
+    EXPECT_EQ(BEST, moves.state());
 
     // Test if MoveList::inc_ply() has been implicitly called by Moves()
     for (int i = 0; i < MAX_PLY; ++i) {

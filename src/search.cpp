@@ -90,7 +90,7 @@ int Game::quiescence(int alpha, int beta, int depth, const int ply)
     Moves moves(board, pieces, current_position(), search_moves);
     Move move;
     while (!(move = moves.next()).is_null()) {
-        if (moves.get_state() > GOOD_CAPTURES) break; // Skip bad captures
+        if (moves.state() > GOOD_CAPTURES) break; // Skip bad captures
         make_move(move);
 
         if (is_check(player)) { // Illegal move

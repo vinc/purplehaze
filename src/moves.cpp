@@ -44,23 +44,23 @@ ExtendedMove Moves::next()
         return moves[i++];
     }
 
-    switch (state) {
+    switch (generation_state) {
         case BEST:
             if (i < size[BEST]) return moves[i++];
-            state = GOOD_CAPTURES;
+            generation_state = GOOD_CAPTURES;
             generate(CAPTURE);
             i = size[BEST] + size[KILLERS]; // Jump to the first good capture
         case GOOD_CAPTURES:
             if (i < (size[BEST] + size[KILLERS] + size[GOOD_CAPTURES])) break;
-            state = KILLERS;
+            generation_state = KILLERS;
             i = size[BEST]; // Jump to the first killer
         case KILLERS:
             if (i < (size[BEST] + size[KILLERS])) return moves[i++];
-            state = BAD_CAPTURES;
+            generation_state = BAD_CAPTURES;
             i = size[BEST] + size[KILLERS] + size[GOOD_CAPTURES];
         case BAD_CAPTURES:
             if (i < n) break;
-            state = QUIET_MOVES;
+            generation_state = QUIET_MOVES;
             generate(QUIET_MOVE);
         case QUIET_MOVES:
             if (i < n) return moves[i++];
@@ -69,8 +69,8 @@ ExtendedMove Moves::next()
     }
 
     // If we are here, next() should return a capture
-    // FIXME: the two conditions are identical
-    assert(state == GOOD_CAPTURES || state == GOOD_CAPTURES);
+    // FIXME: Review this assert
+    assert(generation_state == GOOD_CAPTURES);
 
     // Find the best remaining capture by selection sort
     auto max = i;
@@ -116,19 +116,19 @@ void Moves::add(Move move, MovesState mt)
             size[mt]++;
             break;
         default:
-            //assert(state > KILLERS);
-            //size[state]++; // If move is a capture or a quiet move
+            //assert(generation_state > KILLERS);
+            //size[generation_state]++; // If move is a capture or a quiet move
             break;
     }
-    switch (state) {
+    switch (generation_state) {
         case GOOD_CAPTURES:
         case BAD_CAPTURES:
             score = get_mvv_lva_score(move);
-            size[state]++;
+            size[generation_state]++;
             break;
         case QUIET_MOVES:
             score = -BEST_SCORE;
-            size[state]++;
+            size[generation_state]++;
             break;
         default:
             //assert(mt < GOOD_CAPTURES);
