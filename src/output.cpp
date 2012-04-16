@@ -193,14 +193,14 @@ std::string print_table_stats(const HashTable<T>& table, int table_size)
     stream << get_stat("Entries", table.size());
     stream << std::endl;
 
-    stream << get_stat("Usage", table.get_usage());
-    stream << get_meta(get_percent(table.get_usage(), table.size()), "%");
+    stream << get_stat("Usage", table.usage());
+    stream << get_meta(get_percent(table.usage(), table.size()), "%");
     stream << std::endl;
 
-    stream << get_stat("0's", get_percent(zeros, 64 * table.get_usage()), "%");
+    stream << get_stat("0's", get_percent(zeros, 64 * table.usage()), "%");
     stream << std::endl;
 
-    stream << get_stat("1's", get_percent(ones, 64 * table.get_usage()), "%");
+    stream << get_stat("1's", get_percent(ones, 64 * table.usage()), "%");
     stream << std::endl;
 
     stream << get_stat("Lookups", table.nb_lookups());

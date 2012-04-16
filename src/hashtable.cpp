@@ -53,7 +53,7 @@ void HashTable<T>::clear()
 }
 
 template <class T>
-int HashTable<T>::get_usage() const
+int HashTable<T>::usage() const
 {
     int res = 0;
     for (int i = 0; i < SIZE; ++i) if (entries[i].hash) ++res;

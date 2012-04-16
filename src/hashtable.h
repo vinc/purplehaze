@@ -65,7 +65,7 @@ class HashTable
             return entries[i].hash;
         };
 
-        int get_usage() const;
+        int usage() const;
         long nb_lookups() const {
             return hits + misses;
         };
