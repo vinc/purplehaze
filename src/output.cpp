@@ -178,7 +178,7 @@ std::string print_table_stats(const HashTable<T>& table, int table_size)
     long zeros = 0;
     long ones = 0;
     for (int i = 0; i < table.size(); ++i) {
-        Hash h = table.get_hash_at(i);
+        Hash h = table.hash_at(i);
         if (!h) continue;
         std::bitset<64> b = h;
         int z = b.count();
@@ -203,22 +203,22 @@ std::string print_table_stats(const HashTable<T>& table, int table_size)
     stream << get_stat("1's", get_percent(ones, 64 * table.get_usage()), "%");
     stream << std::endl;
 
-    stream << get_stat("Lookups", table.get_nb_lookups());
+    stream << get_stat("Lookups", table.nb_lookups());
     stream << std::endl;
 
-    stream << get_stat("Hits", table.get_nb_hits());
-    stream << get_meta(get_percent(table.get_nb_hits(),
-                                   table.get_nb_lookups()), "%");
+    stream << get_stat("Hits", table.nb_hits());
+    stream << get_meta(get_percent(table.nb_hits(),
+                                   table.nb_lookups()), "%");
     stream << std::endl;
 
-    stream << get_stat("Collisions", table.get_nb_collisions());
-    stream << get_meta(get_percent(table.get_nb_collisions(),
-                                   table.get_nb_lookups()), "%");
+    stream << get_stat("Collisions", table.nb_collisions());
+    stream << get_meta(get_percent(table.nb_collisions(),
+                                   table.nb_lookups()), "%");
     stream << std::endl;
 
-    stream << get_stat("Misses", table.get_nb_misses());
-    stream << get_meta(get_percent(table.get_nb_misses(),
-                                   table.get_nb_lookups()), "%");
+    stream << get_stat("Misses", table.nb_misses());
+    stream << get_meta(get_percent(table.nb_misses(),
+                                   table.nb_lookups()), "%");
     stream << std::endl;
 
     return stream.str();

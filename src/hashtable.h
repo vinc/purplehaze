@@ -58,24 +58,24 @@ class HashTable
             return SIZE;
         };
 
-        T get_value_at(int i) const {
+        T value_at(int i) const {
             return entries[i].value;
         };
-        Hash get_hash_at(int i) const {
+        Hash hash_at(int i) const {
             return entries[i].hash;
         };
 
         int get_usage() const;
-        long get_nb_lookups() const {
+        long nb_lookups() const {
             return hits + misses;
         };
-        long get_nb_hits() const {
+        long nb_hits() const {
             return hits;
         };
-        long get_nb_collisions() const {
+        long nb_collisions() const {
             return collisions;
         };
-        long get_nb_misses() const {
+        long nb_misses() const {
             return misses;
         };
 };

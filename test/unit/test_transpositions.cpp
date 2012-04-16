@@ -85,8 +85,8 @@ TEST_F(TranspositionsTest, Constructor)
     tt.clear();
     int n = tt.size();
     for (int i = 0; i < n; ++i) {
-        EXPECT_TRUE(tt.get_value_at(i).is_empty());
-        EXPECT_EQ(0, tt.get_hash_at(i));
+        EXPECT_TRUE(tt.value_at(i).is_empty());
+        EXPECT_EQ(0, tt.hash_at(i));
     }
 }
 
@@ -121,9 +121,9 @@ TEST_F(TranspositionsTest, Lookup)
                     tt.save(h, v, b, d, m);
 
                     // Check transposition
-                    EXPECT_FALSE(tt.get_value_at(i).is_empty());
-                    EXPECT_EQ(trans_sent, tt.get_value_at(i));
-                    EXPECT_EQ(h, tt.get_hash_at(i));
+                    EXPECT_FALSE(tt.value_at(i).is_empty());
+                    EXPECT_EQ(trans_sent, tt.value_at(i));
+                    EXPECT_EQ(h, tt.hash_at(i));
                 }
             }
         }
