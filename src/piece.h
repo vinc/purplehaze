@@ -51,13 +51,13 @@ class Piece
                    (static_cast<int>(c) << C_SHIFT);
         }
 
-        Color get_color() const {
+        Color color() const {
             return static_cast<Color>((code >> C_SHIFT) & C_MASK);
         };
-        PieceType get_type() const {
+        PieceType type() const {
             return static_cast<PieceType>((code >> T_SHIFT) & T_MASK);
         };
-        int get_index() const {
+        int index() const {
             return (code >> I_SHIFT) & I_MASK;
         };
         /*

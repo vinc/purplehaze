@@ -32,14 +32,14 @@ class Pieces
     public:
         Pieces();
         Square get_position(Piece p) const {
-            return positions[p.get_color()][p.get_type()][p.get_index()];
+            return positions[p.color()][p.type()][p.index()];
         };
         Square get_position(Color c, PieceType t, int i) const {
             assert(0 <= i && i < 9);
             return positions[c][t][i];
         };
         void set_position(Piece p, Square s) {
-            positions[p.get_color()][p.get_type()][p.get_index()] = s;
+            positions[p.color()][p.type()][p.index()] = s;
         };
         void set_position(Color c, PieceType t, int i, Square s) {
             assert(0 <= i && i < 9);

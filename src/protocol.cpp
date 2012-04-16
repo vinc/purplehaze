@@ -75,7 +75,7 @@ Move Protocol::parse_move(std::string move)
             default: return Move();
         }
     }
-    if (game.board.get_piece(from).get_type() == PAWN) {
+    if (game.board.get_piece(from).type() == PAWN) {
         if (game.board.is_pawn_begin(c, from) &&
             to == Square(from + 2 * PAWN_PUSH_DIRS[c])) {
                 return Move(from, to, DOUBLE_PAWN_PUSH);
@@ -84,7 +84,7 @@ Move Protocol::parse_move(std::string move)
                 return Move(from, to, EN_PASSANT);
         }
     }
-    if (game.board.get_piece(from).get_type() == KING) {
+    if (game.board.get_piece(from).type() == KING) {
         if (to == Square(from + RIGHT + RIGHT)) {
             return Move(from, to, KING_CASTLE);
         } else if (to == Square(from + LEFT + LEFT)) {

@@ -25,7 +25,7 @@ TEST(MoveListTest, Constructor)
             EXPECT_TRUE(moves[j].is_null());
 
             // Test default score
-            EXPECT_EQ(0, moves[j].get_score());
+            EXPECT_EQ(0, moves[j].value());
         }
         moves.inc_ply();
     }
@@ -40,7 +40,7 @@ TEST(MoveListTest, Assignement)
             ExtendedMove em1(m, i + j);
             moves[j] = em1;
             EXPECT_EQ(em1, moves[j]);
-            EXPECT_EQ(em1.get_score(), moves[j].get_score());
+            EXPECT_EQ(em1.value(), moves[j].value());
         }
         moves.inc_ply();
     }
@@ -49,7 +49,7 @@ TEST(MoveListTest, Assignement)
         for (int j = 0; j < MAX_BF; ++j) {
             ExtendedMove em1(m, i + j);
             EXPECT_EQ(em1, moves[j]);
-            EXPECT_EQ(em1.get_score(), moves[j].get_score());
+            EXPECT_EQ(em1.value(), moves[j].value());
         }
     }
     moves.clear();
@@ -57,7 +57,7 @@ TEST(MoveListTest, Assignement)
         for (int j = 0; j < MAX_BF; ++j) {
             ExtendedMove em1(m, i + j);
             EXPECT_EQ(em1, moves[j]);
-            EXPECT_EQ(em1.get_score(), moves[j].get_score());
+            EXPECT_EQ(em1.value(), moves[j].value());
         }
         moves.inc_ply();
     }
@@ -90,7 +90,7 @@ TEST(MovesTest, Constructor)
     Move m;
     ExtendedMove em(m, 50);
     list[0] = em;
-    EXPECT_EQ(em.get_score(), list[0].get_score());
+    EXPECT_EQ(em.value(), list[0].value());
 
     Moves moves(board, pieces, position, list);
 
@@ -98,8 +98,8 @@ TEST(MovesTest, Constructor)
 
     // Test if MoveList::inc_ply() has been implicitly called by Moves()
     for (int i = 0; i < MAX_PLY; ++i) {
-        EXPECT_EQ(0, list[i].get_score());
+        EXPECT_EQ(0, list[i].value());
     }
     list.dec_ply();
-    EXPECT_EQ(em.get_score(), list[0].get_score());
+    EXPECT_EQ(em.value(), list[0].value());
 }

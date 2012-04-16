@@ -75,7 +75,7 @@ ExtendedMove Moves::next()
     // Find the best remaining capture by selection sort
     auto max = i;
     for (auto j = i + 1; j < n; ++j) {
-        if (moves[j].get_score() > moves[max].get_score()) {
+        if (moves[j].value() > moves[max].value()) {
             max = j;
         }
     }
@@ -162,8 +162,8 @@ void Moves::init_mvv_lva_scores()
 Score Moves::get_mvv_lva_score(Move move)
 {
     assert(move.is_capture());
-    PieceType a = board.get_piece(move.get_orig()).get_type();
-    PieceType v = board.get_piece(move.get_dest()).get_type();
+    PieceType a = board.get_piece(move.orig()).type();
+    PieceType v = board.get_piece(move.dest()).type();
     if (move.is_en_passant()) return mvv_lva_scores[PAWN][a];
     return mvv_lva_scores[v][a];
 }

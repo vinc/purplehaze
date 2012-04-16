@@ -41,7 +41,7 @@ class Board
             board[s] = p;
         };
         bool is_empty(Square s) const {
-            return board[s].get_type() == EMPTY;
+            return board[s].type() == EMPTY;
         };
         static bool is_out(Square s) {
             return s & 0x88;

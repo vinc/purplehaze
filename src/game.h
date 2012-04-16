@@ -51,7 +51,7 @@ class Game
         void add_piece(Color c, PieceType t, Square s);
         void del_piece(Color c, PieceType t, int i);
         void del_piece(Piece p) {
-            del_piece(p.get_color(), p.get_type(), p.get_index());
+            del_piece(p.color(), p.type(), p.index());
         };
 
         void new_position();

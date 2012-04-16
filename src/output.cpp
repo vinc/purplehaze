@@ -96,20 +96,20 @@ std::string Game::output_move(Move m)
 
     // Castling
     if (m.is_castle()) {
-        if (m.get_castle_side() == QUEEN) stream << "O-";
+        if (m.castle_side() == QUEEN) stream << "O-";
         return stream.str() + "O-O";
     }
 
     // Type of piece
-    Square from = m.get_orig();
+    Square from = m.orig();
     Piece p = board.get_piece(from);
-    PieceType t = p.get_type();
+    PieceType t = p.type();
     if (t > PAWN) stream << Piece(WHITE, t); // Upper case
 
     // Disambiguation
     if (t != PAWN) {
-        Color c = p.get_color();
-        Square to = m.get_dest();
+        Color c = p.color();
+        Square to = m.dest();
         for (int i = 0; i < pieces.count(c, t); ++i) {
             Piece other(c, t, i);
             if (other == p) continue;
@@ -119,7 +119,7 @@ std::string Game::output_move(Move m)
                 // attack the destination (fast answer by array lookup)
                 // and can really go to this destination (not so fast
                 // answer) then a disambiguation is needed
-                stream << static_cast<char>('a' + m.get_orig_file());
+                stream << static_cast<char>('a' + m.orig_file());
                 break;
             }
         }
@@ -127,16 +127,16 @@ std::string Game::output_move(Move m)
 
     // Capture
     if (m.is_capture()) {
-        if (t == PAWN) stream << static_cast<char>('a' + m.get_orig_file());
+        if (t == PAWN) stream << static_cast<char>('a' + m.orig_file());
         stream << "x";
     }
 
     // Destination
-    stream << output_square(m.get_dest_file(), m.get_dest_rank());
+    stream << output_square(m.dest_file(), m.dest_rank());
 
     // Promotion
     if (m.is_promotion()) {
-        stream << "=" << Piece(WHITE, m.get_promotion_type());
+        stream << "=" << Piece(WHITE, m.promotion_type());
     }
 
     return stream.str();

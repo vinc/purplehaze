@@ -70,14 +70,14 @@ TEST(MoveTest, Constructor)
             if (d == OUT || d == o) continue;
             for (const MoveType &t : MOVES) {
                 Move m(o, d, t);
-                EXPECT_EQ(o, m.get_orig());
-                EXPECT_EQ(d, m.get_dest());
-                EXPECT_EQ(t, m.get_type());
+                EXPECT_EQ(o, m.orig());
+                EXPECT_EQ(d, m.dest());
+                EXPECT_EQ(t, m.type());
 
-                EXPECT_EQ(Board::get_file(o), m.get_orig_file());
-                EXPECT_EQ(Board::get_file(d), m.get_dest_file());
-                EXPECT_EQ(Board::get_rank(o), m.get_orig_rank());
-                EXPECT_EQ(Board::get_rank(d), m.get_dest_rank());
+                EXPECT_EQ(Board::get_file(o), m.orig_file());
+                EXPECT_EQ(Board::get_file(d), m.dest_file());
+                EXPECT_EQ(Board::get_rank(o), m.orig_rank());
+                EXPECT_EQ(Board::get_rank(d), m.dest_rank());
 
                 /*
                 // FIXME: Takes too long, too much moves
@@ -128,26 +128,26 @@ TEST(MoveTest, Type)
 
                 switch (t) {
                     case KING_CASTLE:
-                        EXPECT_EQ(KING, m.get_castle_side());
+                        EXPECT_EQ(KING, m.castle_side());
                         break;
                     case QUEEN_CASTLE:
-                        EXPECT_EQ(QUEEN, m.get_castle_side());
+                        EXPECT_EQ(QUEEN, m.castle_side());
                         break;
                     case KNIGHT_PROMOTION:
                     case KNIGHT_PROMOTION_CAPTURE:
-                        EXPECT_EQ(KNIGHT, m.get_promotion_type());
+                        EXPECT_EQ(KNIGHT, m.promotion_type());
                         break;
                     case BISHOP_PROMOTION:
                     case BISHOP_PROMOTION_CAPTURE:
-                        EXPECT_EQ(BISHOP, m.get_promotion_type());
+                        EXPECT_EQ(BISHOP, m.promotion_type());
                         break;
                     case ROOK_PROMOTION:
                     case ROOK_PROMOTION_CAPTURE:
-                        EXPECT_EQ(ROOK, m.get_promotion_type());
+                        EXPECT_EQ(ROOK, m.promotion_type());
                         break;
                     case QUEEN_PROMOTION:
                     case QUEEN_PROMOTION_CAPTURE:
-                        EXPECT_EQ(QUEEN, m.get_promotion_type());
+                        EXPECT_EQ(QUEEN, m.promotion_type());
                         break;
                     default:
                         break;
@@ -168,7 +168,7 @@ TEST(ExtendedMoveTest, Size)
 TEST(ExtendedMoveTest, Constructor)
 {
     EXPECT_EQ(Move(), ExtendedMove());
-    EXPECT_EQ(0, ExtendedMove().get_score());
+    EXPECT_EQ(0, ExtendedMove().value());
 
     for (const Square &o : SQUARES) {
         if (o == OUT) continue;
@@ -194,15 +194,15 @@ TEST(ExtendedMoveTest, Score)
     Move m;
     for (int i = SCHAR_MIN; i <= SCHAR_MAX; ++i) {
         ExtendedMove em1(m, i);
-        EXPECT_EQ(i, em1.get_score());
+        EXPECT_EQ(i, em1.value());
 
         // Test getter and setter
         ExtendedMove em2(m, 0);
-        EXPECT_EQ(0, em2.get_score());
+        EXPECT_EQ(0, em2.value());
         em2.set_score(i);
-        EXPECT_EQ(i, em2.get_score());
+        EXPECT_EQ(i, em2.value());
         em2.set_score(0);
-        EXPECT_EQ(0, em2.get_score());
+        EXPECT_EQ(0, em2.value());
     }
 }
 

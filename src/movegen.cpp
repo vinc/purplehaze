@@ -28,7 +28,7 @@ void Moves::generate_pieces(Color c, PieceType t, MoveType mt)
             Square to = Square(from + dirs[d]);
             while (!board.is_out(to)) {
                 if (!board.is_empty(to)) {
-                    if (board.get_piece(to).get_color() == c) break;
+                    if (board.get_piece(to).color() == c) break;
                     if (mt != QUIET_MOVE) {
                         add(Move(from, to, CAPTURE));
                     }
@@ -56,7 +56,7 @@ void Moves::generate(MoveType mt)
             if (mt == QUIET_MOVE) break;
             Square to = Square(from + PAWN_CAPTURE_DIRS[c][d]);
             if (board.is_out(to)) continue;
-            if (!board.is_empty(to) && board.get_piece(to).get_color() != c) {
+            if (!board.is_empty(to) && board.get_piece(to).color() != c) {
                 if (board.is_pawn_end(c, to)) { // Promotion capture
                     add(Move(from, to, KNIGHT_PROMOTION_CAPTURE));
                     add(Move(from, to, BISHOP_PROMOTION_CAPTURE));
@@ -109,8 +109,8 @@ void Moves::generate(MoveType mt)
         Square rook = Square(H1 + A8 * c);
         if (board.is_empty(Square(F1 + A8 * c)) &&
             board.is_empty(to) &&
-            board.get_piece(rook).get_type() == ROOK &&
-            board.get_piece(rook).get_color() == c &&
+            board.get_piece(rook).type() == ROOK &&
+            board.get_piece(rook).color() == c &&
             !board.is_attacked_by(!c, from, pieces) &&
             !board.is_attacked_by(!c, to, pieces) &&
             !board.is_attacked_by(!c, Square((F1 + A8 * c)), pieces)
@@ -125,8 +125,8 @@ void Moves::generate(MoveType mt)
         if (board.is_empty(Square(B1 + A8 * c)) &&
             board.is_empty(Square(D1 + A8 * c)) &&
             board.is_empty(to) &&
-            board.get_piece(rook).get_type() == ROOK &&
-            board.get_piece(rook).get_color() == c &&
+            board.get_piece(rook).type() == ROOK &&
+            board.get_piece(rook).color() == c &&
             !board.is_attacked_by(!c, from, pieces) &&
             !board.is_attacked_by(!c, to, pieces) &&
             !board.is_attacked_by(!c, Square((D1 + A8 * c)), pieces)
@@ -138,12 +138,12 @@ void Moves::generate(MoveType mt)
 
 void Game::make_move(Move m)
 {
-    Square orig = m.get_orig();
-    Square dest = m.get_dest();
+    Square orig = m.orig();
+    Square dest = m.dest();
     Square ep = current_position().get_en_passant();
     Color c = current_position().get_turn_color();
     Piece p = board.get_piece(orig);
-    PieceType t = p.get_type();
+    PieceType t = p.type();
     Piece capture;
     assert(!board.is_out(orig));
     assert(!board.is_out(dest));
@@ -186,7 +186,7 @@ void Game::make_move(Move m)
         assert(!board.is_empty(s) || assert_msg(debug_move(m)));
 
         capture = board.get_piece(s);
-        if (capture.get_type() == ROOK) { // Update opponent's castling rights
+        if (capture.type() == ROOK) { // Update opponent's castling rights
             if (dest == Square(H1 + A8 * !c)) {
                 pos.set_castle_right(!c, KING, false);
                 zobrist.update_castle_right(pos.hash(), !c, KING);
@@ -202,7 +202,7 @@ void Game::make_move(Move m)
     // Castling
     if (m.is_castle()) {
         Square rook_orig, rook_dest;
-        switch (m.get_castle_side()) {
+        switch (m.castle_side()) {
             case KING:
                 rook_orig = Square(H1 + A8 * c);
                 rook_dest = Square(F1 + A8 * c);
@@ -229,7 +229,7 @@ void Game::make_move(Move m)
     // Move the piece
     board.set_piece(Piece(), orig); // FIXME: duplicate in case of promotion?
     if (m.is_promotion()) {
-        add_piece(p.get_color(), m.get_promotion_type(), dest);
+        add_piece(p.color(), m.promotion_type(), dest);
         del_piece(p);
     } else {
         board.set_piece(p, dest);
@@ -251,13 +251,13 @@ void Game::make_move(Move m)
 
 void Game::undo_move(Move m)
 {
-    Square orig = m.get_orig();
-    Square dest = m.get_dest();
+    Square orig = m.orig();
+    Square dest = m.dest();
 
     // Move back the piece to its origin
     Piece p = board.get_piece(dest);
     if (m.is_promotion()) {
-        add_piece(p.get_color(), PAWN, orig);
+        add_piece(p.color(), PAWN, orig);
         del_piece(p);
     } else if (!m.is_null()) {
         board.set_piece(p, orig);
@@ -273,7 +273,7 @@ void Game::undo_move(Move m)
             s = (c == WHITE ? Square(dest + UP) : Square(dest + DOWN));
             board.set_piece(Piece(), dest);
         }
-        add_piece(capture.get_color(), capture.get_type(), s);
+        add_piece(capture.color(), capture.type(), s);
     } else if (!m.is_null()) {
         board.set_piece(Piece(), dest);
     }
@@ -282,7 +282,7 @@ void Game::undo_move(Move m)
     if (m.is_castle()) {
         Square rook_orig, rook_dest;
         Color c = current_position().get_turn_color();
-        switch (m.get_castle_side()) {
+        switch (m.castle_side()) {
             case KING:
                 rook_orig = Square(H1 + A8 * c);
                 rook_dest = Square(F1 + A8 * c);
@@ -312,15 +312,15 @@ bool Game::is_legal(Move m)
     // Null-move is obviously wrong
     if (m.is_null()) return false;
 
-    Square from = m.get_orig();
-    Square to = m.get_dest();
+    Square from = m.orig();
+    Square to = m.dest();
 
     // There must be a piece to move on the board
     if (board.is_empty(from)) return false;
 
     Piece p = board.get_piece(from);
-    PieceType t = p.get_type();
-    Color c = p.get_color();
+    PieceType t = p.type();
+    Color c = p.color();
 
     // The piece cannot be one of the opponent
     if (c != current_position().get_turn_color()) return false;
@@ -353,22 +353,22 @@ bool Game::is_legal(Move m)
 
             // from another pawn, the later being captured by the former
             s = (c == BLACK ? Square(ep + UP) : Square(ep + DOWN));
-            if (board.get_piece(s).get_type() != PAWN) return false;
+            if (board.get_piece(s).type() != PAWN) return false;
         }
 
         // An opponent's piece must be captured
         if (board.is_empty(s)) return false;
-        if (c == board.get_piece(s).get_color()) return false;
+        if (c == board.get_piece(s).color()) return false;
 
     } else if (m.is_castle()) {
         Square rook = Square(H1 + A8 * c);
-        switch (m.get_castle_side()) {
+        switch (m.castle_side()) {
             case KING:
                 rook = Square(H1 + A8 * c);
                 if (!board.is_empty(Square(F1 + A8 * c)) ||
                     !board.is_empty(to) ||
-                    board.get_piece(rook).get_type() != ROOK ||
-                    board.get_piece(rook).get_color() != c ||
+                    board.get_piece(rook).type() != ROOK ||
+                    board.get_piece(rook).color() != c ||
                     board.is_attacked_by(!c, from, pieces) ||
                     board.is_attacked_by(!c, Square((F1 + A8 * c)), pieces) ||
                     board.is_attacked_by(!c, to, pieces)) {
@@ -380,8 +380,8 @@ bool Game::is_legal(Move m)
                 if (!board.is_empty(Square(B1 + A8 * c)) ||
                     !board.is_empty(Square(D1 + A8 * c)) ||
                     !board.is_empty(to) ||
-                    board.get_piece(rook).get_type() != ROOK ||
-                    board.get_piece(rook).get_color() != c ||
+                    board.get_piece(rook).type() != ROOK ||
+                    board.get_piece(rook).color() != c ||
                     board.is_attacked_by(!c, from, pieces) ||
                     board.is_attacked_by(!c, Square((D1 + A8 * c)), pieces) ||
                     board.is_attacked_by(!c, to, pieces)) {
