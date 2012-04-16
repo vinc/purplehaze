@@ -136,9 +136,6 @@ class ExtendedMove : public Move
         char value() const {
             return val;
         };
-        void set_score(int s) {
-            val = s;
-        };
         bool operator<(const ExtendedMove& other) const {
             return this->val > other.val;
         }

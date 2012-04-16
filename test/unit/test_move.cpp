@@ -199,10 +199,6 @@ TEST(ExtendedMoveTest, Score)
         // Test getter and setter
         ExtendedMove em2(m, 0);
         EXPECT_EQ(0, em2.value());
-        em2.set_score(i);
-        EXPECT_EQ(i, em2.value());
-        em2.set_score(0);
-        EXPECT_EQ(0, em2.value());
     }
 }
 
