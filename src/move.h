@@ -23,7 +23,7 @@
 
 class Move
 {
-    protected:
+    private:
         /*
          * A move is coded using 16 bits:
          *     4 bits for the type
@@ -45,6 +45,16 @@ class Move
         static const int OR_SHIFT = 10;
         static const int OF_SHIFT = 13;
 
+        static uint16_t encode(Square o, Square d, MoveType t) {
+            uint16_t code = 0;
+            code |= (o & 7) << OF_SHIFT;
+            code |= (o >> 4) << OR_SHIFT;
+            code |= (d & 7) << DF_SHIFT;
+            code |= (d >> 4) << DR_SHIFT;
+            code |= t;
+            return code;
+        };
+
         uint16_t code;
 
         bool is_set(int i) const {
@@ -54,13 +64,7 @@ class Move
     public:
         Move() : code(NULL_MOVE) {}
 
-        Move(Square o, Square d, MoveType t) {
-            code = ((o & 7) << OF_SHIFT) |
-                   ((o >> 4) << OR_SHIFT) |
-                   ((d & 7) << DF_SHIFT) |
-                   ((d >> 4) << DR_SHIFT) |
-                   t;
-        };
+        Move(Square o, Square d, MoveType t) : code(encode(o, d, t)) {}
 
         File orig_file() const {
             return File((code >> OF_SHIFT) & OF_MASK);
@@ -105,13 +109,6 @@ class Move
         PieceType promotion_type() const;
         PieceType castle_side() const;
 
-        /*
-        // Static member function for sorting move in natural order
-        static bool numeric_comp(Move a, Move b) {
-            return (a.code < b.code);
-        };
-        */
-
         bool operator==(const Move& other) const {
             return this->code == other.code;
         }
@@ -121,7 +118,6 @@ class Move
         std::string to_string() const;
 
         friend std::ostream& operator<<(std::ostream& out, const Move move);
-        friend class ExtendedMove;
 };
 
 class ExtendedMove : public Move
@@ -130,8 +126,8 @@ class ExtendedMove : public Move
         char val;
 
     public:
-        ExtendedMove() : val(0) { code = NULL_MOVE; }
-        ExtendedMove(Move m, int v = 0) : val(v) { code = m.code; }
+        ExtendedMove() : val(0) {}
+        ExtendedMove(Move m, int v = 0) : Move(m), val(v) {}
 
         char value() const {
             return val;
