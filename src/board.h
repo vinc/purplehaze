@@ -54,45 +54,45 @@ class Board
         static bool is_same_color(Square a, Square b) {
             return (is_dark(a) && is_dark(b)) || (!is_dark(a) && !is_dark(b));
         }
-        static File get_file(Square s) {
+        static File file(Square s) {
             return File(s & 7);
         };
-        static Rank get_rank(Square s) {
+        static Rank rank(Square s) {
             return Rank(s >> 4);
         };
         static bool is_pawn_begin(Color c, Square s) {
-            return (get_rank(s) - RANK_6 * c) == RANK_2;
+            return (rank(s) - RANK_6 * c) == RANK_2;
         };
         static bool is_pawn_end(Color c, Square s) {
-            return (get_rank(s) + RANK_8 * c) == RANK_8;
+            return (rank(s) + RANK_8 * c) == RANK_8;
         };
         static bool is_border(Square s) {
-            File f = get_file(s);
-            Rank r = get_rank(s);
+            File f = file(s);
+            Rank r = rank(s);
             if (f == FILE_A || f == FILE_H) return true;
             if (r == RANK_1 || r == RANK_8) return true;
             return false;
         };
-        static Square get_square(int i) {
+        static Square square(int i) {
             return Square(i + (i & ~7));
         };
-        static Square get_square(File f, Rank r) {
+        static Square square(File f, Rank r) {
             return Square(16 * r + f);
         };
-        static Square get_square(Square s, Direction d) {
+        static Square square(Square s, Direction d) {
             return Square(s + d);
         };
 
         // Used for PST with black's point of view
         static Square flip(Square s) {
-            return get_square(get_file(s), Rank(RANK_8 - get_rank(s)));
+            return square(file(s), Rank(RANK_8 - rank(s)));
         }
 
         // Theoretical answer by array lookup
         bool can_attack(PieceType t, Square from, Square to) const {
             return static_cast<bool>(attack_array[0x77 + from - to][t]);
         }
-        Direction get_direction_to(Square from, Square to) const {
+        Direction direction_to(Square from, Square to) const {
             return dir_array[0x77 + from - to];
         }
 

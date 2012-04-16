@@ -31,7 +31,7 @@ void Game::init_eval()
 {
     for (int i = 0; i < 64; ++i) {
         for (const PieceType& t : PIECE_TYPES) {
-            Square s = board.get_square(i);
+            Square s = board.square(i);
 
             int opening_score = 0;
             int ending_score = 0;
@@ -40,27 +40,27 @@ void Game::init_eval()
                 case PAWN:
                     // Develop central pawns
                     // But not side pawns
-                    opening_score = PAWN_FILES_VALUES[board.get_file(s)];
+                    opening_score = PAWN_FILES_VALUES[board.file(s)];
 
                     // Run for promotion
-                    ending_score = 10 * board.get_rank(s);
+                    ending_score = 10 * board.rank(s);
                     break;
                 case KNIGHT:
                 case BISHOP:
                     // Develop toward center files
-                    opening_score = CENTER_BONUS[board.get_file(s)];
+                    opening_score = CENTER_BONUS[board.file(s)];
                     if (board.is_border(s)) {
                         opening_score = 2 * BORDER_MALUS;
                     }
                     // no break
                 default:
-                    ending_score = CENTER_BONUS[board.get_file(s)];
-                    ending_score += CENTER_BONUS[board.get_rank(s)];
+                    ending_score = CENTER_BONUS[board.file(s)];
+                    ending_score += CENTER_BONUS[board.rank(s)];
                     break;
             }
 
             // Rank bonus
-            int bonus = OPENING_RANKS_BONUS[t][board.get_rank(s)];
+            int bonus = OPENING_RANKS_BONUS[t][board.rank(s)];
             opening_score += (opening_score * bonus) / 2;
 
             PST[OPENING][WHITE][t][s] = opening_score;
@@ -88,7 +88,7 @@ void Game::init_eval()
     for (int i = 0; i < 2; ++i) {
         for (int j = 0; j < 64; ++j) {
             for (const PieceType& t : PIECE_TYPES) {
-                Square ws = board.get_square(j);
+                Square ws = board.square(j);
                 Square bs = board.flip(ws);
                 PST[i][BLACK][t][bs] = PST[i][WHITE][t][ws];
             }
@@ -271,7 +271,7 @@ int Game::position_eval()
                 Square s = pieces.get_position(c, t, j);
                 position_score[OPENING][c] += PST[OPENING][c][t][s];
                 position_score[ENDING][c] += PST[ENDING][c][t][s];
-                if (t == PAWN) pawns_files[c][board.get_file(s)]++;
+                if (t == PAWN) pawns_files[c][board.file(s)]++;
             }
         }
 
@@ -286,8 +286,8 @@ int Game::position_eval()
         const int nb_rooks = pieces.count(c, ROOK);
         for (int j = 0; j < nb_rooks; ++j) {
             Square s = pieces.get_position(c, ROOK, j);
-            if (!pawns_files[!c][board.get_file(s)]) {
-                if (!pawns_files[c][board.get_file(s)]) {
+            if (!pawns_files[!c][board.file(s)]) {
+                if (!pawns_files[c][board.file(s)]) {
                     rooks_score += OPEN_FILE_BONUS;
                 }
                 else rooks_score += HALF_OPEN_FILE_BONUS;

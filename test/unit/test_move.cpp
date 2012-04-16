@@ -74,10 +74,10 @@ TEST(MoveTest, Constructor)
                 EXPECT_EQ(d, m.dest());
                 EXPECT_EQ(t, m.type());
 
-                EXPECT_EQ(Board::get_file(o), m.orig_file());
-                EXPECT_EQ(Board::get_file(d), m.dest_file());
-                EXPECT_EQ(Board::get_rank(o), m.orig_rank());
-                EXPECT_EQ(Board::get_rank(d), m.dest_rank());
+                EXPECT_EQ(Board::file(o), m.orig_file());
+                EXPECT_EQ(Board::file(d), m.dest_file());
+                EXPECT_EQ(Board::rank(o), m.orig_rank());
+                EXPECT_EQ(Board::rank(d), m.dest_rank());
 
                 /*
                 // FIXME: Takes too long, too much moves

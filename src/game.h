@@ -105,7 +105,7 @@ class Game
         std::string output_pv(int depth, int score, Move m);
         std::string output_move(Move m);
         std::string output_square(Square s) {
-            return output_square(board.get_file(s), board.get_rank(s));
+            return output_square(board.file(s), board.rank(s));
         };
         std::string output_square(File f, Rank r);
         void print_tt_stats();

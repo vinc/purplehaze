@@ -33,9 +33,9 @@ Board::Board()
 
     // Initialize the attack array
     for (int i = 0; i < 64; ++i) {
-        Square from = get_square(i);
+        Square from = square(i);
         for (int j = 0; j < 64; ++j) {
-            Square to = get_square(j);
+            Square to = square(j);
             int diff = 0x77 + from - to;
             for (const PieceType& t : NOT_PAWN_TYPES) {
                 const Direction * dirs = PIECES_DIRS[t];
@@ -66,7 +66,7 @@ std::string Board::to_string(const std::string squares[], const int sq_width)
     stream << std::endl;
     for (Square s = A8; s < OUT; s = Square(s + 1)) {
         if (is_out(s)) continue;
-        if (get_file(s) == FILE_A) {
+        if (file(s) == FILE_A) {
             stream << "     +";
             for (int i = 0; i < 8; ++i) {
                 // Every string representing a square
@@ -80,11 +80,11 @@ std::string Board::to_string(const std::string squares[], const int sq_width)
                 stream << "+";
             }
             stream << std::endl;
-            stream << "   " << get_rank(s) + 1 << " ";
+            stream << "   " << rank(s) + 1 << " ";
         }
         stream << "|";
         stream << squares[s];
-        if (get_file(s) == FILE_H) {
+        if (file(s) == FILE_H) {
             stream << "|" << std::endl;
             if (s == H1) break; // The loop ends here
             s = Square(s - 0x18);

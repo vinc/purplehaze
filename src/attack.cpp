@@ -29,7 +29,7 @@ bool Board::is_attacked_by(Color c, Square s, const Pieces& pieces) const
             Square from = pieces.get_position(c, t, i);
             if (!can_attack(t, from, s)) continue;
             if (t == KNIGHT || t == KING) return true;
-            Direction d = get_direction_to(from, s);
+            Direction d = direction_to(from, s);
             Square to = Square(from + d);
             while (to != s && is_empty(to)) {
                 to = Square(to + d);
@@ -58,7 +58,7 @@ bool Board::can_go(Piece p, Square from, Square to) const
 {
     PieceType t = p.type();
     Color c = p.color();
-    Direction d = get_direction_to(from, to);
+    Direction d = direction_to(from, to);
 
     // A piece cannot capture another piece of the same color
     if (!is_empty(to) && board[to].color() == c) return false;
