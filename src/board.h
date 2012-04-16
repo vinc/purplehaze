@@ -34,12 +34,14 @@ class Board
         Board();
         static std::string to_string(const std::string squares[],
                                      const int sq_width);
-        Piece get_piece(Square s) const {
+
+        Piece& operator[] (Square s) {
             return board[s];
         };
-        void set_piece(Piece p, Square s) {
-            board[s] = p;
+        const Piece& operator[] (Square s) const {
+            return board[s];
         };
+
         bool is_empty(Square s) const {
             return board[s].type() == EMPTY;
         };

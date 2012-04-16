@@ -162,8 +162,8 @@ void Moves::init_mvv_lva_scores()
 Score Moves::get_mvv_lva_score(Move move)
 {
     assert(move.is_capture());
-    PieceType a = board.get_piece(move.orig()).type();
-    PieceType v = board.get_piece(move.dest()).type();
+    PieceType a = board[move.orig()].type();
+    PieceType v = board[move.dest()].type();
     if (move.is_en_passant()) return mvv_lva_scores[PAWN][a];
     return mvv_lva_scores[v][a];
 }

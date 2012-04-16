@@ -121,7 +121,7 @@ std::ostream& operator<<(std::ostream& out, const Board board)
         Square s = Square(i);
         squares[i] = " ";
         if (!board.is_empty(s)) {
-            squares[i] += board.get_piece(s).to_string();
+            squares[i] += board[s].to_string();
         } else if (board.is_dark(s)) {
             squares[i] += ".";
         } else {

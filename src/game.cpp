@@ -48,7 +48,7 @@ void Game::add_piece(Color c, PieceType t, Square s)
 {
     int i = pieces.count(c, t);
     pieces.set_position(c, t, i, s);
-    board.set_piece(Piece(c, t, i), s);
+    board[s] = Piece(c, t, i);
     pieces.inc_nb_pieces(c, t);
 
     // Update Zobrist hash
@@ -68,7 +68,7 @@ void Game::del_piece(Color c, PieceType t, int i)
     // Remove the piece, and put in its place the higher index piece of the
     // same color and type in order to avoid holes (idea from Mediocre Chess)
     Square emptied = pieces.get_position(c, t, i); // Get piece's position
-    board.set_piece(Piece(), emptied);             // Remove it from board
+    board[emptied] = Piece();                      // Remove it from board
     pieces.dec_nb_pieces(c, t);                    // and from pieces list
     pieces.set_position(c, t, i, OUT);             // TODO: not needed
     int j = pieces.count(c, t);                    // Last piece's index
@@ -77,7 +77,7 @@ void Game::del_piece(Color c, PieceType t, int i)
         Square s = pieces.get_position(c, t, j);   // Last piece's position
         pieces.set_position(c, t, i, s);           // Fill the hole left
         pieces.set_position(c, t, j, OUT);         // TODO: not needed
-        board.set_piece(Piece(c, t, i), s);        // Update board
+        board[s] = Piece(c, t, i);                 // Update board
     }
     // Update Zobrist hash
     Position& pos = current_position();

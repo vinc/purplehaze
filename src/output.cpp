@@ -102,7 +102,7 @@ std::string Game::output_move(Move m)
 
     // Type of piece
     Square from = m.orig();
-    Piece p = board.get_piece(from);
+    Piece p = board[from];
     PieceType t = p.type();
     if (t > PAWN) stream << Piece(WHITE, t); // Upper case
 
