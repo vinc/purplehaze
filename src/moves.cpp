@@ -123,7 +123,7 @@ void Moves::add(Move move, MovesState mt)
     switch (generation_state) {
         case GOOD_CAPTURES:
         case BAD_CAPTURES:
-            score = get_mvv_lva_score(move);
+            score = mvv_lva_score(move);
             size[generation_state]++;
             break;
         case QUIET_MOVES:
@@ -159,7 +159,7 @@ void Moves::init_mvv_lva_scores()
     }
 }
 
-Score Moves::get_mvv_lva_score(Move move)
+Score Moves::mvv_lva_score(Move move)
 {
     assert(move.is_capture());
     PieceType a = board[move.orig()].type();
