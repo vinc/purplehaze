@@ -63,7 +63,7 @@ class Game
         void init(std::string fen);
 
         bool is_check(Color c) const {
-            Square s = pieces.get_position(c, KING, 0);
+            Square s = pieces.position(c, KING, 0);
             return board.is_attacked_by(!c, s, pieces);
         }
 

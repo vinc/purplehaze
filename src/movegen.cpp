@@ -23,7 +23,7 @@ void Moves::generate_pieces(Color c, PieceType t, MoveType mt)
 {
     const Direction * dirs = PIECES_DIRS[t];
     for (int j = 0; j < pieces.count(c, t); ++j) {
-        Square from = pieces.get_position(c, t, j);
+        Square from = pieces.position(c, t, j);
         for (int d = 0; d < NB_DIRS[t]; ++d) {
             Square to = Square(from + dirs[d]);
             while (!board.is_out(to)) {
@@ -49,7 +49,7 @@ void Moves::generate(MoveType mt)
 
     // Pawns moves
     for (int j = 0; j < pieces.count(c, PAWN); ++j) {
-        Square from = pieces.get_position(c, PAWN, j);
+        Square from = pieces.position(c, PAWN, j);
 
         // Pawn captures
         for (int d = 0; d < 2; ++d) {

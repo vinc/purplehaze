@@ -67,14 +67,14 @@ void Game::del_piece(Color c, PieceType t, int i)
 {
     // Remove the piece, and put in its place the higher index piece of the
     // same color and type in order to avoid holes (idea from Mediocre Chess)
-    Square emptied = pieces.get_position(c, t, i); // Get piece's position
+    Square emptied = pieces.position(c, t, i); // Get piece's position
     board[emptied] = Piece();                      // Remove it from board
     pieces.dec_nb_pieces(c, t);                    // and from pieces list
     pieces.set_position(c, t, i, OUT);             // TODO: not needed
     int j = pieces.count(c, t);                    // Last piece's index
     if (pieces.count(c, t) > 0 && i != j) {
         // Swap i and j and update board
-        Square s = pieces.get_position(c, t, j);   // Last piece's position
+        Square s = pieces.position(c, t, j);   // Last piece's position
         pieces.set_position(c, t, i, s);           // Fill the hole left
         pieces.set_position(c, t, j, OUT);         // TODO: not needed
         board[s] = Piece(c, t, i);                 // Update board

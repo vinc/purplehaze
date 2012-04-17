@@ -26,7 +26,7 @@ bool Board::is_attacked_by(Color c, Square s, const Pieces& pieces) const
     for (const PieceType& t : NOT_PAWN_TYPES) {
         int n = pieces.count(c, t);
         for (int i = 0; i < n; ++i) {
-            Square from = pieces.get_position(c, t, i);
+            Square from = pieces.position(c, t, i);
             if (!can_attack(t, from, s)) continue;
             if (t == KNIGHT || t == KING) return true;
             Direction d = direction_to(from, s);

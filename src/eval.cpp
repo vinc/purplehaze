@@ -169,8 +169,8 @@ int Game::material_eval()
                     // No bonus for two bishops controlling the same color
                     // No bonus for more than two bishops
                     if (n == 2 && !board.is_same_color(
-                            pieces.get_position(c, t, 0),
-                            pieces.get_position(c, t, 1))) {
+                            pieces.position(c, t, 0),
+                            pieces.position(c, t, 1))) {
                                 material_bonus[c] +=
                                     BISHOP_PAIR_BONUS + (3 * 8 - nb_pawns);
                     }
@@ -268,7 +268,7 @@ int Game::position_eval()
             const int n = pieces.count(c, t);
             phase += n * PHASE_COEF[t];
             for (int j = 0; j < n; ++j) {
-                Square s = pieces.get_position(c, t, j);
+                Square s = pieces.position(c, t, j);
                 position_score[OPENING][c] += PST[OPENING][c][t][s];
                 position_score[ENDING][c] += PST[ENDING][c][t][s];
                 if (t == PAWN) pawns_files[c][board.file(s)]++;
@@ -285,7 +285,7 @@ int Game::position_eval()
         int rooks_score = 0;
         const int nb_rooks = pieces.count(c, ROOK);
         for (int j = 0; j < nb_rooks; ++j) {
-            Square s = pieces.get_position(c, ROOK, j);
+            Square s = pieces.position(c, ROOK, j);
             if (!pawns_files[!c][board.file(s)]) {
                 if (!pawns_files[c][board.file(s)]) {
                     rooks_score += OPEN_FILE_BONUS;

@@ -113,7 +113,7 @@ std::string Game::output_move(Move m)
         for (int i = 0; i < pieces.count(c, t); ++i) {
             Piece other(c, t, i);
             if (other == p) continue;
-            Square s = pieces.get_position(other);
+            Square s = pieces.position(other);
             if (board.can_attack(t, s, to) && board.can_go(other, s, to)) {
                 // If another piece of the same type can theoretically
                 // attack the destination (fast answer by array lookup)
