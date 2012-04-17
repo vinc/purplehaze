@@ -333,7 +333,7 @@ transposition:
 
 Move Game::root(int max_depth)
 {
-    time.start_thinking(tree.get_ply());
+    time.start_thinking(tree.ply());
     Color player = current_position().turn_color();
     print_thinking_header();
     nodes_count = 0;

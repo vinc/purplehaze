@@ -39,11 +39,11 @@ class Tree
         Position& top() {
             return tree[tree_top];
         };
-        uint16_t get_ply() const {
+        uint16_t ply() const {
             return tree_offset + tree_top;
         };
-        void set_ply(uint16_t ply) {
-            tree_offset = ply;
+        void set_ply(uint16_t offset) {
+            tree_offset = offset;
         };
         bool has_repetition_draw();
 };
