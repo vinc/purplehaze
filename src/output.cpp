@@ -41,7 +41,7 @@ void Game::print_thinking(int depth, int score, Move m)
     if (!output_thinking) return;
     std::cout << std::setw(4) << depth
               << std::setw(WIDE - 1) << score
-              << std::setw(WIDE) << time.get_elapsed_time()
+              << std::setw(WIDE) << time.elapsed()
               << std::setw(WIDE + 3) << nodes_count
               << std::setw(WIDE - 3) << " ";
     const int ply = tree.ply();

@@ -116,10 +116,10 @@ int main(int argc, char *argv[])
             Game game;
             game.init(init_fen);
             for (unsigned int i = 1; ; ++i) {
-                clock_t starting_time = clock();
+                clock_t start = clock();
                 unsigned long long int perft_result = game.perft(i);
-                long double elapsed = clock() - starting_time;
-                long double perft_time = elapsed / CLOCKS_PER_SEC;
+                long double clocks = clock() - start;
+                long double perft_time = clocks / CLOCKS_PER_SEC;
                 std::cout << "Perft(" << i << ") = " << perft_result;
                 std::cout << " (" << perft_time << " secs, ";
                 std::cout << perft_result / perft_time << " nps)" << std::endl;

@@ -48,8 +48,8 @@ void Xboard::think()
         play_move(move);
         if (debug_mode) {
             log << std::endl << "  DEBUG: "
-                << game.time.get_elapsed_time() / 100.0f
-                << " of " << game.time.get_allocated_time() / 100.0f
+                << game.time.elapsed() / 100.0f
+                << " of " << game.time.allocated() / 100.0f
                 << " seconds used to play";
         }
         if (get_verbosity() > 1) {
@@ -193,7 +193,7 @@ void Xboard::loop()
             if (debug_mode) {
                 log << " " << time;
             }
-            set_remaining_time(time);
+            set_remaining(time);
         } else if (cmd == "otim") {
             int time = 0;
             std::cin >> time;

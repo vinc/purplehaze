@@ -42,7 +42,7 @@ class Protocol
 
         bool set_time(int moves, int time);
 
-        bool set_remaining_time(int time);
+        bool set_remaining(int time);
 
         bool play_move(std::string move);
 

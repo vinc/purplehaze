@@ -46,9 +46,9 @@ bool Protocol::set_time(int moves, int time)
     return true;
 }
 
-bool Protocol::set_remaining_time(int time)
+bool Protocol::set_remaining(int time)
 {
-    game.time.set_remaining_time(time);
+    game.time.set_remaining(time);
     return true;
 }
 

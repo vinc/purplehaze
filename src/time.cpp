@@ -19,43 +19,45 @@
 #include "time.h"
 #include "assert.h"
 
-void Time::start_thinking(unsigned int ply)
+void Time::start_thinking(const unsigned int ply)
 {
-    starting_time = clock();
+    // Reset variables
+    start = clock();
     abort_search = false;
-    last_poll_nodes_count = 0;
-    polling_interval = 1000000;
-    if (remaining_time != allocated_time) {
-        unsigned int n = allowed_moves;
-        unsigned int remaining_moves = n - (((ply + 1) / 2) % n);
-        assert(remaining_moves > 0);
-        allocated_time = remaining_time / remaining_moves;
+    polling.interval = 1000000;
+    polling.previous = 0;
+
+    // Compute time per move
+    if (remaining != time_per_move) {
+        unsigned int n = level_moves;
+        n = n - (((ply + 1) / 2) % n);
+        assert(n > 0);
+        time_per_move = remaining / n;
     } else {
-        assert(allowed_moves > 0);
-        allocated_time = allowed_time / allowed_moves;
+        assert(level_moves > 0);
+        time_per_move = level_time / level_moves;
     }
 
-    if (allocated_time > 3000) {
+    // Compute coefs
+    if (time_per_move > 3000) {
         coef_1 = 16; coef_2 = 15;
-    } else if (allocated_time > 1000) {
+    } else if (time_per_move > 1000) {
         coef_1 = 4; coef_2 = 3;
     } else {
         coef_1 = 5; coef_2 = 3;
     }
 }
 
-bool Time::is_out_of_time()
+bool Time::is_out_of_time() const
 {
-    if (coef_1 * get_elapsed_time() > coef_2 * get_allocated_time()) {
-        return true;
-    }
-    return false;
+    return coef_1 * elapsed() > coef_2 * allocated();
 }
 
-bool Time::poll(unsigned int nodes_count)
+bool Time::poll(const unsigned int node_count)
 {
-    if (nodes_count - last_poll_nodes_count > polling_interval) {
-        last_poll_nodes_count = nodes_count;
+    // Avoid wasting time by calling 'is_out_of_time()' too frequently
+    if (node_count - polling.previous > polling.interval) {
+        polling.previous = node_count;
         abort_search = is_out_of_time();
     }
     return abort_search;

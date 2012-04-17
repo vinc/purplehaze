@@ -23,53 +23,50 @@
 class Time
 {
     private:
+        struct Polling {
+            unsigned int interval;
+            unsigned int previous;
+            Polling() : interval(50000), previous(0) {}
+        } polling;
+
         // Set the time to play the game
-        unsigned int allowed_moves;
-        unsigned int allowed_time; // In centi-seconds
+        unsigned int level_moves;
+        unsigned int level_time; // In centi-seconds
 
         // Set the time to play a move
-        clock_t starting_time;
-        unsigned long long int allocated_time; // Calculated
-        unsigned int remaining_time; // Given by protocols like Xboard
+        clock_t start;
+        unsigned long long int time_per_move; // Calculated
+        unsigned int remaining; // Given by protocols like Xboard
         int coef_1, coef_2;
 
-        unsigned int polling_interval;
-        unsigned int last_poll_nodes_count;
         bool abort_search;
 
     public:
-        Time() :
-            allowed_moves(40), allowed_time(24000),
-            allocated_time(allowed_time / allowed_moves),
-            remaining_time(allowed_time / allowed_moves),
-            polling_interval(500000), last_poll_nodes_count(0),
-            abort_search(false)
-            {}
+        Time() : Time(40, 24000) {}
 
         Time(unsigned int moves, unsigned int time) :
-            allowed_moves(moves), allowed_time(time),
-            allocated_time(allowed_time / allowed_moves),
-            remaining_time(allowed_time / allowed_moves),
-            polling_interval(500000), last_poll_nodes_count(0),
+            level_moves(moves), level_time(time),
+            time_per_move(level_time / level_moves),
+            remaining(time_per_move),
             abort_search(false)
             {}
 
-        void set_polling_interval(unsigned int nodes) {
-            polling_interval = nodes;
+        void set_polling_interval(const unsigned int nodes) {
+            polling.interval = nodes;
         };
-        void set_remaining_time(unsigned int time) {
-            remaining_time = time;
+        void set_remaining(const unsigned int time) {
+            remaining = time;
         };
-        unsigned long long int get_allocated_time() const {
-            return allocated_time;
+        unsigned long long int allocated() const {
+            return time_per_move;
         };
-        unsigned long long int get_elapsed_time() {
-            unsigned long long int elapsed = clock() - starting_time;
-            return 100 * elapsed / CLOCKS_PER_SEC;
+        unsigned long long int elapsed() const {
+            unsigned long long int clocks = clock() - start;
+            return 100 * clocks / CLOCKS_PER_SEC;
         };
-        void start_thinking(unsigned int ply);
-        bool is_out_of_time();
-        bool poll(unsigned int nodes_count);
+        void start_thinking(const unsigned int ply);
+        bool is_out_of_time() const;
+        bool poll(const unsigned int node_count);
 };
 
 #endif /* !TIME_H */

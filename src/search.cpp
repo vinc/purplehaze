@@ -347,7 +347,7 @@ Move Game::root(int max_depth)
         int alpha = -INF;
         int beta = INF;
         if (time.is_out_of_time()) break; // Do not start this ply if no time
-        if (time.get_allocated_time() - time.get_elapsed_time() < 100) {
+        if (time.allocated() - time.elapsed() < 100) {
             // Decrease polling interval if <1s left
             time.set_polling_interval(100000);
         }
