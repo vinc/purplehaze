@@ -25,8 +25,8 @@ std::string Transposition::to_string() const
 {
     std::ostringstream stream;
     stream << "<";
-    stream << ", " << std::dec << get_value() << ", " << get_depth();
-    stream << ", " << get_bound() << ", " << get_best_move() << ">";
+    stream << ", " << std::dec << value() << ", " << depth();
+    stream << ", " << bound() << ", " << best_move() << ">";
     return stream.str();
 }
 

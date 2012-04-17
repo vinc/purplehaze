@@ -132,11 +132,11 @@ int Game::search(int alpha, int beta, int depth, const int ply)
     if (!is_empty) {
         // FIXME Avoid a potential bug with tt.lookup()
         const bool discard = pos.hash() == 0 &&
-                             trans.get_bound() == UNDEF_BOUND;
+                             trans.bound() == UNDEF_BOUND;
 
-        if (/*!is_pv &&*/ depth <= trans.get_depth() && !discard) {
-            const int tr_score = trans.get_value();
-            switch (trans.get_bound()) {
+        if (/*!is_pv &&*/ depth <= trans.depth() && !discard) {
+            const int tr_score = trans.value();
+            switch (trans.bound()) {
                 case EXACT: return tr_score; // Already searched node
                 case UPPER: if (tr_score < beta) beta = tr_score; break;
                 case LOWER: if (tr_score > alpha) alpha = tr_score; break;
@@ -147,7 +147,7 @@ int Game::search(int alpha, int beta, int depth, const int ply)
 
         // If the transposition does not contain the best move,
         // best_move.is_null() will be true.
-        best_move = trans.get_best_move();
+        best_move = trans.best_move();
     }
 
     const Color player = pos.turn_color();
@@ -192,7 +192,7 @@ int Game::search(int alpha, int beta, int depth, const int ply)
     const bool iid_allowed = !is_null_move && is_pv;
     if (iid_allowed && depth > IID_DEPTH && best_move.is_null()) {
         search<PV>(alpha, beta, depth / 2, ply);
-        best_move = tt.lookup(pos.hash(), &is_empty).get_best_move();
+        best_move = tt.lookup(pos.hash(), &is_empty).best_move();
     }
 #endif
 
@@ -320,7 +320,7 @@ int Game::search(int alpha, int beta, int depth, const int ply)
 transposition:
     // Store the search to Transposition Table
     //assert(!best_move.is_null());
-    if (depth >= trans.get_depth() /*&& !is_null_move*/) {
+    if (depth >= trans.depth() /*&& !is_null_move*/) {
         const int value = best_score;
         const Bound bound = (best_score >= beta ? LOWER :
                                 (best_score <= old_alpha ? UPPER : EXACT));

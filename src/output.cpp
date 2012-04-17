@@ -76,10 +76,10 @@ std::string Game::output_pv(int depth, int score, Move m)
     // Find next move in TT
     bool is_empty;
     Transposition trans = tt.lookup(current_position().hash(), &is_empty);
-    Move move = trans.get_best_move();
-    if (depth > 0 && is_legal(move) && trans.get_bound() < 3) {
+    Move move = trans.best_move();
+    if (depth > 0 && is_legal(move) && trans.bound() < 3) {
         if (is_in_check) stream << "+"; // Check
-        stream << output_pv(depth - 1, trans.get_value(), move);
+        stream << output_pv(depth - 1, trans.value(), move);
     } else if (move.is_null() && is_mate(score)) {
         if (is_in_check) stream << "#"; // Mate
     } else if (is_in_check) {

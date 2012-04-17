@@ -20,10 +20,10 @@ TEST(TranspositionTest, Constructor)
 {
     Transposition t1;
     EXPECT_TRUE(t1.is_empty());
-    EXPECT_EQ(0, t1.get_value());
-    EXPECT_EQ(0, t1.get_depth());
-    EXPECT_EQ(Move(), t1.get_best_move());
-    EXPECT_EQ(UNDEF_BOUND, t1.get_bound());
+    EXPECT_EQ(0, t1.value());
+    EXPECT_EQ(0, t1.depth());
+    EXPECT_EQ(Move(), t1.best_move());
+    EXPECT_EQ(UNDEF_BOUND, t1.bound());
 
     for (int v = SHRT_MIN; v <= SHRT_MAX; v += 1000) {
         for (int d = 0; d <= UCHAR_MAX; ++d) {
@@ -31,10 +31,10 @@ TEST(TranspositionTest, Constructor)
                 Move m(E2, E3, QUIET_MOVE);
                 Transposition t2(v, b, d, m);
                 EXPECT_FALSE(t2.is_empty());
-                EXPECT_EQ(v, t2.get_value());
-                EXPECT_EQ(d, t2.get_depth());
-                EXPECT_EQ(m, t2.get_best_move());
-                EXPECT_EQ(b, t2.get_bound());
+                EXPECT_EQ(v, t2.value());
+                EXPECT_EQ(d, t2.depth());
+                EXPECT_EQ(m, t2.best_move());
+                EXPECT_EQ(b, t2.bound());
                 
                 Transposition t3(v, b, d, m);
                 Transposition t4(v + 1, b, d, m);
@@ -101,7 +101,7 @@ TEST_F(TranspositionsTest, Lookup)
         if (i == 0) {
             // FIXME
             EXPECT_FALSE(is_empty);
-            EXPECT_EQ(UNDEF_BOUND, trans.get_bound());
+            EXPECT_EQ(UNDEF_BOUND, trans.bound());
         } else {
             EXPECT_TRUE(is_empty);
         }
@@ -167,6 +167,6 @@ TEST(TTTest, LookupAfterSearch)
 
     bool is_empty;
     Position &pos = game.current_position();
-    Move m2 = game.tt.lookup(pos.hash(), &is_empty).get_best_move();
+    Move m2 = game.tt.lookup(pos.hash(), &is_empty).best_move();
     EXPECT_EQ(m1, m2);
 }
