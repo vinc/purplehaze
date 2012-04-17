@@ -130,7 +130,7 @@ int Game::material_eval()
     bool is_empty = true;
     int hash_score = material_table.lookup(pos.material_hash(), &is_empty);
     if (!is_empty) {
-        const Color c = pos.get_turn_color();
+        const Color c = pos.turn_color();
         return (c == WHITE ? hash_score : -hash_score);
     }
 
@@ -228,7 +228,7 @@ int Game::material_eval()
         is_draw = false; // no break happened
     }
 
-    const Color c = pos.get_turn_color();
+    const Color c = pos.turn_color();
 
     if (!is_draw) {
         score = material_score[c] - material_score[!c];
@@ -245,7 +245,7 @@ int Game::material_eval()
 int castling_score(const Position& pos, Color c)
 {
     int score = 0;
-    if (pos.has_castle(c)) {
+    if (pos.has_castled(c)) {
         score += CASTLE_BONUS;
     } else {
         for (const PieceType& t : SIDE_TYPES) { // for QUEEN and KING side
@@ -301,7 +301,7 @@ int Game::position_eval()
     }
 
     // Retrieve opening and ending score
-    const Color& c = pos.get_turn_color();
+    const Color& c = pos.turn_color();
     const int opening = position_score[OPENING][c] -
                         position_score[OPENING][!c];
     const int ending = position_score[ENDING][c] -

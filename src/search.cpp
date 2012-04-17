@@ -30,13 +30,13 @@ inline bool Game::is_dangerous(Move m)
     // that the move as already been made.
 
     if (board[m.dest()].type() == PAWN) {
-        const Color c = !current_position().get_turn_color();
+        const Color c = !current_position().turn_color();
         if (m.dest_rank() + RANK_6 * c == RANK_7) return true;
     }
 
     /*
     if (m.is_capture()) {
-        const Piece capture = current_position().get_capture();
+        const Piece capture = current_position().capture();
         if (capture.type() != PAWN) return true;
     }
 
@@ -50,7 +50,7 @@ unsigned long long int Game::perft(unsigned int depth)
 {
     if (depth == 0) return 1;
     unsigned long long int nodes = 0;
-    Color c = current_position().get_turn_color();
+    Color c = current_position().turn_color();
     bool use_lazy = false; // Lazy moves generation is not usefull in perft()
     Moves moves(board, pieces, current_position(), search_moves, use_lazy);
     Move move;
@@ -85,7 +85,7 @@ int Game::quiescence(int alpha, int beta, int depth, const int ply)
 
     if (alpha < stand_pat) alpha = stand_pat; // New alpha
 
-    Color player = current_position().get_turn_color();
+    Color player = current_position().turn_color();
 
     Moves moves(board, pieces, current_position(), search_moves);
     Move move;
@@ -150,9 +150,9 @@ int Game::search(int alpha, int beta, int depth, const int ply)
         best_move = trans.get_best_move();
     }
 
-    const Color player = pos.get_turn_color();
+    const Color player = pos.turn_color();
     const bool is_in_check = is_check(player);
-    const bool is_null_move = !pos.get_null_move_right(); // No more than one
+    const bool is_null_move = !pos.can_null_move(); // No more than one
 
 #ifndef NCE
     // Check Extension
@@ -334,7 +334,7 @@ transposition:
 Move Game::root(int max_depth)
 {
     time.start_thinking(tree.get_ply());
-    Color player = current_position().get_turn_color();
+    Color player = current_position().turn_color();
     print_thinking_header();
     nodes_count = 0;
     int best_score = 0;

@@ -28,17 +28,17 @@ class Position
     private:
         Hash zobrist_hash;
         Hash material_zobrist_hash;
-        Piece capture;
+        Piece captured_piece;
         std::bitset<4> castle_rights;
-        std::bitset<2> castle;
-        Square en_passant;
+        std::bitset<2> castled;
+        Square en_passant_square;
         unsigned char halfmove_counter;
         bool null_move_right;
         Color side_to_move;
 
     public:
         Position() :
-            en_passant(OUT),
+            en_passant_square(OUT),
             halfmove_counter(0),
             null_move_right(true),
             side_to_move(WHITE)
@@ -50,13 +50,13 @@ class Position
         Hash& material_hash() {
             return material_zobrist_hash;
         };
-        Color get_turn_color() const {
+        Color turn_color() const {
             return side_to_move;
         };
         void change_side() {
             side_to_move = !side_to_move;
         };
-        unsigned char get_halfmove() const {
+        unsigned char halfmove() const {
             return halfmove_counter;
         };
         void set_halfmove(unsigned char i) {
@@ -68,17 +68,23 @@ class Position
         void reset_halfmove() {
             halfmove_counter = 0;
         };
-        Square get_en_passant() const {
-            return en_passant;
+        Square en_passant() const {
+            return en_passant_square;
         };
         void set_en_passant(Square ep) {
-            en_passant = ep;
+            en_passant_square = ep;
         };
-        Piece get_capture() const {
-            return capture;
+        Piece capture() const {
+            return captured_piece;
         };
         void set_capture(Piece p) {
-            capture = p;
+            captured_piece = p;
+        };
+        bool can_null_move() const {
+            return null_move_right;
+        };
+        void set_null_move_right(bool b) {
+            null_move_right = b;
         };
         bool can_castle(Color c, PieceType t) const {
             return castle_rights[2 * c + t - QUEEN];
@@ -86,17 +92,11 @@ class Position
         void set_castle_right(Color c, PieceType t, bool b = true) {
             castle_rights.set(2 * c + t - QUEEN, b);
         };
-        bool has_castle(Color c) const {
-            return castle[c];
+        bool has_castled(Color c) const {
+            return castled[c];
         };
-        void set_has_castle(Color c, bool b = true) {
-            castle.set(c, b);
-        };
-        bool get_null_move_right() const {
-            return null_move_right;
-        };
-        void set_null_move_right(bool b) {
-            null_move_right = b;
+        void set_has_castled(Color c, bool b = true) {
+            castled.set(c, b);
         };
 };
 

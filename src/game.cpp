@@ -95,7 +95,7 @@ void Game::new_position()
 
     // Remove the previous en passant square from the Zobrist hash
     zobrist.update_en_passant(current_position().hash(),
-                              current_position().get_en_passant());
+                              current_position().en_passant());
 
     // Update the position for a new move
     current_position().change_side();

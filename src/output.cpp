@@ -46,7 +46,7 @@ void Game::print_thinking(int depth, int score, Move m)
               << std::setw(WIDE - 3) << " ";
     const int ply = tree.get_ply();
 
-    if (current_position().get_turn_color() == BLACK) {
+    if (current_position().turn_color() == BLACK) {
         std::cout << " " << 1 + (ply / 2) << ". ...";
     }
 
@@ -64,14 +64,14 @@ std::string Game::output_pv(int depth, int score, Move m)
     std::ostringstream stream;
     stream << " ";
     const int ply = tree.get_ply();
-    if (current_position().get_turn_color() == WHITE) {
+    if (current_position().turn_color() == WHITE) {
         stream << 1 + (ply / 2) << ". ";
     }
     stream << output_move(m);
 
     make_move(m);
 
-    bool is_in_check = is_check(current_position().get_turn_color());
+    bool is_in_check = is_check(current_position().turn_color());
 
     // Find next move in TT
     bool is_empty;
@@ -236,7 +236,7 @@ void Game::print_tt_stats()
 std::string Game::debug_move(Move m)
 {
     std::ostringstream stream;
-    Color c = current_position().get_turn_color();
+    Color c = current_position().turn_color();
     stream << std::endl << board << std::endl
            << (c == WHITE ? "White" : "Black") << " to move" << std::endl
            << "m = " << output_move(m) << " (" << m << ")" << std::endl

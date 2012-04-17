@@ -37,7 +37,7 @@ void Xboard::think()
     std::string output = "";
     if (move == "LOST") {
         output = "result ";
-        if (game.current_position().get_turn_color() == WHITE) {
+        if (game.current_position().turn_color() == WHITE) {
             output += "0-1 {Black mates}";
         } else {
             output += "1-0 {White mates}";
