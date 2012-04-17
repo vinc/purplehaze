@@ -206,7 +206,7 @@ int Game::search(int alpha, int beta, int depth, const int ply)
     // but they can cause a cut-off and dispense to generate quiet moves
     // so it's worth it.
     for (int i = 0; i < MAX_KILLERS; ++i) {
-        Move killer = get_killer_move(depth, i);
+        Move killer = killer_move(depth, i);
         if (is_legal(killer)) {
             moves.add(killer, KILLERS);
         }

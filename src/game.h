@@ -84,7 +84,7 @@ class Game
 
         // Killer Moves
         void clear_killers();
-        Move get_killer_move(int depth, int index) {
+        Move killer_move(int depth, int index) {
             return killer_moves[depth][index];
         }
         void set_killer_move(int depth, Move move);
