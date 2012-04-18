@@ -9,10 +9,10 @@ class SearchMoveTest : public testing::Test
 
         virtual void SetUp() {
             proto.new_game();
-            //proto.set_output_thinking(true);
+            proto.set_output_thinking(true);
         }
 
-        std::string search(int time = 10) {
+        std::string search(int time = 20) {
             proto.set_board(fen);
             proto.set_time(1, time);
             return proto.search_move(true);
