@@ -90,6 +90,15 @@ TEST_F(TranspositionsTest, Constructor)
     }
 }
 
+TEST_F(TranspositionsTest, ConstructorWithoutClear)
+{
+    int n = tt.size();
+    for (int i = 0; i < n; ++i) {
+        EXPECT_TRUE(tt.value_at(i).is_empty());
+        EXPECT_EQ(0, tt.hash_at(i));
+    }
+}
+
 TEST_F(TranspositionsTest, Lookup)
 {
     tt.clear();
