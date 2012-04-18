@@ -46,7 +46,7 @@ void Game::clear_killers()
 
 void Game::add_piece(Color c, PieceType t, Square s)
 {
-    int i = pieces.count(c, t);
+    const int i = pieces.count(c, t);
     pieces.set_position(c, t, i, s);
     board[s] = Piece(c, t, i);
     pieces.inc_nb_pieces(c, t);
@@ -67,17 +67,17 @@ void Game::del_piece(Color c, PieceType t, int i)
 {
     // Remove the piece, and put in its place the higher index piece of the
     // same color and type in order to avoid holes (idea from Mediocre Chess)
-    Square emptied = pieces.position(c, t, i); // Get piece's position
-    board[emptied] = Piece();                      // Remove it from board
-    pieces.dec_nb_pieces(c, t);                    // and from pieces list
-    pieces.set_position(c, t, i, OUT);             // TODO: not needed
-    int j = pieces.count(c, t);                    // Last piece's index
-    if (pieces.count(c, t) > 0 && i != j) {
+    const Square emptied = pieces.position(c, t, i); // Get piece's position
+    board[emptied] = Piece();                        // Remove it from board
+    pieces.dec_nb_pieces(c, t);                      // and from pieces list
+    pieces.set_position(c, t, i, OUT);               // FIXME: not needed
+    const int j = pieces.count(c, t);                // Last piece's index
+    if (i != j && pieces.count(c, t) > 0) {
         // Swap i and j and update board
-        Square s = pieces.position(c, t, j);   // Last piece's position
-        pieces.set_position(c, t, i, s);           // Fill the hole left
-        pieces.set_position(c, t, j, OUT);         // TODO: not needed
-        board[s] = Piece(c, t, i);                 // Update board
+        Square s = pieces.position(c, t, j);         // Last piece's position
+        pieces.set_position(c, t, i, s);             // Fill the hole left
+        pieces.set_position(c, t, j, OUT);           // FIXME: not needed
+        board[s] = Piece(c, t, i);                   // Update board
     }
     // Update Zobrist hash
     Position& pos = current_position();
@@ -90,21 +90,21 @@ void Game::del_piece(Color c, PieceType t, int i)
 
 void Game::new_position()
 {
-    // Take a "snapshot" of the current position
+    // Save the state of the current position
     tree.push();
 
     // Remove the previous en passant square from the Zobrist hash
-    zobrist.update_en_passant(current_position().hash(),
-                              current_position().en_passant());
+    Position& pos = current_position();
+    zobrist.update_en_passant(pos.hash(), pos.en_passant());
 
-    // Update the position for a new move
-    current_position().change_side();
-    zobrist.change_side(current_position().hash());
+    // Prepare the position for a new move
+    pos.change_side();
+    zobrist.change_side(pos.hash());
 }
 
 void Game::del_position()
 {
-    // Take back the previous "snapshot"
+    // Revert back to previous position
     tree.pop();
 }
 
