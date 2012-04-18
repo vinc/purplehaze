@@ -31,6 +31,8 @@ class HashTable
         struct Entry {
             Hash hash;
             T value;
+
+            Entry() : hash(0), value() {}
         };
         Entry* entries;
 

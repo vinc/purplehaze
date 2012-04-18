@@ -23,8 +23,8 @@ Game::Game()
 {
     nodes_count = 0;
     output_thinking = false;
-    tt.clear();
-    material_table.clear();
+    //tt.clear();
+    //material_table.clear();
     clear_killers();
     search_moves.clear();
 
