@@ -70,13 +70,11 @@ void Game::del_piece(Color c, PieceType t, int i)
     const Square emptied = pieces.position(c, t, i); // Get piece's position
     board[emptied] = Piece();                        // Remove it from board
     pieces.dec_nb_pieces(c, t);                      // and from pieces list
-    pieces.set_position(c, t, i, OUT);               // FIXME: not needed
     const int j = pieces.count(c, t);                // Last piece's index
     if (i != j && pieces.count(c, t) > 0) {
         // Swap i and j and update board
         Square s = pieces.position(c, t, j);         // Last piece's position
         pieces.set_position(c, t, i, s);             // Fill the hole left
-        pieces.set_position(c, t, j, OUT);           // FIXME: not needed
         board[s] = Piece(c, t, i);                   // Update board
     }
     // Update Zobrist hash
