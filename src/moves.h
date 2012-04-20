@@ -38,7 +38,7 @@ class MoveList
 {
     private:
         ExtendedMove list[MAX_PLY][MAX_BF];
-        unsigned int ply;
+        unsigned int ply; // TODO: Redundant with Tree::ply()?
 
     public:
         MoveList() :
@@ -62,6 +62,11 @@ class MoveList
         ExtendedMove& operator[] (unsigned char i) {
             return list[ply][i];
         };
+
+        // Only used in unit tests
+        int cur_ply() const {
+            return ply;
+        }
 };
 
 class Moves
@@ -105,6 +110,11 @@ class Moves
 
         static void init_mvv_lva_scores();
         Score mvv_lva_score(Move m);
+
+        // Only used in unit tests
+        int count(MovesState mt) const {
+            return size[mt];
+        }
 
         /*
         // Used in divide

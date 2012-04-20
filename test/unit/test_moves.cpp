@@ -92,14 +92,26 @@ TEST(MovesTest, Constructor)
     list[0] = em;
     EXPECT_EQ(em.value(), list[0].value());
 
+    EXPECT_EQ(0, list.cur_ply());
+
     Moves moves(board, pieces, position, list);
+
+    // Test if MoveList::inc_ply() has been implicitly called by Moves()
+    EXPECT_EQ(1, list.cur_ply());
 
     EXPECT_EQ(BEST, moves.state());
 
-    // Test if MoveList::inc_ply() has been implicitly called by Moves()
+    EXPECT_EQ(0, moves.count(BEST));
+    EXPECT_EQ(0, moves.count(GOOD_CAPTURES));
+    EXPECT_EQ(0, moves.count(KILLERS));
+    EXPECT_EQ(0, moves.count(BAD_CAPTURES));
+    EXPECT_EQ(0, moves.count(QUIET_MOVES));
+
     for (int i = 0; i < MAX_PLY; ++i) {
         EXPECT_EQ(0, list[i].value());
     }
     list.dec_ply();
     EXPECT_EQ(em.value(), list[0].value());
 }
+
+// TODO Add test for Moves destructor (implicit call of MoveList::dec_ply())
