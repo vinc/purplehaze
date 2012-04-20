@@ -73,10 +73,10 @@ TEST(MovesTest, Size)
         sizeof(Position*) +                        // 4 bytes
         sizeof(Board*) +                           // 4 bytes
         sizeof(Pieces*) +                          // 4 bytes
-        2 * sizeof(unsigned char) +                // 2 bytes
+        2 * sizeof(int) +                          // 8 bytes
         sizeof(MovesState) +                       // 1 byte
         sizeof(bool);                              // 1 byte
-    EXPECT_EQ(28, size);
+    EXPECT_EQ(36, size);
     EXPECT_EQ(size, sizeof(Moves));
 }
 

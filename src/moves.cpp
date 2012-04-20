@@ -38,32 +38,42 @@
 ExtendedMove Moves::next()
 {
     if (!use_lazy_generation) {
-        if (i == 0) generate(); // generate() will change the value of 'n'
+        if (cur == 0) generate(); // generate() will change the value of 'n'
 
-        if (i == n) return ExtendedMove();
-        return moves[i++];
+        if (cur == end) return ExtendedMove();
+        return moves[cur++];
     }
 
     switch (generation_state) {
         case BEST:
-            if (i < size[BEST]) return moves[i++];
+            if (cur < size[BEST]) {
+                return moves[cur++];
+            }
             generation_state = GOOD_CAPTURES;
             generate(CAPTURE);
-            i = size[BEST] + size[KILLERS]; // Jump to the first good capture
+            cur = size[BEST] + size[KILLERS]; // Jump to first good capture
         case GOOD_CAPTURES:
-            if (i < (size[BEST] + size[KILLERS] + size[GOOD_CAPTURES])) break;
+            if (cur < (size[BEST] + size[KILLERS] + size[GOOD_CAPTURES])) {
+                break;
+            }
             generation_state = KILLERS;
-            i = size[BEST]; // Jump to the first killer
+            cur = size[BEST]; // Jump to the first killer
         case KILLERS:
-            if (i < (size[BEST] + size[KILLERS])) return moves[i++];
+            if (cur < (size[BEST] + size[KILLERS])) {
+                return moves[cur++];
+            }
             generation_state = BAD_CAPTURES;
-            i = size[BEST] + size[KILLERS] + size[GOOD_CAPTURES];
+            cur = size[BEST] + size[KILLERS] + size[GOOD_CAPTURES];
         case BAD_CAPTURES:
-            if (i < n) break;
+            if (cur < end) {
+                break;
+            }
             generation_state = QUIET_MOVES;
             generate(QUIET_MOVE);
         case QUIET_MOVES:
-            if (i < n) return moves[i++];
+            if (cur < end) {
+                return moves[cur++];
+            }
         default:
             return ExtendedMove();
     }
@@ -73,36 +83,36 @@ ExtendedMove Moves::next()
     assert(generation_state == GOOD_CAPTURES);
 
     // Find the best remaining capture by selection sort
-    auto max = i;
-    for (auto j = i + 1; j < n; ++j) {
-        if (moves[j].value() > moves[max].value()) {
-            max = j;
+    int max = cur;
+    for (int i = cur + 1; i < end; ++i) {
+        if (moves[i].value() > moves[max].value()) {
+            max = i;
         }
     }
 
     // Swap it with the current one
-    if (max != i) {
-        ExtendedMove tmp = std::move(moves[i]);
-        moves[i] = std::move(moves[max]);
+    if (max != cur) {
+        ExtendedMove tmp = std::move(moves[cur]);
+        moves[cur] = std::move(moves[max]);
         moves[max] = std::move(tmp);
     }
 
     // Return it
-    return moves[i++];
+    return moves[cur++];
 }
 
 void Moves::add(Move move, MovesState mt)
 {
     if (!use_lazy_generation) {
-        moves[n++] = ExtendedMove(move, 0);
+        moves[end++] = ExtendedMove(move, 0);
         return;
     }
 
     if (move.is_null()) return;
 
     // Don't add again best and killer moves
-    auto end = size[BEST] + size[KILLERS];
-    for (auto j = 0; j < end; ++j) if (moves[j] == move) return;
+    const int n = size[BEST] + size[KILLERS];
+    for (int i = 0; i < n; ++i) if (moves[i] == move) return;
 
     // Calculate the move's score
     Score score = 0;
@@ -137,7 +147,7 @@ void Moves::add(Move move, MovesState mt)
     }
 
     // Add the move and its score to moves list
-    moves[n++] = ExtendedMove(move, score);
+    moves[end++] = ExtendedMove(move, score);
 }
 
 Score Moves::mvv_lva_scores[][NB_PIECE_TYPES] = { { 0 } };

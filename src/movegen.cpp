@@ -22,8 +22,9 @@
 void Moves::generate_pieces(Color c, PieceType t, MoveType mt)
 {
     const Direction * dirs = PIECES_DIRS[t];
-    for (int j = 0; j < pieces.count(c, t); ++j) {
-        Square from = pieces.position(c, t, j);
+    const int n = pieces.count(c, t);
+    for (int i = 0; i < n; ++i) {
+        const Square from = pieces.position(c, t, i);
         for (int d = 0; d < NB_DIRS[t]; ++d) {
             Square to = Square(from + dirs[d]);
             while (!board.is_out(to)) {
@@ -45,11 +46,12 @@ void Moves::generate_pieces(Color c, PieceType t, MoveType mt)
 
 void Moves::generate(MoveType mt)
 {
-    Color c = current_position.turn_color();
+    const Color c = current_position.turn_color();
 
     // Pawns moves
-    for (int j = 0; j < pieces.count(c, PAWN); ++j) {
-        Square from = pieces.position(c, PAWN, j);
+    const int n = pieces.count(c, PAWN);
+    for (int i = 0; i < n; ++i) {
+        Square from = pieces.position(c, PAWN, i);
 
         // Pawn captures
         for (int d = 0; d < 2; ++d) {
@@ -138,13 +140,12 @@ void Moves::generate(MoveType mt)
 
 void Game::make_move(Move m)
 {
-    Square orig = m.orig();
-    Square dest = m.dest();
-    Square ep = current_position().en_passant();
-    Color c = current_position().turn_color();
-    Piece p = board[orig];
-    PieceType t = p.type();
-    Piece capture;
+    const Square orig = m.orig();
+    const Square dest = m.dest();
+    const Square ep = current_position().en_passant();
+    const Color c = current_position().turn_color();
+    const Piece p = board[orig];
+    const PieceType t = p.type();
     assert(!board.is_out(orig));
     assert(!board.is_out(dest));
 
@@ -185,7 +186,7 @@ void Game::make_move(Move m)
         }
         assert(!board.is_empty(s) || assert_msg(debug_move(m)));
 
-        capture = board[s];
+        Piece capture = board[s];
         if (capture.type() == ROOK) { // Update opponent's castling rights
             if (dest == Square(H1 + A8 * !c)) {
                 pos.set_castle_right(!c, KING, false);
@@ -196,6 +197,7 @@ void Game::make_move(Move m)
             }
         }
         del_piece(capture);
+        pos.set_capture(capture);
         assert(board.is_empty(s) || assert_msg(debug_move(m)));
     }
 
@@ -239,7 +241,6 @@ void Game::make_move(Move m)
     }
 
     // Update en passant
-    pos.set_capture(capture);
     if (m.is_double_pawn_push()) {
         Square new_ep = Square(orig + (dest - orig) / 2);
         pos.set_en_passant(new_ep);

@@ -41,15 +41,8 @@ class MoveList
         unsigned int ply; // TODO: Redundant with Tree::ply()?
 
     public:
-        MoveList() :
-            ply(0)
-            {
-                for (int i = 0; i < MAX_PLY; ++i) {
-                    for (int j = 0; j < MAX_BF; ++j) {
-                        list[i][j] = ExtendedMove();
-                    }
-                }
-            }
+        MoveList() : list(), ply(0) {}
+
         void inc_ply() {
             ++ply;
         };
@@ -80,7 +73,7 @@ class Moves
         const Pieces& pieces;
 
         unsigned char size[MOVES_STATE_SIZE]; // Moves types counters
-        unsigned char i, n;
+        int cur, end;
         MovesState generation_state;
         bool use_lazy_generation;
 
@@ -88,12 +81,12 @@ class Moves
         Moves(const Board& b, const Pieces& ps, const Position& cn,
               MoveList& ml, bool lg = true) :
             moves(ml), current_position(cn), board(b), pieces(ps),
-            i(0), n(0),
+            size(),
+            cur(0), end(0),
             generation_state(BEST),
             use_lazy_generation(lg)
             {
                 moves.inc_ply(); // Increment move list internal counter
-                for (int j = 0; j < MOVES_STATE_SIZE; ++j) size[j] = 0;
             }
 
         ~Moves() {
