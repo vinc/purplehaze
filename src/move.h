@@ -51,7 +51,7 @@ class Move
             code |= (o >> 4) << OR_SHIFT;
             code |= (d & 7) << DF_SHIFT;
             code |= (d >> 4) << DR_SHIFT;
-            code |= t;
+            code |= static_cast<uint16_t>(t);
             return code;
         };
 
