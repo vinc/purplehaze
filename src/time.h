@@ -42,9 +42,7 @@ class Time
         bool abort_search;
 
     public:
-        Time() : Time(40, 24000) {}
-
-        Time(unsigned int moves, unsigned int time) :
+        Time(unsigned int moves = 40, unsigned int time = 24000) :
             level_moves(moves), level_time(time),
             time_per_move(level_time / level_moves),
             remaining(time_per_move),
