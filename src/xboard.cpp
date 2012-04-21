@@ -89,29 +89,32 @@ void Xboard::loop()
                             << "< feature " << XBOARD_FEATURES[i][0];
                     }
                     std::string value = XBOARD_FEATURES[i][1];
-                    if (value == "0" || value == "1") {
-                        std::cout << "=" << value << std::endl;
-                        if (debug_mode) {
-                            log << "=" << value;
-                        }
-                    } else {
-                        std::cout << "=\"" << value << "\"" << std::endl;
-                        if (debug_mode) {
-                            log << "=\"" << value << "\"";
-                        }
+                    if (value != "0" && value != "1") {
+                        // Add quotes if value is not a boolean
+                        value = '"' + value + '"';
                     }
-                    std::string reply, feature;
-                    std::cin >> reply;
-                    std::cin >> feature;
+                    std::cout << '=' << value << std::endl;
                     if (debug_mode) {
-                        log << std::endl << "> " << reply << " " << feature;
+                        log << "=" << value;
                     }
-                    assert(feature == XBOARD_FEATURES[i][0]);
-                    if (reply == "accepted") continue;
-                    if (reply == "rejected") assert(false); // FIXME
-                    assert(false); // FIXME
                 }
             }
+        } else if (cmd == "accepted") {
+            std::string feature;
+            std::cin >> feature;
+            if (debug_mode) {
+                log << std::endl << "> accepted " << feature;
+            }
+            // Given the current feature list, there is nothing to be done
+            // when a feature gets accepted.
+        } else if (cmd == "rejected") {
+            std::string feature;
+            std::cin >> feature;
+            if (debug_mode) {
+                log << std::endl << "> rejected " << feature;
+            }
+            // Given the current feature list, there is nothing to be done
+            // when a feature gets rejected.
         } else if (cmd == "debug") {
             if (!debug_mode) {
                 debug_mode = true;
