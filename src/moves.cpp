@@ -79,8 +79,7 @@ ExtendedMove Moves::next()
     }
 
     // If we are here, next() should return a capture
-    // FIXME: Review this assert
-    assert(generation_state == GOOD_CAPTURES);
+    assert(state() == GOOD_CAPTURES || state() == BAD_CAPTURES);
 
     // Find the best remaining capture by selection sort
     int max = cur;
