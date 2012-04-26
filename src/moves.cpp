@@ -151,19 +151,21 @@ void Moves::add(Move move, MovesState mt)
 
 Score Moves::mvv_lva_scores[][NB_PIECE_TYPES] = { { 0 } };
 
-/*
- * PxK = 94,  NxK = 92,  BxK = 90,  RxK = 88,  QxK = 86,  KxK = 84,  PxQ = 78,
- * NxQ = 76,  BxQ = 74,  RxQ = 72,  QxQ = 70,  KxQ = 68,  PxR = 62,  NxR = 60,
- * BxR = 58,  RxR = 56,  QxR = 54,  KxR = 52,  PxB = 46,  NxB = 44,  BxB = 42,
- * RxB = 40,  QxB = 38,  KxB = 36,  PxN = 30,  NxN = 28,  BxN = 26,  RxN = 24,
- * QxN = 22,  KxN = 20,  PxP = 14,  NxP = 12,  BxP = 10,  RxP =  8,  QxP =  6,
- * KxP =  4
+/**
+ * MVV/LVA scores:
+ *
+ *     PxP =  7, PxN = 15, PxB = 23, PxR = 31, PxQ = 39, PxK = 47
+ *     NxP =  6, NxN = 14, NxB = 22, NxR = 30, NxQ = 38, NxK = 46
+ *     BxP =  5, BxN = 13, BxB = 21, BxR = 29, BxQ = 37, BxK = 45
+ *     RxP =  4, RxN = 12, RxB = 20, RxR = 28, RxQ = 36, RxK = 44
+ *     QxP =  3, QxN = 11, QxB = 19, QxR = 27, QxQ = 35, QxK = 43
+ *     KxP =  2, KxN = 10, KxB = 18, KxR = 26, KxQ = 34, KxK = 42
  */
 void Moves::init_mvv_lva_scores()
 {
-    for (const PieceType& v : PIECE_TYPES) {
-        for (const PieceType& a : PIECE_TYPES) {
-            mvv_lva_scores[v][a] = (16 * v) - (2 * a);
+    for (const PieceType& a : PIECE_TYPES) {
+        for (const PieceType& v : PIECE_TYPES) {
+            mvv_lva_scores[a][v] = (8 * v) - a;
         }
     }
 }
@@ -172,7 +174,6 @@ Score Moves::mvv_lva_score(Move move)
 {
     assert(move.is_capture());
     PieceType a = board[move.orig()].type();
-    PieceType v = board[move.dest()].type();
-    if (move.is_en_passant()) return mvv_lva_scores[PAWN][a];
-    return mvv_lva_scores[v][a];
+    PieceType v = move.is_en_passant() ? PAWN : board[move.dest()].type();
+    return mvv_lva_scores[a][v];
 }
