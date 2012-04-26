@@ -69,7 +69,8 @@ std::string Game::output_pv(int depth, int score, Move m)
     }
     stream << output_move(m);
 
-    make_move(m);
+    make_move(m); // Update nodes_count
+    --nodes_count;
 
     bool is_in_check = is_check(current_position().turn_color());
 
