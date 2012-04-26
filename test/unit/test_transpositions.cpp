@@ -170,9 +170,11 @@ TEST(TTTest, LookupAfterSearch)
     game.search_moves.clear();
 
     game.init("7K/8/k1P5/7p/8/8/8/8 w - -");
-    game.time = Time(1, 50); // Search 1 move in 50 ms
+    game.time = Time(1, 200); // Search 1 move in 200 ms
     Move m1 = game.root(MAX_PLY);
-    EXPECT_EQ("Kg7", game.output_move(m1));
+    EXPECT_NE("c7", game.output_move(m1)); // BM at depth <= 3
+    EXPECT_NE("Kh7", game.output_move(m1)); // BM at depth <= 13
+    EXPECT_EQ("Kg7", game.output_move(m1)); // BM at depth >= 13
 
     bool is_empty;
     Position &pos = game.current_position();
