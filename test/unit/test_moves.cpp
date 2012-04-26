@@ -82,10 +82,10 @@ TEST(MovesTest, Size)
 
 TEST(MovesTest, Constructor)
 {
-    Position position;
-    MoveList list;
     Board board;
     Pieces pieces;
+    Position position;
+    MoveList list;
 
     Move m;
     ExtendedMove em(m, 50);
@@ -112,6 +112,69 @@ TEST(MovesTest, Constructor)
     }
     list.dec_ply();
     EXPECT_EQ(em.value(), list[0].value());
+}
+
+TEST(MovesTest, Score)
+{
+    Board board;
+    Pieces pieces;
+    Position position;
+    MoveList list;
+    Moves moves(board, pieces, position, list);
+
+    Moves::init_mvv_lva_scores();
+    for (const PieceType& v : PIECE_TYPES) {
+        for (const PieceType& a : PIECE_TYPES) {
+            Square to = E5;
+            Square from;
+            switch (a) {
+                case KNIGHT:
+                    from = D3;
+                    break;
+                default:
+                    from = D4;
+                    break;
+            }
+            board[from] = Piece(WHITE, a);
+            board[to] = Piece(BLACK, v);
+            Move capture(from, to, CAPTURE);
+            Score score = moves.mvv_lva_score(capture);
+
+            EXPECT_GT(BEST_SCORE, score);
+            EXPECT_LT(KILLERS_SCORE, score);
+
+            for (const PieceType& v2 : PIECE_TYPES) {
+                for (const PieceType& a2 : PIECE_TYPES) {
+                    switch (a2) {
+                        case KNIGHT:
+                            from = D3;
+                            break;
+                        default:
+                            from = D4;
+                            break;
+                    }
+                    board[from] = Piece(WHITE, a2);
+                    board[to] = Piece(BLACK, v2);
+                    Move capture2(from, to, CAPTURE);
+                    Score score2 = moves.mvv_lva_score(capture2);
+
+                    if (v > v2) {
+                        EXPECT_GT(score, score2);
+                    } else if (v < v2) {
+                        EXPECT_LT(score, score2);
+                    } else {
+                        if (a > a2) {
+                            EXPECT_LT(score, score2);
+                        } else if (a < a2) {
+                            EXPECT_GT(score, score2);
+                        } else {
+                            EXPECT_EQ(score, score2);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 // TODO Add test for Moves destructor (implicit call of MoveList::dec_ply())
