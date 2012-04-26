@@ -66,17 +66,26 @@ TEST(MoveListTest, Assignement)
 
 TEST(MovesTest, Size)
 {
+    EXPECT_EQ(1, sizeof(MovesState));
+    EXPECT_EQ(5, MOVES_STATE_SIZE * sizeof(unsigned char));
     int size =
+        sizeof(MoveList*) +                        // 4-8 bytes
+        sizeof(Position*) +                        // 4-8 bytes
+        sizeof(Board*) +                           // 4-8 bytes
+        sizeof(Pieces*) +                          // 4-8 bytes
+        sizeof(int) +                              // 4 bytes
+        sizeof(int) +                              // 4 bytes
         MOVES_STATE_SIZE * sizeof(unsigned char) + // 5 bytes
-        3 +                                        // 3 bytes (padding)
-        sizeof(MoveList*) +                        // 4 bytes
-        sizeof(Position*) +                        // 4 bytes
-        sizeof(Board*) +                           // 4 bytes
-        sizeof(Pieces*) +                          // 4 bytes
-        2 * sizeof(int) +                          // 8 bytes
+        1 +                                        // 1 byte (padding)
         sizeof(MovesState) +                       // 1 byte
         sizeof(bool);                              // 1 byte
-    EXPECT_EQ(36, size);
+
+#ifdef __x86_64__
+    EXPECT_EQ(48, size);
+#elif __i386__
+    EXPECT_EQ(32, size);
+#endif
+
     EXPECT_EQ(size, sizeof(Moves));
 }
 

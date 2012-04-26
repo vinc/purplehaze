@@ -71,9 +71,9 @@ class Moves
         const Position& current_position;
         const Board& board;
         const Pieces& pieces;
-
+        int cur;
+        int end;
         unsigned char size[MOVES_STATE_SIZE]; // Moves types counters
-        int cur, end;
         MovesState generation_state;
         bool use_lazy_generation;
 
@@ -81,8 +81,8 @@ class Moves
         Moves(const Board& b, const Pieces& ps, const Position& cn,
               MoveList& ml, bool lg = true) :
             moves(ml), current_position(cn), board(b), pieces(ps),
-            size(),
             cur(0), end(0),
+            size(),
             generation_state(BEST),
             use_lazy_generation(lg)
             {
