@@ -17,7 +17,6 @@
 #ifndef PIECE_H
 #define PIECE_H
 
-#include <bitset>
 #include <string>
 
 #include "common.h"
