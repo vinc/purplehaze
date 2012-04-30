@@ -21,34 +21,40 @@
 
 #include "board.h"
 
-Board::Board()
+Board::Board() : board(), dir_array()
 {
-    // Initialize the board's squares
-    for (int i = 0; i < BOARD_SIZE; ++i) board[i] = Piece();
 
-    // Initialize the direction array
-    for (int i = 0; i < 240; ++i) {
-        dir_array[i] = NO_DIR;
-    }
-
-    // Initialize the attack array
-    for (int i = 0; i < 64; ++i) {
-        Square from = square(i);
-        for (int j = 0; j < 64; ++j) {
-            Square to = square(j);
+    // Initialize attack and direction arrays
+    for (const Square &from : SQUARES) {
+        if (from == OUT) {
+            break;
+        }
+        for (const Square &to : SQUARES) {
+            if (to == OUT) {
+                break;
+            }
             int diff = 0x77 + from - to;
             for (const PieceType& t : NOT_PAWN_TYPES) {
-                const Direction * dirs = PIECES_DIRS[t];
-                for (int d = 0; d < NB_DIRS[t]; ++d) {
-                    Square s = Square(from + dirs[d]);
+                for (const Direction &d : PIECES_DIRS[t]) {
+                    if (d == NO_DIR) {
+                        break;
+                    }
+                    Square s = static_cast<Square>(from + d);
                     while (!is_out(s)) {
                         if (s == to) {
                             attack_array[diff].set(t, true);
-                            dir_array[diff] = dirs[d];
+                            dir_array[diff] = d;
                             break;
                         }
-                        if (t == KNIGHT || t == KING) break; // Leapers
-                        s = Square(s + dirs[d]); // Sliders
+                        switch (t) {
+                            case KNIGHT:
+                            case KING:
+                                s = OUT;
+                                break;
+                            default:
+                                s = static_cast<Square>(s + d);
+                                break;
+                        }
                     }
                 }
             }
