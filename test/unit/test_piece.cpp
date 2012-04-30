@@ -10,8 +10,15 @@ TEST(PieceTest, Constructor)
 
                 // Test getters
                 EXPECT_EQ(c, p.color());
+                EXPECT_NE(!c, p.color());
                 EXPECT_EQ(t, p.type());
                 EXPECT_EQ(i, p.index());
+
+                EXPECT_TRUE(p.is(c));
+                EXPECT_FALSE(p.is(!c));
+                EXPECT_TRUE(p.is(t));
+                EXPECT_TRUE(p.is(c, t));
+                EXPECT_FALSE(p.is(!c, t));
 
                 // Test comparison operators
                 for (const Color &c2 : COLORS) {
