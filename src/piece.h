@@ -65,6 +65,15 @@ class Piece
             code |= (i << I_SHIFT);
         }
         */
+        bool is(const Color c) const {
+            return color() == c;
+        }
+        bool is(const PieceType t) const {
+            return type() == t;
+        }
+        bool is(const Color c, const PieceType t) const {
+            return is(c) && is(t);
+        }
         bool operator==(const Piece& other) const {
             return this->code == other.code;
         }

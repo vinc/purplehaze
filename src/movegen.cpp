@@ -28,8 +28,7 @@ bool king_castle_allowed(const Color c, const Square from, const Square to,
     return
         board.is_empty(Square(F1 + A8 * c)) &&
         board.is_empty(to) &&
-        board[rook].type() == ROOK &&
-        board[rook].color() == c &&
+        board[rook].is(c, ROOK) &&
         !board.is_attacked_by(!c, from, pieces) &&
         !board.is_attacked_by(!c, to, pieces) &&
         !board.is_attacked_by(!c, Square((F1 + A8 * c)), pieces);
@@ -45,8 +44,7 @@ bool queen_castle_allowed(const Color c, const Square from, const Square to,
         board.is_empty(Square(B1 + A8 * c)) &&
         board.is_empty(Square(D1 + A8 * c)) &&
         board.is_empty(to) &&
-        board[rook].type() == ROOK &&
-        board[rook].color() == c &&
+        board[rook].is(c, ROOK) &&
         !board.is_attacked_by(!c, from, pieces) &&
         !board.is_attacked_by(!c, to, pieces) &&
         !board.is_attacked_by(!c, Square((D1 + A8 * c)), pieces);
@@ -62,7 +60,7 @@ void Moves::generate_pieces(Color c, PieceType t, MoveType mt)
             Square to = Square(from + dirs[d]);
             while (!board.is_out(to)) {
                 if (!board.is_empty(to)) {
-                    if (board[to].color() == c) {
+                    if (board[to].is(c)) {
                         break;
                     }
                     if (mt != QUIET_MOVE) {
@@ -220,7 +218,7 @@ void Game::make_move(Move m)
         assert(!board.is_empty(s) || assert_msg(debug_move(m)));
 
         Piece capture = board[s];
-        if (capture.type() == ROOK) { // Update opponent's castling rights
+        if (capture.is(ROOK)) { // Update opponent's castling rights
             if (dest == Square(H1 + A8 * !c)) {
                 pos.set_castle_right(!c, KING, false);
                 zobrist.update_castle_right(pos.hash(), !c, KING);

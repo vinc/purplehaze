@@ -29,7 +29,7 @@ inline bool Game::is_dangerous(Move m)
     // current_position() is used assuming
     // that the move as already been made.
 
-    if (board[m.dest()].type() == PAWN) {
+    if (board[m.dest()].is(PAWN)) {
         const Color c = !current_position().turn_color();
         if (m.dest_rank() + RANK_6 * c == RANK_7) return true;
     }
@@ -215,7 +215,7 @@ int Game::search(int alpha, int beta, int depth, const int ply)
     Move move;
     while (!(move = moves.next()).is_null()) {
         if (move.is_capture()) {
-            if (board[move.dest()].type() == KING) {
+            if (board[move.dest()].is(KING)) {
                 return INF - ply; // Checkmate
             }
         }
