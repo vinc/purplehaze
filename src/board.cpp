@@ -42,7 +42,7 @@ Board::Board() : board(), dir_array()
                     Square s = static_cast<Square>(from + d);
                     while (!is_out(s)) {
                         if (s == to) {
-                            attack_array[diff].set(t, true);
+                            attack_array[diff][t] = true;
                             dir_array[diff] = d;
                             break;
                         }

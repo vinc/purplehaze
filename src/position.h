@@ -90,13 +90,13 @@ class Position
             return castle_rights[2 * c + t - QUEEN];
         };
         void set_castle_right(Color c, PieceType t, bool b = true) {
-            castle_rights.set(2 * c + t - QUEEN, b);
+            castle_rights[2 * c + t - QUEEN] = b;
         };
         bool has_castled(Color c) const {
             return castled[c];
         };
         void set_has_castled(Color c, bool b = true) {
-            castled.set(c, b);
+            castled[c] = b;
         };
 };
 
