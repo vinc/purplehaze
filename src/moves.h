@@ -37,7 +37,7 @@ enum MovesState : unsigned char {
 class MoveList
 {
     private:
-        ExtendedMove list[MAX_PLY][MAX_BF];
+        ExtendedMove list[MAX_PLY][MAX_MOVES];
         unsigned int ply; // TODO: Redundant with Tree::ply()?
 
     public:
