@@ -336,6 +336,7 @@ Move Game::root(int max_depth)
     assert(max_depth <= MAX_PLY);
 
     nodes_count = 0;
+    search_moves.clear();
     time.start_thinking(tree.ply());
     print_thinking_header();
 
