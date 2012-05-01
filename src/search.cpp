@@ -333,34 +333,39 @@ transposition:
 
 Move Game::root(int max_depth)
 {
-    time.start_thinking(tree.ply());
-    Color player = current_position().side();
-    print_thinking_header();
+    assert(max_depth <= MAX_PLY);
+
     nodes_count = 0;
+    time.start_thinking(tree.ply());
+    print_thinking_header();
+
     int best_score = 0;
     Move best_move;
-    assert(max_depth <= MAX_PLY);
-    int it; // Iteration of Depth
     int best_scores[MAX_PLY];
-    for (it = 1; it < max_depth; ++it) { // Iterative Deepening
+    int depth;
+    for (depth = 1; depth < max_depth; ++depth) { // Iterative Deepening
         int score;
         int alpha = -INF;
         int beta = INF;
-        if (time.is_out_of_time()) break; // Do not start this ply if no time
+        if (time.is_out_of_time()) {
+            break; // Do not start a new ply
+        }
         if (time.allocated() - time.elapsed() < 100) {
             // Decrease polling interval if <1s left
             time.set_polling_interval(100000);
         }
         // Mate pruning
-        if (it > 6) {
+        if (depth > 6) {
             bool is_mate = true;
             for (int i = 1; i < 4; ++i) {
-                int val = best_scores[it - i];
+                int val = best_scores[depth - i];
                 if (-INF + MAX_PLY < val && val < INF - MAX_PLY) {
                     is_mate = false;
                 }
             }
-            if (is_mate) break; // The position was mate in the 3 previous ply
+            if (is_mate) {
+                break; // The position was mate in the 3 previous plies
+            }
         }
 
         Moves moves(board, pieces, current_position(), search_moves);
@@ -369,27 +374,26 @@ Move Game::root(int max_depth)
         int nb_moves;
         for (nb_moves = 1; !(move = moves.next()).is_null(); ++nb_moves) {
             make_move(move);
-            if (is_check(player)) { // Skip illegal move
+            if (is_check(!current_position().side())) { // Skip illegal move
                 undo_move(move);
                 --nb_moves;
                 continue;
             }
-            // FIXME
-            //NodeType node_type = (nb_moves ? PV : ALL);
-            //score = -search<node_type>(-beta, -alpha, it - 1, 1);
             if (nb_moves == 1) {
-                score = -search<PV>(-beta, -alpha, it - 1, 1);
+                score = -search<PV>(-beta, -alpha, depth - 1, 1);
             } else {
-                score = -search<ALL>(-beta, -alpha, it - 1, 1);
+                score = -search<ALL>(-beta, -alpha, depth - 1, 1);
             }
             undo_move(move);
-            if (time.is_out_of_time()) break; // Discard this move
+            if (time.is_out_of_time()) {
+                break; // Discard the move
+            }
             if (score > alpha) {
                 alpha = score;
                 best_score = score;
                 best_move = move;
                 if (nodes_count > 200000) { // Save CPU time at the beginning
-                    print_thinking(it, alpha, best_move);
+                    print_thinking(depth, alpha, best_move);
                 }
             }
         }
@@ -398,15 +402,16 @@ Move Game::root(int max_depth)
             break; // Discard this ply
         }
         if (!best_move.is_null()) {
-            tt.save(current_position().hash(), alpha, EXACT, it, best_move);
+            tt.save(current_position().hash(), alpha, EXACT, depth, best_move);
         }
-        best_scores[it] = best_score;
+        best_scores[depth] = best_score;
 
-        // If there is only one legal move, no iterative deepening needed
-        if (nb_moves == 1) break;
+        if (nb_moves == 1) { // If only one move allowed,
+            break;           // no need to do iterative deepening
+        }
     }
     if (!best_move.is_null()) {
-        print_thinking(it, best_score, best_move);
+        print_thinking(depth, best_score, best_move);
     }
     return best_move;
 }
