@@ -81,7 +81,7 @@ void Moves::generate_pieces(Color c, PieceType t, MoveType mt)
 
 void Moves::generate(MoveType mt)
 {
-    const Color c = current_position.turn_color();
+    const Color c = current_position.side();
 
     // Pawns moves
     const int n = pieces.count(c, PAWN);
@@ -172,7 +172,7 @@ void Game::make_move(Move m)
     const Square orig = m.orig();
     const Square dest = m.dest();
     const Square ep = current_position().en_passant();
-    const Color c = current_position().turn_color();
+    const Color c = current_position().side();
     const Piece p = board[orig];
     const PieceType t = p.type();
     assert(!board.is_out(orig));
@@ -301,7 +301,7 @@ void Game::undo_move(Move m)
         Piece capture = current_position().capture();
         Square s = dest;
         if (m.is_en_passant()) {
-            Color c = current_position().turn_color();
+            Color c = current_position().side();
             s = (c == WHITE ? Square(dest + UP) : Square(dest + DOWN));
             board[dest] = Piece();
         }
@@ -315,7 +315,7 @@ void Game::undo_move(Move m)
     }
     if (m.is_castle()) {
         Square rook_orig, rook_dest;
-        Color c = current_position().turn_color();
+        Color c = current_position().side();
         switch (m.castle_side()) {
             case KING:
                 rook_orig = Square(H1 + A8 * c);
@@ -361,7 +361,7 @@ bool Game::is_legal(Move m)
     Color c = p.color();
 
     // The piece cannot be one of the opponent
-    if (c != current_position().turn_color()) {
+    if (c != current_position().side()) {
         return false;
     }
 

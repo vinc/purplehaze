@@ -50,7 +50,7 @@ class Position
         Hash& material_hash() {
             return material_zobrist_hash;
         };
-        Color turn_color() const {
+        Color side() const {
             return side_to_move;
         };
         void change_side() {

@@ -30,7 +30,7 @@ inline bool Game::is_dangerous(Move m)
     // that the move as already been made.
 
     if (board[m.dest()].is(PAWN)) {
-        const Color c = !current_position().turn_color();
+        const Color c = !current_position().side();
         if (m.dest_rank() + RANK_6 * c == RANK_7) return true;
     }
 
@@ -50,7 +50,7 @@ unsigned long long int Game::perft(unsigned int depth)
 {
     if (depth == 0) return 1;
     unsigned long long int nodes = 0;
-    Color c = current_position().turn_color();
+    Color c = current_position().side();
     bool use_lazy = false; // Lazy moves generation is not usefull in perft()
     Moves moves(board, pieces, current_position(), search_moves, use_lazy);
     Move move;
@@ -85,7 +85,7 @@ int Game::quiescence(int alpha, int beta, int depth, const int ply)
 
     if (alpha < stand_pat) alpha = stand_pat; // New alpha
 
-    Color player = current_position().turn_color();
+    Color player = current_position().side();
 
     Moves moves(board, pieces, current_position(), search_moves);
     Move move;
@@ -150,7 +150,7 @@ int Game::search(int alpha, int beta, int depth, const int ply)
         best_move = trans.best_move();
     }
 
-    const Color player = pos.turn_color();
+    const Color player = pos.side();
     const bool is_in_check = is_check(player);
     const bool is_null_move = !pos.can_null_move(); // No more than one
 
@@ -334,7 +334,7 @@ transposition:
 Move Game::root(int max_depth)
 {
     time.start_thinking(tree.ply());
-    Color player = current_position().turn_color();
+    Color player = current_position().side();
     print_thinking_header();
     nodes_count = 0;
     int best_score = 0;

@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
             std::cout << std::endl;
             Game game;
             game.init(init_fen);
-            Color c = game.current_position().turn_color();
+            Color c = game.current_position().side();
             unsigned int nodes_count = 0;
             unsigned int moves_count = 0;
             Moves moves(game.board, game.pieces, game.current_position(),
