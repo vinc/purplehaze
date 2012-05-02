@@ -128,7 +128,7 @@ int Game::material_eval()
 
     // Lookup position in material hash table
     bool is_empty = true;
-    int hash_score = material_table.lookup(pos.material_hash(), &is_empty);
+    auto hash_score = material_table.lookup(pos.material_hash(), &is_empty);
     if (!is_empty) {
         const Color c = pos.side();
         return (c == WHITE ? hash_score : -hash_score);

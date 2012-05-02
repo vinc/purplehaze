@@ -201,6 +201,11 @@ static const Direction PAWN_CAPTURE_DIRS[][2] = {
 // Used in tt.h
 enum Bound : unsigned char { EXACT, LOWER, UPPER, UNDEF_BOUND };
 
+// Used in game.h, hashtable.cpp
+// NOTE: sizeof(Material) + sizeof(Hash) must be a power of two
+// for efficient material hashtable lookup.
+typedef uint64_t Material;
+
 // Used for debugging
 #define assert_msg(x) !(std::cerr << "Assertion failed: " << x << std::endl)
 

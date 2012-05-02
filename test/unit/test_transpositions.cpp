@@ -74,7 +74,7 @@ TEST_F(TranspositionsTest, Size)
     // TODO Internal array size should not be a power of two?
     //EXPECT_NE(0, TT_SIZE & (TT_SIZE - 1));
     
-    // But internal array entries number should be a power of two
+    // 'size' must be a power of two for Transpositions::lookup()
     EXPECT_EQ(0, size & (size - 1));
 
     EXPECT_EQ(size, tt.size());

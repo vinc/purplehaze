@@ -36,7 +36,7 @@ class Game
     private:
         Zobrist zobrist;
         Move killer_moves[MAX_PLY][MAX_KILLERS];
-        HashTable<int> material_table;
+        HashTable<Material> material_table;
 
     public:
         bool output_thinking;

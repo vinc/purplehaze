@@ -60,5 +60,5 @@ int HashTable<T>::usage() const
     return res;
 }
 
-template class HashTable<int>; // To avoid linker errors
+template class HashTable<Material>; // To avoid linker errors
 template class HashTable<Transposition>; // To avoid linker errors
