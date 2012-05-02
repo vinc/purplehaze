@@ -5,7 +5,7 @@
 
 TEST(MoveListTest, Size)
 {
-    int list_size = (MAX_PLY * MAX_BF) * sizeof(ExtendedMove);
+    int list_size = (MAX_PLY * MAX_MOVES) * sizeof(ExtendedMove);
     int size = list_size + sizeof(unsigned int);
 
     // MoveList's internal array's size should not be a power of two
@@ -20,7 +20,7 @@ TEST(MoveListTest, Constructor)
 {
     MoveList moves;
     for (int i = 0; i < MAX_PLY; ++i) {
-        for (int j = 0; j < MAX_BF; ++j) {
+        for (int j = 0; j < MAX_MOVES; ++j) {
             // Test default move
             EXPECT_TRUE(moves[j].is_null());
 
@@ -36,7 +36,7 @@ TEST(MoveListTest, Assignement)
     MoveList moves;
     Move m;
     for (int i = 0; i < MAX_PLY; ++i) {
-        for (int j = 0; j < MAX_BF; ++j) {
+        for (int j = 0; j < MAX_MOVES; ++j) {
             ExtendedMove em1(m, i + j);
             moves[j] = em1;
             EXPECT_EQ(em1, moves[j]);
@@ -46,7 +46,7 @@ TEST(MoveListTest, Assignement)
     }
     for (int i = MAX_PLY - 1; i > 0; --i) {
         moves.dec_ply();
-        for (int j = 0; j < MAX_BF; ++j) {
+        for (int j = 0; j < MAX_MOVES; ++j) {
             ExtendedMove em1(m, i + j);
             EXPECT_EQ(em1, moves[j]);
             EXPECT_EQ(em1.value(), moves[j].value());
@@ -54,7 +54,7 @@ TEST(MoveListTest, Assignement)
     }
     moves.clear();
     for (int i = 0; i < MAX_PLY; ++i) {
-        for (int j = 0; j < MAX_BF; ++j) {
+        for (int j = 0; j < MAX_MOVES; ++j) {
             ExtendedMove em1(m, i + j);
             EXPECT_EQ(em1, moves[j]);
             EXPECT_EQ(em1.value(), moves[j].value());
