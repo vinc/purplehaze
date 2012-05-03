@@ -44,10 +44,7 @@ T HashTable<T>::lookup(Hash h, bool* is_empty)
 template <class T>
 void HashTable<T>::clear()
 {
-    for (int i = 0; i < SIZE; ++i) {
-        entries[i].hash = 0;
-        entries[i].value = T();
-    }
+    std::fill(entries, entries + SIZE, Entry());
     hits = 0;
     misses = 0;
 }
