@@ -192,8 +192,7 @@ int main(int argc, char *argv[])
 
                 // Load position in game
                 init_fen = line.substr(0, fensep);
-                std::cout << "Loading position #" << i + 1
-                          << " '" << init_fen << "' ";
+                std::cout << "FEN #" << i + 1 << " '" << init_fen << "' ";
                 proto.set_board(init_fen);
 
                 // Search best move and test it
