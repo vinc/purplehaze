@@ -96,9 +96,10 @@ class Board
             return dir_array[0x77 + from - to];
         }
 
-        // Practical answer
-        bool is_attacked_by(Color c, Square s, const Pieces& pieces) const;
-        bool can_go(Piece p, Square from, Square to) const;
+        // Practical answer (implemented in 'attack.cpp')
+        bool is_attacked_by(const Color c, const Square s,
+                            const Pieces& pieces) const;
+        bool can_go(const Piece p, const Square from, const Square to) const;
 
         friend std::ostream& operator<<(std::ostream& out, const Board board);
 };
