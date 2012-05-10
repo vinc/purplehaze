@@ -15,9 +15,9 @@
  */
 
 #include <assert.h>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <iomanip>
 
 #include "board.h"
 

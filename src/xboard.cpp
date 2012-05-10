@@ -16,9 +16,9 @@
 
 #include <assert.h>
 #include <iostream>
+#include <signal.h>
 #include <sstream>
 #include <string>
-#include <signal.h>
 
 #include "xboard.h"
 

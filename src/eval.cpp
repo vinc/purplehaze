@@ -15,10 +15,10 @@
  */
 
 #include <assert.h>
-#include <string>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <iomanip>
+#include <string>
 
 #include "game.h"
 #include "eval.h"

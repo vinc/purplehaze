@@ -14,12 +14,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <bitset>
 #include <assert.h>
 #include <iostream>
 #include <iomanip>
 #include <string>
 #include <sstream>
-#include <bitset>
 
 #include "game.h"
 

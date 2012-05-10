@@ -17,8 +17,8 @@
 #ifndef PROTOCOL_H
 #define PROTOCOL_H
 
-#include <string>
 #include <stack>
+#include <string>
 
 #include "common.h"
 #include "game.h"

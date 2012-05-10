@@ -16,9 +16,9 @@
 
 #include <assert.h>
 #include <iostream>
+#include <iomanip>
 #include <stdio.h>
 #include <time.h>
-#include <iomanip>
 
 #include "game.h"
 #include "search.h"

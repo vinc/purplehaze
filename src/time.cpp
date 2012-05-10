@@ -14,10 +14,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <assert.h>
 #include <iostream>
 
 #include "time.h"
-#include "assert.h"
 
 void Time::start_thinking(const unsigned int ply)
 {
