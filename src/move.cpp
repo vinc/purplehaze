@@ -20,9 +20,9 @@
 #include "move.h"
 #include "piece.h"
 
-PieceType Move::get_promotion_type() const
+PieceType Move::promotion_type() const
 {
-    switch (get_type()) {
+    switch (type()) {
         case KNIGHT_PROMOTION:
         case KNIGHT_PROMOTION_CAPTURE:
             return KNIGHT;
@@ -40,9 +40,9 @@ PieceType Move::get_promotion_type() const
     }
 }
 
-PieceType Move::get_castle_side() const
+PieceType Move::castle_side() const
 {
-    switch (get_type()) {
+    switch (type()) {
         case KING_CASTLE: return KING;
         case QUEEN_CASTLE: return QUEEN;
         default: return EMPTY;
@@ -58,12 +58,12 @@ std::string Move::to_string() const
 {
     if (is_null()) return "#";
     std::string res = "";
-    res += static_cast<char>('a' + get_orig_file());
-    res += static_cast<char>('1' + get_orig_rank());
-    res += static_cast<char>('a' + get_dest_file());
-    res += static_cast<char>('1' + get_dest_rank());
+    res += static_cast<char>('a' + orig_file());
+    res += static_cast<char>('1' + orig_rank());
+    res += static_cast<char>('a' + dest_file());
+    res += static_cast<char>('1' + dest_rank());
     if (is_promotion()) {
-        res += Piece(BLACK, get_promotion_type()).to_string(); // Lower case
+        res += Piece(BLACK, promotion_type()).to_string(); // Lower case
     }
     return res;
 }

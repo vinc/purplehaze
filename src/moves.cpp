@@ -17,6 +17,8 @@
 #include <assert.h>
 
 #include "moves.h"
+#include "board.h"
+#include "position.h"
 
 /*
  * Use lazy move generation to get the next move.
@@ -36,71 +38,80 @@
 ExtendedMove Moves::next()
 {
     if (!use_lazy_generation) {
-        if (i == 0) generate(); // generate() will change the value of 'n'
+        if (cur == 0) generate(); // generate() will change the value of 'n'
 
-        if (i == n) return ExtendedMove();
-        return moves[i++];
+        if (cur == end) return ExtendedMove();
+        return moves[cur++];
     }
 
-    switch (state) {
+    switch (generation_state) {
         case BEST:
-            if (i < size[BEST]) return moves[i++];
-            state = GOOD_CAPTURES;
+            if (cur < size[BEST]) {
+                return moves[cur++];
+            }
+            generation_state = GOOD_CAPTURES;
             generate(CAPTURE);
-            i = size[BEST] + size[KILLERS]; // Jump to the first good capture
+            cur = size[BEST] + size[KILLERS]; // Jump to first good capture
         case GOOD_CAPTURES:
-            if (i < (size[BEST] + size[KILLERS] + size[GOOD_CAPTURES])) break;
-            state = KILLERS;
-            i = size[BEST]; // Jump to the first killer
+            if (cur < (size[BEST] + size[KILLERS] + size[GOOD_CAPTURES])) {
+                break;
+            }
+            generation_state = KILLERS;
+            cur = size[BEST]; // Jump to the first killer
         case KILLERS:
-            if (i < (size[BEST] + size[KILLERS])) return moves[i++];
-            state = BAD_CAPTURES;
-            i = size[BEST] + size[KILLERS] + size[GOOD_CAPTURES];
+            if (cur < (size[BEST] + size[KILLERS])) {
+                return moves[cur++];
+            }
+            generation_state = BAD_CAPTURES;
+            cur = size[BEST] + size[KILLERS] + size[GOOD_CAPTURES];
         case BAD_CAPTURES:
-            if (i < n) break;
-            state = QUIET_MOVES;
+            if (cur < end) {
+                break;
+            }
+            generation_state = QUIET_MOVES;
             generate(QUIET_MOVE);
         case QUIET_MOVES:
-            if (i < n) return moves[i++];
+            if (cur < end) {
+                return moves[cur++];
+            }
         default:
             return ExtendedMove();
     }
 
     // If we are here, next() should return a capture
-    // FIXME: the two conditions are identical
-    assert(state == GOOD_CAPTURES || state == GOOD_CAPTURES);
+    assert(state() == GOOD_CAPTURES || state() == BAD_CAPTURES);
 
     // Find the best remaining capture by selection sort
-    auto max = i;
-    for (auto j = i + 1; j < n; ++j) {
-        if (moves[j].get_score() > moves[max].get_score()) {
-            max = j;
+    int max = cur;
+    for (int i = cur + 1; i < end; ++i) {
+        if (moves[i].value() > moves[max].value()) {
+            max = i;
         }
     }
 
     // Swap it with the current one
-    if (max != i) {
-        ExtendedMove tmp = std::move(moves[i]);
-        moves[i] = std::move(moves[max]);
+    if (max != cur) {
+        ExtendedMove tmp = std::move(moves[cur]);
+        moves[cur] = std::move(moves[max]);
         moves[max] = std::move(tmp);
     }
 
     // Return it
-    return moves[i++];
+    return moves[cur++];
 }
 
 void Moves::add(Move move, MovesState mt)
 {
     if (!use_lazy_generation) {
-        moves[n++] = ExtendedMove(move, 0);
+        moves[end++] = ExtendedMove(move, 0);
         return;
     }
 
     if (move.is_null()) return;
 
     // Don't add again best and killer moves
-    auto end = size[BEST] + size[KILLERS];
-    for (auto j = 0; j < end; ++j) if (moves[j] == move) return;
+    const int n = size[BEST] + size[KILLERS];
+    for (int i = 0; i < n; ++i) if (moves[i] == move) return;
 
     // Calculate the move's score
     Score score = 0;
@@ -114,19 +125,19 @@ void Moves::add(Move move, MovesState mt)
             size[mt]++;
             break;
         default:
-            //assert(state > KILLERS);
-            //size[state]++; // If move is a capture or a quiet move
+            //assert(generation_state > KILLERS);
+            //size[generation_state]++; // If move is a capture or a quiet move
             break;
     }
-    switch (state) {
+    switch (generation_state) {
         case GOOD_CAPTURES:
         case BAD_CAPTURES:
-            score = get_mvv_lva_score(move);
-            size[state]++;
+            score = mvv_lva_score(move);
+            size[generation_state]++;
             break;
         case QUIET_MOVES:
             score = -BEST_SCORE;
-            size[state]++;
+            size[generation_state]++;
             break;
         default:
             //assert(mt < GOOD_CAPTURES);
@@ -135,33 +146,34 @@ void Moves::add(Move move, MovesState mt)
     }
 
     // Add the move and its score to moves list
-    moves[n++] = ExtendedMove(move, score);
+    moves[end++] = ExtendedMove(move, score);
 }
 
 Score Moves::mvv_lva_scores[][NB_PIECE_TYPES] = { { 0 } };
 
-/*
- * PxK = 94,  NxK = 92,  BxK = 90,  RxK = 88,  QxK = 86,  KxK = 84,  PxQ = 78,
- * NxQ = 76,  BxQ = 74,  RxQ = 72,  QxQ = 70,  KxQ = 68,  PxR = 62,  NxR = 60,
- * BxR = 58,  RxR = 56,  QxR = 54,  KxR = 52,  PxB = 46,  NxB = 44,  BxB = 42,
- * RxB = 40,  QxB = 38,  KxB = 36,  PxN = 30,  NxN = 28,  BxN = 26,  RxN = 24,
- * QxN = 22,  KxN = 20,  PxP = 14,  NxP = 12,  BxP = 10,  RxP =  8,  QxP =  6,
- * KxP =  4
+/**
+ * MVV/LVA scores:
+ *
+ *     PxP =  7, PxN = 15, PxB = 23, PxR = 31, PxQ = 39, PxK = 47
+ *     NxP =  6, NxN = 14, NxB = 22, NxR = 30, NxQ = 38, NxK = 46
+ *     BxP =  5, BxN = 13, BxB = 21, BxR = 29, BxQ = 37, BxK = 45
+ *     RxP =  4, RxN = 12, RxB = 20, RxR = 28, RxQ = 36, RxK = 44
+ *     QxP =  3, QxN = 11, QxB = 19, QxR = 27, QxQ = 35, QxK = 43
+ *     KxP =  2, KxN = 10, KxB = 18, KxR = 26, KxQ = 34, KxK = 42
  */
 void Moves::init_mvv_lva_scores()
 {
-    for (const PieceType& v : PIECE_TYPES) {
-        for (const PieceType& a : PIECE_TYPES) {
-            mvv_lva_scores[v][a] = (16 * v) - (2 * a);
+    for (const PieceType& a : PIECE_TYPES) {
+        for (const PieceType& v : PIECE_TYPES) {
+            mvv_lva_scores[a][v] = (8 * v) - a;
         }
     }
 }
 
-Score Moves::get_mvv_lva_score(Move move)
+Score Moves::mvv_lva_score(Move move)
 {
     assert(move.is_capture());
-    PieceType a = board.get_piece(move.get_orig()).get_type();
-    PieceType v = board.get_piece(move.get_dest()).get_type();
-    if (move.is_en_passant()) return mvv_lva_scores[PAWN][a];
-    return mvv_lva_scores[v][a];
+    PieceType a = board[move.orig()].type();
+    PieceType v = move.is_en_passant() ? PAWN : board[move.dest()].type();
+    return mvv_lva_scores[a][v];
 }

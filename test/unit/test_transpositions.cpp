@@ -8,7 +8,7 @@ static const Bound BOUNDS[] = { EXACT, LOWER, UPPER };
 
 TEST(TranspositionTest, Size)
 {
-    int size = sizeof(short) +          // 2 bytes
+    int size = sizeof(int16_t) +        // 2 bytes
                sizeof(Move) +           // 2 bytes
                sizeof(unsigned char) +  // 1 byte
                sizeof(Bound);           // 1 byte
@@ -20,10 +20,10 @@ TEST(TranspositionTest, Constructor)
 {
     Transposition t1;
     EXPECT_TRUE(t1.is_empty());
-    EXPECT_EQ(0, t1.get_value());
-    EXPECT_EQ(0, t1.get_depth());
-    EXPECT_EQ(Move(), t1.get_best_move());
-    EXPECT_EQ(UNDEF_BOUND, t1.get_bound());
+    EXPECT_EQ(0, t1.value());
+    EXPECT_EQ(0, t1.depth());
+    EXPECT_EQ(Move(), t1.best_move());
+    EXPECT_EQ(UNDEF_BOUND, t1.bound());
 
     for (int v = SHRT_MIN; v <= SHRT_MAX; v += 1000) {
         for (int d = 0; d <= UCHAR_MAX; ++d) {
@@ -31,10 +31,10 @@ TEST(TranspositionTest, Constructor)
                 Move m(E2, E3, QUIET_MOVE);
                 Transposition t2(v, b, d, m);
                 EXPECT_FALSE(t2.is_empty());
-                EXPECT_EQ(v, t2.get_value());
-                EXPECT_EQ(d, t2.get_depth());
-                EXPECT_EQ(m, t2.get_best_move());
-                EXPECT_EQ(b, t2.get_bound());
+                EXPECT_EQ(v, t2.value());
+                EXPECT_EQ(d, t2.depth());
+                EXPECT_EQ(m, t2.best_move());
+                EXPECT_EQ(b, t2.bound());
                 
                 Transposition t3(v, b, d, m);
                 Transposition t4(v + 1, b, d, m);
@@ -74,7 +74,7 @@ TEST_F(TranspositionsTest, Size)
     // TODO Internal array size should not be a power of two?
     //EXPECT_NE(0, TT_SIZE & (TT_SIZE - 1));
     
-    // But internal array entries number should be a power of two
+    // 'size' must be a power of two for Transpositions::lookup()
     EXPECT_EQ(0, size & (size - 1));
 
     EXPECT_EQ(size, tt.size());
@@ -85,8 +85,17 @@ TEST_F(TranspositionsTest, Constructor)
     tt.clear();
     int n = tt.size();
     for (int i = 0; i < n; ++i) {
-        EXPECT_TRUE(tt.get_value_at(i).is_empty());
-        EXPECT_EQ(0, tt.get_hash_at(i));
+        EXPECT_TRUE(tt.value_at(i).is_empty());
+        EXPECT_EQ(0, tt.hash_at(i));
+    }
+}
+
+TEST_F(TranspositionsTest, ConstructorWithoutClear)
+{
+    int n = tt.size();
+    for (int i = 0; i < n; ++i) {
+        EXPECT_TRUE(tt.value_at(i).is_empty());
+        EXPECT_EQ(0, tt.hash_at(i));
     }
 }
 
@@ -101,7 +110,7 @@ TEST_F(TranspositionsTest, Lookup)
         if (i == 0) {
             // FIXME
             EXPECT_FALSE(is_empty);
-            EXPECT_EQ(UNDEF_BOUND, trans.get_bound());
+            EXPECT_EQ(UNDEF_BOUND, trans.bound());
         } else {
             EXPECT_TRUE(is_empty);
         }
@@ -121,9 +130,9 @@ TEST_F(TranspositionsTest, Lookup)
                     tt.save(h, v, b, d, m);
 
                     // Check transposition
-                    EXPECT_FALSE(tt.get_value_at(i).is_empty());
-                    EXPECT_EQ(trans_sent, tt.get_value_at(i));
-                    EXPECT_EQ(h, tt.get_hash_at(i));
+                    EXPECT_FALSE(tt.value_at(i).is_empty());
+                    EXPECT_EQ(trans_sent, tt.value_at(i));
+                    EXPECT_EQ(h, tt.hash_at(i));
                 }
             }
         }
@@ -161,12 +170,14 @@ TEST(TTTest, LookupAfterSearch)
     game.search_moves.clear();
 
     game.init("7K/8/k1P5/7p/8/8/8/8 w - -");
-    game.time = Time(1, 50); // Search 1 move in 50 ms
+    game.time = Time(1, 200); // Search 1 move in 200 ms
     Move m1 = game.root(MAX_PLY);
-    EXPECT_EQ("Kg7", game.output_move(m1));
+    EXPECT_NE("c7", game.output_move(m1)); // BM at depth <= 3
+    EXPECT_NE("Kh7", game.output_move(m1)); // BM at depth <= 13
+    EXPECT_EQ("Kg7", game.output_move(m1)); // BM at depth >= 13
 
     bool is_empty;
     Position &pos = game.current_position();
-    Move m2 = game.tt.lookup(pos.hash(), &is_empty).get_best_move();
+    Move m2 = game.tt.lookup(pos.hash(), &is_empty).best_move();
     EXPECT_EQ(m1, m2);
 }

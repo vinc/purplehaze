@@ -73,7 +73,7 @@ void Game::init(std::string fen)
     // Set the side to move
     char side;
     iss >> side;
-    assert(current_position().get_turn_color() == WHITE);
+    assert(current_position().side() == WHITE);
     switch(side) {
         case 'w': break;
         case 'b': current_position().change_side(); break;
@@ -109,6 +109,6 @@ void Game::init(std::string fen)
     int fullmove = 1;
     iss >> fullmove;
     int ply = 2 * (fullmove - 1);
-    if (current_position().get_turn_color() == BLACK) ++ply;
-    current_position().set_ply(ply);
+    if (current_position().side() == BLACK) ++ply;
+    tree.set_ply(ply);
 }

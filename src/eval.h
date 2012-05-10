@@ -84,4 +84,12 @@ static const int OPENING_RANKS_BONUS[][8] = {
     {  0, -15, -40, -40, -40, -40, -40, -40,}  // King
 };
 
+inline static bool has_bishop_pair(const Color c, const Pieces &pieces)
+{
+    assert(pieces.count(c, BISHOP) == 2);
+    const Square fb = pieces.position(c, BISHOP, 0);
+    const Square sb = pieces.position(c, BISHOP, 1);
+    return !Board::is_same_color(fb, sb);
+}
+
 #endif /* !EVAL_H */

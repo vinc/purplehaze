@@ -46,9 +46,9 @@ bool Protocol::set_time(int moves, int time)
     return true;
 }
 
-bool Protocol::set_remaining_time(int time)
+bool Protocol::set_remaining(int time)
 {
-    game.time.set_remaining_time(time);
+    game.time.set_remaining(time);
     return true;
 }
 
@@ -63,7 +63,7 @@ Move Protocol::parse_move(std::string move)
     Square from = Square(move[0] - 'a' + 16 * (move[1] - '1'));
     Square to = Square(move[2] - 'a' + 16 * (move[3] - '1'));
     if (game.board.is_out(from) || game.board.is_out(to)) return Move();
-    Color c = game.current_position().get_turn_color();
+    Color c = game.current_position().side();
     MoveType t = QUIET_MOVE;
 
     if (move.size() == 5) { // Promotion
@@ -75,7 +75,7 @@ Move Protocol::parse_move(std::string move)
             default: return Move();
         }
     }
-    if (game.board.get_piece(from).get_type() == PAWN) {
+    if (game.board[from].is(PAWN)) {
         if (game.board.is_pawn_begin(c, from) &&
             to == Square(from + 2 * PAWN_PUSH_DIRS[c])) {
                 return Move(from, to, DOUBLE_PAWN_PUSH);
@@ -84,7 +84,7 @@ Move Protocol::parse_move(std::string move)
                 return Move(from, to, EN_PASSANT);
         }
     }
-    if (game.board.get_piece(from).get_type() == KING) {
+    if (game.board[from].is(KING)) {
         if (to == Square(from + RIGHT + RIGHT)) {
             return Move(from, to, KING_CASTLE);
         } else if (to == Square(from + LEFT + LEFT)) {
@@ -134,7 +134,7 @@ std::string Protocol::search_move(bool use_san_notation)
 {
     Move m = game.root(depth + 1);
     if (m.is_null()) {
-        if (game.is_check(game.current_position().get_turn_color())) {
+        if (game.is_check(game.current_position().side())) {
             return "LOST";
         }
         return "DRAW";
@@ -142,7 +142,7 @@ std::string Protocol::search_move(bool use_san_notation)
         if (use_san_notation) {
             std::string res = game.output_move(m);
             play_move(m.to_string());
-            if (game.is_check(game.current_position().get_turn_color())) {
+            if (game.is_check(game.current_position().side())) {
                 res += "+";
             }
             undo_move();

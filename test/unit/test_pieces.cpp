@@ -11,8 +11,8 @@ TEST(PiecesTest, Constructor)
             EXPECT_EQ(0, pieces.count(c, t));
             for (int i = 0; i < 9; ++i) {
                 Piece p(c, t, i);
-                EXPECT_EQ(OUT, pieces.get_position(p));
-                EXPECT_EQ(OUT, pieces.get_position(c, t, i));
+                EXPECT_EQ(OUT, pieces.position(p));
+                EXPECT_EQ(OUT, pieces.position(c, t, i));
             }
         }
     }
@@ -29,11 +29,11 @@ TEST(PiecesTest, Positions)
 
                     // Test getters and setters
                     pieces.set_position(p, s);
-                    EXPECT_EQ(s, pieces.get_position(p));
-                    EXPECT_EQ(s, pieces.get_position(c, t, i));
+                    EXPECT_EQ(s, pieces.position(p));
+                    EXPECT_EQ(s, pieces.position(c, t, i));
                     pieces.set_position(c, t, i, s);
-                    EXPECT_EQ(s, pieces.get_position(p));
-                    EXPECT_EQ(s, pieces.get_position(c, t, i));
+                    EXPECT_EQ(s, pieces.position(p));
+                    EXPECT_EQ(s, pieces.position(c, t, i));
 
                     // Internal counters are not implicitly changed
                     EXPECT_EQ(0, pieces.count(c));

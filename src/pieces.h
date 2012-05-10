@@ -31,15 +31,17 @@ class Pieces
 
     public:
         Pieces();
-        Square get_position(Piece p) const {
-            return positions[p.get_color()][p.get_type()][p.get_index()];
+        Square position(Piece p) const {
+            assert(0 <= p.index() && p.index() < 9);
+            return positions[p.color()][p.type()][p.index()];
         };
-        Square get_position(Color c, PieceType t, int i) const {
+        Square position(Color c, PieceType t, int i) const {
             assert(0 <= i && i < 9);
             return positions[c][t][i];
         };
         void set_position(Piece p, Square s) {
-            positions[p.get_color()][p.get_type()][p.get_index()] = s;
+            assert(0 <= p.index() && p.index() < 9);
+            positions[p.color()][p.type()][p.index()] = s;
         };
         void set_position(Color c, PieceType t, int i, Square s) {
             assert(0 <= i && i < 9);

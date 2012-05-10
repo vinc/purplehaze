@@ -16,9 +16,9 @@
 
 #include <assert.h>
 #include <iostream>
+#include <signal.h>
 #include <sstream>
 #include <string>
-#include <signal.h>
 
 #include "xboard.h"
 
@@ -37,7 +37,7 @@ void Xboard::think()
     std::string output = "";
     if (move == "LOST") {
         output = "result ";
-        if (game.current_position().get_turn_color() == WHITE) {
+        if (game.current_position().side() == WHITE) {
             output += "0-1 {Black mates}";
         } else {
             output += "1-0 {White mates}";
@@ -48,8 +48,8 @@ void Xboard::think()
         play_move(move);
         if (debug_mode) {
             log << std::endl << "  DEBUG: "
-                << game.time.get_elapsed_time() / 100.0f
-                << " of " << game.time.get_allocated_time() / 100.0f
+                << game.time.elapsed() / 100.0f
+                << " of " << game.time.allocated() / 100.0f
                 << " seconds used to play";
         }
         if (get_verbosity() > 1) {
@@ -89,29 +89,32 @@ void Xboard::loop()
                             << "< feature " << XBOARD_FEATURES[i][0];
                     }
                     std::string value = XBOARD_FEATURES[i][1];
-                    if (value == "0" || value == "1") {
-                        std::cout << "=" << value << std::endl;
-                        if (debug_mode) {
-                            log << "=" << value;
-                        }
-                    } else {
-                        std::cout << "=\"" << value << "\"" << std::endl;
-                        if (debug_mode) {
-                            log << "=\"" << value << "\"";
-                        }
+                    if (value != "0" && value != "1") {
+                        // Add quotes if value is not a boolean
+                        value = '"' + value + '"';
                     }
-                    std::string reply, feature;
-                    std::cin >> reply;
-                    std::cin >> feature;
+                    std::cout << '=' << value << std::endl;
                     if (debug_mode) {
-                        log << std::endl << "> " << reply << " " << feature;
+                        log << "=" << value;
                     }
-                    assert(feature == XBOARD_FEATURES[i][0]);
-                    if (reply == "accepted") continue;
-                    if (reply == "rejected") assert(false); // FIXME
-                    assert(false); // FIXME
                 }
             }
+        } else if (cmd == "accepted") {
+            std::string feature;
+            std::cin >> feature;
+            if (debug_mode) {
+                log << std::endl << "> accepted " << feature;
+            }
+            // Given the current feature list, there is nothing to be done
+            // when a feature gets accepted.
+        } else if (cmd == "rejected") {
+            std::string feature;
+            std::cin >> feature;
+            if (debug_mode) {
+                log << std::endl << "> rejected " << feature;
+            }
+            // Given the current feature list, there is nothing to be done
+            // when a feature gets rejected.
         } else if (cmd == "debug") {
             if (!debug_mode) {
                 debug_mode = true;
@@ -193,7 +196,7 @@ void Xboard::loop()
             if (debug_mode) {
                 log << " " << time;
             }
-            set_remaining_time(time);
+            set_remaining(time);
         } else if (cmd == "otim") {
             int time = 0;
             std::cin >> time;

@@ -17,8 +17,8 @@
 #ifndef PROTOCOL_H
 #define PROTOCOL_H
 
-#include <string>
 #include <stack>
+#include <string>
 
 #include "common.h"
 #include "game.h"
@@ -42,7 +42,7 @@ class Protocol
 
         bool set_time(int moves, int time);
 
-        bool set_remaining_time(int time);
+        bool set_remaining(int time);
 
         bool play_move(std::string move);
 
@@ -52,11 +52,17 @@ class Protocol
 
         Move parse_move(std::string move);
 
-        void set_depth(int d) { depth = d; };
+        void set_depth(int d) {
+            depth = d;
+        };
 
-        void set_verbosity(int v = 0) { verbosity = v; };
+        void set_verbosity(int v = 0) {
+            verbosity = v;
+        };
 
-        int get_verbosity() { return verbosity; };
+        int get_verbosity() {
+            return verbosity;
+        };
 };
 
 #endif /* !PROTOCOL_H */

@@ -22,7 +22,6 @@
 #include "pieces.h"
 #include "board.h"
 #include "moves.h"
-#include "position.h"
 #include "tt.h"
 #include "hashtable.h"
 #include "time.h"
@@ -30,12 +29,14 @@
 #include "zobrist.h"
 #include "search.h"
 
+class Position;
+
 class Game
 {
     private:
         Zobrist zobrist;
         Move killer_moves[MAX_PLY][MAX_KILLERS];
-        HashTable<int> material_table;
+        HashTable<Material> material_table;
 
     public:
         bool output_thinking;
@@ -50,23 +51,26 @@ class Game
         void add_piece(Color c, PieceType t, Square s);
         void del_piece(Color c, PieceType t, int i);
         void del_piece(Piece p) {
-            del_piece(p.get_color(), p.get_type(), p.get_index());
+            del_piece(p.color(), p.type(), p.index());
         };
 
         void new_position();
         void del_position();
-        Position& current_position() { return tree.top(); };
+        Position& current_position() {
+            return tree.top();
+        };
 
         void init(std::string fen);
 
         bool is_check(Color c) const {
-            Square s = pieces.get_position(c, KING, 0);
+            Square s = pieces.position(c, KING, 0);
             return board.is_attacked_by(!c, s, pieces);
         }
 
         void make_move(Move m);
         void undo_move(Move m);
         bool is_legal(Move m);
+        bool is_dangerous(Move m);
 
         // Search
         unsigned long long int perft(unsigned int depth);
@@ -80,7 +84,7 @@ class Game
 
         // Killer Moves
         void clear_killers();
-        Move get_killer_move(int depth, int index) {
+        Move killer_move(int depth, int index) {
             return killer_moves[depth][index];
         }
         void set_killer_move(int depth, Move move);
@@ -101,7 +105,7 @@ class Game
         std::string output_pv(int depth, int score, Move m);
         std::string output_move(Move m);
         std::string output_square(Square s) {
-            return output_square(board.get_file(s), board.get_rank(s));
+            return output_square(board.file(s), board.rank(s));
         };
         std::string output_square(File f, Rank r);
         void print_tt_stats();

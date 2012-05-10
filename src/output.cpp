@@ -14,12 +14,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <bitset>
 #include <assert.h>
 #include <iostream>
 #include <iomanip>
 #include <string>
 #include <sstream>
-#include <bitset>
 
 #include "game.h"
 
@@ -41,12 +41,12 @@ void Game::print_thinking(int depth, int score, Move m)
     if (!output_thinking) return;
     std::cout << std::setw(4) << depth
               << std::setw(WIDE - 1) << score
-              << std::setw(WIDE) << time.get_elapsed_time()
+              << std::setw(WIDE) << time.elapsed()
               << std::setw(WIDE + 3) << nodes_count
               << std::setw(WIDE - 3) << " ";
-    int ply = current_position().get_ply();
+    const int ply = tree.ply();
 
-    if (current_position().get_turn_color() == BLACK) {
+    if (current_position().side() == BLACK) {
         std::cout << " " << 1 + (ply / 2) << ". ...";
     }
 
@@ -56,31 +56,31 @@ void Game::print_thinking(int depth, int score, Move m)
 
 bool is_mate(int score)
 {
-    if ((score < -INF + MAX_PLY) || (INF - MAX_PLY < score)) return true;
-    return false;
+    return ((score < -INF + MAX_PLY) || (INF - MAX_PLY < score));
 }
 
 std::string Game::output_pv(int depth, int score, Move m)
 {
     std::ostringstream stream;
     stream << " ";
-    int ply = current_position().get_ply();
-    if (current_position().get_turn_color() == WHITE) {
+    const int ply = tree.ply();
+    if (current_position().side() == WHITE) {
         stream << 1 + (ply / 2) << ". ";
     }
     stream << output_move(m);
 
-    make_move(m);
+    make_move(m); // Update nodes_count
+    --nodes_count;
 
-    bool is_in_check = is_check(current_position().get_turn_color());
+    bool is_in_check = is_check(current_position().side());
 
     // Find next move in TT
     bool is_empty;
     Transposition trans = tt.lookup(current_position().hash(), &is_empty);
-    Move move = trans.get_best_move();
-    if (depth > 0 && is_legal(move) && trans.get_bound() < 3) {
+    Move move = trans.best_move();
+    if (depth > 0 && is_legal(move) && trans.bound() < 3) {
         if (is_in_check) stream << "+"; // Check
-        stream << output_pv(depth - 1, trans.get_value(), move);
+        stream << output_pv(depth - 1, trans.value(), move);
     } else if (move.is_null() && is_mate(score)) {
         if (is_in_check) stream << "#"; // Mate
     } else if (is_in_check) {
@@ -97,30 +97,30 @@ std::string Game::output_move(Move m)
 
     // Castling
     if (m.is_castle()) {
-        if (m.get_castle_side() == QUEEN) stream << "O-";
+        if (m.castle_side() == QUEEN) stream << "O-";
         return stream.str() + "O-O";
     }
 
     // Type of piece
-    Square from = m.get_orig();
-    Piece p = board.get_piece(from);
-    PieceType t = p.get_type();
+    Square from = m.orig();
+    Piece p = board[from];
+    PieceType t = p.type();
     if (t > PAWN) stream << Piece(WHITE, t); // Upper case
 
     // Disambiguation
     if (t != PAWN) {
-        Color c = p.get_color();
-        Square to = m.get_dest();
+        Color c = p.color();
+        Square to = m.dest();
         for (int i = 0; i < pieces.count(c, t); ++i) {
             Piece other(c, t, i);
             if (other == p) continue;
-            Square s = pieces.get_position(other);
+            Square s = pieces.position(other);
             if (board.can_attack(t, s, to) && board.can_go(other, s, to)) {
                 // If another piece of the same type can theoretically
                 // attack the destination (fast answer by array lookup)
                 // and can really go to this destination (not so fast
                 // answer) then a disambiguation is needed
-                stream << static_cast<char>('a' + m.get_orig_file());
+                stream << static_cast<char>('a' + m.orig_file());
                 break;
             }
         }
@@ -128,16 +128,16 @@ std::string Game::output_move(Move m)
 
     // Capture
     if (m.is_capture()) {
-        if (t == PAWN) stream << static_cast<char>('a' + m.get_orig_file());
+        if (t == PAWN) stream << static_cast<char>('a' + m.orig_file());
         stream << "x";
     }
 
     // Destination
-    stream << output_square(m.get_dest_file(), m.get_dest_rank());
+    stream << output_square(m.dest_file(), m.dest_rank());
 
     // Promotion
     if (m.is_promotion()) {
-        stream << "=" << Piece(WHITE, m.get_promotion_type());
+        stream << "=" << Piece(WHITE, m.promotion_type());
     }
 
     return stream.str();
@@ -174,12 +174,12 @@ double get_percent(double a, double b)
 }
 
 template <class T>
-std::string print_table_stats(HashTable<T>& table, int table_size)
+std::string print_table_stats(const HashTable<T>& table, int table_size)
 {
     long zeros = 0;
     long ones = 0;
     for (int i = 0; i < table.size(); ++i) {
-        Hash h = table.get_hash_at(i);
+        Hash h = table.hash_at(i);
         if (!h) continue;
         std::bitset<64> b = h;
         int z = b.count();
@@ -194,32 +194,32 @@ std::string print_table_stats(HashTable<T>& table, int table_size)
     stream << get_stat("Entries", table.size());
     stream << std::endl;
 
-    stream << get_stat("Usage", table.get_usage());
-    stream << get_meta(get_percent(table.get_usage(), table.size()), "%");
+    stream << get_stat("Usage", table.usage());
+    stream << get_meta(get_percent(table.usage(), table.size()), "%");
     stream << std::endl;
 
-    stream << get_stat("0's", get_percent(zeros, 64 * table.get_usage()), "%");
+    stream << get_stat("0's", get_percent(zeros, 64 * table.usage()), "%");
     stream << std::endl;
 
-    stream << get_stat("1's", get_percent(ones, 64 * table.get_usage()), "%");
+    stream << get_stat("1's", get_percent(ones, 64 * table.usage()), "%");
     stream << std::endl;
 
-    stream << get_stat("Lookups", table.get_nb_lookups());
+    stream << get_stat("Lookups", table.nb_lookups());
     stream << std::endl;
 
-    stream << get_stat("Hits", table.get_nb_hits());
-    stream << get_meta(get_percent(table.get_nb_hits(),
-                                   table.get_nb_lookups()), "%");
+    stream << get_stat("Hits", table.nb_hits());
+    stream << get_meta(get_percent(table.nb_hits(),
+                                   table.nb_lookups()), "%");
     stream << std::endl;
 
-    stream << get_stat("Collisions", table.get_nb_collisions());
-    stream << get_meta(get_percent(table.get_nb_collisions(),
-                                   table.get_nb_lookups()), "%");
+    stream << get_stat("Collisions", table.nb_collisions());
+    stream << get_meta(get_percent(table.nb_collisions(),
+                                   table.nb_lookups()), "%");
     stream << std::endl;
 
-    stream << get_stat("Misses", table.get_nb_misses());
-    stream << get_meta(get_percent(table.get_nb_misses(),
-                                   table.get_nb_lookups()), "%");
+    stream << get_stat("Misses", table.nb_misses());
+    stream << get_meta(get_percent(table.nb_misses(),
+                                   table.nb_lookups()), "%");
     stream << std::endl;
 
     return stream.str();
@@ -237,7 +237,7 @@ void Game::print_tt_stats()
 std::string Game::debug_move(Move m)
 {
     std::ostringstream stream;
-    Color c = current_position().get_turn_color();
+    Color c = current_position().side();
     stream << std::endl << board << std::endl
            << (c == WHITE ? "White" : "Black") << " to move" << std::endl
            << "m = " << output_move(m) << " (" << m << ")" << std::endl

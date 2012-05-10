@@ -25,9 +25,10 @@ class Tree
 {
     private:
         Position tree[MAX_TREE];
-        unsigned int tree_top; // TODO Redundant? current_position().get_ply()
+        uint16_t tree_offset;
+        uint16_t tree_top;
     public:
-        Tree() : tree_top(0) {}
+        Tree() : tree_offset(0), tree_top(0) {}
         void push() {
             tree[tree_top + 1] = tree[tree_top];
             ++tree_top;
@@ -37,6 +38,12 @@ class Tree
         };
         Position& top() {
             return tree[tree_top];
+        };
+        uint16_t ply() const {
+            return tree_offset + tree_top;
+        };
+        void set_ply(uint16_t offset) {
+            tree_offset = offset;
         };
         bool has_repetition_draw();
 };

@@ -116,10 +116,10 @@ int main(int argc, char *argv[])
             Game game;
             game.init(init_fen);
             for (unsigned int i = 1; ; ++i) {
-                clock_t starting_time = clock();
+                clock_t start = clock();
                 unsigned long long int perft_result = game.perft(i);
-                long double elapsed = clock() - starting_time;
-                long double perft_time = elapsed / CLOCKS_PER_SEC;
+                long double clocks = clock() - start;
+                long double perft_time = clocks / CLOCKS_PER_SEC;
                 std::cout << "Perft(" << i << ") = " << perft_result;
                 std::cout << " (" << perft_time << " secs, ";
                 std::cout << perft_result / perft_time << " nps)" << std::endl;
@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
             std::cout << std::endl;
             Game game;
             game.init(init_fen);
-            Color c = game.current_position().get_turn_color();
+            Color c = game.current_position().side();
             unsigned int nodes_count = 0;
             unsigned int moves_count = 0;
             Moves moves(game.board, game.pieces, game.current_position(),
@@ -192,8 +192,7 @@ int main(int argc, char *argv[])
 
                 // Load position in game
                 init_fen = line.substr(0, fensep);
-                std::cout << "Loading position #" << i + 1
-                          << " '" << init_fen << "' ";
+                std::cout << "FEN #" << i + 1 << " '" << init_fen << "' ";
                 proto.set_board(init_fen);
 
                 // Search best move and test it

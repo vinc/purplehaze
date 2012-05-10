@@ -23,7 +23,7 @@
 
 class Move
 {
-    protected:
+    private:
         /*
          * A move is coded using 16 bits:
          *     4 bits for the type
@@ -45,40 +45,46 @@ class Move
         static const int OR_SHIFT = 10;
         static const int OF_SHIFT = 13;
 
-        short code;
+        static uint16_t encode(Square o, Square d, MoveType t) {
+            uint16_t code = 0;
+            code |= (o & 7) << OF_SHIFT;
+            code |= (o >> 4) << OR_SHIFT;
+            code |= (d & 7) << DF_SHIFT;
+            code |= (d >> 4) << DR_SHIFT;
+            code |= static_cast<uint16_t>(t);
+            return code;
+        };
 
-        bool is_set(int i) const { return code & ( 1 << i); };
+        uint16_t code;
+
+        bool is_set(int i) const {
+            return code & ( 1 << i);
+        };
 
     public:
         Move() : code(NULL_MOVE) {}
 
-        Move(Square o, Square d, MoveType t) {
-            code = ((o & 7) << OF_SHIFT) |
-                   ((o >> 4) << OR_SHIFT) |
-                   ((d & 7) << DF_SHIFT) |
-                   ((d >> 4) << DR_SHIFT) |
-                   t;
-        };
+        Move(Square o, Square d, MoveType t) : code(encode(o, d, t)) {}
 
-        File get_orig_file() const {
+        File orig_file() const {
             return File((code >> OF_SHIFT) & OF_MASK);
         };
-        Rank get_orig_rank() const {
+        Rank orig_rank() const {
             return Rank((code >> OR_SHIFT) & OR_MASK);
         };
-        File get_dest_file() const {
+        File dest_file() const {
             return File((code >> DF_SHIFT) & DF_MASK);
         };
-        Rank get_dest_rank() const {
+        Rank dest_rank() const {
             return Rank((code >> DR_SHIFT) & DR_MASK);
         };
-        Square get_orig() const {
-            return Square(16 * get_orig_rank() + get_orig_file());
+        Square orig() const {
+            return Square(16 * orig_rank() + orig_file());
         };
-        Square get_dest() const {
-            return Square(16 * get_dest_rank() + get_dest_file());
+        Square dest() const {
+            return Square(16 * dest_rank() + dest_file());
         };
-        MoveType get_type() const {
+        MoveType type() const {
             return static_cast<MoveType>((code >> MT_SHIFT) & MT_MASK);
         };
 
@@ -92,23 +98,16 @@ class Move
             return is_set(3);
         };
         bool is_double_pawn_push() const {
-            return get_type() == DOUBLE_PAWN_PUSH;
+            return type() == DOUBLE_PAWN_PUSH;
         };
         bool is_en_passant() const {
-            return get_type() == EN_PASSANT;
+            return type() == EN_PASSANT;
         };
         bool is_null() const {
-            return get_type() == NULL_MOVE;
+            return type() == NULL_MOVE;
         };
-        PieceType get_promotion_type() const;
-        PieceType get_castle_side() const;
-
-        /*
-        // Static member function for sorting move in natural order
-        static bool numeric_comp(Move a, Move b) {
-            return (a.code < b.code);
-        };
-        */
+        PieceType promotion_type() const;
+        PieceType castle_side() const;
 
         bool operator==(const Move& other) const {
             return this->code == other.code;
@@ -119,22 +118,22 @@ class Move
         std::string to_string() const;
 
         friend std::ostream& operator<<(std::ostream& out, const Move move);
-        friend class ExtendedMove;
 };
 
 class ExtendedMove : public Move
 {
     private:
-        char score;
+        char val;
 
     public:
-        ExtendedMove() : score(0) { code = NULL_MOVE; }
-        ExtendedMove(Move m, int s = 0) : score(s) { code = m.code; }
+        ExtendedMove() : val(0) {}
+        ExtendedMove(Move m, int v = 0) : Move(m), val(v) {}
 
-        char get_score() const { return score; };
-        void set_score(int s) { score = s; };
+        char value() const {
+            return val;
+        };
         bool operator<(const ExtendedMove& other) const {
-            return this->score > other.score;
+            return this->val > other.val;
         }
 };
 

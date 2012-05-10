@@ -19,8 +19,10 @@
 
 #include "common.h"
 #include "move.h"
-#include "board.h"
-#include "position.h"
+
+class Board;
+class Pieces;
+class Position;
 
 typedef char Score;
 
@@ -35,23 +37,29 @@ enum MovesState : unsigned char {
 class MoveList
 {
     private:
-        ExtendedMove list[MAX_PLY][MAX_BF];
-        unsigned int ply;
+        ExtendedMove list[MAX_PLY][MAX_MOVES];
+        unsigned int ply; // TODO: Redundant with Tree::ply()?
 
     public:
-        MoveList() :
-            ply(0)
-            {
-                for (int i = 0; i < MAX_PLY; ++i) {
-                    for (int j = 0; j < MAX_BF; ++j) {
-                        list[i][j] = ExtendedMove();
-                    }
-                }
-            }
-        void inc_ply() { ++ply; };
-        void dec_ply() { --ply; };
-        void clear() { ply = 0; };
-        ExtendedMove& operator[] (unsigned char i) { return list[ply][i]; };
+        MoveList() : list(), ply(0) {}
+
+        void inc_ply() {
+            ++ply;
+        };
+        void dec_ply() {
+            --ply;
+        };
+        void clear() {
+            ply = 0;
+        };
+        ExtendedMove& operator[] (unsigned char i) {
+            return list[ply][i];
+        };
+
+        // Only used in unit tests
+        int cur_ply() const {
+            return ply;
+        }
 };
 
 class Moves
@@ -60,25 +68,25 @@ class Moves
         static Score mvv_lva_scores[NB_PIECE_TYPES][NB_PIECE_TYPES];
 
         MoveList& moves;
-        Position& current_position;
-        Board& board;
-        Pieces& pieces;
-
+        const Position& current_position;
+        const Board& board;
+        const Pieces& pieces;
+        int cur;
+        int end;
         unsigned char size[MOVES_STATE_SIZE]; // Moves types counters
-        unsigned char i, n;
-        MovesState state;
+        MovesState generation_state;
         bool use_lazy_generation;
 
     public:
-        Moves(Board& b, Pieces& ps, Position& cn, MoveList& ml,
-              bool lg = true) :
+        Moves(const Board& b, const Pieces& ps, const Position& cn,
+              MoveList& ml, bool lg = true) :
             moves(ml), current_position(cn), board(b), pieces(ps),
-            i(0), n(0),
-            state(BEST),
+            cur(0), end(0),
+            size(),
+            generation_state(BEST),
             use_lazy_generation(lg)
             {
                 moves.inc_ply(); // Increment move list internal counter
-                for (int j = 0; j < MOVES_STATE_SIZE; ++j) size[j] = 0;
             }
 
         ~Moves() {
@@ -89,10 +97,17 @@ class Moves
         void generate_pieces(Color c, PieceType t, MoveType mt);
         void add(Move m, MovesState mt = UNDEF_MOVES);
         ExtendedMove next();
-        MovesState get_state() const { return state; };
+        MovesState state() const {
+            return generation_state;
+        };
 
         static void init_mvv_lva_scores();
-        Score get_mvv_lva_score(Move m);
+        Score mvv_lva_score(Move m);
+
+        // Only used in unit tests
+        int count(MovesState mt) const {
+            return size[mt];
+        }
 
         /*
         // Used in divide

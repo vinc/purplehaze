@@ -17,7 +17,6 @@
 #ifndef PIECE_H
 #define PIECE_H
 
-#include <bitset>
 #include <string>
 
 #include "common.h"
@@ -51,13 +50,13 @@ class Piece
                    (static_cast<int>(c) << C_SHIFT);
         }
 
-        Color get_color() const {
+        Color color() const {
             return static_cast<Color>((code >> C_SHIFT) & C_MASK);
         };
-        PieceType get_type() const {
+        PieceType type() const {
             return static_cast<PieceType>((code >> T_SHIFT) & T_MASK);
         };
-        int get_index() const {
+        int index() const {
             return (code >> I_SHIFT) & I_MASK;
         };
         /*
@@ -66,6 +65,15 @@ class Piece
             code |= (i << I_SHIFT);
         }
         */
+        bool is(const Color c) const {
+            return color() == c;
+        }
+        bool is(const PieceType t) const {
+            return type() == t;
+        }
+        bool is(const Color c, const PieceType t) const {
+            return is(c) && is(t);
+        }
         bool operator==(const Piece& other) const {
             return this->code == other.code;
         }

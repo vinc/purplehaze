@@ -31,6 +31,8 @@ class HashTable
         struct Entry {
             Hash hash;
             T value;
+
+            Entry() : hash(0), value() {}
         };
         Entry* entries;
 
@@ -54,20 +56,30 @@ class HashTable
         void clear();
 
         // Used to print stats
-        int size() const { return SIZE; };
+        int size() const {
+            return SIZE;
+        };
 
-        T get_value_at(int i) const {
+        T value_at(int i) const {
             return entries[i].value;
         };
-        Hash get_hash_at(int i) const {
+        Hash hash_at(int i) const {
             return entries[i].hash;
         };
 
-        int get_usage() const;
-        long get_nb_lookups() const { return hits + misses; };
-        long get_nb_hits() const { return hits; };
-        long get_nb_collisions() const { return collisions; };
-        long get_nb_misses() const { return misses; };
+        int usage() const;
+        long nb_lookups() const {
+            return hits + misses;
+        };
+        long nb_hits() const {
+            return hits;
+        };
+        long nb_collisions() const {
+            return collisions;
+        };
+        long nb_misses() const {
+            return misses;
+        };
 };
 
 #endif /* !HASH_TABLE_H */

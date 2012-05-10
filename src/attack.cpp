@@ -21,28 +21,34 @@
 /*
  * Return true if the square s is attacked by one of the c color's pieces.
  */
-bool Board::is_attacked_by(Color c, Square s, const Pieces& pieces) const
+bool Board::is_attacked_by(const Color c, const Square s,
+                           const Pieces& pieces) const
 {
     for (const PieceType& t : NOT_PAWN_TYPES) {
-        int n = pieces.count(c, t);
+        const int n = pieces.count(c, t);
         for (int i = 0; i < n; ++i) {
-            Square from = pieces.get_position(c, t, i);
-            if (!can_attack(t, from, s)) continue;
-            if (t == KNIGHT || t == KING) return true;
-            Direction d = get_direction_to(from, s);
-            Square to = Square(from + d);
-            while (to != s && is_empty(to)) {
-                to = Square(to + d);
+            const Square from = pieces.position(c, t, i);
+            if (!can_attack(t, from, s)) {
+                continue;
             }
-            if (to == s) return true;
+            if (t == KNIGHT || t == KING) {
+                return true;
+            }
+            const Direction d = direction_to(from, s);
+            Square to = static_cast<Square>(from + d);
+            while (to != s && is_empty(to)) {
+                to = static_cast<Square>(to + d);
+            }
+            if (to == s) {
+                return true;
+            }
         }
     }
 
     // Specific code for pawns
     for (int i = 0; i < 2; ++i) {
-        Square from = Square(s + PAWN_CAPTURE_DIRS[!c][i]);
-        if (get_piece(from).get_type() == PAWN &&
-            get_piece(from).get_color() == c) {
+        const Square from = static_cast<Square>(s + PAWN_CAPTURE_DIRS[!c][i]);
+        if (board[from].is(c, PAWN)) {
             return true;
         }
     }
@@ -51,43 +57,60 @@ bool Board::is_attacked_by(Color c, Square s, const Pieces& pieces) const
 }
 
 /*
- * Return true if a piece p can do a capture or a quiet move from square from
- * to square to on the board. This method does not say if the move is a legal
- * one.
+ * Return 'true' if a piece 'p' can do a capture or a quiet move from
+ * square 'from' to square 'to' on the board. This function does not
+ * say if the move is legal.
  */
-bool Board::can_go(Piece p, Square from, Square to) const
+bool Board::can_go(const Piece p, const Square from, const Square to) const
 {
-    PieceType t = p.get_type();
-    Color c = p.get_color();
-    Direction d = get_direction_to(from, to);
+    const Color c = p.color();
 
     // A piece cannot capture another piece of the same color
-    if (!is_empty(to) && get_piece(to).get_color() == c) return false;
+    if (!is_empty(to) && board[to].is(c)) {
+        return false;
+    }
 
-    Direction push_dir;
+    Direction d;
     Square s;
+    const PieceType t = p.type();
     switch (t) {
         case PAWN:
-            push_dir = (c == WHITE ? UP : DOWN);
+            d = (c == WHITE ? UP : DOWN);
+            s = static_cast<Square>(from + d);
             if (!is_empty(to)) { // Capture
-                if (to == Square(from + push_dir + LEFT)) return true;
-                if (to == Square(from + push_dir + RIGHT)) return true;
+                if (to == static_cast<Square>(s + LEFT)) {
+                    return true;
+                }
+                if (to == static_cast<Square>(s + RIGHT)) {
+                    return true;
+                }
             } else { // Pawn push (and double push)
-                if (to == Square(from + push_dir)) return true;
-                if (to == Square(from + 2 * push_dir) &&
-                    is_empty(Square(from + push_dir)) &&
-                    is_pawn_begin(c, from)) return true;
+                if (to == static_cast<Square>(s)) {
+                    return true;
+                }
+                if (to == static_cast<Square>(s + d)) {
+                    if (is_empty(s) && is_pawn_begin(c, from)) {
+                        return true;
+                    }
+                }
             }
             break;
         default:
-            if (!can_attack(t, from, to)) return false;
-            if (t == KNIGHT || t == KING) return true;
-            s = Square(from + d);
+            if (!can_attack(t, from, to)) {
+                return false;
+            }
+            if (t == KNIGHT || t == KING) {
+                return true;
+            }
+            d = direction_to(from, to);
+            s = static_cast<Square>(from + d);
             while (s != to && is_empty(s)) { // Search for a blocker
-                s = Square(s + d);
+                s = static_cast<Square>(s + d);
                 assert(!is_out(s));
             }
-            if (s == to) return true;
+            if (s == to) {
+                return true;
+            }
             break;
     }
     return false;

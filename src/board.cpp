@@ -15,40 +15,46 @@
  */
 
 #include <assert.h>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <iomanip>
 
 #include "board.h"
 
-Board::Board()
+Board::Board() : board(), dir_array()
 {
-    // Initialize the board's squares
-    for (int i = 0; i < BOARD_SIZE; ++i) board[i] = Piece();
 
-    // Initialize the direction array
-    for (int i = 0; i < 240; ++i) {
-        dir_array[i] = NO_DIR;
-    }
-
-    // Initialize the attack array
-    for (int i = 0; i < 64; ++i) {
-        Square from = get_square(i);
-        for (int j = 0; j < 64; ++j) {
-            Square to = get_square(j);
+    // Initialize attack and direction arrays
+    for (const Square &from : SQUARES) {
+        if (from == OUT) {
+            break;
+        }
+        for (const Square &to : SQUARES) {
+            if (to == OUT) {
+                break;
+            }
             int diff = 0x77 + from - to;
             for (const PieceType& t : NOT_PAWN_TYPES) {
-                const Direction * dirs = PIECES_DIRS[t];
-                for (int d = 0; d < NB_DIRS[t]; ++d) {
-                    Square s = Square(from + dirs[d]);
+                for (const Direction &d : PIECES_DIRS[t]) {
+                    if (d == NO_DIR) {
+                        break;
+                    }
+                    Square s = static_cast<Square>(from + d);
                     while (!is_out(s)) {
                         if (s == to) {
-                            attack_array[diff].set(t, true);
-                            dir_array[diff] = dirs[d];
+                            attack_array[diff][t] = true;
+                            dir_array[diff] = d;
                             break;
                         }
-                        if (t == KNIGHT || t == KING) break; // Leapers
-                        s = Square(s + dirs[d]); // Sliders
+                        switch (t) {
+                            case KNIGHT:
+                            case KING:
+                                s = OUT;
+                                break;
+                            default:
+                                s = static_cast<Square>(s + d);
+                                break;
+                        }
                     }
                 }
             }
@@ -66,7 +72,7 @@ std::string Board::to_string(const std::string squares[], const int sq_width)
     stream << std::endl;
     for (Square s = A8; s < OUT; s = Square(s + 1)) {
         if (is_out(s)) continue;
-        if (get_file(s) == FILE_A) {
+        if (file(s) == FILE_A) {
             stream << "     +";
             for (int i = 0; i < 8; ++i) {
                 // Every string representing a square
@@ -80,11 +86,11 @@ std::string Board::to_string(const std::string squares[], const int sq_width)
                 stream << "+";
             }
             stream << std::endl;
-            stream << "   " << get_rank(s) + 1 << " ";
+            stream << "   " << rank(s) + 1 << " ";
         }
         stream << "|";
         stream << squares[s];
-        if (get_file(s) == FILE_H) {
+        if (file(s) == FILE_H) {
             stream << "|" << std::endl;
             if (s == H1) break; // The loop ends here
             s = Square(s - 0x18);
@@ -121,7 +127,7 @@ std::ostream& operator<<(std::ostream& out, const Board board)
         Square s = Square(i);
         squares[i] = " ";
         if (!board.is_empty(s)) {
-            squares[i] += board.get_piece(s).to_string();
+            squares[i] += board[s].to_string();
         } else if (board.is_dark(s)) {
             squares[i] += ".";
         } else {

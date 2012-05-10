@@ -22,41 +22,48 @@
 #include "common.h"
 #include "hashtable.h"
 #include "move.h"
-#include "zobrist.h"
 
 class Transposition
 {
     private:
-        short value;         // 2 bytes / 16 bits used
-        Move best_move;      // 2 bytes / 16 bits used
-        unsigned char depth; // 1 byte  /  8 bits used: depth < 256
-        Bound bound;         // 1 byte  /  2 bits used
+        int16_t value_;       // 2 bytes / 16 bits used
+        Move best_move_;      // 2 bytes / 16 bits used
+        unsigned char depth_; // 1 byte  /  8 bits used (depth < 256)
+        Bound bound_;         // 1 byte  /  2 bits used
 
     public:
         Transposition(int v, Bound b, int d, Move bm)
-            : value(v), best_move(bm), depth(d),
-              bound(b) {}
+            : value_(v), best_move_(bm), depth_(d),
+              bound_(b) {}
         Transposition()
-            : value(0), best_move(Move()), depth(0),
-              bound(UNDEF_BOUND) {}
+            : value_(0), best_move_(Move()), depth_(0),
+              bound_(UNDEF_BOUND) {}
 
-        int get_value() const { return value; };
-        int get_depth() const { return depth; };
-        Bound get_bound() const { return bound; };
-        Move get_best_move() const { return best_move; };
+        int value() const {
+            return value_;
+        };
+        int depth() const {
+            return depth_;
+        };
+        Bound bound() const {
+            return bound_;
+        };
+        Move best_move() const {
+            return best_move_;
+        };
 
         bool is_empty() const {
-            return value == 0 &&
-                   depth == 0 &&
-                   bound == UNDEF_BOUND &&
-                   best_move.is_null();
+            return value_ == 0 &&
+                   depth_ == 0 &&
+                   bound_ == UNDEF_BOUND &&
+                   best_move_.is_null();
         };
 
         bool operator==(const Transposition& other) const {
-            return this->value == other.value &&
-                   this->depth == other.depth &&
-                   this->bound == other.bound &&
-                   this->best_move == other.best_move;
+            return this->value_ == other.value_ &&
+                   this->depth_ == other.depth_ &&
+                   this->bound_ == other.bound_ &&
+                   this->best_move_ == other.best_move_;
         }
         bool operator!=(const Transposition& other) const {
             return !(*this == other);

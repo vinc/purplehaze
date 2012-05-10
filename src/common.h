@@ -20,16 +20,16 @@
 #include <string>
 
 #ifndef VERSION
-#define VERSION "2.0.2"
+#define VERSION "2.0.3"
 #endif
 
-static const int BOARD_SIZE =  128;
-static const int MAX_PLY =     128; // Maximum search depth
-static const int MAX_BF =      256; // Maximum number of moves per position
-static const int INF =         29999;
-static const int TT_SIZE =     1024 * 1024 * 128;
-static const int MT_SIZE =     1024 * 1024;
+static const int BOARD_SIZE  = 128;
+static const int MAX_PLY     = 128; // Maximum search depth
+static const int MAX_MOVES   = 256; // Maximum number of moves per position
 static const int MAX_KILLERS = 2;
+static const int INF         = 29999;
+static const int TT_SIZE     = 1024 * 1024 * 128;
+static const int MT_SIZE     = 1024 * 1024;
 
 static const std::string DEFAULT_FEN =
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -200,6 +200,11 @@ static const Direction PAWN_CAPTURE_DIRS[][2] = {
 
 // Used in tt.h
 enum Bound : unsigned char { EXACT, LOWER, UPPER, UNDEF_BOUND };
+
+// Used in game.h, hashtable.cpp
+// NOTE: sizeof(Material) + sizeof(Hash) must be a power of two
+// for efficient material hashtable lookup.
+typedef uint64_t Material;
 
 // Used for debugging
 #define assert_msg(x) !(std::cerr << "Assertion failed: " << x << std::endl)
