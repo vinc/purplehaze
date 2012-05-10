@@ -20,7 +20,7 @@
 #include <string>
 
 #ifndef VERSION
-#define VERSION "2.0.2"
+#define VERSION "2.0.3"
 #endif
 
 static const int BOARD_SIZE  = 128;
