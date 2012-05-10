@@ -1,3 +1,12 @@
+10 May 2012 v2.0.3 - Improved search heuristics
+    * Better search pruning
+        * Null Move Pruning
+        * Futility Pruning
+    * Code improvements
+        * Clean up
+        * Better test coverage
+        * Bug fixes
+
 26 Mar 2012 v2.0.2 - General clean up
     * New features
         * Global move list
