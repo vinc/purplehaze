@@ -31,7 +31,7 @@ ifeq ($(compiler),clang)
     CXX = clang++
 endif
 
-CXXFLAGS = -std=c++0x -pipe
+CXXFLAGS = -std=c++0x -pthread -pipe
 ifeq ($(compiler),intel)
     CXXFLAGS += -Wall -Wremarks -wd981 -wd2259
 else

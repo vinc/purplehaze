@@ -20,6 +20,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <thread>
 
 #include "protocol.h"
 
@@ -36,6 +37,7 @@ class Xboard : public Protocol
         std::ofstream log;
         bool force_mode;
         bool debug_mode;
+        std::thread thinker;
     public:
         Xboard();
         void loop();

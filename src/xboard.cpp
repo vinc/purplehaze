@@ -137,7 +137,10 @@ void Xboard::loop()
             force_mode = false;
         } else if (cmd == "go") {
             force_mode = false;
-            think();
+            if (thinker.joinable()) {
+                thinker.join();
+            }
+            thinker = std::thread(&Xboard::think, this);
         } else if (cmd == "force") {
             force_mode = true;
         } else if (cmd == "ping") {
@@ -236,7 +239,12 @@ void Xboard::loop()
                     log << std::endl << "< Illegal move: " << cmd;
                 }
             }
-            if (!force_mode) think();
+            if (!force_mode) {
+                if (thinker.joinable()) {
+                    thinker.join();
+                }
+                thinker = std::thread(&Xboard::think, this);
+            }
         } else if (cmd == "verbose") { // Debug mode
             verbosity = 2;
         } else {
@@ -248,6 +256,9 @@ void Xboard::loop()
             log << std::endl;
         }
         std::cin >> cmd;
+    }
+    if (thinker.joinable()) {
+        thinker.join();
     }
     if (debug_mode) {
         log << "> " << cmd << std::endl;
