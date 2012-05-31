@@ -22,7 +22,7 @@
 #include <sstream>
 #include <stdio.h>
 #include <string>
-#include <time.h>
+#include <ctime>
 
 #include "common.h"
 #include "game.h"

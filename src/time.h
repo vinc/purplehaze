@@ -18,7 +18,7 @@
 #define TIME_H
 
 #include <stdio.h>
-#include <time.h>
+#include <ctime>
 
 class Time
 {

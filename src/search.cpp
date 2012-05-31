@@ -18,7 +18,7 @@
 #include <iostream>
 #include <iomanip>
 #include <stdio.h>
-#include <time.h>
+#include <ctime>
 
 #include "game.h"
 #include "search.h"
