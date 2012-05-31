@@ -41,6 +41,8 @@ class Time
 
         bool abort_search;
 
+        bool is_out_of_time() const;
+
     public:
         Time(unsigned int moves = 40, unsigned int time = 24000) :
             level_moves(moves), level_time(time),
@@ -62,8 +64,10 @@ class Time
             unsigned long long int clocks = clock() - start;
             return 100 * clocks / CLOCKS_PER_SEC;
         };
+        void abort() {
+            abort_search = true;
+        };
         void start_thinking(const unsigned int ply);
-        bool is_out_of_time() const;
         bool poll(const unsigned int node_count);
 };
 

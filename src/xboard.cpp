@@ -141,6 +141,8 @@ void Xboard::loop()
                 thinker.join();
             }
             thinker = std::thread(&Xboard::think, this);
+        } else if (cmd == "?") {
+            game.time.abort();
         } else if (cmd == "force") {
             force_mode = true;
         } else if (cmd == "ping") {

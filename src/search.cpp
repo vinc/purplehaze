@@ -348,7 +348,7 @@ Move Game::root(int max_depth)
         int score;
         int alpha = -INF;
         int beta = INF;
-        if (time.is_out_of_time()) {
+        if (time.poll(nodes_count)) {
             break; // Do not start a new ply
         }
         if (time.allocated() - time.elapsed() < 100) {
@@ -386,7 +386,7 @@ Move Game::root(int max_depth)
                 score = -search<ALL>(-beta, -alpha, depth - 1, 1);
             }
             undo_move(move);
-            if (time.is_out_of_time()) {
+            if (time.poll(nodes_count)) {
                 break; // Discard the move
             }
             if (score > alpha) {
@@ -398,7 +398,7 @@ Move Game::root(int max_depth)
                 }
             }
         }
-        if (time.is_out_of_time()) {
+        if (time.poll(nodes_count)) {
             // TODO: restore best_move and best_score from previous ply?
             break; // Discard this ply
         }

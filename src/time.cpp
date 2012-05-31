@@ -58,7 +58,7 @@ bool Time::poll(const unsigned int node_count)
     // Avoid wasting time by calling 'is_out_of_time()' too frequently
     if (node_count - polling.previous > polling.interval) {
         polling.previous = node_count;
-        abort_search = is_out_of_time();
+        abort_search = abort_search || is_out_of_time();
     }
     return abort_search;
 }
