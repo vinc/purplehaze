@@ -82,20 +82,16 @@ void Xboard::loop()
                 log << " " << n;
             }
             if (n == 2) {
-                for (int i = 0; i < XBOARD_NB_FEATURES; ++i) {
-                    std::cout << "feature " << XBOARD_FEATURES[i][0];
-                    if (debug_mode) {
-                        log << std::endl
-                            << "< feature " << XBOARD_FEATURES[i][0];
-                    }
-                    std::string value = XBOARD_FEATURES[i][1];
+                for (const std::string (&feature)[2] : XBOARD_FEATURES) {
+                    std::string title = feature[0];
+                    std::string value = feature[1];
                     if (value != "0" && value != "1") {
-                        // Add quotes if value is not a boolean
                         value = '"' + value + '"';
                     }
-                    std::cout << '=' << value << std::endl;
+                    std::string out = "feature " + title + "=" + value;
+                    std::cout << out << std::endl;
                     if (debug_mode) {
-                        log << "=" << value;
+                        log << std::endl << "< " << out;
                     }
                 }
             }
