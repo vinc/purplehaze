@@ -349,10 +349,13 @@ Move Game::root(int max_depth)
         if (time.poll(nodes_count)) {
             break; // Do not start a new ply
         }
-        if (time.allocated() - time.elapsed() < 100) {
-            // Decrease polling interval if <1s left
-            time.set_polling_interval(100000);
+
+        // Increase poll frequency as time is running out
+        const int time_remaining = time.allocated() - time.elapsed();
+        if (time_remaining < 1000) {
+            time.set_polling_interval(time_remaining * 512);
         }
+
         // Mate pruning
         if (depth > 6) {
             bool is_mate = true;

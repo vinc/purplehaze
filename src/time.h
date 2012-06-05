@@ -28,25 +28,22 @@ class Time
             Polling() : interval(50000), previous(0) {}
         } polling;
 
-        // Set the time to play the game
-        unsigned int level_moves;
-        unsigned int level_time; // In centi-seconds
+        struct Clock {
+            unsigned int moves;
+            unsigned int time; // Centiseconds
+            Clock(int m, int t) : moves(m), time(t) {}
+        } level, clock;
 
-        // Set the time to play a move
+        unsigned int ratio;
         clock_t start;
-        unsigned long long int time_per_move; // Calculated
-        unsigned int remaining; // Given by protocols like Xboard
-        int coef_1, coef_2;
-
         bool abort_search;
 
         bool is_out_of_time() const;
 
     public:
-        Time(unsigned int moves = 40, unsigned int time = 24000) :
-            level_moves(moves), level_time(time),
-            time_per_move(level_time / level_moves),
-            remaining(time_per_move),
+        Time(const int moves = 40, const int time = 24000) :
+            level(moves, time),
+            clock(moves, time),
             abort_search(false)
             {}
 
@@ -54,13 +51,15 @@ class Time
             polling.interval = nodes;
         };
         void set_remaining(const unsigned int time) {
-            remaining = time;
+            clock.time = time;
         };
-        unsigned long long int allocated() const {
-            return time_per_move;
+        unsigned int allocated() const {
+            assert(level.moves >= clock.moves);
+            const unsigned int moves = level.moves - clock.moves + 1;
+            return clock.time / moves;
         };
         unsigned long long int elapsed() const {
-            unsigned long long int clocks = clock() - start;
+            const unsigned long long int clocks = std::clock() - start;
             return 100 * clocks / CLOCKS_PER_SEC;
         };
         void abort() {
