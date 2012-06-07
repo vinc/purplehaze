@@ -66,7 +66,7 @@ static const std::string OPTIONS[][2] = {
     }
 };
 
-std::string prompt()
+static std::string prompt()
 {
     std::cout << "> ";
     std::string cmd;

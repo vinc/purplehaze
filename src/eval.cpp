@@ -252,7 +252,7 @@ int Game::material_eval()
     return score;
 }
 
-int castling_score(const Position &pos, Color c)
+static int castling_score(const Position &pos, Color c)
 {
     int score = 0;
     if (pos.has_castled(c)) {

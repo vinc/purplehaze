@@ -19,8 +19,9 @@
 
 #include "game.h"
 
-bool king_castle_allowed(const Color c, const Square from, const Square to,
-                         const Board &board, const Pieces &pieces)
+static bool king_castle_allowed(const Color c,
+                                const Square from, const Square to,
+                                const Board &board, const Pieces &pieces)
 {
     assert(from == Square(E1 + A8 * c));
     assert(to == Square(G1 + A8 * c));
@@ -34,8 +35,9 @@ bool king_castle_allowed(const Color c, const Square from, const Square to,
         !board.is_attacked_by(!c, Square((F1 + A8 * c)), pieces);
 }
 
-bool queen_castle_allowed(const Color c, const Square from, const Square to,
-                          const Board &board, const Pieces &pieces)
+static bool queen_castle_allowed(const Color c,
+                                 const Square from, const Square to,
+                                 const Board &board, const Pieces &pieces)
 {
     assert(from == Square(E1 + A8 * c));
     assert(to == Square(C1 + A8 * c));

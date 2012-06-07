@@ -54,7 +54,7 @@ void Game::print_thinking(int depth, int score, Move m)
     std::cout << output_pv(depth, score, m) << std::endl;
 }
 
-bool is_mate(int score)
+static bool is_mate(int score)
 {
     return ((score < -INF + MAX_PLY) || (INF - MAX_PLY < score));
 }
@@ -168,7 +168,7 @@ std::string get_meta(double value, std::string unit)
     return stream.str();
 }
 
-double get_percent(double a, double b)
+static double get_percent(double a, double b)
 {
     return 100 * a / b;
 }
