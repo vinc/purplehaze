@@ -41,7 +41,7 @@ class Time
         bool is_out_of_time() const;
 
     public:
-        Time(const int moves = 40, const int time = 24000) :
+        Time(const int moves = 40, const int time = 30000) :
             level(moves, time),
             clock(moves, time),
             abort_search(false)
