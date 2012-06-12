@@ -30,7 +30,13 @@ class Pieces
         unsigned char total[2];
 
     public:
-        Pieces();
+        Pieces() :
+            nb_pieces(),
+            total()
+            {
+                std::fill(positions[0][0], positions[0][0] + 2 * 7 * 9, OUT);
+            }
+
         Square position(Piece p) const {
             assert(0 <= p.index() && p.index() < 9);
             return positions[p.color()][p.type()][p.index()];
