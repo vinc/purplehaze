@@ -23,43 +23,41 @@ static bool king_castle_allowed(const Color c,
                                 const Square from, const Square to,
                                 const Board &board, const Pieces &pieces)
 {
-    assert(from == Square(E1 + A8 * c));
-    assert(to == Square(G1 + A8 * c));
-    const Square rook = Square(H1 + A8 * c);
+    assert(from == static_cast<Square>(E1 + A8 * c));
+    assert(to == static_cast<Square>(G1 + A8 * c));
+    const Square rook = static_cast<Square>(H1 + A8 * c);
     return
-        board.is_empty(Square(F1 + A8 * c)) &&
+        board.is_empty(static_cast<Square>(F1 + A8 * c)) &&
         board.is_empty(to) &&
         board[rook].is(c, ROOK) &&
         !board.is_attacked_by(!c, from, pieces) &&
         !board.is_attacked_by(!c, to, pieces) &&
-        !board.is_attacked_by(!c, Square((F1 + A8 * c)), pieces);
+        !board.is_attacked_by(!c, static_cast<Square>(F1 + A8 * c), pieces);
 }
 
 static bool queen_castle_allowed(const Color c,
                                  const Square from, const Square to,
                                  const Board &board, const Pieces &pieces)
 {
-    assert(from == Square(E1 + A8 * c));
-    assert(to == Square(C1 + A8 * c));
-    const Square rook = Square(A1 + A8 * c);
+    assert(from == static_cast<Square>(E1 + A8 * c));
+    assert(to == static_cast<Square>(C1 + A8 * c));
+    const Square rook = static_cast<Square>(A1 + A8 * c);
     return
-        board.is_empty(Square(B1 + A8 * c)) &&
-        board.is_empty(Square(D1 + A8 * c)) &&
+        board.is_empty(static_cast<Square>(B1 + A8 * c)) &&
+        board.is_empty(static_cast<Square>(D1 + A8 * c)) &&
         board.is_empty(to) &&
         board[rook].is(c, ROOK) &&
         !board.is_attacked_by(!c, from, pieces) &&
         !board.is_attacked_by(!c, to, pieces) &&
-        !board.is_attacked_by(!c, Square((D1 + A8 * c)), pieces);
+        !board.is_attacked_by(!c, static_cast<Square>(D1 + A8 * c), pieces);
 }
 
 void Moves::generate_pieces(Color c, PieceType t, MoveType mt)
 {
-    const Direction * dirs = PIECES_DIRS[t];
-    const int n = pieces.count(c, t);
-    for (int i = 0; i < n; ++i) {
+    for (int i = 0, n = pieces.count(c, t); i < n; ++i) {
         const Square from = pieces.position(c, t, i);
-        for (int d = 0; d < NB_DIRS[t]; ++d) {
-            Square to = Square(from + dirs[d]);
+        for (const Direction &dir : PIECES_DIRS[t]) {
+            Square to = static_cast<Square>(from + dir);
             while (!board.is_out(to)) {
                 if (!board.is_empty(to)) {
                     if (board[to].is(c)) {
@@ -75,7 +73,7 @@ void Moves::generate_pieces(Color c, PieceType t, MoveType mt)
                 if (t == KNIGHT || t == KING) {
                     break; // Leapers
                 }
-                to = Square(to + dirs[d]); // Sliders
+                to = static_cast<Square>(to + dir); // Sliders
             }
         }
     }
@@ -86,37 +84,38 @@ void Moves::generate(MoveType mt)
     const Color c = current_position.side();
 
     // Pawns moves
-    const int n = pieces.count(c, PAWN);
-    for (int i = 0; i < n; ++i) {
-        Square from = pieces.position(c, PAWN, i);
+    for (int i = 0, n = pieces.count(c, PAWN); i < n; ++i) {
+        const Square from = pieces.position(c, PAWN, i);
 
         // Pawn captures
-        for (int d = 0; d < 2; ++d) {
-            if (mt == QUIET_MOVE) {
-                break;
-            }
-            Square to = Square(from + PAWN_CAPTURE_DIRS[c][d]);
-            if (board.is_out(to)) {
-                continue;
-            }
-            if (!board.is_empty(to) && board[to].color() != c) {
-                if (board.is_pawn_end(c, to)) { // Promotion capture
-                    add(Move(from, to, KNIGHT_PROMOTION_CAPTURE));
-                    add(Move(from, to, BISHOP_PROMOTION_CAPTURE));
-                    add(Move(from, to, ROOK_PROMOTION_CAPTURE));
-                    add(Move(from, to, QUEEN_PROMOTION_CAPTURE));
-                } else { // Capture
-                    add(Move(from, to, CAPTURE));
+        if (mt != QUIET_MOVE) {
+            for (const Direction &dir : PAWN_CAPTURE_DIRS[c]) {
+                const Square to = static_cast<Square>(from + dir);
+                if (board.is_out(to)) {
+                    continue;
                 }
-            } else if (to == current_position.en_passant()) { // En passant
-                add(Move(from, to, EN_PASSANT));
+                if (!board.is_empty(to) && board[to].color() != c) {
+                    if (board.is_pawn_end(c, to)) {
+                        // Promotion capture
+                        add(Move(from, to, KNIGHT_PROMOTION_CAPTURE));
+                        add(Move(from, to, BISHOP_PROMOTION_CAPTURE));
+                        add(Move(from, to, ROOK_PROMOTION_CAPTURE));
+                        add(Move(from, to, QUEEN_PROMOTION_CAPTURE));
+                    } else {
+                        // Capture
+                        add(Move(from, to, CAPTURE));
+                    }
+                } else if (to == current_position.en_passant()) {
+                    // En passant
+                    add(Move(from, to, EN_PASSANT));
+                }
             }
         }
 
         if (mt == CAPTURE) {
             continue;
         }
-        Square to = Square(from + PAWN_PUSH_DIRS[c]);
+        Square to = static_cast<Square>(from + PAWN_PUSH_DIRS[c]);
         assert(!board.is_out(to)); // Should never happend
         if (!board.is_empty(to)) {
             continue;
@@ -136,7 +135,7 @@ void Moves::generate(MoveType mt)
 
         // Double pawn push
         if (board.is_pawn_begin(c, from)) {
-            to = Square(to + PAWN_PUSH_DIRS[c]);
+            to = static_cast<Square>(to + PAWN_PUSH_DIRS[c]);
             if (!board.is_empty(to)) {
                 continue;
             }
@@ -154,15 +153,15 @@ void Moves::generate(MoveType mt)
     }
 
     // Castling
-    const Square from = Square(E1 + A8 * c);
+    const Square from = static_cast<Square>(E1 + A8 * c);
     if (current_position.can_castle(c, KING)) {
-        const Square to = Square(G1 + A8 * c);
+        const Square to = static_cast<Square>(G1 + A8 * c);
         if (king_castle_allowed(c, from, to, board, pieces)) {
             add(Move(from, to, KING_CASTLE));
         }
     }
     if (current_position.can_castle(c, QUEEN)) {
-        const Square to = Square(C1 + A8 * c);
+        const Square to = static_cast<Square>(C1 + A8 * c);
         if (queen_castle_allowed(c, from, to, board, pieces)) {
             add(Move(from, to, QUEEN_CASTLE));
         }
@@ -199,13 +198,15 @@ void Game::make_move(Move m)
 
     // Update castling rights
     if (pos.can_castle(c, KING)) {
-        if (t == KING || (t == ROOK && orig == Square(H1 + A8 * c))) {
+        const Square s = static_cast<Square>(H1 + A8 * c);
+        if (t == KING || (t == ROOK && orig == s)) {
             pos.set_castle_right(c, KING, false);
             zobrist.update_castle_right(pos.hash(), c, KING);
         }
     }
     if (pos.can_castle(c, QUEEN)) {
-        if (t == KING || (t == ROOK && orig == Square(A1 + A8 * c))) {
+        const Square s = static_cast<Square>(A1 + A8 * c);
+        if (t == KING || (t == ROOK && orig == s)) {
             pos.set_castle_right(c, QUEEN, false);
             zobrist.update_castle_right(pos.hash(), c, QUEEN);
         }
@@ -215,16 +216,16 @@ void Game::make_move(Move m)
     if (m.is_capture()) {
         Square s = dest;
         if (m.is_en_passant()) {
-            s = (c == BLACK ? Square(ep + UP) : Square(ep + DOWN));
+            s = static_cast<Square>(ep + (c == BLACK ? UP : DOWN));
         }
         assert(!board.is_empty(s) || assert_msg(debug_move(m)));
 
         Piece capture = board[s];
         if (capture.is(ROOK)) { // Update opponent's castling rights
-            if (dest == Square(H1 + A8 * !c)) {
+            if (dest == static_cast<Square>(H1 + A8 * !c)) {
                 pos.set_castle_right(!c, KING, false);
                 zobrist.update_castle_right(pos.hash(), !c, KING);
-            } else if (dest == Square(A1 + A8 * !c)) {
+            } else if (dest == static_cast<Square>(A1 + A8 * !c)) {
                 pos.set_castle_right(!c, QUEEN, false);
                 zobrist.update_castle_right(pos.hash(), !c, QUEEN);
             }
@@ -239,12 +240,12 @@ void Game::make_move(Move m)
         Square rook_orig, rook_dest;
         switch (m.castle_side()) {
             case KING:
-                rook_orig = Square(H1 + A8 * c);
-                rook_dest = Square(F1 + A8 * c);
+                rook_orig = static_cast<Square>(H1 + A8 * c);
+                rook_dest = static_cast<Square>(F1 + A8 * c);
                 break;
             case QUEEN:
-                rook_orig = Square(A1 + A8 * c);
-                rook_dest = Square(D1 + A8 * c);
+                rook_orig = static_cast<Square>(A1 + A8 * c);
+                rook_dest = static_cast<Square>(D1 + A8 * c);
                 break;
             default:
                 assert(false);
@@ -275,7 +276,7 @@ void Game::make_move(Move m)
 
     // Update en passant
     if (m.is_double_pawn_push()) {
-        Square new_ep = Square(orig + (dest - orig) / 2);
+        Square new_ep = static_cast<Square>(orig + (dest - orig) / 2);
         pos.set_en_passant(new_ep);
         zobrist.update_en_passant(pos.hash(), new_ep);
     } else {
@@ -303,8 +304,8 @@ void Game::undo_move(Move m)
         Piece capture = current_position().capture();
         Square s = dest;
         if (m.is_en_passant()) {
-            Color c = current_position().side();
-            s = (c == WHITE ? Square(dest + UP) : Square(dest + DOWN));
+            const Color c = current_position().side();
+            s = static_cast<Square>(dest + (c == WHITE ? UP : DOWN));
             board[dest] = Piece();
         }
         add_piece(capture.color(), capture.type(), s);
@@ -316,16 +317,16 @@ void Game::undo_move(Move m)
         return;
     }
     if (m.is_castle()) {
+        const Color c = current_position().side();
         Square rook_orig, rook_dest;
-        Color c = current_position().side();
         switch (m.castle_side()) {
             case KING:
-                rook_orig = Square(H1 + A8 * c);
-                rook_dest = Square(F1 + A8 * c);
+                rook_orig = static_cast<Square>(H1 + A8 * c);
+                rook_dest = static_cast<Square>(F1 + A8 * c);
                 break;
             case QUEEN:
-                rook_orig = Square(A1 + A8 * c);
-                rook_dest = Square(D1 + A8 * c);
+                rook_orig = static_cast<Square>(A1 + A8 * c);
+                rook_dest = static_cast<Square>(D1 + A8 * c);
                 break;
             default:
                 assert(false);
@@ -358,9 +359,9 @@ bool Game::is_legal(Move m)
         return false;
     }
 
-    Piece p = board[from];
-    PieceType t = p.type();
-    Color c = p.color();
+    const Piece p = board[from];
+    const PieceType t = p.type();
+    const Color c = p.color();
 
     // The piece cannot be one of the opponent
     if (c != current_position().side()) {
@@ -398,7 +399,7 @@ bool Game::is_legal(Move m)
                 return false;
             }
             // from another pawn, the later being captured by the former
-            s = (c == BLACK ? Square(ep + UP) : Square(ep + DOWN));
+            s = static_cast<Square>(ep + (c == BLACK ? UP : DOWN));
             if (board[s].type() != PAWN) {
                 return false;
             }
