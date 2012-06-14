@@ -25,8 +25,7 @@
 #include "protocol.h"
 #include "log.h"
 
-static const int XBOARD_NB_FEATURES = 4;
-static const std::string XBOARD_FEATURES[XBOARD_NB_FEATURES][2] = {
+static const std::string XBOARD_FEATURES[][2] = {
     { "myname",   "Purple Haze " + static_cast<std::string>(VERSION) },
     { "ping",     "1" },
     { "setboard", "1" },
