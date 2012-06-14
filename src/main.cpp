@@ -76,12 +76,16 @@ static std::string prompt()
 
 int main(int argc, char *argv[])
 {
+    std::string logfile = "";
     bool option_color = false;
     char opt;
-    while ((opt = getopt(argc, argv, "c")) != -1) {
+    while ((opt = getopt(argc, argv, "cl:")) != -1) {
         switch (opt) {
             case 'c':
                 option_color = true;
+                break;
+            case 'l':
+                logfile = optarg;
                 break;
         }
     }
@@ -93,6 +97,9 @@ int main(int argc, char *argv[])
     for (std::string cmd = prompt(); cmd != "quit"; cmd = prompt()) {
         if (cmd == "xboard") { // Xboard protocol mode
             Xboard xboard;
+            if (!logfile.empty()) {
+                xboard.debug(logfile);
+            }
             xboard.loop();
             return 0;
         } else if (cmd == "help") {

@@ -23,6 +23,7 @@
 #include <thread>
 
 #include "protocol.h"
+#include "log.h"
 
 static const int XBOARD_NB_FEATURES = 4;
 static const std::string XBOARD_FEATURES[XBOARD_NB_FEATURES][2] = {
@@ -35,12 +36,20 @@ static const std::string XBOARD_FEATURES[XBOARD_NB_FEATURES][2] = {
 class Xboard : public Protocol
 {
     private:
-        std::ofstream log;
-        bool force_mode;
-        bool debug_mode;
         std::thread thinker;
+        Log log;
+        bool force_mode;
+
     public:
-        Xboard();
+        Xboard() :
+            Protocol(),
+            force_mode(true)
+            {}
+
+        void debug(std::string logfile) {
+            log.open(logfile);
+        };
+
         void loop();
         void think();
 };

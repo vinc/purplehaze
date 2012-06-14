@@ -15,6 +15,7 @@
  */
 
 #include <assert.h>
+#include <ctime>
 #include <iostream>
 #include <signal.h>
 #include <sstream>
@@ -22,18 +23,13 @@
 
 #include "xboard.h"
 
-Xboard::Xboard()
-{
-    force_mode = true;
-    debug_mode = false;
-    verbosity = 1;
-}
-
 void Xboard::think()
 {
-    if (get_verbosity() > 1) std::cout << game.board << std::endl;
+    if (get_verbosity() > 1) {
+        log.to(Log::FILE) << game.board << std::endl;
+    }
 
-    std::string move = search_move();
+    const std::string move = search_move();
     std::string output = "";
     if (move == "LOST") {
         output = "result ";
@@ -46,77 +42,74 @@ void Xboard::think()
         output = "result 1/2-1/2";
     } else if (!force_mode) {
         play_move(move);
-        if (debug_mode) {
-            log << std::endl << "  DEBUG: "
-                << game.time.elapsed() / 100.0f
-                << " of " << game.time.allocated() / 100.0f
-                << " seconds used to play";
-        }
+
+        const float elapsed = game.time.elapsed() / 100.0f;
+        const float allocated = game.time.allocated() / 100.0f;
+        log.to(Log::FILE) << Log::DEBUG
+                          << elapsed << " of " << allocated
+                          << " second" << (allocated != 1.0f ? "s" : "")
+                          << " used to play" << std::endl;
+
         if (get_verbosity() > 1) {
-            std::cout << std::endl;
+            log << std::endl;
             game.print_tt_stats();
         }
         output = "move " + move;
     }
-    std::cout << output << std::endl;
-    if (debug_mode) {
-        log << std::endl << "< " << output;
-    }
+    log.to(Log::BOTH) << Log::OUT << output << std::endl;
 }
 
 void Xboard::loop()
 {
     signal(SIGINT, SIG_IGN);
-    std::cout << std::endl; // Acknowledge Xboard mode
+    log << std::endl; // Acknowledge Xboard mode
+
+    const std::time_t t = std::time(NULL);
+    std::string datetime = std::ctime(&t);
+    datetime.erase(datetime.end() - 1); // Remove trailing new line character
+    log.to(Log::FILE) << Log::DEBUG << "[" << datetime << "] "
+                      << "Purple Haze " << VERSION << std::endl
+                      << Log::IN << "xboard" << std::endl;
 
     std::string cmd;
     std::cin >> cmd;
     while (cmd != "quit") {
-        if (debug_mode) {
-            log << "> " << cmd;
-        }
+        log.to(Log::FILE) << Log::IN << cmd;
+
         if (cmd == "protover") {
             int n;
             std::cin >> n;
-            if (debug_mode) {
-                log << " " << n;
-            }
+
+            log.to(Log::FILE) << " " << n << std::endl;
+
             if (n == 2) {
                 for (const std::string (&feature)[2] : XBOARD_FEATURES) {
                     std::string title = feature[0];
                     std::string value = feature[1];
                     if (value != "0" && value != "1") {
+                        // Non boolean values must be quoted
                         value = '"' + value + '"';
                     }
                     std::string out = "feature " + title + "=" + value;
-                    std::cout << out << std::endl;
-                    if (debug_mode) {
-                        log << std::endl << "< " << out;
-                    }
+                    log.to(Log::BOTH) << Log::OUT << out << std::endl;
                 }
             }
         } else if (cmd == "accepted") {
             std::string feature;
             std::cin >> feature;
-            if (debug_mode) {
-                log << std::endl << "> accepted " << feature;
-            }
+
+            log.to(Log::FILE) << " " << feature;
+
             // Given the current feature list, there is nothing to be done
             // when a feature gets accepted.
         } else if (cmd == "rejected") {
             std::string feature;
             std::cin >> feature;
-            if (debug_mode) {
-                log << std::endl << "> rejected " << feature;
-            }
+
+            log.to(Log::FILE) << " " << feature;
+
             // Given the current feature list, there is nothing to be done
             // when a feature gets rejected.
-        } else if (cmd == "debug") {
-            if (!debug_mode) {
-                debug_mode = true;
-                log.open("game.log", std::ios::app);
-                log << "  DEBUG: Starting log" << std::endl;
-            }
         } else if (cmd == "new") {
             new_game();
             set_board(DEFAULT_FEN);
@@ -127,9 +120,9 @@ void Xboard::loop()
             fen.erase(0, 1); // Remove the first whitespace
             new_game();
             set_board(fen);
-            if (debug_mode) {
-                log << " " << fen;
-            }
+
+            log.to(Log::FILE) << " " << fen;
+
             force_mode = false;
         } else if (cmd == "go") {
             force_mode = false;
@@ -144,14 +137,15 @@ void Xboard::loop()
         } else if (cmd == "ping") {
             int n;
             std::cin >> n;
-            std::cout << "pong " << n << std::endl;
+            log.to(Log::FILE) << " " << n << std::endl;
+            log.to(Log::BOTH) << Log::OUT << "pong " << n;
+            log.to(Log::COUT) << std::endl;
         } else if (cmd == "level") {
             // Number of moves
             int moves;
             std::cin >> moves;
-            if (debug_mode) {
-                log << " " << moves;
-            }
+
+            log.to(Log::FILE) << " " << moves;
 
             // TODO "level 0 m 0" means play the entire game in 'm' minutes,
             // but the current time management don't support it.
@@ -161,9 +155,7 @@ void Xboard::loop()
             int time;
             std::string str_time;
             std::cin >> str_time;
-            if (debug_mode) {
-                log << " " << str_time;
-            }
+
             size_t sep = str_time.find(":");
             if (sep == std::string::npos) {
                 std::istringstream minutes(str_time);
@@ -181,9 +173,9 @@ void Xboard::loop()
             // Control character
             int control;
             std::cin >> control;
-            if (debug_mode) {
-                log << " " << control;
-            }
+
+            log.to(Log::FILE) << " " << str_time << " " << control;
+
             if (control == 0) {
                 set_time(moves, time);
             } else { // Not in Xboard protocol
@@ -194,23 +186,21 @@ void Xboard::loop()
         } else if (cmd == "time") {
             int time = 0;
             std::cin >> time;
-            if (debug_mode) {
-                log << " " << time;
-            }
+
+            log.to(Log::FILE) << " " << time;
+
             set_remaining(time);
         } else if (cmd == "otim") {
             int time = 0;
             std::cin >> time;
-            if (debug_mode) {
-                log << " " << time;
-            }
+
+            log.to(Log::FILE) << " " << time;
         } else if (cmd == "sd") {
             int d = 0;
             std::cin >> d;
-            if (debug_mode) {
-                log << " " << d;
-            }
             set_depth(d);
+
+            log.to(Log::FILE) << " " << d;
         } else if (cmd == "undo") {
             undo_move();
         } else if (cmd == "remove") {
@@ -228,14 +218,14 @@ void Xboard::loop()
                  'a' <= cmd[2] && cmd[2] <= 'h' &&
                  '1' <= cmd[3] && cmd[3] <= '8' &&
                  !parse_move(cmd).is_null()) {
-            if (debug_mode) {
-                log << std::endl << "  DEBUG: move '" << cmd << "' successfully parsed";
-            }
+
+            log.to(Log::FILE) << std::endl << Log::DEBUG
+                              << "move '" << cmd << "' successfully parsed";
+
             if (!play_move(cmd)) {
-                std::cout << "Illegal move: " << cmd << std::endl;
-                if (debug_mode) {
-                    log << std::endl << "< Illegal move: " << cmd;
-                }
+                log.to(Log::FILE) << std::endl;
+                log.to(Log::BOTH) << Log::OUT << "Illegal move: " << cmd;
+                log.to(Log::COUT) << std::endl;
             }
             if (!force_mode) {
                 if (thinker.joinable()) {
@@ -246,21 +236,23 @@ void Xboard::loop()
         } else if (cmd == "verbose") { // Debug mode
             verbosity = 2;
         } else {
-            if (debug_mode) {
-                log << std::endl << "  DEBUG: unrecognized command:" << cmd;
-            }
+            std::string args;
+            getline(std::cin, args);
+            log.to(Log::FILE) << std::endl << Log::DEBUG
+                              << "unrecognized command "
+                              << "'" << cmd << args << "'";
         }
-        if (debug_mode) {
-            log << std::endl;
+
+        if (cmd != "protover") {
+            log.to(Log::FILE) << std::endl;
         }
+
         std::cin >> cmd;
     }
     if (thinker.joinable()) {
         thinker.join();
     }
-    if (debug_mode) {
-        log << "> " << cmd << std::endl;
-        log << "  DEBUG: Closing log" << std::endl;
-        log.close();
-    }
+
+    log.to(Log::FILE) << Log::IN << cmd << std::endl;
+    //log.close();
 }
