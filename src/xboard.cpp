@@ -74,7 +74,9 @@ void Xboard::loop()
     std::string cmd;
     std::cin >> cmd;
     while (cmd != "quit") {
-        log.to(Log::FILE) << Log::IN << cmd;
+        if (cmd != "ping") {
+            log.to(Log::FILE) << Log::IN << cmd;
+        }
 
         if (cmd == "protover") {
             int n;
@@ -135,9 +137,12 @@ void Xboard::loop()
         } else if (cmd == "force") {
             force_mode = true;
         } else if (cmd == "ping") {
+            if (thinker.joinable()) {
+                thinker.join(); // Wait before replying to 'ping'
+            }
             int n;
             std::cin >> n;
-            log.to(Log::FILE) << " " << n << std::endl;
+            log.to(Log::FILE) << Log::IN << cmd << " " << n << std::endl;
             log.to(Log::BOTH) << Log::OUT << "pong " << n;
             log.to(Log::COUT) << std::endl;
         } else if (cmd == "level") {
