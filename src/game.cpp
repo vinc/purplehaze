@@ -109,7 +109,7 @@ void Game::del_position()
 /*
  * Killer move setter for the Killer Heuristic in move ordering.
  */
-void Game::set_killer_move(int depth, Move move)
+void Game::set_killer(const Move move, const int depth)
 {
     if (move != killer_moves[depth][0]) {
         killer_moves[depth][1] = killer_moves[depth][0];

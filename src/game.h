@@ -84,11 +84,16 @@ class Game
 
         // Killer Moves
         void clear_killers();
-        Move killer_move(int depth, int index) {
+        /*
+        Move killer(int depth, int index) {
             return killer_moves[depth][index];
-        }
-        void set_killer_move(int depth, Move move);
-        bool is_killer_move(int depth, Move move) {
+        };
+        */
+        Move (&killers(const int depth))[MAX_KILLERS] {
+            return killer_moves[depth];
+        };
+        void set_killer(const Move move, const int depth);
+        bool is_killer(const Move move, const int depth) {
             return (move == killer_moves[depth][0] ||
                     move == killer_moves[depth][1]);
         };

@@ -203,10 +203,9 @@ int Game::search(int alpha, int beta, int depth, const int ply)
     // Killer moves need pseudo legality checking before we can use them,
     // but they can cause a cut-off and dispense to generate quiet moves
     // so it's worth it.
-    for (int i = 0; i < MAX_KILLERS; ++i) {
-        Move killer = killer_move(depth, i);
-        if (is_legal(killer)) {
-            moves.add(killer, KILLERS);
+    for (const Move &killer_move : killers(depth)) {
+        if (is_legal(killer_move)) {
+            moves.add(killer_move, KILLERS);
         }
     }
 
@@ -233,7 +232,7 @@ int Game::search(int alpha, int beta, int depth, const int ply)
                 if (best_score >= beta) { // Beta cut-off
                     // Update killer moves
                     if (!move.is_capture()) {
-                        set_killer_move(depth, move);
+                        set_killer(move, depth);
                     }
 
                     best_move = move;
@@ -250,7 +249,7 @@ int Game::search(int alpha, int beta, int depth, const int ply)
             const bool fp_allowed =
                 !is_in_check &&
                 !is_giving_check &&
-                !is_killer_move(depth, move) &&
+                !is_killer(move, depth) &&
                 !is_dangerous(move) &&
                 !move.is_castle() &&
                 legal_move_found &&
@@ -274,7 +273,7 @@ int Game::search(int alpha, int beta, int depth, const int ply)
             const bool lmr_allowed =
                 !is_in_check &&
                 !is_giving_check &&
-                !is_killer_move(depth, move) &&
+                !is_killer(move, depth) &&
                 !move.is_capture() &&
                 !move.is_promotion();
 
@@ -301,7 +300,7 @@ int Game::search(int alpha, int beta, int depth, const int ply)
                 best_move = move;
                 if (score >= beta) { // Sufficient to cause a cut-off?
                     if (!move.is_capture()) {
-                        set_killer_move(depth, move); // Update killer moves
+                        set_killer(move, depth); // Update killer moves
                     }
 
                     goto transposition;
