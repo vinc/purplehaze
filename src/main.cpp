@@ -78,8 +78,8 @@ int main(int argc, char *argv[])
 {
     std::string logfile = "";
     bool option_color = false;
-    char opt;
-    while ((opt = getopt(argc, argv, "cl:")) != -1) {
+    signed char opt;
+    while ((opt = getopt(argc, argv, "cl:")) != EOF) {
         switch (opt) {
             case 'c':
                 option_color = true;
