@@ -71,6 +71,9 @@ static std::string prompt()
     std::cout << "> ";
     std::string cmd;
     std::cin >> cmd;
+    if (cmd == "") {
+        cmd = "quit";
+    }
     return cmd;
 }
 
