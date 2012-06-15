@@ -15,13 +15,13 @@
  */
 
 #include <assert.h>
+#include <ctime>
 #include <fstream>
 #include <getopt.h>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <ctime>
 
 #include "common.h"
 #include "game.h"
@@ -97,7 +97,8 @@ int main(int argc, char *argv[])
 
     // Parse commands from CLI
     std::string init_fen(DEFAULT_FEN);
-    for (std::string cmd = prompt(); cmd != "quit"; cmd = prompt()) {
+    std::string cmd;
+    while ((cmd = prompt()) != "quit") {
         if (cmd == "xboard") { // Xboard protocol mode
             Xboard xboard;
             if (!logfile.empty()) {
@@ -148,10 +149,10 @@ int main(int argc, char *argv[])
             while (!(move = moves.next()).is_null()) {
                 game.make_move(move);
                 if (!game.is_check(c)) {
-                    unsigned int cnt = game.perft(depth - 1);
-                    nodes_count += cnt;
+                    const unsigned int n = game.perft(depth - 1);
+                    nodes_count += n;
                     ++moves_count;
-                    std::cout << move << " " << cnt << std::endl;
+                    std::cout << move << " " << n << std::endl;
                 }
                 game.undo_move(move);
             }
@@ -161,22 +162,28 @@ int main(int argc, char *argv[])
         } else if (cmd == "testsuite") { // Load EPD test suite
             std::string filename;
             std::cin >> filename;
+            std::string args;
+            getline(std::cin, args);
 
             // Check if filename exists
             std::ifstream epdfile;
             epdfile.open(filename.c_str());
             if (!epdfile.is_open()) {
-                std::cerr << "Cannot open '" << filename;
-                std::cerr << "': No such file or directory" << std::endl;
+                std::cerr << "Cannot open '" << filename << "': "
+                          << "No such file or directory" << std::endl;
+                continue;
             }
 
             // Get time per move (optional)
-            std::string seconds;
-            getline(std::cin, seconds);
             int time = 10;
-            if (seconds != "") {
-                std::istringstream iss(seconds);
-                iss >> time;
+            if (args != "") {
+                std::istringstream iss(args);
+                if (!(iss >> time)) {
+                    args.erase(0, 1); // Remove whitespace
+                    std::cerr << "Invalid argument '" << args << "'"
+                              << std::endl;
+                    continue;
+                }
             }
 
             std::cout << "Loading '" << filename << "', ";
@@ -243,6 +250,7 @@ int main(int argc, char *argv[])
             if (!epdfile.is_open()) {
                 std::cerr << "Cannot open '" << filename << "': "
                           << "No such file or directory" << std::endl;
+                continue;
             }
             const size_t npos = std::string::npos;
             std::string line;
@@ -276,6 +284,8 @@ int main(int argc, char *argv[])
                 std::cout << std::endl;
             }
             epdfile.close();
+        } else {
+            std::cerr << "Invalid command '" << cmd << "'" << std::endl;
         }
     }
     return 0;
