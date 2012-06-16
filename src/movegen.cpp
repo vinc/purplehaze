@@ -214,9 +214,9 @@ void Game::make_move(Move m)
     if (m.is_capture()) {
         Square s = dest;
         if (m.is_en_passant()) {
-            s = static_cast<Square>(ep + (c == BLACK ? UP : DOWN));
+            s = static_cast<Square>(ep + PAWN_PUSH_DIRS[!c]);
         }
-        assert(!board.is_empty(s) || assert_msg(debug_move(m)));
+        assert(!board.is_empty(s));
 
         Piece capture = board[s];
         if (capture.is(ROOK)) { // Update opponent's castling rights
@@ -230,12 +230,13 @@ void Game::make_move(Move m)
         }
         del_piece(capture);
         pos.set_capture(capture);
-        assert(board.is_empty(s) || assert_msg(debug_move(m)));
+        assert(board.is_empty(s));
     }
 
     // Castling
     if (m.is_castle()) {
-        Square rook_orig, rook_dest;
+        Square rook_orig;
+        Square rook_dest;
         switch (m.castle_side()) {
             case KING:
                 rook_orig = Board::flip(H1, c);
@@ -261,11 +262,11 @@ void Game::make_move(Move m)
     }
 
     // Move the piece
-    board[orig] = Piece(); // FIXME: duplicate in case of promotion?
     if (m.is_promotion()) {
         add_piece(p.color(), m.promotion_type(), dest);
         del_piece(p);
     } else {
+        board[orig] = Piece();
         board[dest] = p;
         pieces.set_position(p, dest);
         zobrist.update_piece(pos.hash(), c, t, orig);
@@ -274,7 +275,7 @@ void Game::make_move(Move m)
 
     // Update en passant
     if (m.is_double_pawn_push()) {
-        Square new_ep = static_cast<Square>(orig + (dest - orig) / 2);
+        Square new_ep = static_cast<Square>((orig + dest) / 2);
         pos.set_en_passant(new_ep);
         zobrist.update_en_passant(pos.hash(), new_ep);
     } else {
@@ -303,7 +304,7 @@ void Game::undo_move(Move m)
         Square s = dest;
         if (m.is_en_passant()) {
             const Color c = current_position().side();
-            s = static_cast<Square>(dest + (c == WHITE ? UP : DOWN));
+            s = static_cast<Square>(dest + PAWN_PUSH_DIRS[c]);
             board[dest] = Piece();
         }
         add_piece(capture.color(), capture.type(), s);
@@ -316,7 +317,8 @@ void Game::undo_move(Move m)
     }
     if (m.is_castle()) {
         const Color c = current_position().side();
-        Square rook_orig, rook_dest;
+        Square rook_orig;
+        Square rook_dest;
         switch (m.castle_side()) {
             case KING:
                 rook_orig = Board::flip(H1, c);
@@ -397,7 +399,7 @@ bool Game::is_legal(Move m)
                 return false;
             }
             // from another pawn, the later being captured by the former
-            s = static_cast<Square>(ep + (c == BLACK ? UP : DOWN));
+            s = static_cast<Square>(ep + PAWN_PUSH_DIRS[!c]);
             if (board[s].type() != PAWN) {
                 return false;
             }

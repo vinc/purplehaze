@@ -267,6 +267,10 @@ inline int operator+(Square s, int i)
 {
     return i + static_cast<int>(s);
 }
+inline int operator+(Square a, Square b)
+{
+    return static_cast<int>(a) + static_cast<int>(b);
+}
 inline int operator+(Rank r, int i)
 {
     return static_cast<int>(r) + i;
