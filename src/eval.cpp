@@ -88,8 +88,8 @@ void Game::init_eval()
     for (int i = 0; i < 2; ++i) {
         for (int j = 0; j < 64; ++j) {
             for (const PieceType &t : PIECE_TYPES) {
-                const Square ws = board.square(j);
-                const Square bs = board.flip(ws);
+                const Square ws = Board::square(j);
+                const Square bs = Board::flip(ws);
                 PST[i][BLACK][t][bs] = PST[i][WHITE][t][ws];
             }
         }

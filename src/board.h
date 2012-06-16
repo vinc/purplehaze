@@ -83,9 +83,11 @@ class Board
             return Square(s + d);
         };
 
-        // Used for PST with black's point of view
         static Square flip(Square s) {
             return square(file(s), Rank(RANK_8 - rank(s)));
+        }
+        static Square flip(const Square s, const Color c) {
+            return static_cast<Square>(s + A8 * c);
         }
 
         // Theoretical answer by array lookup

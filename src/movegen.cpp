@@ -23,33 +23,33 @@ static bool king_castle_allowed(const Color c,
                                 const Square from, const Square to,
                                 const Board &board, const Pieces &pieces)
 {
-    assert(from == static_cast<Square>(E1 + A8 * c));
-    assert(to == static_cast<Square>(G1 + A8 * c));
-    const Square rook = static_cast<Square>(H1 + A8 * c);
+    assert(from == Board::flip(E1, c));
+    assert(to == Board::flip(G1, c));
+    const Square rook = Board::flip(H1, c);
     return
-        board.is_empty(static_cast<Square>(F1 + A8 * c)) &&
+        board.is_empty(Board::flip(F1, c)) &&
         board.is_empty(to) &&
         board[rook].is(c, ROOK) &&
         !board.is_attacked_by(!c, from, pieces) &&
         !board.is_attacked_by(!c, to, pieces) &&
-        !board.is_attacked_by(!c, static_cast<Square>(F1 + A8 * c), pieces);
+        !board.is_attacked_by(!c, Board::flip(F1, c), pieces);
 }
 
 static bool queen_castle_allowed(const Color c,
                                  const Square from, const Square to,
                                  const Board &board, const Pieces &pieces)
 {
-    assert(from == static_cast<Square>(E1 + A8 * c));
-    assert(to == static_cast<Square>(C1 + A8 * c));
-    const Square rook = static_cast<Square>(A1 + A8 * c);
+    assert(from == Board::flip(E1, c));
+    assert(to == Board::flip(C1, c));
+    const Square rook = Board::flip(A1, c);
     return
-        board.is_empty(static_cast<Square>(B1 + A8 * c)) &&
-        board.is_empty(static_cast<Square>(D1 + A8 * c)) &&
+        board.is_empty(Board::flip(B1, c)) &&
+        board.is_empty(Board::flip(D1, c)) &&
         board.is_empty(to) &&
         board[rook].is(c, ROOK) &&
         !board.is_attacked_by(!c, from, pieces) &&
         !board.is_attacked_by(!c, to, pieces) &&
-        !board.is_attacked_by(!c, static_cast<Square>(D1 + A8 * c), pieces);
+        !board.is_attacked_by(!c, Board::flip(D1, c), pieces);
 }
 
 void Moves::generate_pieces(Color c, PieceType t, MoveType mt)
@@ -153,15 +153,15 @@ void Moves::generate(MoveType mt)
     }
 
     // Castling
-    const Square from = static_cast<Square>(E1 + A8 * c);
+    const Square from = Board::flip(E1, c);
     if (current_position.can_castle(c, KING)) {
-        const Square to = static_cast<Square>(G1 + A8 * c);
+        const Square to = Board::flip(G1, c);
         if (king_castle_allowed(c, from, to, board, pieces)) {
             add(Move(from, to, KING_CASTLE));
         }
     }
     if (current_position.can_castle(c, QUEEN)) {
-        const Square to = static_cast<Square>(C1 + A8 * c);
+        const Square to = Board::flip(C1, c);
         if (queen_castle_allowed(c, from, to, board, pieces)) {
             add(Move(from, to, QUEEN_CASTLE));
         }
@@ -198,14 +198,14 @@ void Game::make_move(Move m)
 
     // Update castling rights
     if (pos.can_castle(c, KING)) {
-        const Square s = static_cast<Square>(H1 + A8 * c);
+        const Square s = Board::flip(H1, c);
         if (t == KING || (t == ROOK && orig == s)) {
             pos.set_castle_right(c, KING, false);
             zobrist.update_castle_right(pos.hash(), c, KING);
         }
     }
     if (pos.can_castle(c, QUEEN)) {
-        const Square s = static_cast<Square>(A1 + A8 * c);
+        const Square s = Board::flip(A1, c);
         if (t == KING || (t == ROOK && orig == s)) {
             pos.set_castle_right(c, QUEEN, false);
             zobrist.update_castle_right(pos.hash(), c, QUEEN);
@@ -222,10 +222,10 @@ void Game::make_move(Move m)
 
         Piece capture = board[s];
         if (capture.is(ROOK)) { // Update opponent's castling rights
-            if (dest == static_cast<Square>(H1 + A8 * !c)) {
+            if (dest == Board::flip(H1, !c)) {
                 pos.set_castle_right(!c, KING, false);
                 zobrist.update_castle_right(pos.hash(), !c, KING);
-            } else if (dest == static_cast<Square>(A1 + A8 * !c)) {
+            } else if (dest == Board::flip(A1, !c)) {
                 pos.set_castle_right(!c, QUEEN, false);
                 zobrist.update_castle_right(pos.hash(), !c, QUEEN);
             }
@@ -240,12 +240,12 @@ void Game::make_move(Move m)
         Square rook_orig, rook_dest;
         switch (m.castle_side()) {
             case KING:
-                rook_orig = static_cast<Square>(H1 + A8 * c);
-                rook_dest = static_cast<Square>(F1 + A8 * c);
+                rook_orig = Board::flip(H1, c);
+                rook_dest = Board::flip(F1, c);
                 break;
             case QUEEN:
-                rook_orig = static_cast<Square>(A1 + A8 * c);
-                rook_dest = static_cast<Square>(D1 + A8 * c);
+                rook_orig = Board::flip(A1, c);
+                rook_dest = Board::flip(D1, c);
                 break;
             default:
                 assert(false);
@@ -321,12 +321,12 @@ void Game::undo_move(Move m)
         Square rook_orig, rook_dest;
         switch (m.castle_side()) {
             case KING:
-                rook_orig = static_cast<Square>(H1 + A8 * c);
-                rook_dest = static_cast<Square>(F1 + A8 * c);
+                rook_orig = Board::flip(H1, c);
+                rook_dest = Board::flip(F1, c);
                 break;
             case QUEEN:
-                rook_orig = static_cast<Square>(A1 + A8 * c);
-                rook_dest = static_cast<Square>(D1 + A8 * c);
+                rook_orig = Board::flip(A1, c);
+                rook_dest = Board::flip(D1, c);
                 break;
             default:
                 assert(false);
