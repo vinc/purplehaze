@@ -198,15 +198,13 @@ void Game::make_move(Move m)
 
     // Update castling rights
     if (pos.can_castle(c, KING)) {
-        const Square s = Board::flip(H1, c);
-        if (t == KING || (t == ROOK && orig == s)) {
+        if (t == KING || (t == ROOK && orig == Board::flip(H1, c))) {
             pos.set_castle_right(c, KING, false);
             zobrist.update_castle_right(pos.hash(), c, KING);
         }
     }
     if (pos.can_castle(c, QUEEN)) {
-        const Square s = Board::flip(A1, c);
-        if (t == KING || (t == ROOK && orig == s)) {
+        if (t == KING || (t == ROOK && orig == Board::flip(A1, c))) {
             pos.set_castle_right(c, QUEEN, false);
             zobrist.update_castle_right(pos.hash(), c, QUEEN);
         }
