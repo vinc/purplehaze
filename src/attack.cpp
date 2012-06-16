@@ -25,8 +25,7 @@ bool Board::is_attacked_by(const Color c, const Square s,
                            const Pieces& pieces) const
 {
     for (const PieceType& t : NOT_PAWN_TYPES) {
-        const int n = pieces.count(c, t);
-        for (int i = 0; i < n; ++i) {
+        for (int i = 0, n = pieces.count(c, t); i < n; ++i) {
             const Square from = pieces.position(c, t, i);
             if (!can_attack(t, from, s)) {
                 continue;
@@ -46,8 +45,8 @@ bool Board::is_attacked_by(const Color c, const Square s,
     }
 
     // Specific code for pawns
-    for (int i = 0; i < 2; ++i) {
-        const Square from = static_cast<Square>(s + PAWN_CAPTURE_DIRS[!c][i]);
+    for (const Direction &d : PAWN_CAPTURE_DIRS[!c]) {
+        const Square from = static_cast<Square>(s + d);
         if (board[from].is(c, PAWN)) {
             return true;
         }
@@ -75,7 +74,7 @@ bool Board::can_go(const Piece p, const Square from, const Square to) const
     const PieceType t = p.type();
     switch (t) {
         case PAWN:
-            d = (c == WHITE ? UP : DOWN);
+            d = PAWN_PUSH_DIRS[c];
             s = static_cast<Square>(from + d);
             if (!is_empty(to)) { // Capture
                 if (to == static_cast<Square>(s + LEFT)) {
@@ -85,7 +84,7 @@ bool Board::can_go(const Piece p, const Square from, const Square to) const
                     return true;
                 }
             } else { // Pawn push (and double push)
-                if (to == static_cast<Square>(s)) {
+                if (to == s) {
                     return true;
                 }
                 if (to == static_cast<Square>(s + d)) {
