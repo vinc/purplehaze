@@ -66,6 +66,27 @@ static const std::string OPTIONS[][2] = {
     }
 };
 
+static const std::string FLAGS[][2] = {
+    { "-c",      "use colored output" },
+    { "-l FILE", "write log to FILE" },
+    { "-m NUM",  "set material table size to NUM megabytes" },
+    { "-t NUM",  "set transposition table size to NUM megabytes" }
+};
+
+void print_usage() {
+    std::cout << "Usage: purplehaze [OPTION]" << std::endl;
+    std::cout << std::left;
+    int option_width = 15;
+    for (const std::string (&option)[2] : FLAGS) {
+        std::string name = option[0];
+        std::string usage = option[1];
+        std::cout << "  "
+                  << std::setw(option_width) << name
+                  << std::setw(80 - 2 - option_width) << usage
+                  << std::endl;
+    }
+}
+
 static std::string prompt()
 {
     std::cout << "> ";
@@ -84,11 +105,14 @@ int main(int argc, char *argv[])
     int tt_size = TT_SIZE;
     int mt_size = MT_SIZE;
     signed char opt;
-    while ((opt = getopt(argc, argv, "cl:m:t:")) != EOF) {
+    while ((opt = getopt(argc, argv, "chl:m:t:")) != EOF) {
         switch (opt) {
             case 'c':
                 option_color = true;
                 break;
+            case 'h':
+                print_usage();
+                return 0;
             case 'l':
                 logfile = optarg;
                 break;
