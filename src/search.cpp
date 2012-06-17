@@ -29,13 +29,17 @@ inline bool Game::is_dangerous(Move m)
 
     if (board[m.dest()].is(PAWN)) {
         const Color c = !current_position().side();
-        if (m.dest_rank() + RANK_6 * c == RANK_7) return true;
+        if (m.dest_rank() + RANK_6 * c == RANK_7) {
+            return true;
+        }
     }
 
     /*
     if (m.is_capture()) {
         const Piece capture = current_position().capture();
-        if (capture.type() != PAWN) return true;
+        if (capture.type() != PAWN) {
+            return true;
+        }
     }
 
     return m.is_promotion();
@@ -46,7 +50,9 @@ inline bool Game::is_dangerous(Move m)
 
 unsigned long long int Game::perft(unsigned int depth)
 {
-    if (depth == 0) return 1;
+    if (depth == 0) {
+        return 1;
+    }
     unsigned long long int nodes = 0;
     Color c = current_position().side();
     bool use_lazy = false; // Lazy moves generation is not usefull in perft()
@@ -55,11 +61,15 @@ unsigned long long int Game::perft(unsigned int depth)
     while (!(move = moves.next()).is_null()) {
 #ifdef LEGAL
         if (depth == 1) {
-            if (is_legal(move)) ++nodes; // TODO: Finish is_legal()
+            if (is_legal(move)) {
+                ++nodes; // TODO: Finish is_legal()
+            }
         } else {
 #endif
             make_move(move);
-            if (!is_check(c)) nodes += perft(depth - 1);
+            if (!is_check(c)) {
+                nodes += perft(depth - 1);
+            }
             undo_move(move);
 #ifdef LEGAL
         }
@@ -70,25 +80,37 @@ unsigned long long int Game::perft(unsigned int depth)
 
 int Game::quiescence(int alpha, int beta, int depth, const int ply)
 {
-    if (time.poll(nodes_count)) return 0;
+    if (time.poll(nodes_count)) {
+        return 0;
+    }
 
     const int stand_pat = eval(alpha, beta);
-    if (ply >= MAX_PLY) return stand_pat;
+    if (ply >= MAX_PLY) {
+        return stand_pat;
+    }
 
-    if (stand_pat >= beta) return stand_pat; // Beta cut-off
+    if (stand_pat >= beta) {
+        return stand_pat; // Beta cut-off
+    }
 
     // Delta pruning
     const int delta = PIECE_VALUE[QUEEN]; // TODO: Switch off in late endgame
-    if (stand_pat < alpha - delta) return alpha;
+    if (stand_pat < alpha - delta) {
+        return alpha;
+    }
 
-    if (alpha < stand_pat) alpha = stand_pat; // New alpha
+    if (alpha < stand_pat) {
+        alpha = stand_pat; // New alpha
+    }
 
     Color player = current_position().side();
 
     Moves moves(board, pieces, current_position(), search_moves);
     Move move;
     while (!(move = moves.next()).is_null()) {
-        if (moves.state() > GOOD_CAPTURES) break; // Skip bad captures
+        if (moves.state() > GOOD_CAPTURES) {
+            break; // Skip bad captures
+        }
         make_move(move);
 
         if (is_check(player)) { // Illegal move
@@ -98,7 +120,9 @@ int Game::quiescence(int alpha, int beta, int depth, const int ply)
 
         const int score = -quiescence(-beta, -alpha, depth - 1, ply + 1);
         undo_move(move);
-        if (time.poll(nodes_count)) return 0;
+        if (time.poll(nodes_count)) {
+            return 0;
+        }
         if (score >= beta) {
             return score;
         }
@@ -106,16 +130,24 @@ int Game::quiescence(int alpha, int beta, int depth, const int ply)
             alpha = score;
         }
     }
-    if (time.poll(nodes_count)) return 0;
+    if (time.poll(nodes_count)) {
+        return 0;
+    }
     return alpha;
 }
 
 template<NodeType node_type>
 int Game::search(int alpha, int beta, int depth, const int ply)
 {
-    if (time.poll(nodes_count)) return 0;
-    if (depth <= 0) return quiescence(alpha, beta, 0, ply + 1); // Quiescence
-    if (tree.has_repetition_draw()) return 0; // Repetition draw rules
+    if (time.poll(nodes_count)) {
+        return 0;
+    }
+    if (depth <= 0) {
+        return quiescence(alpha, beta, 0, ply + 1); // Quiescence
+    }
+    if (tree.has_repetition_draw()) {
+        return 0; // Repetition draw rules
+    }
 
     int score = -INF;
     const int old_alpha = alpha;
@@ -129,18 +161,29 @@ int Game::search(int alpha, int beta, int depth, const int ply)
     Transposition trans = tt.lookup(pos.hash(), &is_empty);
     if (!is_empty) {
         // FIXME Avoid a potential bug with tt.lookup()
-        const bool discard = pos.hash() == 0 &&
-                             trans.bound() == UNDEF_BOUND;
+        const bool discard = pos.hash() == 0 && trans.bound() == UNDEF_BOUND;
 
         if (/*!is_pv &&*/ depth <= trans.depth() && !discard) {
             const int tr_score = trans.value();
             switch (trans.bound()) {
-                case EXACT: return tr_score; // Already searched node
-                case UPPER: if (tr_score < beta) beta = tr_score; break;
-                case LOWER: if (tr_score > alpha) alpha = tr_score; break;
-                default: assert(false);
+            case EXACT:
+                return tr_score; // Already searched node
+            case UPPER:
+                if (tr_score < beta) {
+                    beta = tr_score;
+                }
+                break;
+            case LOWER:
+                if (tr_score > alpha) {
+                    alpha = tr_score;
+                }
+                break;
+            default:
+                assert(false);
             }
-            if (alpha >= beta) return tr_score; // TT cause a cut-off
+            if (alpha >= beta) {
+                return tr_score; // TT cause a cut-off
+            }
         }
 
         // If the transposition does not contain the best move,
@@ -154,7 +197,9 @@ int Game::search(int alpha, int beta, int depth, const int ply)
 
 #ifndef NCE
     // Check Extension
-    if (is_in_check) ++depth;
+    if (is_in_check) {
+        ++depth;
+    }
 #endif
 
 #ifndef NNMP
@@ -294,7 +339,9 @@ int Game::search(int alpha, int beta, int depth, const int ply)
             }
 
             undo_move(move);
-            if (time.poll(nodes_count)) return 0;
+            if (time.poll(nodes_count)) {
+                return 0;
+            }
             if (score > best_score) { // Found a new best move
                 best_score = score;
                 best_move = move;
@@ -308,10 +355,15 @@ int Game::search(int alpha, int beta, int depth, const int ply)
             }
         }
     }
-    if (time.poll(nodes_count)) return 0;
+    if (time.poll(nodes_count)) {
+        return 0;
+    }
     if (!legal_move_found) { // End of game?
-        if (is_in_check) return -INF + ply; // Checkmate
-        return 0; // Stalemate
+        if (is_in_check) {
+            return -INF + ply; // Checkmate
+        } else {
+            return 0; // Stalemate
+        }
     }
 
 transposition:
@@ -321,10 +373,11 @@ transposition:
         const int value = best_score;
         const Bound bound = (best_score >= beta ? LOWER :
                                 (best_score <= old_alpha ? UPPER : EXACT));
-        if (bound == UPPER) best_move = Move(); // Don't store best move
+        if (bound == UPPER) {
+            best_move = Move(); // Don't store best move
+        }
         tt.save(pos.hash(), value, bound, depth, best_move);
     }
-
     return best_score;
 }
 

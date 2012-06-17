@@ -154,7 +154,9 @@ void Xboard::loop()
 
             // TODO "level 0 m 0" means play the entire game in 'm' minutes,
             // but the current time management don't support it.
-            if (moves == 0) moves = 60;
+            if (moves == 0) {
+                moves = 60;
+            }
 
             // Time interval in minutes or minutes:seconds
             int time;

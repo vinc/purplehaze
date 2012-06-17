@@ -23,29 +23,32 @@
 PieceType Move::promotion_type() const
 {
     switch (type()) {
-        case KNIGHT_PROMOTION:
-        case KNIGHT_PROMOTION_CAPTURE:
-            return KNIGHT;
-        case BISHOP_PROMOTION:
-        case BISHOP_PROMOTION_CAPTURE:
-            return BISHOP;
-        case ROOK_PROMOTION:
-        case ROOK_PROMOTION_CAPTURE:
-            return ROOK;
-        case QUEEN_PROMOTION:
-        case QUEEN_PROMOTION_CAPTURE:
-            return QUEEN;
-        default:
-            return EMPTY;
+    case KNIGHT_PROMOTION:
+    case KNIGHT_PROMOTION_CAPTURE:
+        return KNIGHT;
+    case BISHOP_PROMOTION:
+    case BISHOP_PROMOTION_CAPTURE:
+        return BISHOP;
+    case ROOK_PROMOTION:
+    case ROOK_PROMOTION_CAPTURE:
+        return ROOK;
+    case QUEEN_PROMOTION:
+    case QUEEN_PROMOTION_CAPTURE:
+        return QUEEN;
+    default:
+        return EMPTY;
     }
 }
 
 PieceType Move::castle_side() const
 {
     switch (type()) {
-        case KING_CASTLE: return KING;
-        case QUEEN_CASTLE: return QUEEN;
-        default: return EMPTY;
+    case KING_CASTLE:
+        return KING;
+    case QUEEN_CASTLE:
+        return QUEEN;
+    default:
+        return EMPTY;
     }
 }
 
@@ -56,7 +59,9 @@ std::ostream& operator<<(std::ostream& out, const Move move)
 
 std::string Move::to_string() const
 {
-    if (is_null()) return "#";
+    if (is_null()) {
+        return "#";
+    }
     std::string res = "";
     res += static_cast<char>('a' + orig_file());
     res += static_cast<char>('1' + orig_rank());

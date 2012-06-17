@@ -53,7 +53,11 @@ template <class T>
 int HashTable<T>::usage() const
 {
     int res = 0;
-    for (int i = 0; i < SIZE; ++i) if (entries[i].hash) ++res;
+    for (int i = 0; i < SIZE; ++i) {
+        if (entries[i].hash) {
+            ++res;
+        }
+    }
     return res;
 }
 

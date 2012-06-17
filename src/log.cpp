@@ -32,18 +32,18 @@ Log& Log::icmd(Log& log)
 Log& Log::to(Stream s)
 {
     switch (s) {
-        case COUT:
-            cout.state = true;
-            file.state = false;
-            break;
-        case FILE:
-            cout.state = false;
-            file.state = true;
-            break;
-        case BOTH:
-            cout.state = true;
-            file.state = true;
-            break;
+    case COUT:
+        cout.state = true;
+        file.state = false;
+        break;
+    case FILE:
+        cout.state = false;
+        file.state = true;
+        break;
+    case BOTH:
+        cout.state = true;
+        file.state = true;
+        break;
     }
     return *this;
 }
@@ -52,15 +52,15 @@ Log& Log::operator<<(const LogDirection &dir)
 {
     if (file.state && file.stream.is_open()) {
         switch (dir) {
-            case IN:
-                file.stream << ">> ";
-                break;
-            case OUT:
-                file.stream << "<< ";
-                break;
-            case DEBUG:
-                file.stream << "## ";
-                break;
+        case IN:
+            file.stream << ">> ";
+            break;
+        case OUT:
+            file.stream << "<< ";
+            break;
+        case DEBUG:
+            file.stream << "## ";
+            break;
         }
     }
     return *this;

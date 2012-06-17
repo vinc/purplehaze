@@ -137,12 +137,12 @@ TEST(MovesTest, Score)
             Square to = E5;
             Square from;
             switch (a) {
-                case KNIGHT:
-                    from = D3;
-                    break;
-                default:
-                    from = D4;
-                    break;
+            case KNIGHT:
+                from = D3;
+                break;
+            default:
+                from = D4;
+                break;
             }
             board[from] = Piece(WHITE, a);
             board[to] = Piece(BLACK, v);
@@ -155,12 +155,12 @@ TEST(MovesTest, Score)
             for (const PieceType& v2 : PIECE_TYPES) {
                 for (const PieceType& a2 : PIECE_TYPES) {
                     switch (a2) {
-                        case KNIGHT:
-                            from = D3;
-                            break;
-                        default:
-                            from = D4;
-                            break;
+                    case KNIGHT:
+                        from = D3;
+                        break;
+                    default:
+                        from = D4;
+                        break;
                     }
                     board[from] = Piece(WHITE, a2);
                     board[to] = Piece(BLACK, v2);

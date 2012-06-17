@@ -47,13 +47,13 @@ Board::Board() : board(), dir_array()
                             break;
                         }
                         switch (t) {
-                            case KNIGHT:
-                            case KING:
-                                s = OUT;
-                                break;
-                            default:
-                                s = static_cast<Square>(s + d);
-                                break;
+                        case KNIGHT:
+                        case KING:
+                            s = OUT;
+                            break;
+                        default:
+                            s = static_cast<Square>(s + d);
+                            break;
                         }
                     }
                 }
@@ -71,7 +71,9 @@ std::string Board::to_string(const std::string squares[], const int sq_width)
     std::ostringstream stream;
     stream << std::endl;
     for (Square s = A8; s < OUT; s = Square(s + 1)) {
-        if (is_out(s)) continue;
+        if (is_out(s)) {
+            continue;
+        }
         if (file(s) == FILE_A) {
             stream << "     +";
             for (int i = 0; i < 8; ++i) {
@@ -92,7 +94,9 @@ std::string Board::to_string(const std::string squares[], const int sq_width)
         stream << squares[s];
         if (file(s) == FILE_H) {
             stream << "|" << std::endl;
-            if (s == H1) break; // The loop ends here
+            if (s == H1) {
+                break; // The loop ends here
+            }
             s = Square(s - 0x18);
         }
     }

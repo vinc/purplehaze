@@ -238,19 +238,19 @@ void Game::make_move(Move m)
         Square rook_orig;
         Square rook_dest;
         switch (m.castle_side()) {
-            case KING:
-                rook_orig = Board::flip(H1, c);
-                rook_dest = Board::flip(F1, c);
-                break;
-            case QUEEN:
-                rook_orig = Board::flip(A1, c);
-                rook_dest = Board::flip(D1, c);
-                break;
-            default:
-                assert(false);
-                rook_orig = OUT;
-                rook_dest = OUT;
-                break;
+        case KING:
+            rook_orig = Board::flip(H1, c);
+            rook_dest = Board::flip(F1, c);
+            break;
+        case QUEEN:
+            rook_orig = Board::flip(A1, c);
+            rook_dest = Board::flip(D1, c);
+            break;
+        default:
+            assert(false);
+            rook_orig = OUT;
+            rook_dest = OUT;
+            break;
         }
         Piece rook = board[rook_orig];
         board[rook_orig] = Piece();
@@ -320,19 +320,19 @@ void Game::undo_move(Move m)
         Square rook_orig;
         Square rook_dest;
         switch (m.castle_side()) {
-            case KING:
-                rook_orig = Board::flip(H1, c);
-                rook_dest = Board::flip(F1, c);
-                break;
-            case QUEEN:
-                rook_orig = Board::flip(A1, c);
-                rook_dest = Board::flip(D1, c);
-                break;
-            default:
-                assert(false);
-                rook_orig = OUT;
-                rook_dest = OUT;
-                break;
+        case KING:
+            rook_orig = Board::flip(H1, c);
+            rook_dest = Board::flip(F1, c);
+            break;
+        case QUEEN:
+            rook_orig = Board::flip(A1, c);
+            rook_dest = Board::flip(D1, c);
+            break;
+        default:
+            assert(false);
+            rook_orig = OUT;
+            rook_dest = OUT;
+            break;
         }
         Piece rook = board[rook_dest];
         board[rook_dest] = Piece();
@@ -415,12 +415,12 @@ bool Game::is_legal(Move m)
 
     } else if (m.is_castle()) {
         switch (m.castle_side()) {
-            case KING:
-                return king_castle_allowed(c, from, to, board, pieces);
-            case QUEEN:
-                return queen_castle_allowed(c, from, to, board, pieces);
-            default:
-                return false;
+        case KING:
+            return king_castle_allowed(c, from, to, board, pieces);
+        case QUEEN:
+            return queen_castle_allowed(c, from, to, board, pieces);
+        default:
+            return false;
         }
     } else if (m.is_double_pawn_push()) {
         if (t != PAWN) {

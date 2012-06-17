@@ -107,21 +107,21 @@ int main(int argc, char *argv[])
     signed char opt;
     while ((opt = getopt(argc, argv, "chl:m:t:")) != EOF) {
         switch (opt) {
-            case 'c':
-                option_color = true;
-                break;
-            case 'h':
-                print_usage();
-                return 0;
-            case 'l':
-                logfile = optarg;
-                break;
-            case 'm':
-                mt_size = std::stoi(optarg) << 20;
-                break;
-            case 't':
-                tt_size = std::stoi(optarg) << 20;
-                break;
+        case 'c':
+            option_color = true;
+            break;
+        case 'h':
+            print_usage();
+            return 0;
+        case 'l':
+            logfile = optarg;
+            break;
+        case 'm':
+            mt_size = std::stoi(optarg) << 20;
+            break;
+        case 't':
+            tt_size = std::stoi(optarg) << 20;
+            break;
         }
     }
     std::cout << "Purple Haze " << VERSION << std::endl;
@@ -236,7 +236,9 @@ int main(int argc, char *argv[])
                 size_t fensep = line.find(" bm ");
                 size_t bmsep = line.find(";");
                 size_t not_found = std::string::npos;
-                if (fensep == not_found || bmsep == not_found) continue;
+                if (fensep == not_found || bmsep == not_found) {
+                    continue;
+                }
 
                 // Load position in game
                 init_fen = line.substr(0, fensep);
@@ -261,14 +263,20 @@ int main(int argc, char *argv[])
                 } while (iss);
 
                 if (is_found) {
-                    if (option_color) std::cout << color_green;
+                    if (option_color) {
+                        std::cout << color_green;
+                    }
                     std::cout << " OK";
                     ++res;
                 } else {
-                    if (option_color) std::cout << color_red;
+                    if (option_color) {
+                        std::cout << color_red;
+                    }
                     std::cout << " KO";
                 }
-                if (option_color) std::cout << color_reset;
+                if (option_color) {
+                    std::cout << color_reset;
+                }
                 std::cout << std::endl;
                 ++i;
             }

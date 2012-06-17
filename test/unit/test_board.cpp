@@ -37,13 +37,13 @@ TEST(BoardTest, Constructor)
                             break;
                         }
                         switch (t) {
-                            case KNIGHT:
-                            case KING:
-                                s = OUT;
-                                break;
-                            default:
-                                s = static_cast<Square>(s + d);
-                                break;
+                        case KNIGHT:
+                        case KING:
+                            s = OUT;
+                            break;
+                        default:
+                            s = static_cast<Square>(s + d);
+                            break;
                         }
                     }
                 }

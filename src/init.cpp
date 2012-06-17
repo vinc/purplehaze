@@ -50,19 +50,56 @@ void Game::init(std::string fen)
             Color c = WHITE;
             PieceType t = EMPTY;
             switch (sq) {
-                case 'p': c = BLACK, t = PAWN; break;
-                case 'n': c = BLACK, t = KNIGHT; break;
-                case 'b': c = BLACK, t = BISHOP; break;
-                case 'r': c = BLACK, t = ROOK; break;
-                case 'q': c = BLACK, t = QUEEN; break;
-                case 'k': c = BLACK, t = KING; break;
-                case 'P': c = WHITE, t = PAWN; break;
-                case 'N': c = WHITE, t = KNIGHT; break;
-                case 'B': c = WHITE, t = BISHOP; break;
-                case 'R': c = WHITE, t = ROOK; break;
-                case 'Q': c = WHITE, t = QUEEN; break;
-                case 'K': c = WHITE, t = KING; break;
-                default: assert(false);
+            case 'p':
+                c = BLACK;
+                t = PAWN;
+                break;
+            case 'n':
+                c = BLACK;
+                t = KNIGHT;
+                break;
+            case 'b':
+                c = BLACK;
+                t = BISHOP;
+                break;
+            case 'r':
+                c = BLACK;
+                t = ROOK;
+                break;
+            case 'q':
+                c = BLACK;
+                t = QUEEN;
+                break;
+            case 'k':
+                c = BLACK;
+                t = KING;
+                break;
+            case 'P':
+                c = WHITE;
+                t = PAWN;
+                break;
+            case 'N':
+                c = WHITE;
+                t = KNIGHT;
+                break;
+            case 'B':
+                c = WHITE;
+                t = BISHOP;
+                break;
+            case 'R':
+                c = WHITE;
+                t = ROOK;
+                break;
+            case 'Q':
+                c = WHITE;
+                t = QUEEN;
+                break;
+            case 'K':
+                c = WHITE;
+                t = KING;
+                break;
+            default:
+                assert(false);
             }
             add_piece(c, t, s);
             s = Square(s + RIGHT); // Next square
@@ -75,20 +112,34 @@ void Game::init(std::string fen)
     iss >> side;
     assert(current_position().side() == WHITE);
     switch(side) {
-        case 'w': break;
-        case 'b': current_position().change_side(); break;
-        default: assert(!"FEN: no side to move!"); break;
+    case 'w':
+        break;
+    case 'b':
+        current_position().change_side();
+        break;
+    default:
+        assert(false);
+        break;
     }
 
     std::string castling;
     iss >> castling;
     for (auto it = castling.begin(); it != castling.end(); ++it) {
         switch(*it) {
-            case '-': break;
-            case 'K': current_position().set_castle_right(WHITE, KING); break;
-            case 'Q': current_position().set_castle_right(WHITE, QUEEN); break;
-            case 'k': current_position().set_castle_right(BLACK, KING); break;
-            case 'q': current_position().set_castle_right(BLACK, QUEEN); break;
+        case 'K':
+            current_position().set_castle_right(WHITE, KING);
+            break;
+        case 'Q':
+            current_position().set_castle_right(WHITE, QUEEN);
+            break;
+        case 'k':
+            current_position().set_castle_right(BLACK, KING);
+            break;
+        case 'q':
+            current_position().set_castle_right(BLACK, QUEEN);
+            break;
+        case '-':
+            break;
         }
     }
 
@@ -109,6 +160,8 @@ void Game::init(std::string fen)
     int fullmove = 1;
     iss >> fullmove;
     int ply = 2 * (fullmove - 1);
-    if (current_position().side() == BLACK) ++ply;
+    if (current_position().side() == BLACK) {
+        ++ply;
+    }
     tree.set_ply(ply);
 }

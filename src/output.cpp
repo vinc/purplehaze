@@ -27,7 +27,9 @@ static const int WIDE = 10;
 
 void Game::print_thinking_header()
 {
-    if (!output_thinking) return;
+    if (!output_thinking) {
+        return;
+    }
     std::cout << std::setw(4) << "ply"
               << std::setw(WIDE - 1) << "score"
               << std::setw(WIDE) << "time"
@@ -38,7 +40,9 @@ void Game::print_thinking_header()
 
 void Game::print_thinking(int depth, int score, Move m)
 {
-    if (!output_thinking) return;
+    if (!output_thinking) {
+        return;
+    }
     std::cout << std::setw(4) << depth
               << std::setw(WIDE - 1) << score
               << std::setw(WIDE) << time.elapsed()
@@ -79,10 +83,14 @@ std::string Game::output_pv(int depth, int score, Move m)
     Transposition trans = tt.lookup(current_position().hash(), &is_empty);
     Move move = trans.best_move();
     if (depth > 0 && is_legal(move) && trans.bound() < 3) {
-        if (is_in_check) stream << "+"; // Check
+        if (is_in_check) {
+            stream << "+"; // Check
+        }
         stream << output_pv(depth - 1, trans.value(), move);
     } else if (move.is_null() && is_mate(score)) {
-        if (is_in_check) stream << "#"; // Mate
+        if (is_in_check) {
+            stream << "#"; // Mate
+        }
     } else if (is_in_check) {
         stream << "+"; // Cut-off
     }
@@ -97,7 +105,9 @@ std::string Game::output_move(Move m)
 
     // Castling
     if (m.is_castle()) {
-        if (m.castle_side() == QUEEN) stream << "O-";
+        if (m.castle_side() == QUEEN) {
+            stream << "O-";
+        }
         return stream.str() + "O-O";
     }
 
@@ -105,7 +115,9 @@ std::string Game::output_move(Move m)
     Square from = m.orig();
     Piece p = board[from];
     PieceType t = p.type();
-    if (t > PAWN) stream << Piece(WHITE, t); // Upper case
+    if (t > PAWN) {
+        stream << Piece(WHITE, t); // Upper case
+    }
 
     // Disambiguation
     if (t != PAWN) {
@@ -113,7 +125,9 @@ std::string Game::output_move(Move m)
         Square to = m.dest();
         for (int i = 0; i < pieces.count(c, t); ++i) {
             Piece other(c, t, i);
-            if (other == p) continue;
+            if (other == p) {
+                continue;
+            }
             Square s = pieces.position(other);
             if (board.can_attack(t, s, to) && board.can_go(other, s, to)) {
                 // If another piece of the same type can theoretically
@@ -128,7 +142,9 @@ std::string Game::output_move(Move m)
 
     // Capture
     if (m.is_capture()) {
-        if (t == PAWN) stream << static_cast<char>('a' + m.orig_file());
+        if (t == PAWN) {
+            stream << static_cast<char>('a' + m.orig_file());
+        }
         stream << "x";
     }
 
@@ -180,7 +196,9 @@ std::string print_table_stats(const HashTable<T>& table, int table_size)
     long ones = 0;
     for (int i = 0; i < table.size(); ++i) {
         Hash h = table.hash_at(i);
-        if (!h) continue;
+        if (!h) {
+            continue;
+        }
         std::bitset<64> b = h;
         int z = b.count();
         zeros += 64 - z;

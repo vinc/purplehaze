@@ -27,13 +27,27 @@ std::string Piece::to_string() const
 {
     char t;
     switch (type()) {
-        case PAWN:   t = 'P'; break;
-        case KNIGHT: t = 'N'; break;
-        case BISHOP: t = 'B'; break;
-        case ROOK:   t = 'R'; break;
-        case QUEEN:  t = 'Q'; break;
-        case KING:   t = 'K'; break;
-        default:     t = ' '; break;
+    case PAWN:
+        t = 'P';
+        break;
+    case KNIGHT:
+        t = 'N';
+        break;
+    case BISHOP:
+        t = 'B';
+        break;
+    case ROOK:
+        t = 'R';
+        break;
+    case QUEEN:
+        t = 'Q';
+        break;
+    case KING:
+        t = 'K';
+        break;
+    default:
+        t = ' ';
+        break;
     }
     if (color() == BLACK) {
         t = static_cast<char>(t + 'a' - 'A'); // Lower case for black pieces

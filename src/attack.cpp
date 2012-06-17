@@ -73,44 +73,44 @@ bool Board::can_go(const Piece p, const Square from, const Square to) const
     Square s;
     const PieceType t = p.type();
     switch (t) {
-        case PAWN:
-            d = PAWN_PUSH_DIRS[c];
-            s = static_cast<Square>(from + d);
-            if (!is_empty(to)) { // Capture
-                if (to == static_cast<Square>(s + LEFT)) {
-                    return true;
-                }
-                if (to == static_cast<Square>(s + RIGHT)) {
-                    return true;
-                }
-            } else { // Pawn push (and double push)
-                if (to == s) {
-                    return true;
-                }
-                if (to == static_cast<Square>(s + d)) {
-                    if (is_empty(s) && is_pawn_begin(c, from)) {
-                        return true;
-                    }
-                }
-            }
-            break;
-        default:
-            if (!can_attack(t, from, to)) {
-                return false;
-            }
-            if (t == KNIGHT || t == KING) {
+    case PAWN:
+        d = PAWN_PUSH_DIRS[c];
+        s = static_cast<Square>(from + d);
+        if (!is_empty(to)) { // Capture
+            if (to == static_cast<Square>(s + LEFT)) {
                 return true;
             }
-            d = direction_to(from, to);
-            s = static_cast<Square>(from + d);
-            while (s != to && is_empty(s)) { // Search for a blocker
-                s = static_cast<Square>(s + d);
-                assert(!is_out(s));
-            }
-            if (s == to) {
+            if (to == static_cast<Square>(s + RIGHT)) {
                 return true;
             }
-            break;
+        } else { // Pawn push (and double push)
+            if (to == s) {
+                return true;
+            }
+            if (to == static_cast<Square>(s + d)) {
+                if (is_empty(s) && is_pawn_begin(c, from)) {
+                    return true;
+                }
+            }
+        }
+        break;
+    default:
+        if (!can_attack(t, from, to)) {
+            return false;
+        }
+        if (t == KNIGHT || t == KING) {
+            return true;
+        }
+        d = direction_to(from, to);
+        s = static_cast<Square>(from + d);
+        while (s != to && is_empty(s)) { // Search for a blocker
+            s = static_cast<Square>(s + d);
+            assert(!is_out(s));
+        }
+        if (s == to) {
+            return true;
+        }
+        break;
     }
     return false;
 }

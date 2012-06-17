@@ -37,26 +37,26 @@ void Game::init_eval()
             int ending_score = 0;
 
             switch (t) {
-                case PAWN:
-                    // Develop central pawns
-                    // But not side pawns
-                    opening_score = PAWN_FILES_VALUES[board.file(s)];
+            case PAWN:
+                // Develop central pawns
+                // But not side pawns
+                opening_score = PAWN_FILES_VALUES[board.file(s)];
 
-                    // Run for promotion
-                    ending_score = 10 * board.rank(s);
-                    break;
-                case KNIGHT:
-                case BISHOP:
-                    // Develop toward center files
-                    opening_score = CENTER_BONUS[board.file(s)];
-                    if (board.is_border(s)) {
-                        opening_score = 2 * BORDER_MALUS;
-                    }
-                    // no break
-                default:
-                    ending_score = CENTER_BONUS[board.file(s)];
-                    ending_score += CENTER_BONUS[board.rank(s)];
-                    break;
+                // Run for promotion
+                ending_score = 10 * board.rank(s);
+                break;
+            case KNIGHT:
+            case BISHOP:
+                // Develop toward center files
+                opening_score = CENTER_BONUS[board.file(s)];
+                if (board.is_border(s)) {
+                    opening_score = 2 * BORDER_MALUS;
+                }
+                // no break
+            default:
+                ending_score = CENTER_BONUS[board.file(s)];
+                ending_score += CENTER_BONUS[board.rank(s)];
+                break;
             }
 
             // Rank bonus
@@ -104,7 +104,11 @@ int Game::eval(int alpha, int beta)
     int score = material_eval();
 
     // TODO Draws should be caught here
-    // if (score == 0) return 0; // Draw
+    /*
+    if (score == 0) {
+        return 0; // Draw
+    }
+    */
     if (score > PIECE_VALUE[KING]) {
         return INF; // Win
     } else if (score < -PIECE_VALUE[KING]) {
@@ -147,65 +151,69 @@ int Game::material_eval()
         int nb_minors = 0;
         for (const PieceType &t : PIECE_TYPES) {
             const int n = pieces.count(c, t);
-            // Pieces' standard values
+            // Standard pieces values
             material_score[c] += n * PIECE_VALUE[t];
 
             // Bonus values depending on material imbalance
             int adj;
             switch (t) {
-                case PAWN:
-                    nb_pawns = n;
-                    if (n == 0) material_bonus[c] += NO_PAWNS_MALUS;
-                    break;
-                case KNIGHT:
-                    nb_minors = n;
-                    if (n > 1) material_bonus[c] += REDUNDANCY_MALUS;
+            case PAWN:
+                nb_pawns = n;
+                if (n == 0) {
+                    material_bonus[c] += NO_PAWNS_MALUS;
+                }
+                break;
+            case KNIGHT:
+                nb_minors = n;
+                if (n > 1) {
+                    material_bonus[c] += REDUNDANCY_MALUS;
+                }
 
-                    // Value adjusted by the number of pawns on the board
-                    adj = PAWNS_ADJUSTEMENT[KNIGHT][nb_pawns];
-                    material_bonus[c] += n * adj;
-                    break;
-                case BISHOP:
-                    nb_minors += n;
-                    // Bishop bonus pair (from +40 to +64):
-                    // less than half a pawn when most or all the pawns are on
-                    // the board, and more than half a pawn when half or more
-                    // of the pawns are gone. (Kaufman 1999)
-                    //
-                    // No bonus for two bishops controlling the same color
-                    // No bonus for more than two bishops
-                    if (n == 2 && has_bishop_pair(c, pieces)) {
-                        material_bonus[c] +=
-                            (BISHOP_PAIR_BONUS + 3 * 8 - nb_pawns);
-                    }
+                // Value adjusted by the number of pawns on the board
+                adj = PAWNS_ADJUSTEMENT[KNIGHT][nb_pawns];
+                material_bonus[c] += n * adj;
+                break;
+            case BISHOP:
+                nb_minors += n;
+                // Bishop bonus pair (from +40 to +64): less than half a pawn
+                // when most or all the pawns are on the board, and more than
+                // half a pawn when half or more of the pawns are gone.
+                // (Kaufman 1999)
+                //
+                // No bonus for two bishops controlling the same color
+                // No bonus for more than two bishops
+                if (n == 2 && has_bishop_pair(c, pieces)) {
+                    material_bonus[c] +=
+                        (BISHOP_PAIR_BONUS + 3 * 8 - nb_pawns);
+                }
 
-                    // Value adjusted by the number of pawns on the board
-                    adj = PAWNS_ADJUSTEMENT[BISHOP][nb_pawns];
-                    material_bonus[c] += n * adj;
-                    break;
-                case ROOK:
-                    // Principle of the redundancy (Kaufman 1999)
-                    if (n > 1) {
-                        material_bonus[c] += REDUNDANCY_MALUS;
-                    }
+                // Value adjusted by the number of pawns on the board
+                adj = PAWNS_ADJUSTEMENT[BISHOP][nb_pawns];
+                material_bonus[c] += n * adj;
+                break;
+            case ROOK:
+                // Principle of the redundancy (Kaufman 1999)
+                if (n > 1) {
+                    material_bonus[c] += REDUNDANCY_MALUS;
+                }
 
-                    // Value adjusted by the number of pawns on the board
-                    adj = PAWNS_ADJUSTEMENT[ROOK][nb_pawns];
-                    material_bonus[c] += n * adj;
-                    break;
-                case QUEEN:
-                    if (nb_minors > 1) {
-                        // With two or more minor pieces, the queen
-                        // equal two rooks. (Kaufman 1999)
-                        material_bonus[c] +=
-                            (2 * PIECE_VALUE[ROOK]) - (PIECE_VALUE[QUEEN]);
-                    }
-                    // Value adjusted by the number of pawns on the board
-                    adj = PAWNS_ADJUSTEMENT[QUEEN][nb_pawns];
-                    material_bonus[c] += n * adj;
-                    break;
-                default:
-                    break;
+                // Value adjusted by the number of pawns on the board
+                adj = PAWNS_ADJUSTEMENT[ROOK][nb_pawns];
+                material_bonus[c] += n * adj;
+                break;
+            case QUEEN:
+                if (nb_minors > 1) {
+                    // With two or more minor pieces, the queen equals two
+                    // rooks. (Kaufman 1999)
+                    material_bonus[c] +=
+                        (2 * PIECE_VALUE[ROOK]) - (PIECE_VALUE[QUEEN]);
+                }
+                // Value adjusted by the number of pawns on the board
+                adj = PAWNS_ADJUSTEMENT[QUEEN][nb_pawns];
+                material_bonus[c] += n * adj;
+                break;
+            default:
+                break;
             }
         }
     }
