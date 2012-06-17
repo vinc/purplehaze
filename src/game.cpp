@@ -19,22 +19,6 @@
 
 #include "game.h"
 
-Game::Game()
-{
-    nodes_count = 0;
-    output_thinking = false;
-    //tt.clear();
-    //material_table.clear();
-    clear_killers();
-    search_moves.clear();
-
-    // Make PST
-    init_eval();
-
-    // Initialize MVV/LVA score array
-    Moves::init_mvv_lva_scores();
-}
-
 void Game::clear_killers()
 {
     for (int i = 0; i < MAX_PLY; ++i) {

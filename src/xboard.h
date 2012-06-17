@@ -40,8 +40,8 @@ class Xboard : public Protocol
         bool force_mode;
 
     public:
-        Xboard() :
-            Protocol(),
+        Xboard(const int tt_size = TT_SIZE, const int mt_size = MT_SIZE) :
+            Protocol(tt_size, mt_size),
             force_mode(true)
             {}
 

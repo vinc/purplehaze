@@ -47,7 +47,17 @@ class Game
         Time time;
         Transpositions tt;
         MoveList search_moves;
-        Game();
+
+        Game(const int tt_size = TT_SIZE, const int mt_size = MT_SIZE) :
+            material_table(mt_size),
+            output_thinking(false),
+            nodes_count(0),
+            tt(tt_size)
+            {
+                init_eval(); // PST
+                Moves::init_mvv_lva_scores();
+            }
+
         void add_piece(Color c, PieceType t, Square s);
         void del_piece(Color c, PieceType t, int i);
         void del_piece(Piece p) {

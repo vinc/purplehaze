@@ -81,14 +81,22 @@ int main(int argc, char *argv[])
 {
     std::string logfile = "";
     bool option_color = false;
+    int tt_size = TT_SIZE;
+    int mt_size = MT_SIZE;
     signed char opt;
-    while ((opt = getopt(argc, argv, "cl:")) != EOF) {
+    while ((opt = getopt(argc, argv, "cl:m:t:")) != EOF) {
         switch (opt) {
             case 'c':
                 option_color = true;
                 break;
             case 'l':
                 logfile = optarg;
+                break;
+            case 'm':
+                mt_size = std::stoi(optarg) << 20;
+                break;
+            case 't':
+                tt_size = std::stoi(optarg) << 20;
                 break;
         }
     }
@@ -100,7 +108,7 @@ int main(int argc, char *argv[])
     std::string cmd;
     while ((cmd = prompt()) != "quit") {
         if (cmd == "xboard") { // Xboard protocol mode
-            Xboard xboard;
+            Xboard xboard(tt_size, mt_size);
             if (!logfile.empty()) {
                 xboard.debug(logfile);
             }
@@ -123,7 +131,7 @@ int main(int argc, char *argv[])
             getline(std::cin, init_fen);
             init_fen.erase(0, 1); // Remove the first whitespace
         } else if (cmd == "perft") {
-            Game game;
+            Game game(tt_size, mt_size);
             game.init(init_fen);
             for (unsigned int i = 1; ; ++i) {
                 clock_t start = clock();
@@ -138,7 +146,7 @@ int main(int argc, char *argv[])
             int depth = 0;
             std::cin >> depth;
             std::cout << std::endl;
-            Game game;
+            Game game(tt_size, mt_size);
             game.init(init_fen);
             Color c = game.current_position().side();
             unsigned int nodes_count = 0;
@@ -190,7 +198,7 @@ int main(int argc, char *argv[])
             std::cout << time << "s per move" << std::endl; // In seconds
 
             // Load game protocol
-            Protocol proto;
+            Protocol proto(tt_size, mt_size);
             proto.set_output_thinking(false);
             proto.set_time(1, time);
 
@@ -256,7 +264,7 @@ int main(int argc, char *argv[])
             std::string line;
             while (getline(epdfile, line)) {
                 std::string fen;
-                Game game;
+                Game game(tt_size, mt_size);
                 for (int i = 0; line.length() > 0; ++i) {
 
                     const size_t pos = line.find(" ;");
