@@ -132,6 +132,7 @@ int main(int argc, char *argv[])
     std::string cmd;
     while ((cmd = prompt()) != "quit") {
         if (cmd == "xboard") { // Xboard protocol mode
+            std::cin.ignore(); // Discards end of line
             Xboard xboard(tt_size, mt_size);
             if (!logfile.empty()) {
                 xboard.debug(logfile);
