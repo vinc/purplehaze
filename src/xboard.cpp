@@ -228,6 +228,7 @@ void Xboard::loop()
             if (!play_move(move)) {
                 log.to(Log::BOTH) << Log::OUT
                                   << "Illegal move: " << move << std::endl;
+                continue;
             }
             if (!force_mode) {
                 if (thinker.joinable()) {
