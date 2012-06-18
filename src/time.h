@@ -17,7 +17,7 @@
 #ifndef TIME_H
 #define TIME_H
 
-#include <assert.h>
+#include <cassert>
 #include <ctime>
 
 class Time

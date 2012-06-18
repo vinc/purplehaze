@@ -17,7 +17,7 @@
 #ifndef PIECES_H
 #define PIECES_H
 
-#include <assert.h>
+#include <cassert>
 
 #include "common.h"
 #include "piece.h"

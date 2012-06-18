@@ -15,11 +15,11 @@
  */
 
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 #include <ctime>
 #include <iostream>
 #include <iterator>
-#include <signal.h>
+#include <csignal>
 #include <sstream>
 #include <string>
 #include <vector>

@@ -15,7 +15,7 @@
  */
 
 #include <bitset>
-#include <assert.h>
+#include <cassert>
 #include <iostream>
 #include <iomanip>
 #include <string>
