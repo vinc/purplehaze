@@ -136,8 +136,7 @@ int Game::material_eval()
     bool is_empty = true;
     auto hash_score = material_table.lookup(pos.material_hash(), &is_empty);
     if (!is_empty) {
-        const Color c = pos.side();
-        return (c == WHITE ? hash_score : -hash_score);
+        return (pos.side() == WHITE ? hash_score : -hash_score);
     }
 
     int scores[2] = { 0 };
