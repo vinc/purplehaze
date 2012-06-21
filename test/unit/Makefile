@@ -2,7 +2,7 @@ include ../../configure.mk
 
 CXXFLAGS += -lgtest
 
-SOURCES = $(shell ls {../../src,.}/*.cpp | grep -v 'src/main.cpp')
+SOURCES = $(shell find ../.. -name '*.cpp' ! -name 'main.cpp' | sort)
 OBJECTS = $(SOURCES:.cpp=.o)
 EXECUTABLE = test_purplehaze
 
