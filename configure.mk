@@ -14,8 +14,9 @@ use_futility_pruning = yes
 use_late_move_reduction = yes
 
 # Debug options
-use_profiler = no
+use_gcov = no
 use_gdb = no
+use_profiler = no
 
 # Supported compiler options: gcc, intel, clang
 ifndef compiler
@@ -46,6 +47,9 @@ ifeq ($(optimize),yes)
     else
         CXXFLAGS += -O3 -march=native -mtune=native
     endif
+endif
+ifeq ($(use_gcov),yes)
+    CXXFLAGS += -fprofile-arcs -ftest-coverage
 endif
 ifeq ($(use_gdb),yes)
     CXXFLAGS += -g
