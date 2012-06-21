@@ -414,6 +414,9 @@ bool Game::is_legal(Move m)
         }
 
     } else if (m.is_castle()) {
+        if (from != Board::flip(E1, c)) {
+            return false;
+        }
         switch (m.castle_side()) {
         case KING:
             return king_castle_allowed(c, from, to, board, pieces);
