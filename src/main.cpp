@@ -68,13 +68,15 @@ static const std::string OPTIONS[][2] = {
 
 static const std::string FLAGS[][2] = {
     { "-c",      "use colored output" },
-    { "-l FILE", "write log to FILE" },
-    { "-m NUM",  "set material table size to NUM megabytes" },
-    { "-t NUM",  "set transposition table size to NUM megabytes" }
+    { "-l <file>", "write log to <file>" },
+    { "-m <size>",  "set material table size to <size> megabytes" },
+    { "-t <size>",  "set transposition table size to <size> megabytes" }
 };
 
 void print_usage() {
-    std::cout << "Usage: purplehaze [OPTION]" << std::endl;
+    std::cout << "Usage: purplehaze [options]" << std::endl
+              << std::endl
+              << "Options:" << std::endl;
     std::cout << std::left;
     int option_width = 15;
     for (const std::string (&option)[2] : FLAGS) {
@@ -85,6 +87,8 @@ void print_usage() {
                   << std::setw(80 - 2 - option_width) << usage
                   << std::endl;
     }
+    std::cout << std::endl
+              << "Report bugs to <bug-purplehaze@vinc.cc>" << std::endl;
 }
 
 static std::string prompt()
@@ -104,7 +108,7 @@ int main(int argc, char *argv[])
     bool option_color = false;
     int tt_size = TT_SIZE;
     int mt_size = MT_SIZE;
-    signed char opt;
+    int opt;
     while ((opt = getopt(argc, argv, "chl:m:t:")) != EOF) {
         switch (opt) {
         case 'c':
@@ -122,6 +126,11 @@ int main(int argc, char *argv[])
         case 't':
             tt_size = std::stoi(optarg) << 20;
             break;
+        case '?':
+        default:
+            std::cerr << "Try 'purplehaze -h' for more information."
+                      << std::endl;
+            return 1;
         }
     }
     std::cout << "Purple Haze " << VERSION << std::endl;
