@@ -34,7 +34,9 @@ class Pieces
             nb_pieces(),
             total()
             {
-                std::fill(positions[0][0], positions[0][0] + 2 * 7 * 9, OUT);
+                std::fill(&positions[0][0][0],
+                          &positions[0][0][0] + sizeof(positions),
+                          OUT);
             }
 
         Square position(Piece p) const {
