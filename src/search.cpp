@@ -166,18 +166,18 @@ int Game::search(int alpha, int beta, int depth, const int ply)
         if (/*!is_pv &&*/ depth <= trans.depth() && !discard) {
             const int tr_score = trans.value();
             switch (trans.bound()) {
-            case EXACT:
-                return tr_score; // Already searched node
-            case UPPER:
-                if (tr_score < beta) {
-                    beta = tr_score;
-                }
-                break;
             case LOWER:
                 if (tr_score > alpha) {
                     alpha = tr_score;
                 }
                 break;
+            case UPPER:
+                if (tr_score < beta) {
+                    beta = tr_score;
+                }
+                break;
+            case EXACT:
+                return tr_score; // Already searched node
             default:
                 assert(false);
             }
