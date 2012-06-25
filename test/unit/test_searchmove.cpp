@@ -19,7 +19,7 @@ class SearchMoveTest : public testing::Test
         }
 };
 
-TEST_F(SearchMoveTest, DISABLED_Fine70Position)
+TEST_F(SearchMoveTest, Fine70Position)
 {
     fen = "8/k7/3p4/p2P1p2/P2P1P2/8/8/K7 w - -";
     EXPECT_EQ("Kb1", search());
