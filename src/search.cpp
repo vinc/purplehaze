@@ -256,11 +256,6 @@ int Game::search(int alpha, int beta, int depth, const int ply)
 
     Move move;
     while (!(move = moves.next()).is_null()) {
-        if (move.is_capture()) {
-            if (board[move.dest()].is(KING)) {
-                return INF - ply; // Checkmate
-            }
-        }
         make_move(move);
         if (is_check(player)) { // Skip illegal move
             undo_move(move);
