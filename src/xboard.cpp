@@ -43,8 +43,9 @@ static std::string read_line(Log &log)
 {
     std::string line;
     getline(std::cin, line);
-    assert(line.length() > 0);
-    if (line.substr(0, 4) != "ping") {
+    if (line.length() == 0) {
+        line = "quit";
+    } else if (line.substr(0, 4) != "ping") {
         log.to(Log::FILE) << Log::IN << line << std::endl;
     }
     return line;
