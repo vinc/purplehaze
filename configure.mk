@@ -18,22 +18,8 @@ use_gcov = no
 use_gdb = no
 use_profiler = no
 
-# Supported compiler options: gcc, intel, clang
-ifndef compiler
-    compiler = gcc
-endif
-ifeq ($(compiler),gcc)
-    CXX = g++
-endif
-ifeq ($(compiler),intel)
-    CXX = icpc
-endif
-ifeq ($(compiler),clang)
-    CXX = clang++
-endif
-
 CXXFLAGS = -std=c++0x -pthread -pipe
-ifeq ($(compiler),intel)
+ifeq ($(CXX),icpc) # Intel Compiler
     CXXFLAGS += -Wall -Wremarks -wd981 -wd2259
 else
     CXXFLAGS += -Wall -pedantic-errors -Wcast-qual -Wshadow -Wextra
@@ -42,7 +28,7 @@ ifeq ($(use_git_describe),yes)
     CXXFLAGS += -DVERSION=\"$(shell git describe HEAD)\"
 endif
 ifeq ($(optimize),yes)
-    ifeq ($(compiler),intel)
+    ifeq ($(CXX),icpc) # Intel Compiler
         CXXFLAGS += -fast
     else
         CXXFLAGS += -O3 -march=native -mtune=native
