@@ -1,5 +1,8 @@
 language: cpp
-script: make && make test
 compiler:
     - clang
     - gcc
+before_install:
+    - sudo apt-get update -qq
+    - sudo apt-get install -qq libgtest-dev
+script: make && make test
