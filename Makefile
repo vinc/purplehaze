@@ -20,3 +20,4 @@ test:
 
 clean:
 	$(RM) $(OBJECTS) $(EXECUTABLE)
+	make -C ./test/unit clean
