@@ -1,9 +1,11 @@
 Purple Haze
 ===========
 
+> Do chess engines dream of electric guitar?
 
-Do Chess Engines Dream of Electric Guitar?
-------------------------------------------
+
+Synopsis
+--------
 
 Purple Haze is a free chess engine compatible with the Xboard protocol. It is
 written by Vincent Ollivier and distributed under the terms of the GNU General
@@ -31,8 +33,20 @@ them Purple Haze would not be able to do more than moving the pieces around
 the board.
 
 
-Implemented features
---------------------
+Installation
+------------
+
+See INSTALL for detailed installation instructions or just type the following
+commands in a terminal:
+
+    $ git clone git://github.com/vinc/purplehaze.git
+    $ cd purplehaze
+    $ make
+
+
+
+Features
+--------
 
 Data Structures:
 * 0x88 Board Representation
@@ -76,17 +90,6 @@ Miscellaneous:
 * Zobrist hashing
 * Xboard protocol
 * Time Management
-
-
-Installation
-------------
-
-See INSTALL for detailed installation instructions or just type the following
-commands in a terminal:
-
-    $ git clone git://github.com/vinc/purplehaze.git
-    $ cd purplehaze
-    $ make
 
 
 Usage
