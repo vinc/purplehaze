@@ -15,9 +15,9 @@ $(EXECUTABLE): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 test:
-	make -C ./test/unit
-	make -C ./test/unit test
+	$(MAKE) -C ./test/unit
+	$(MAKE) -C ./test/unit test
 
 clean:
 	$(RM) $(OBJECTS) $(EXECUTABLE)
-	make -C ./test/unit clean
+	$(MAKE) -C ./test/unit clean
