@@ -1,4 +1,4 @@
-/* Copyright (C) 2007-2011 Vincent Ollivier
+/* Copyright (C) 2007-2012 Vincent Ollivier
  *
  * Purple Haze is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,26 +14,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <assert.h>
+#include <cassert>
 #include <iostream>
 
 #include "game.h"
-
-Game::Game()
-{
-    nodes_count = 0;
-    output_thinking = false;
-    //tt.clear();
-    //material_table.clear();
-    clear_killers();
-    search_moves.clear();
-
-    // Make PST
-    init_eval();
-
-    // Initialize MVV/LVA score array
-    Moves::init_mvv_lva_scores();
-}
 
 void Game::clear_killers()
 {
@@ -109,7 +93,7 @@ void Game::del_position()
 /*
  * Killer move setter for the Killer Heuristic in move ordering.
  */
-void Game::set_killer_move(int depth, Move move)
+void Game::set_killer(const Move move, const int depth)
 {
     if (move != killer_moves[depth][0]) {
         killer_moves[depth][1] = killer_moves[depth][0];

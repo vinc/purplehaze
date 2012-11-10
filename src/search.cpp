@@ -1,4 +1,4 @@
-/* Copyright (C) 2007-2011 Vincent Ollivier
+/* Copyright (C) 2007-2012 Vincent Ollivier
  *
  * Purple Haze is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,11 +14,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <assert.h>
+#include <cassert>
 #include <iostream>
 #include <iomanip>
-#include <stdio.h>
-#include <time.h>
 
 #include "game.h"
 #include "search.h"
@@ -31,13 +29,17 @@ inline bool Game::is_dangerous(Move m)
 
     if (board[m.dest()].is(PAWN)) {
         const Color c = !current_position().side();
-        if (m.dest_rank() + RANK_6 * c == RANK_7) return true;
+        if (m.dest_rank() + RANK_6 * c == RANK_7) {
+            return true;
+        }
     }
 
     /*
     if (m.is_capture()) {
         const Piece capture = current_position().capture();
-        if (capture.type() != PAWN) return true;
+        if (capture.type() != PAWN) {
+            return true;
+        }
     }
 
     return m.is_promotion();
@@ -48,7 +50,9 @@ inline bool Game::is_dangerous(Move m)
 
 unsigned long long int Game::perft(unsigned int depth)
 {
-    if (depth == 0) return 1;
+    if (depth == 0) {
+        return 1;
+    }
     unsigned long long int nodes = 0;
     Color c = current_position().side();
     bool use_lazy = false; // Lazy moves generation is not usefull in perft()
@@ -57,11 +61,15 @@ unsigned long long int Game::perft(unsigned int depth)
     while (!(move = moves.next()).is_null()) {
 #ifdef LEGAL
         if (depth == 1) {
-            if (is_legal(move)) ++nodes; // TODO: Finish is_legal()
+            if (is_legal(move)) {
+                ++nodes; // TODO: Finish is_legal()
+            }
         } else {
 #endif
             make_move(move);
-            if (!is_check(c)) nodes += perft(depth - 1);
+            if (!is_check(c)) {
+                nodes += perft(depth - 1);
+            }
             undo_move(move);
 #ifdef LEGAL
         }
@@ -72,25 +80,37 @@ unsigned long long int Game::perft(unsigned int depth)
 
 int Game::quiescence(int alpha, int beta, int depth, const int ply)
 {
-    if (time.poll(nodes_count)) return 0;
+    if (time.poll(nodes_count)) {
+        return 0;
+    }
 
     const int stand_pat = eval(alpha, beta);
-    if (ply >= MAX_PLY) return stand_pat;
+    if (ply >= MAX_PLY) {
+        return stand_pat;
+    }
 
-    if (stand_pat >= beta) return stand_pat; // Beta cut-off
+    if (stand_pat >= beta) {
+        return stand_pat; // Beta cut-off
+    }
 
     // Delta pruning
     const int delta = PIECE_VALUE[QUEEN]; // TODO: Switch off in late endgame
-    if (stand_pat < alpha - delta) return alpha;
+    if (stand_pat < alpha - delta) {
+        return alpha;
+    }
 
-    if (alpha < stand_pat) alpha = stand_pat; // New alpha
+    if (alpha < stand_pat) {
+        alpha = stand_pat; // New alpha
+    }
 
     Color player = current_position().side();
 
     Moves moves(board, pieces, current_position(), search_moves);
     Move move;
     while (!(move = moves.next()).is_null()) {
-        if (moves.state() > GOOD_CAPTURES) break; // Skip bad captures
+        if (moves.state() > GOOD_CAPTURES) {
+            break; // Skip bad captures
+        }
         make_move(move);
 
         if (is_check(player)) { // Illegal move
@@ -100,7 +120,9 @@ int Game::quiescence(int alpha, int beta, int depth, const int ply)
 
         const int score = -quiescence(-beta, -alpha, depth - 1, ply + 1);
         undo_move(move);
-        if (time.poll(nodes_count)) return 0;
+        if (time.poll(nodes_count)) {
+            return 0;
+        }
         if (score >= beta) {
             return score;
         }
@@ -108,16 +130,24 @@ int Game::quiescence(int alpha, int beta, int depth, const int ply)
             alpha = score;
         }
     }
-    if (time.poll(nodes_count)) return 0;
+    if (time.poll(nodes_count)) {
+        return 0;
+    }
     return alpha;
 }
 
 template<NodeType node_type>
 int Game::search(int alpha, int beta, int depth, const int ply)
 {
-    if (time.poll(nodes_count)) return 0;
-    if (depth <= 0) return quiescence(alpha, beta, 0, ply + 1); // Quiescence
-    if (tree.has_repetition_draw()) return 0; // Repetition draw rules
+    if (time.poll(nodes_count)) {
+        return 0;
+    }
+    if (depth <= 0) {
+        return quiescence(alpha, beta, 0, ply + 1); // Quiescence
+    }
+    if (tree.has_repetition_draw()) {
+        return 0; // Repetition draw rules
+    }
 
     int score = -INF;
     const int old_alpha = alpha;
@@ -131,18 +161,29 @@ int Game::search(int alpha, int beta, int depth, const int ply)
     Transposition trans = tt.lookup(pos.hash(), &is_empty);
     if (!is_empty) {
         // FIXME Avoid a potential bug with tt.lookup()
-        const bool discard = pos.hash() == 0 &&
-                             trans.bound() == UNDEF_BOUND;
+        const bool discard = pos.hash() == 0 && trans.bound() == UNDEF_BOUND;
 
         if (/*!is_pv &&*/ depth <= trans.depth() && !discard) {
             const int tr_score = trans.value();
             switch (trans.bound()) {
-                case EXACT: return tr_score; // Already searched node
-                case UPPER: if (tr_score < beta) beta = tr_score; break;
-                case LOWER: if (tr_score > alpha) alpha = tr_score; break;
-                default: assert(false);
+            case LOWER:
+                if (tr_score > alpha) {
+                    alpha = tr_score;
+                }
+                break;
+            case UPPER:
+                if (tr_score < beta) {
+                    beta = tr_score;
+                }
+                break;
+            case EXACT:
+                return tr_score; // Already searched node
+            default:
+                assert(false);
             }
-            if (alpha >= beta) return tr_score; // TT cause a cut-off
+            if (alpha >= beta) {
+                return tr_score; // TT cause a cut-off
+            }
         }
 
         // If the transposition does not contain the best move,
@@ -156,7 +197,9 @@ int Game::search(int alpha, int beta, int depth, const int ply)
 
 #ifndef NCE
     // Check Extension
-    if (is_in_check) ++depth;
+    if (is_in_check) {
+        ++depth;
+    }
 #endif
 
 #ifndef NNMP
@@ -205,20 +248,14 @@ int Game::search(int alpha, int beta, int depth, const int ply)
     // Killer moves need pseudo legality checking before we can use them,
     // but they can cause a cut-off and dispense to generate quiet moves
     // so it's worth it.
-    for (int i = 0; i < MAX_KILLERS; ++i) {
-        Move killer = killer_move(depth, i);
-        if (is_legal(killer)) {
-            moves.add(killer, KILLERS);
+    for (const Move &killer_move : killers(depth)) {
+        if (is_legal(killer_move)) {
+            moves.add(killer_move, KILLERS);
         }
     }
 
     Move move;
     while (!(move = moves.next()).is_null()) {
-        if (move.is_capture()) {
-            if (board[move.dest()].is(KING)) {
-                return INF - ply; // Checkmate
-            }
-        }
         make_move(move);
         if (is_check(player)) { // Skip illegal move
             undo_move(move);
@@ -235,7 +272,7 @@ int Game::search(int alpha, int beta, int depth, const int ply)
                 if (best_score >= beta) { // Beta cut-off
                     // Update killer moves
                     if (!move.is_capture()) {
-                        set_killer_move(depth, move);
+                        set_killer(move, depth);
                     }
 
                     best_move = move;
@@ -252,7 +289,7 @@ int Game::search(int alpha, int beta, int depth, const int ply)
             const bool fp_allowed =
                 !is_in_check &&
                 !is_giving_check &&
-                !is_killer_move(depth, move) &&
+                !is_killer(move, depth) &&
                 !is_dangerous(move) &&
                 !move.is_castle() &&
                 legal_move_found &&
@@ -276,7 +313,7 @@ int Game::search(int alpha, int beta, int depth, const int ply)
             const bool lmr_allowed =
                 !is_in_check &&
                 !is_giving_check &&
-                !is_killer_move(depth, move) &&
+                !is_killer(move, depth) &&
                 !move.is_capture() &&
                 !move.is_promotion();
 
@@ -297,13 +334,15 @@ int Game::search(int alpha, int beta, int depth, const int ply)
             }
 
             undo_move(move);
-            if (time.poll(nodes_count)) return 0;
+            if (time.poll(nodes_count)) {
+                return 0;
+            }
             if (score > best_score) { // Found a new best move
                 best_score = score;
                 best_move = move;
                 if (score >= beta) { // Sufficient to cause a cut-off?
                     if (!move.is_capture()) {
-                        set_killer_move(depth, move); // Update killer moves
+                        set_killer(move, depth); // Update killer moves
                     }
 
                     goto transposition;
@@ -311,10 +350,15 @@ int Game::search(int alpha, int beta, int depth, const int ply)
             }
         }
     }
-    if (time.poll(nodes_count)) return 0;
+    if (time.poll(nodes_count)) {
+        return 0;
+    }
     if (!legal_move_found) { // End of game?
-        if (is_in_check) return -INF + ply; // Checkmate
-        return 0; // Stalemate
+        if (is_in_check) {
+            return -INF + ply; // Checkmate
+        } else {
+            return 0; // Stalemate
+        }
     }
 
 transposition:
@@ -324,10 +368,11 @@ transposition:
         const int value = best_score;
         const Bound bound = (best_score >= beta ? LOWER :
                                 (best_score <= old_alpha ? UPPER : EXACT));
-        if (bound == UPPER) best_move = Move(); // Don't store best move
+        if (bound == UPPER) {
+            best_move = Move(); // Don't store best move
+        }
         tt.save(pos.hash(), value, bound, depth, best_move);
     }
-
     return best_score;
 }
 
@@ -348,13 +393,16 @@ Move Game::root(int max_depth)
         int score;
         int alpha = -INF;
         int beta = INF;
-        if (time.is_out_of_time()) {
+        if (time.poll(nodes_count)) {
             break; // Do not start a new ply
         }
-        if (time.allocated() - time.elapsed() < 100) {
-            // Decrease polling interval if <1s left
-            time.set_polling_interval(100000);
+
+        // Increase poll frequency as time is running out
+        const int time_remaining = time.allocated() - time.elapsed();
+        if (time_remaining < 1000) {
+            time.set_polling_interval(time_remaining * 512);
         }
+
         // Mate pruning
         if (depth > 6) {
             bool is_mate = true;
@@ -386,7 +434,7 @@ Move Game::root(int max_depth)
                 score = -search<ALL>(-beta, -alpha, depth - 1, 1);
             }
             undo_move(move);
-            if (time.is_out_of_time()) {
+            if (time.poll(nodes_count)) {
                 break; // Discard the move
             }
             if (score > alpha) {
@@ -398,7 +446,7 @@ Move Game::root(int max_depth)
                 }
             }
         }
-        if (time.is_out_of_time()) {
+        if (time.poll(nodes_count)) {
             // TODO: restore best_move and best_score from previous ply?
             break; // Discard this ply
         }

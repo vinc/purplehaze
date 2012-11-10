@@ -14,25 +14,12 @@ use_futility_pruning = yes
 use_late_move_reduction = yes
 
 # Debug options
-use_profiler = no
+use_gcov = no
 use_gdb = no
+use_profiler = no
 
-# Supported compiler options: gcc, intel, clang
-ifndef compiler
-    compiler = gcc
-endif
-ifeq ($(compiler),gcc)
-    CXX = g++
-endif
-ifeq ($(compiler),intel)
-    CXX = icpc
-endif
-ifeq ($(compiler),clang)
-    CXX = clang++
-endif
-
-CXXFLAGS = -std=c++0x -pipe
-ifeq ($(compiler),intel)
+CXXFLAGS = -std=c++0x -pthread -pipe
+ifeq ($(CXX),icpc) # Intel Compiler
     CXXFLAGS += -Wall -Wremarks -wd981 -wd2259
 else
     CXXFLAGS += -Wall -pedantic-errors -Wcast-qual -Wshadow -Wextra
@@ -41,11 +28,14 @@ ifeq ($(use_git_describe),yes)
     CXXFLAGS += -DVERSION=\"$(shell git describe HEAD)\"
 endif
 ifeq ($(optimize),yes)
-    ifeq ($(compiler),intel)
+    ifeq ($(CXX),icpc) # Intel Compiler
         CXXFLAGS += -fast
     else
         CXXFLAGS += -O3 -march=native -mtune=native
     endif
+endif
+ifeq ($(use_gcov),yes)
+    CXXFLAGS += -fprofile-arcs -ftest-coverage
 endif
 ifeq ($(use_gdb),yes)
     CXXFLAGS += -g

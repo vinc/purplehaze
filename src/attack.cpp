@@ -1,4 +1,4 @@
-/* Copyright (C) 2007-2011 Vincent Ollivier
+/* Copyright (C) 2007-2012 Vincent Ollivier
  *
  * Purple Haze is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <assert.h>
+#include <cassert>
 
 #include "game.h"
 
@@ -25,8 +25,7 @@ bool Board::is_attacked_by(const Color c, const Square s,
                            const Pieces& pieces) const
 {
     for (const PieceType& t : NOT_PAWN_TYPES) {
-        const int n = pieces.count(c, t);
-        for (int i = 0; i < n; ++i) {
+        for (int i = 0, n = pieces.count(c, t); i < n; ++i) {
             const Square from = pieces.position(c, t, i);
             if (!can_attack(t, from, s)) {
                 continue;
@@ -46,8 +45,8 @@ bool Board::is_attacked_by(const Color c, const Square s,
     }
 
     // Specific code for pawns
-    for (int i = 0; i < 2; ++i) {
-        const Square from = static_cast<Square>(s + PAWN_CAPTURE_DIRS[!c][i]);
+    for (const Direction &d : PAWN_CAPTURE_DIRS[!c]) {
+        const Square from = static_cast<Square>(s + d);
         if (board[from].is(c, PAWN)) {
             return true;
         }
@@ -74,44 +73,44 @@ bool Board::can_go(const Piece p, const Square from, const Square to) const
     Square s;
     const PieceType t = p.type();
     switch (t) {
-        case PAWN:
-            d = (c == WHITE ? UP : DOWN);
-            s = static_cast<Square>(from + d);
-            if (!is_empty(to)) { // Capture
-                if (to == static_cast<Square>(s + LEFT)) {
-                    return true;
-                }
-                if (to == static_cast<Square>(s + RIGHT)) {
-                    return true;
-                }
-            } else { // Pawn push (and double push)
-                if (to == static_cast<Square>(s)) {
-                    return true;
-                }
-                if (to == static_cast<Square>(s + d)) {
-                    if (is_empty(s) && is_pawn_begin(c, from)) {
-                        return true;
-                    }
-                }
-            }
-            break;
-        default:
-            if (!can_attack(t, from, to)) {
-                return false;
-            }
-            if (t == KNIGHT || t == KING) {
+    case PAWN:
+        d = PAWN_PUSH_DIRS[c];
+        s = static_cast<Square>(from + d);
+        if (!is_empty(to)) { // Capture
+            if (to == static_cast<Square>(s + LEFT)) {
                 return true;
             }
-            d = direction_to(from, to);
-            s = static_cast<Square>(from + d);
-            while (s != to && is_empty(s)) { // Search for a blocker
-                s = static_cast<Square>(s + d);
-                assert(!is_out(s));
-            }
-            if (s == to) {
+            if (to == static_cast<Square>(s + RIGHT)) {
                 return true;
             }
-            break;
+        } else { // Pawn push (and double push)
+            if (to == s) {
+                return true;
+            }
+            if (to == static_cast<Square>(s + d)) {
+                if (is_empty(s) && is_pawn_begin(c, from)) {
+                    return true;
+                }
+            }
+        }
+        break;
+    default:
+        if (!can_attack(t, from, to)) {
+            return false;
+        }
+        if (t == KNIGHT || t == KING) {
+            return true;
+        }
+        d = direction_to(from, to);
+        s = static_cast<Square>(from + d);
+        while (s != to && is_empty(s)) { // Search for a blocker
+            s = static_cast<Square>(s + d);
+            assert(!is_out(s));
+        }
+        if (s == to) {
+            return true;
+        }
+        break;
     }
     return false;
 }

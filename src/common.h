@@ -1,4 +1,4 @@
-/* Copyright (C) 2007-2011 Vincent Ollivier
+/* Copyright (C) 2007-2012 Vincent Ollivier
  *
  * Purple Haze is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #include <string>
 
 #ifndef VERSION
-#define VERSION "2.0.3"
+#define VERSION "2.1.0"
 #endif
 
 static const int BOARD_SIZE  = 128;
@@ -28,8 +28,8 @@ static const int MAX_PLY     = 128; // Maximum search depth
 static const int MAX_MOVES   = 256; // Maximum number of moves per position
 static const int MAX_KILLERS = 2;
 static const int INF         = 29999;
-static const int TT_SIZE     = 1024 * 1024 * 128;
-static const int MT_SIZE     = 1024 * 1024;
+static const int TT_SIZE     = 128 << 20; // 128 MB
+static const int MT_SIZE     = 1 << 20; // 1 MB
 
 static const std::string DEFAULT_FEN =
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
@@ -47,14 +47,14 @@ enum Square : unsigned char {
 };
 
 static const Square SQUARES[] = {
-    A1, C1, D1, E1, F1, G1, H1,
-    A2, C2, D2, E2, F2, G2, H2,
-    A3, C3, D3, E3, F3, G3, H3,
-    A4, C4, D4, E4, F4, G4, H4,
-    A5, C5, D5, E5, F5, G5, H5,
-    A6, C6, D6, E6, F6, G6, H6,
-    A7, C7, D7, E7, F7, G7, H7,
-    A8, C8, D8, E8, F8, G8, H8,
+    A1, B1, C1, D1, E1, F1, G1, H1,
+    A2, B2, C2, D2, E2, F2, G2, H2,
+    A3, B3, C3, D3, E3, F3, G3, H3,
+    A4, B4, C4, D4, E4, F4, G4, H4,
+    A5, B5, C5, D5, E5, F5, G5, H5,
+    A6, B6, C6, D6, E6, F6, G6, H6,
+    A7, B7, C7, D7, E7, F7, G7, H7,
+    A8, B8, C8, D8, E8, F8, G8, H8,
     OUT
 };
 
@@ -266,6 +266,10 @@ inline int operator+(PieceType pt, int i)
 inline int operator+(Square s, int i)
 {
     return i + static_cast<int>(s);
+}
+inline int operator+(Square a, Square b)
+{
+    return static_cast<int>(a) + static_cast<int>(b);
 }
 inline int operator+(Rank r, int i)
 {

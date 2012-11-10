@@ -1,4 +1,4 @@
-/* Copyright (C) 2007-2011 Vincent Ollivier
+/* Copyright (C) 2007-2012 Vincent Ollivier
  *
  * Purple Haze is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,7 +53,11 @@ template <class T>
 int HashTable<T>::usage() const
 {
     int res = 0;
-    for (int i = 0; i < SIZE; ++i) if (entries[i].hash) ++res;
+    for (int i = 0; i < SIZE; ++i) {
+        if (entries[i].hash) {
+            ++res;
+        }
+    }
     return res;
 }
 

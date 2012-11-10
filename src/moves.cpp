@@ -1,4 +1,4 @@
-/* Copyright (C) 2007-2011 Vincent Ollivier
+/* Copyright (C) 2007-2012 Vincent Ollivier
  *
  * Purple Haze is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <assert.h>
+#include <cassert>
 
 #include "moves.h"
 #include "board.h"
@@ -38,44 +38,47 @@
 ExtendedMove Moves::next()
 {
     if (!use_lazy_generation) {
-        if (cur == 0) generate(); // generate() will change the value of 'n'
-
-        if (cur == end) return ExtendedMove();
+        if (cur == 0) {
+            generate(); // generate() will change the value of 'n'
+        }
+        if (cur == end) {
+            return ExtendedMove();
+        }
         return moves[cur++];
     }
 
     switch (generation_state) {
-        case BEST:
-            if (cur < size[BEST]) {
-                return moves[cur++];
-            }
-            generation_state = GOOD_CAPTURES;
-            generate(CAPTURE);
-            cur = size[BEST] + size[KILLERS]; // Jump to first good capture
-        case GOOD_CAPTURES:
-            if (cur < (size[BEST] + size[KILLERS] + size[GOOD_CAPTURES])) {
-                break;
-            }
-            generation_state = KILLERS;
-            cur = size[BEST]; // Jump to the first killer
-        case KILLERS:
-            if (cur < (size[BEST] + size[KILLERS])) {
-                return moves[cur++];
-            }
-            generation_state = BAD_CAPTURES;
-            cur = size[BEST] + size[KILLERS] + size[GOOD_CAPTURES];
-        case BAD_CAPTURES:
-            if (cur < end) {
-                break;
-            }
-            generation_state = QUIET_MOVES;
-            generate(QUIET_MOVE);
-        case QUIET_MOVES:
-            if (cur < end) {
-                return moves[cur++];
-            }
-        default:
-            return ExtendedMove();
+    case BEST:
+        if (cur < size[BEST]) {
+            return moves[cur++];
+        }
+        generation_state = GOOD_CAPTURES;
+        generate(CAPTURE);
+        cur = size[BEST] + size[KILLERS]; // Jump to first good capture
+    case GOOD_CAPTURES:
+        if (cur < (size[BEST] + size[KILLERS] + size[GOOD_CAPTURES])) {
+            break;
+        }
+        generation_state = KILLERS;
+        cur = size[BEST]; // Jump to the first killer
+    case KILLERS:
+        if (cur < (size[BEST] + size[KILLERS])) {
+            return moves[cur++];
+        }
+        generation_state = BAD_CAPTURES;
+        cur = size[BEST] + size[KILLERS] + size[GOOD_CAPTURES];
+    case BAD_CAPTURES:
+        if (cur < end) {
+            break;
+        }
+        generation_state = QUIET_MOVES;
+        generate(QUIET_MOVE);
+    case QUIET_MOVES:
+        if (cur < end) {
+            return moves[cur++];
+        }
+    default:
+        return ExtendedMove();
     }
 
     // If we are here, next() should return a capture
@@ -107,42 +110,48 @@ void Moves::add(Move move, MovesState mt)
         return;
     }
 
-    if (move.is_null()) return;
+    if (move.is_null()) {
+        return;
+    }
 
     // Don't add again best and killer moves
     const int n = size[BEST] + size[KILLERS];
-    for (int i = 0; i < n; ++i) if (moves[i] == move) return;
+    for (int i = 0; i < n; ++i) {
+        if (moves[i] == move) {
+            return;
+        }
+    }
 
     // Calculate the move's score
     Score score = 0;
     switch (mt) {
-        case BEST:
-            score = BEST_SCORE;
-            size[mt]++;
-            break;
-        case KILLERS:
-            score = KILLERS_SCORE - size[KILLERS];
-            size[mt]++;
-            break;
-        default:
-            //assert(generation_state > KILLERS);
-            //size[generation_state]++; // If move is a capture or a quiet move
-            break;
+    case BEST:
+        score = BEST_SCORE;
+        size[mt]++;
+        break;
+    case KILLERS:
+        score = KILLERS_SCORE - size[KILLERS];
+        size[mt]++;
+        break;
+    default:
+        //assert(generation_state > KILLERS);
+        //size[generation_state]++; // If move is a capture or a quiet move
+        break;
     }
     switch (generation_state) {
-        case GOOD_CAPTURES:
-        case BAD_CAPTURES:
-            score = mvv_lva_score(move);
-            size[generation_state]++;
-            break;
-        case QUIET_MOVES:
-            score = -BEST_SCORE;
-            size[generation_state]++;
-            break;
-        default:
-            //assert(mt < GOOD_CAPTURES);
-            //size[mt]++; // If move is a best or killer move
-            break;
+    case GOOD_CAPTURES:
+    case BAD_CAPTURES:
+        score = mvv_lva_score(move);
+        size[generation_state]++;
+        break;
+    case QUIET_MOVES:
+        score = -BEST_SCORE;
+        size[generation_state]++;
+        break;
+    default:
+        //assert(mt < GOOD_CAPTURES);
+        //size[mt]++; // If move is a best or killer move
+        break;
     }
 
     // Add the move and its score to moves list

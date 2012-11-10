@@ -1,4 +1,4 @@
-/* Copyright (C) 2007-2011 Vincent Ollivier
+/* Copyright (C) 2007-2012 Vincent Ollivier
  *
  * Purple Haze is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,15 +14,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <assert.h>
+#include <cassert>
+#include <ctime>
 #include <fstream>
 #include <getopt.h>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <stdio.h>
 #include <string>
-#include <time.h>
 
 #include "common.h"
 #include "game.h"
@@ -67,23 +66,71 @@ static const std::string OPTIONS[][2] = {
     }
 };
 
-std::string prompt()
+static const std::string FLAGS[][2] = {
+    { "-c",      "use colored output" },
+    { "-l <file>", "write log to <file>" },
+    { "-m <size>",  "set material table size to <size> megabytes" },
+    { "-t <size>",  "set transposition table size to <size> megabytes" }
+};
+
+void print_usage() {
+    std::cout << "Usage: purplehaze [options]" << std::endl
+              << std::endl
+              << "Options:" << std::endl;
+    std::cout << std::left;
+    int option_width = 15;
+    for (const std::string (&option)[2] : FLAGS) {
+        std::string name = option[0];
+        std::string usage = option[1];
+        std::cout << "  "
+                  << std::setw(option_width) << name
+                  << std::setw(80 - 2 - option_width) << usage
+                  << std::endl;
+    }
+    std::cout << std::endl
+              << "Report bugs to <bug-purplehaze@vinc.cc>" << std::endl;
+}
+
+static std::string prompt()
 {
     std::cout << "> ";
     std::string cmd;
     std::cin >> cmd;
+    if (cmd == "") {
+        cmd = "quit";
+    }
     return cmd;
 }
 
 int main(int argc, char *argv[])
 {
+    std::string logfile = "";
     bool option_color = false;
-    char opt;
-    while ((opt = getopt(argc, argv, "c")) != -1) {
+    int tt_size = TT_SIZE;
+    int mt_size = MT_SIZE;
+    int opt;
+    while ((opt = getopt(argc, argv, "chl:m:t:")) != EOF) {
         switch (opt) {
-            case 'c':
-                option_color = true;
-                break;
+        case 'c':
+            option_color = true;
+            break;
+        case 'h':
+            print_usage();
+            return 0;
+        case 'l':
+            logfile = optarg;
+            break;
+        case 'm':
+            mt_size = std::stoi(optarg) << 20;
+            break;
+        case 't':
+            tt_size = std::stoi(optarg) << 20;
+            break;
+        case '?':
+        default:
+            std::cerr << "Try 'purplehaze -h' for more information."
+                      << std::endl;
+            return 1;
         }
     }
     std::cout << "Purple Haze " << VERSION << std::endl;
@@ -91,9 +138,14 @@ int main(int argc, char *argv[])
 
     // Parse commands from CLI
     std::string init_fen(DEFAULT_FEN);
-    for (std::string cmd = prompt(); cmd != "quit"; cmd = prompt()) {
+    std::string cmd;
+    while ((cmd = prompt()) != "quit") {
         if (cmd == "xboard") { // Xboard protocol mode
-            Xboard xboard;
+            std::cin.ignore(); // Discards end of line
+            Xboard xboard(tt_size, mt_size);
+            if (!logfile.empty()) {
+                xboard.debug(logfile);
+            }
             xboard.loop();
             return 0;
         } else if (cmd == "help") {
@@ -113,7 +165,7 @@ int main(int argc, char *argv[])
             getline(std::cin, init_fen);
             init_fen.erase(0, 1); // Remove the first whitespace
         } else if (cmd == "perft") {
-            Game game;
+            Game game(tt_size, mt_size);
             game.init(init_fen);
             for (unsigned int i = 1; ; ++i) {
                 clock_t start = clock();
@@ -128,7 +180,7 @@ int main(int argc, char *argv[])
             int depth = 0;
             std::cin >> depth;
             std::cout << std::endl;
-            Game game;
+            Game game(tt_size, mt_size);
             game.init(init_fen);
             Color c = game.current_position().side();
             unsigned int nodes_count = 0;
@@ -139,10 +191,10 @@ int main(int argc, char *argv[])
             while (!(move = moves.next()).is_null()) {
                 game.make_move(move);
                 if (!game.is_check(c)) {
-                    unsigned int cnt = game.perft(depth - 1);
-                    nodes_count += cnt;
+                    const unsigned int n = game.perft(depth - 1);
+                    nodes_count += n;
                     ++moves_count;
-                    std::cout << move << " " << cnt << std::endl;
+                    std::cout << move << " " << n << std::endl;
                 }
                 game.undo_move(move);
             }
@@ -152,29 +204,35 @@ int main(int argc, char *argv[])
         } else if (cmd == "testsuite") { // Load EPD test suite
             std::string filename;
             std::cin >> filename;
+            std::string args;
+            getline(std::cin, args);
 
             // Check if filename exists
             std::ifstream epdfile;
             epdfile.open(filename.c_str());
             if (!epdfile.is_open()) {
-                std::cerr << "Cannot open '" << filename;
-                std::cerr << "': No such file or directory" << std::endl;
+                std::cerr << "Cannot open '" << filename << "': "
+                          << "No such file or directory" << std::endl;
+                continue;
             }
 
             // Get time per move (optional)
-            std::string seconds;
-            getline(std::cin, seconds);
             int time = 10;
-            if (seconds != "") {
-                std::istringstream iss(seconds);
-                iss >> time;
+            if (args != "") {
+                std::istringstream iss(args);
+                if (!(iss >> time)) {
+                    args.erase(0, 1); // Remove whitespace
+                    std::cerr << "Invalid argument '" << args << "'"
+                              << std::endl;
+                    continue;
+                }
             }
 
             std::cout << "Loading '" << filename << "', ";
             std::cout << time << "s per move" << std::endl; // In seconds
 
             // Load game protocol
-            Protocol proto;
+            Protocol proto(tt_size, mt_size);
             proto.set_output_thinking(false);
             proto.set_time(1, time);
 
@@ -188,7 +246,9 @@ int main(int argc, char *argv[])
                 size_t fensep = line.find(" bm ");
                 size_t bmsep = line.find(";");
                 size_t not_found = std::string::npos;
-                if (fensep == not_found || bmsep == not_found) continue;
+                if (fensep == not_found || bmsep == not_found) {
+                    continue;
+                }
 
                 // Load position in game
                 init_fen = line.substr(0, fensep);
@@ -213,14 +273,20 @@ int main(int argc, char *argv[])
                 } while (iss);
 
                 if (is_found) {
-                    if (option_color) std::cout << color_green;
+                    if (option_color) {
+                        std::cout << color_green;
+                    }
                     std::cout << " OK";
                     ++res;
                 } else {
-                    if (option_color) std::cout << color_red;
+                    if (option_color) {
+                        std::cout << color_red;
+                    }
                     std::cout << " KO";
                 }
-                if (option_color) std::cout << color_reset;
+                if (option_color) {
+                    std::cout << color_reset;
+                }
                 std::cout << std::endl;
                 ++i;
             }
@@ -234,12 +300,13 @@ int main(int argc, char *argv[])
             if (!epdfile.is_open()) {
                 std::cerr << "Cannot open '" << filename << "': "
                           << "No such file or directory" << std::endl;
+                continue;
             }
             const size_t npos = std::string::npos;
             std::string line;
             while (getline(epdfile, line)) {
                 std::string fen;
-                Game game;
+                Game game(tt_size, mt_size);
                 for (int i = 0; line.length() > 0; ++i) {
 
                     const size_t pos = line.find(" ;");
@@ -267,6 +334,8 @@ int main(int argc, char *argv[])
                 std::cout << std::endl;
             }
             epdfile.close();
+        } else {
+            std::cerr << "Invalid command '" << cmd << "'" << std::endl;
         }
     }
     return 0;

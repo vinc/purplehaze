@@ -37,13 +37,13 @@ TEST(BoardTest, Constructor)
                             break;
                         }
                         switch (t) {
-                            case KNIGHT:
-                            case KING:
-                                s = OUT;
-                                break;
-                            default:
-                                s = static_cast<Square>(s + d);
-                                break;
+                        case KNIGHT:
+                        case KING:
+                            s = OUT;
+                            break;
+                        default:
+                            s = static_cast<Square>(s + d);
+                            break;
                         }
                     }
                 }
@@ -56,4 +56,23 @@ TEST(BoardTest, Constructor)
             EXPECT_EQ(dir, board.direction_to(from, to));
         }
     }
+}
+
+TEST(BoardTest, Square)
+{
+    Square BOARD[BOARD_SIZE] = { OUT };
+    int i;
+    for (i = 0; i < 64; ++i) {
+        Square s = Board::square(i);
+        BOARD[i] = s;
+    }
+    i = 0;
+    for (const Square &s : SQUARES) {
+        if (s == OUT) {
+            continue;
+        }
+        EXPECT_EQ(s, BOARD[i]);
+        ++i;
+    }
+    EXPECT_EQ(i, 64);
 }

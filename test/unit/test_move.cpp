@@ -115,9 +115,13 @@ TEST(MoveTest, Type)
             std::binary_search(PROMOTIONS, PROMOTIONS + NB_PROMOTIONS, t);
 
         for (const Square &o : SQUARES) {
-            if (o == OUT) continue;
+            if (o == OUT) {
+                continue;
+            }
             for (const Square &d : SQUARES) {
-                if (d == OUT || d == o) continue;
+                if (d == OUT || d == o) {
+                    continue;
+                }
                 Move m(o, d, t);
                 EXPECT_EQ(is_null, m.is_null());
                 EXPECT_EQ(is_en_passant, m.is_en_passant());
@@ -127,30 +131,30 @@ TEST(MoveTest, Type)
                 EXPECT_EQ(is_promotion, m.is_promotion());
 
                 switch (t) {
-                    case KING_CASTLE:
-                        EXPECT_EQ(KING, m.castle_side());
-                        break;
-                    case QUEEN_CASTLE:
-                        EXPECT_EQ(QUEEN, m.castle_side());
-                        break;
-                    case KNIGHT_PROMOTION:
-                    case KNIGHT_PROMOTION_CAPTURE:
-                        EXPECT_EQ(KNIGHT, m.promotion_type());
-                        break;
-                    case BISHOP_PROMOTION:
-                    case BISHOP_PROMOTION_CAPTURE:
-                        EXPECT_EQ(BISHOP, m.promotion_type());
-                        break;
-                    case ROOK_PROMOTION:
-                    case ROOK_PROMOTION_CAPTURE:
-                        EXPECT_EQ(ROOK, m.promotion_type());
-                        break;
-                    case QUEEN_PROMOTION:
-                    case QUEEN_PROMOTION_CAPTURE:
-                        EXPECT_EQ(QUEEN, m.promotion_type());
-                        break;
-                    default:
-                        break;
+                case KING_CASTLE:
+                    EXPECT_EQ(KING, m.castle_side());
+                    break;
+                case QUEEN_CASTLE:
+                    EXPECT_EQ(QUEEN, m.castle_side());
+                    break;
+                case KNIGHT_PROMOTION:
+                case KNIGHT_PROMOTION_CAPTURE:
+                    EXPECT_EQ(KNIGHT, m.promotion_type());
+                    break;
+                case BISHOP_PROMOTION:
+                case BISHOP_PROMOTION_CAPTURE:
+                    EXPECT_EQ(BISHOP, m.promotion_type());
+                    break;
+                case ROOK_PROMOTION:
+                case ROOK_PROMOTION_CAPTURE:
+                    EXPECT_EQ(ROOK, m.promotion_type());
+                    break;
+                case QUEEN_PROMOTION:
+                case QUEEN_PROMOTION_CAPTURE:
+                    EXPECT_EQ(QUEEN, m.promotion_type());
+                    break;
+                default:
+                    break;
                 }
             }
         }
@@ -171,9 +175,13 @@ TEST(ExtendedMoveTest, Constructor)
     EXPECT_EQ(0, ExtendedMove().value());
 
     for (const Square &o : SQUARES) {
-        if (o == OUT) continue;
+        if (o == OUT) {
+            continue;
+        }
         for (const Square &d : SQUARES) {
-            if (d == OUT || d == o) continue;
+            if (d == OUT || d == o) {
+                continue;
+            }
             for (const MoveType &t : MOVES) {
                 Move m(o, d, t);
                 ExtendedMove em1(m);

@@ -1,4 +1,4 @@
-/* Copyright (C) 2007-2011 Vincent Ollivier
+/* Copyright (C) 2007-2012 Vincent Ollivier
  *
  * Purple Haze is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <assert.h>
+#include <cassert>
 #include <iostream>
 
 #include "protocol.h"
@@ -62,32 +62,42 @@ Move Protocol::parse_move(std::string move)
 {
     Square from = Square(move[0] - 'a' + 16 * (move[1] - '1'));
     Square to = Square(move[2] - 'a' + 16 * (move[3] - '1'));
-    if (game.board.is_out(from) || game.board.is_out(to)) return Move();
+    if (game.board.is_out(from) || game.board.is_out(to)) {
+        return Move();
+    }
     Color c = game.current_position().side();
     MoveType t = QUIET_MOVE;
 
     if (move.size() == 5) { // Promotion
         switch (move[4]) {
-            case 'n': t = KNIGHT_PROMOTION; break;
-            case 'b': t = BISHOP_PROMOTION; break;
-            case 'r': t = ROOK_PROMOTION; break;
-            case 'q': t = QUEEN_PROMOTION; break;
-            default: return Move();
+        case 'n':
+            t = KNIGHT_PROMOTION;
+            break;
+        case 'b':
+            t = BISHOP_PROMOTION;
+            break;
+        case 'r':
+            t = ROOK_PROMOTION;
+            break;
+        case 'q':
+            t = QUEEN_PROMOTION;
+            break;
+        default:
+            return Move();
         }
     }
     if (game.board[from].is(PAWN)) {
-        if (game.board.is_pawn_begin(c, from) &&
-            to == Square(from + 2 * PAWN_PUSH_DIRS[c])) {
-                return Move(from, to, DOUBLE_PAWN_PUSH);
-        } else if (game.board.is_empty(to) &&
-            to != Square(from + PAWN_PUSH_DIRS[c])) {
-                return Move(from, to, EN_PASSANT);
+        const Direction d = PAWN_PUSH_DIRS[c];
+        if (Board::is_pawn_begin(c, from) && to == Square(from + 2 * d)) {
+            return Move(from, to, DOUBLE_PAWN_PUSH);
+        } else if (game.board.is_empty(to) && to != Square(from + d)) {
+            return Move(from, to, EN_PASSANT);
         }
     }
     if (game.board[from].is(KING)) {
-        if (to == Square(from + RIGHT + RIGHT)) {
+        if (to == Square(from + 2 * RIGHT)) {
             return Move(from, to, KING_CASTLE);
-        } else if (to == Square(from + LEFT + LEFT)) {
+        } else if (to == Square(from + 2 * LEFT)) {
             return Move(from, to, QUEEN_CASTLE);
         }
     }
@@ -108,7 +118,9 @@ bool Protocol::play_move(std::string move)
     Move m = parse_move(move);
 
     // Test legality
-    if (!game.is_legal(m)) return false;
+    if (!game.is_legal(m)) {
+        return false;
+    }
 
     // Play move
     game.make_move(m);
@@ -121,7 +133,9 @@ bool Protocol::play_move(std::string move)
 
 bool Protocol::undo_move()
 {
-    if (history.empty()) return false;
+    if (history.empty()) {
+        return false;
+    }
     Move m = history.top();
     history.pop();
 

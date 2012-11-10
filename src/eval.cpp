@@ -1,4 +1,4 @@
-/* Copyright (C) 2007-2011 Vincent Ollivier
+/* Copyright (C) 2007-2012 Vincent Ollivier
  *
  * Purple Haze is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <assert.h>
+#include <cassert>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -29,34 +29,32 @@ static int PST[2][2][NB_PIECE_TYPES][BOARD_SIZE] = { { { { 0 } } } };
 
 void Game::init_eval()
 {
-    for (int i = 0; i < 64; ++i) {
+    for (const Square &s : SQUARES) {
         for (const PieceType &t : PIECE_TYPES) {
-            Square s = board.square(i);
-
             int opening_score = 0;
             int ending_score = 0;
 
             switch (t) {
-                case PAWN:
-                    // Develop central pawns
-                    // But not side pawns
-                    opening_score = PAWN_FILES_VALUES[board.file(s)];
+            case PAWN:
+                // Develop central pawns
+                // But not side pawns
+                opening_score = PAWN_FILES_VALUES[board.file(s)];
 
-                    // Run for promotion
-                    ending_score = 10 * board.rank(s);
-                    break;
-                case KNIGHT:
-                case BISHOP:
-                    // Develop toward center files
-                    opening_score = CENTER_BONUS[board.file(s)];
-                    if (board.is_border(s)) {
-                        opening_score = 2 * BORDER_MALUS;
-                    }
-                    // no break
-                default:
-                    ending_score = CENTER_BONUS[board.file(s)];
-                    ending_score += CENTER_BONUS[board.rank(s)];
-                    break;
+                // Run for promotion
+                ending_score = 10 * board.rank(s);
+                break;
+            case KNIGHT:
+            case BISHOP:
+                // Develop toward center files
+                opening_score = CENTER_BONUS[board.file(s)];
+                if (board.is_border(s)) {
+                    opening_score = 2 * BORDER_MALUS;
+                }
+                // no break
+            default:
+                ending_score = CENTER_BONUS[board.file(s)];
+                ending_score += CENTER_BONUS[board.rank(s)];
+                break;
             }
 
             // Rank bonus
@@ -85,12 +83,11 @@ void Game::init_eval()
     PST[OPENING][WHITE][PAWN][H3]  += 3;
 
     // Flip scores according to black's side
-    for (int i = 0; i < 2; ++i) {
-        for (int j = 0; j < 64; ++j) {
+    for (const Phase &p : PHASES) {
+        for (const Square &ws : SQUARES) {
+            const Square bs = Board::flip(ws);
             for (const PieceType &t : PIECE_TYPES) {
-                const Square ws = board.square(j);
-                const Square bs = board.flip(ws);
-                PST[i][BLACK][t][bs] = PST[i][WHITE][t][ws];
+                PST[p][BLACK][t][bs] = PST[p][WHITE][t][ws];
             }
         }
     }
@@ -104,7 +101,11 @@ int Game::eval(int alpha, int beta)
     int score = material_eval();
 
     // TODO Draws should be caught here
-    // if (score == 0) return 0; // Draw
+    /*
+    if (score == 0) {
+        return 0; // Draw
+    }
+    */
     if (score > PIECE_VALUE[KING]) {
         return INF; // Win
     } else if (score < -PIECE_VALUE[KING]) {
@@ -129,83 +130,78 @@ int Game::eval(int alpha, int beta)
 
 int Game::material_eval()
 {
-    int score = 0;
     Position &pos = current_position();
 
     // Lookup position in material hash table
     bool is_empty = true;
     auto hash_score = material_table.lookup(pos.material_hash(), &is_empty);
     if (!is_empty) {
-        const Color c = pos.side();
-        return (c == WHITE ? hash_score : -hash_score);
+        return (pos.side() == WHITE ? hash_score : -hash_score);
     }
 
-    int material_score[2] = { 0 };
-    int material_bonus[2] = { 0 };
+    int scores[2] = { 0 };
+    int bonuses[2] = { 0 };
     for (const Color &c : COLORS) {
         int nb_pawns = 0;
         int nb_minors = 0;
         for (const PieceType &t : PIECE_TYPES) {
             const int n = pieces.count(c, t);
-            // Pieces' standard values
-            material_score[c] += n * PIECE_VALUE[t];
+            // Standard pieces values
+            scores[c] += n * PIECE_VALUE[t];
 
             // Bonus values depending on material imbalance
-            int adj;
             switch (t) {
-                case PAWN:
-                    nb_pawns = n;
-                    if (n == 0) material_bonus[c] += NO_PAWNS_MALUS;
-                    break;
-                case KNIGHT:
-                    nb_minors = n;
-                    if (n > 1) material_bonus[c] += REDUNDANCY_MALUS;
+            case PAWN:
+                nb_pawns = n;
+                if (n == 0) {
+                    bonuses[c] += NO_PAWNS_MALUS;
+                }
+                break;
+            case KNIGHT:
+                nb_minors = n;
+                if (n > 1) {
+                    bonuses[c] += REDUNDANCY_MALUS;
+                }
 
-                    // Value adjusted by the number of pawns on the board
-                    adj = PAWNS_ADJUSTEMENT[KNIGHT][nb_pawns];
-                    material_bonus[c] += n * adj;
-                    break;
-                case BISHOP:
-                    nb_minors += n;
-                    // Bishop bonus pair (from +40 to +64):
-                    // less than half a pawn when most or all the pawns are on
-                    // the board, and more than half a pawn when half or more
-                    // of the pawns are gone. (Kaufman 1999)
-                    //
-                    // No bonus for two bishops controlling the same color
-                    // No bonus for more than two bishops
-                    if (n == 2 && has_bishop_pair(c, pieces)) {
-                        material_bonus[c] +=
-                            (BISHOP_PAIR_BONUS + 3 * 8 - nb_pawns);
-                    }
+                // Value adjusted by the number of pawns on the board
+                bonuses[c] += n * PAWNS_ADJUSTEMENT[KNIGHT][nb_pawns];
+                break;
+            case BISHOP:
+                nb_minors += n;
+                // Bishop bonus pair (from +40 to +64): less than half a pawn
+                // when most or all the pawns are on the board, and more than
+                // half a pawn when half or more of the pawns are gone.
+                // (Kaufman 1999)
+                //
+                // No bonus for two bishops controlling the same color
+                // No bonus for more than two bishops
+                if (n == 2 && has_bishop_pair(c, pieces)) {
+                    bonuses[c] += BISHOP_PAIR_BONUS + 3 * 8 - nb_pawns;
+                }
 
-                    // Value adjusted by the number of pawns on the board
-                    adj = PAWNS_ADJUSTEMENT[BISHOP][nb_pawns];
-                    material_bonus[c] += n * adj;
-                    break;
-                case ROOK:
-                    // Principle of the redundancy (Kaufman 1999)
-                    if (n > 1) {
-                        material_bonus[c] += REDUNDANCY_MALUS;
-                    }
+                // Value adjusted by the number of pawns on the board
+                bonuses[c] += n * PAWNS_ADJUSTEMENT[BISHOP][nb_pawns];
+                break;
+            case ROOK:
+                // Principle of the redundancy (Kaufman 1999)
+                if (n > 1) {
+                    bonuses[c] += REDUNDANCY_MALUS;
+                }
 
-                    // Value adjusted by the number of pawns on the board
-                    adj = PAWNS_ADJUSTEMENT[ROOK][nb_pawns];
-                    material_bonus[c] += n * adj;
-                    break;
-                case QUEEN:
-                    if (nb_minors > 1) {
-                        // With two or more minor pieces, the queen
-                        // equal two rooks. (Kaufman 1999)
-                        material_bonus[c] +=
-                            (2 * PIECE_VALUE[ROOK]) - (PIECE_VALUE[QUEEN]);
-                    }
-                    // Value adjusted by the number of pawns on the board
-                    adj = PAWNS_ADJUSTEMENT[QUEEN][nb_pawns];
-                    material_bonus[c] += n * adj;
-                    break;
-                default:
-                    break;
+                // Value adjusted by the number of pawns on the board
+                bonuses[c] += n * PAWNS_ADJUSTEMENT[ROOK][nb_pawns];
+                break;
+            case QUEEN:
+                if (nb_minors > 1) {
+                    // With two or more minor pieces, the queen equals two
+                    // rooks. (Kaufman 1999)
+                    bonuses[c] += 2 * PIECE_VALUE[ROOK] - PIECE_VALUE[QUEEN];
+                }
+                // Value adjusted by the number of pawns on the board
+                bonuses[c] += n * PAWNS_ADJUSTEMENT[QUEEN][nb_pawns];
+                break;
+            default:
+                break;
             }
         }
     }
@@ -219,19 +215,19 @@ int Game::material_eval()
     for (const Color &c : COLORS) {
         is_draw = true;
         // FIDE rules for draw
-        if (material_score[c] == K) {
-            if (material_score[!c] == K) {
+        if (scores[c] == K) {
+            if (scores[!c] == K) {
                 break;
-            } else if (material_score[!c] == K + B) {
+            } else if (scores[!c] == K + B) {
                 break;
-            } else if (material_score[!c] == K + N) {
+            } else if (scores[!c] == K + N) {
                 break;
-            } else if (material_score[!c] == K + N + N) {
+            } else if (scores[!c] == K + N + N) {
                 break;
             }
 
             // TODO is this duplicate with MALUS_NO_PAWNS?
-            if (!pieces.count(!c, PAWN) && material_score[!c] < K + 4 * P) {
+            if (!pieces.count(!c, PAWN) && scores[!c] < K + 4 * P) {
                 break;
             }
         }
@@ -239,10 +235,10 @@ int Game::material_eval()
     }
 
     const Color c = pos.side();
-
+    int score = 0;
     if (!is_draw) {
-        score = material_score[c] - material_score[!c];
-        score += material_bonus[c] - material_bonus[!c];
+        score = scores[c] - scores[!c];
+        score += bonuses[c] - bonuses[!c];
     }
 
     // Save score to material hash table
@@ -252,7 +248,7 @@ int Game::material_eval()
     return score;
 }
 
-int castling_score(const Position &pos, Color c)
+static int castling_score(const Position &pos, Color c)
 {
     int score = 0;
     if (pos.has_castled(c)) {
@@ -295,8 +291,7 @@ int Game::position_eval()
 
         // Rooks' files bonus
         int rooks_score = 0;
-        const int n = pieces.count(c, ROOK);
-        for (int i = 0; i < n; ++i) {
+        for (int i = 0, n = pieces.count(c, ROOK); i < n; ++i) {
             const Square s = pieces.position(c, ROOK, i);
             if (!pawns_files[!c][board.file(s)]) {
                 if (!pawns_files[c][board.file(s)]) {

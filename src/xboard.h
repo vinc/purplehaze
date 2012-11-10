@@ -1,4 +1,4 @@
-/* Copyright (C) 2007-2011 Vincent Ollivier
+/* Copyright (C) 2007-2012 Vincent Ollivier
  *
  * Purple Haze is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,12 +20,14 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <thread>
 
 #include "protocol.h"
+#include "log.h"
 
-static const int XBOARD_NB_FEATURES = 3;
-static const std::string XBOARD_FEATURES[XBOARD_NB_FEATURES][2] = {
+static const std::string XBOARD_FEATURES[][2] = {
     { "myname",   "Purple Haze " + static_cast<std::string>(VERSION) },
+    { "ping",     "1" },
     { "setboard", "1" },
     { "done",     "1" },
 };
@@ -33,11 +35,20 @@ static const std::string XBOARD_FEATURES[XBOARD_NB_FEATURES][2] = {
 class Xboard : public Protocol
 {
     private:
-        std::ofstream log;
+        std::thread thinker;
+        Log log;
         bool force_mode;
-        bool debug_mode;
+
     public:
-        Xboard();
+        Xboard(const int tt_size = TT_SIZE, const int mt_size = MT_SIZE) :
+            Protocol(tt_size, mt_size),
+            force_mode(true)
+            {}
+
+        void debug(std::string logfile) {
+            log.open(logfile);
+        };
+
         void loop();
         void think();
 };

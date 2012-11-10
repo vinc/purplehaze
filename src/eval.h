@@ -1,4 +1,4 @@
-/* Copyright (C) 2007-2011 Vincent Ollivier
+/* Copyright (C) 2007-2012 Vincent Ollivier
  *
  * Purple Haze is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,6 +55,7 @@ static const int MULTI_PAWNS_MALUS[] = { // Pawns on the same file
 
 // Game phase used in tapered evaluation
 enum Phase : unsigned char { OPENING, ENDING };
+static const Phase PHASES[] = { OPENING, ENDING };
 
 // Coefficient of each type of piece to determine the game phase
 static const int PHASE_COEF[] = { 0, 1, 2, 2, 4, 8, 0 };

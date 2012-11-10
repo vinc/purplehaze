@@ -1,4 +1,4 @@
-/* Copyright (C) 2007-2011 Vincent Ollivier
+/* Copyright (C) 2007-2012 Vincent Ollivier
  *
  * Purple Haze is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 #ifndef MOVE_H
 #define MOVE_H
 
+#include <cstdint>
 #include <string>
 
 #include "common.h"
@@ -123,13 +124,13 @@ class Move
 class ExtendedMove : public Move
 {
     private:
-        char val;
+        int8_t val;
 
     public:
         ExtendedMove() : val(0) {}
         ExtendedMove(Move m, int v = 0) : Move(m), val(v) {}
 
-        char value() const {
+        int8_t value() const {
             return val;
         };
         bool operator<(const ExtendedMove& other) const {

@@ -1,4 +1,4 @@
-/* Copyright (C) 2007-2011 Vincent Ollivier
+/* Copyright (C) 2007-2012 Vincent Ollivier
  *
  * Purple Haze is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,11 @@ class Protocol
         unsigned short verbosity;
 
     public:
-        Protocol() : depth(MAX_PLY - 1), verbosity(0) {}
+        Protocol(const int tt_size = TT_SIZE, const int mt_size = MT_SIZE) :
+            game(tt_size, mt_size),
+            depth(MAX_PLY - 1),
+            verbosity(0)
+            {}
 
         void new_game();
 
