@@ -1,11 +1,23 @@
+10 Nov 2012 v2.1.0 - Level up
+    * New features
+        * Support of ARM architecture
+        * Better time management
+        * Better Xboard support
+        * New command line options
+        * New Log class
+    * Code improvements
+        * Better test coverage
+        * Bug fixes
+        * Clean up
+
 10 May 2012 v2.0.3 - Improved search heuristics
     * Better search pruning
         * Null Move Pruning
         * Futility Pruning
     * Code improvements
-        * Clean up
         * Better test coverage
         * Bug fixes
+        * Clean up
 
 26 Mar 2012 v2.0.2 - General clean up
     * New features
