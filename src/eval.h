@@ -73,7 +73,7 @@ static const int CENTER_BONUS[] = {
     0,   0,   1,   2,   2,   1,   0,   0
 };
 static const int PAWN_FILES_VALUES[] = {
-    -15,  -5,   1,   5,   5,   1,  -5, -15
+    -16,  -4,   0,   8,   8,   0,  -4, -16
 };
 static const int OPENING_RANKS_BONUS[][8] = {
     {  0,   0,   0,   0,   0,   0,   0,   0 }, // Dummy for PieceType EMPTY
