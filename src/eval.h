@@ -20,13 +20,13 @@
 #include "common.h"
 
 // Specific bonus and malus
-static const int CASTLE_BONUS          = 100;
-static const int BISHOP_PAIR_BONUS     =  40;
-static const int OPEN_FILE_BONUS       =  30;
-static const int HALF_OPEN_FILE_BONUS  =  15;
-static const int REDUNDANCY_MALUS      = -10;
-static const int BREAKING_CASTLE_MALUS = -40;
-static const int NO_PAWNS_MALUS        = -50;
+static const int CASTLE_BONUS          =  64;
+static const int BISHOP_PAIR_BONUS     =  32;
+static const int OPEN_FILE_BONUS       =  64;
+static const int HALF_OPEN_FILE_BONUS  =  32;
+static const int REDUNDANCY_MALUS      = -16;
+static const int BREAKING_CASTLE_MALUS = -32;
+static const int NO_PAWNS_MALUS        = -64;
 
 static const int PIECE_VALUE[] = {
         0, // Empty piece
