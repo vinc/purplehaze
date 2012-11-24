@@ -19,7 +19,7 @@
 
 #include "position.h"
 
-static const unsigned int MAX_TREE = 512;
+static const unsigned int MAX_TREE = 1024;
 
 class Tree
 {
