@@ -165,3 +165,74 @@ void Game::fen(std::string record)
     }
     tree.set_ply(ply);
 }
+
+std::string Game::fen()
+{
+    std::ostringstream record;
+    const Position &pos = current_position();
+
+    for (int i = 0; i < 8; ++i) {
+        if (i) {
+            record << '/';
+        }
+        int n = 0;
+        for (int j = 0; j < 8; ++j) {
+            const Square s = SQUARES[((7 - i) * 8) + j];
+            if (board.is_empty(s)) {
+                ++n;
+            } else {
+                if (n) {
+                    record << n;
+                    n = 0;
+                }
+                record << board[s].to_string();
+            }
+        }
+        if (n) {
+            record << n;
+        }
+    }
+
+    record << ' ';
+
+    switch (pos.side()) {
+    case WHITE:
+        record << 'w';
+        break;
+    case BLACK:
+        record << 'b';
+        break;
+    }
+
+    record << ' ';
+
+    const PieceType sides[] = { KING, QUEEN };
+    bool found_castle = false;
+    for (const Color &c : COLORS) {
+        for (const PieceType &t : sides) {
+            if (pos.can_castle(c, t)) {
+                record << Piece(c, t).to_string();
+                found_castle = true;
+            }
+        }
+    }
+    if (!found_castle) {
+        record << '-';
+    }
+
+    record << ' ';
+
+    const Square ep = pos.en_passant();
+    switch (ep) {
+    case OUT:
+        record << '-';
+        break;
+    default:
+        record << output_square(Board::file(ep), Board::rank(ep));
+        break;
+    }
+
+    record << ' ' << static_cast<int>(pos.halfmove())
+           << ' ' << (1 + tree.ply() / 2);
+    return record.str();
+}

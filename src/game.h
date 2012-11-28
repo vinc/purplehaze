@@ -70,6 +70,7 @@ class Game
             return tree.top();
         };
 
+        std::string fen(); // Get FEN record of position
         void fen(std::string record); // Set position from FEN record
 
         bool is_check(Color c) const {
