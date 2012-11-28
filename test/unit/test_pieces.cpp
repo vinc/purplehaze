@@ -74,7 +74,7 @@ TEST(PiecesTest, Count)
 TEST(PiecesTest, CountBoard)
 {
     Game game;
-    game.init("8/8/1k6/ppp4P/6P1/5P2/4P3/4K3 w - - 0 1");
+    game.fen("8/8/1k6/ppp4P/6P1/5P2/4P3/4K3 w - - 0 1");
     EXPECT_EQ(5, game.pieces.count(WHITE));
     EXPECT_EQ(4, game.pieces.count(WHITE, PAWN));
     EXPECT_EQ(1, game.pieces.count(WHITE, KING));

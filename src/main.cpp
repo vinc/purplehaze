@@ -166,7 +166,7 @@ int main(int argc, char *argv[])
             init_fen.erase(0, 1); // Remove the first whitespace
         } else if (cmd == "perft") {
             Game game(tt_size, mt_size);
-            game.init(init_fen);
+            game.fen(init_fen);
             for (unsigned int i = 1; ; ++i) {
                 clock_t start = clock();
                 unsigned long long int perft_result = game.perft(i);
@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
             std::cin >> depth;
             std::cout << std::endl;
             Game game(tt_size, mt_size);
-            game.init(init_fen);
+            game.fen(init_fen);
             Color c = game.current_position().side();
             unsigned int nodes_count = 0;
             unsigned int moves_count = 0;
@@ -315,7 +315,7 @@ int main(int argc, char *argv[])
 
                     if (i == 0) {
                         fen = sub;
-                        game.init(fen);
+                        game.fen(fen);
                         std::cout << "FEN '" << fen << "': " << std::flush;
                     } else {
                         sub = sub.substr(3, npos); // Skip /^D\d /

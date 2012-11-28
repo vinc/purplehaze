@@ -169,7 +169,7 @@ TEST(TTTest, LookupAfterSearch)
     game.clear_killers();
     game.search_moves.clear();
 
-    game.init("7K/8/k1P5/7p/8/8/8/8 w - -");
+    game.fen("7K/8/k1P5/7p/8/8/8/8 w - -");
     game.time = Time(1, 200); // Search 1 move in 200 ms
     Move m1 = game.root(MAX_PLY);
     EXPECT_NE("c7", game.output_move(m1)); // BM at depth <= 3

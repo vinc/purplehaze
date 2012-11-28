@@ -31,7 +31,7 @@ bool Protocol::set_board(std::string fen)
     // TODO Test if fen is valid?
 
     // Load fen
-    game.init(fen);
+    game.fen(fen);
 
     return true;
 }

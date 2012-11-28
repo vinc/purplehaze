@@ -70,7 +70,7 @@ class Game
             return tree.top();
         };
 
-        void init(std::string fen);
+        void fen(std::string record); // Set position from FEN record
 
         bool is_check(Color c) const {
             Square s = pieces.position(c, KING, 0);
