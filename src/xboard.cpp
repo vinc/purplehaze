@@ -62,6 +62,8 @@ static bool is_move(const std::string move)
 
 void Xboard::think()
 {
+    log.to(Log::FILE) << Log::DEBUG
+                      << "FEN '" << game.fen() << "'" << std::endl;
     if (get_verbosity() > 1) {
         log.to(Log::FILE) << game.board << std::endl;
     }
