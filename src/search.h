@@ -20,6 +20,12 @@
 #include "common.h"
 #include "eval.h"
 
+#ifdef NDEBUG
+static const bool debug = false;
+#else
+static const bool debug = true;
+#endif
+
 enum NodeType : unsigned char { PV, CUT, ALL };
 
 // Adaptive Null-Move Pruning (Heinz 1999)

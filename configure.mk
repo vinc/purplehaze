@@ -4,7 +4,7 @@ use_git_describe = yes
 
 # Optimize executable for speed
 optimize = yes
-use_asserts = no
+debug = no
 
 # Search options
 use_check_extension = yes
@@ -43,7 +43,7 @@ endif
 ifeq ($(use_profiler),yes)
     CXXFLAGS += -pg -lprofiler
 endif
-ifeq ($(use_asserts),no)
+ifeq ($(debug),no)
     CXXFLAGS += -DNDEBUG
 endif
 ifeq ($(use_check_extension),no)

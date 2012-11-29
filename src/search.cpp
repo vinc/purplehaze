@@ -441,7 +441,7 @@ Move Game::root(int max_depth)
                 alpha = score;
                 best_score = score;
                 best_move = move;
-                if (nodes_count > 200000) { // Save CPU time at the beginning
+                if (debug || nodes_count > 200000) { // Save CPU time at the beginning
                     print_thinking(depth, alpha, best_move);
                 }
             }
