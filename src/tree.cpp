@@ -18,23 +18,19 @@
 
 bool Tree::has_repetition_draw()
 {
-    Position& current_position = tree[tree_top];
-    if (current_position.halfmove() >= 99) {
-        return 0; // Fifty-move rule
+    const int hm = tree[size].halfmove();
+
+    // Fifty-move rule
+    if (hm >= 100) {
+        return true;
     }
-    if (tree_top < 4) {
-        return false;
-    }
-    Hash& pos = current_position.hash();
-    int previous_halfmove = current_position.halfmove();
-    for (int i = tree_top - 2; i >= 0; i -= 2) {
-        if (tree[i].hash() == pos) {
+
+    // Threefold repetition
+    for (int i = size - 2, n = std::max(size - hm, 0); i >= n; i -= 2) {
+        if (tree[i].hash() == tree[size].hash()) {
             return true; // Second repetition
         }
-        if (tree[i].halfmove() > previous_halfmove) { // Halfmove reseted
-            return false; // No previous repetition possible
-        }
-        previous_halfmove = tree[i].halfmove();
     }
+
     return false;
 }

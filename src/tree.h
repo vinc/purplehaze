@@ -25,25 +25,25 @@ class Tree
 {
     private:
         Position tree[MAX_TREE];
-        uint16_t tree_offset;
-        uint16_t tree_top;
+        int offset;
+        int size;
     public:
-        Tree() : tree_offset(0), tree_top(0) {}
+        Tree() : offset(0), size(0) {}
         void push() {
-            tree[tree_top + 1] = tree[tree_top];
-            ++tree_top;
+            tree[size + 1] = tree[size];
+            ++size;
         };
         void pop() {
-            --tree_top;
+            --size;
         };
         Position& top() {
-            return tree[tree_top];
+            return tree[size];
         };
-        uint16_t ply() const {
-            return tree_offset + tree_top;
+        int ply() const {
+            return offset + size;
         };
-        void set_ply(uint16_t offset) {
-            tree_offset = offset;
+        void set_ply(int o) {
+            offset = o;
         };
         bool has_repetition_draw();
 };
