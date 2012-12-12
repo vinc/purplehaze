@@ -24,11 +24,11 @@
 
 inline bool Game::is_dangerous(Move m)
 {
-    // current_position() is used assuming
+    // positions.current() is used assuming
     // that the move as already been made.
 
     if (board[m.dest()].is(PAWN)) {
-        const Color c = !current_position().side();
+        const Color c = !positions.current().side();
         if (m.dest_rank() + RANK_6 * c == RANK_7) {
             return true;
         }
@@ -36,7 +36,7 @@ inline bool Game::is_dangerous(Move m)
 
     /*
     if (m.is_capture()) {
-        const Piece capture = current_position().capture();
+        const Piece capture = positions.current().capture();
         if (capture.type() != PAWN) {
             return true;
         }
@@ -54,9 +54,9 @@ unsigned long long int Game::perft(unsigned int depth)
         return 1;
     }
     unsigned long long int nodes = 0;
-    Color c = current_position().side();
+    Color c = positions.current().side();
     bool use_lazy = false; // Lazy moves generation is not usefull in perft()
-    Moves moves(board, pieces, current_position(), search_moves, use_lazy);
+    Moves moves(board, pieces, positions.current(), search_moves, use_lazy);
     Move move;
     while (!(move = moves.next()).is_null()) {
 #ifdef LEGAL
@@ -103,9 +103,9 @@ int Game::quiescence(int alpha, int beta, int depth, const int ply)
         alpha = stand_pat; // New alpha
     }
 
-    Color player = current_position().side();
+    Color player = positions.current().side();
 
-    Moves moves(board, pieces, current_position(), search_moves);
+    Moves moves(board, pieces, positions.current(), search_moves);
     Move move;
     while (!(move = moves.next()).is_null()) {
         if (moves.state() > GOOD_CAPTURES) {
@@ -151,7 +151,7 @@ int Game::search(int alpha, int beta, int depth, const int ply)
 
     int score = -INF;
     const int old_alpha = alpha;
-    Position pos = current_position();
+    Position pos = positions.current();
     int best_score = -INF;
     Move best_move;
     const bool is_pv = (node_type == PV);
@@ -217,7 +217,7 @@ int Game::search(int alpha, int beta, int depth, const int ply)
     if (nmp_allowed && depth > NMP_DEPTH && nb_pieces > 3) {
         Move null_move;
         make_move(null_move);
-        current_position().set_null_move_right(false); // No consecutive NM
+        positions.current().set_null_move_right(false); // No consecutive NM
         const int r = R_ADAPT(depth, nb_pieces);
         score = -search<node_type>(-beta, -beta + 1, depth - r - 1, ply + 1);
         undo_move(null_move);
@@ -242,7 +242,7 @@ int Game::search(int alpha, int beta, int depth, const int ply)
     bool legal_move_found = false;
     bool is_principal_variation = true;
 
-    Moves moves(board, pieces, current_position(), search_moves);
+    Moves moves(board, pieces, positions.current(), search_moves);
     moves.add(best_move, BEST);
 
     // Killer moves need pseudo legality checking before we can use them,
@@ -417,13 +417,13 @@ Move Game::root(int max_depth)
             }
         }
 
-        Moves moves(board, pieces, current_position(), search_moves);
+        Moves moves(board, pieces, positions.current(), search_moves);
         moves.add(best_move, BEST);
         Move move;
         int nb_moves;
         for (nb_moves = 1; !(move = moves.next()).is_null(); ++nb_moves) {
             make_move(move);
-            if (is_check(!current_position().side())) { // Skip illegal move
+            if (is_check(!positions.current().side())) { // Skip illegal move
                 undo_move(move);
                 --nb_moves;
                 continue;
@@ -451,7 +451,7 @@ Move Game::root(int max_depth)
             break; // Discard this ply
         }
         if (!best_move.is_null()) {
-            tt.save(current_position().hash(), alpha, EXACT, depth, best_move);
+            tt.save(positions.current().hash(), alpha, EXACT, depth, best_move);
         }
         best_scores[depth] = best_score;
 

@@ -177,7 +177,7 @@ TEST(TTTest, LookupAfterSearch)
     EXPECT_EQ("Kg7", game.output_move(m1)); // BM at depth >= 13
 
     bool is_empty;
-    Position &pos = game.current_position();
+    Position &pos = game.positions.current();
     Move m2 = game.tt.lookup(pos.hash(), &is_empty).best_move();
     EXPECT_EQ(m1, m2);
 }

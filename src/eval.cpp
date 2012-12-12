@@ -130,7 +130,7 @@ int Game::eval(int alpha, int beta)
 
 int Game::material_eval()
 {
-    Position &pos = current_position();
+    Position &pos = positions.current();
 
     // Lookup position in material hash table
     bool is_empty = true;
@@ -268,7 +268,7 @@ int Game::position_eval()
     int phase = 0;
     int pos_scores[2][2] = { { 0 } };
     int pawns_files[2][8] = { { 0 } };
-    const Position &pos = current_position();
+    const Position &pos = positions.current();
     for (const Color &c : COLORS) {
         for (const PieceType &t : PIECE_TYPES) {
             const int n = pieces.count(c, t);

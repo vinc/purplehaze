@@ -172,16 +172,16 @@ void Game::make_move(Move m)
 {
     const Square orig = m.orig();
     const Square dest = m.dest();
-    const Square ep = current_position().en_passant();
-    const Color c = current_position().side();
+    const Square ep = positions.current().en_passant();
+    const Color c = positions.current().side();
     const Piece p = board[orig];
     const PieceType t = p.type();
     assert(!board.is_out(orig));
     assert(!board.is_out(dest));
 
     ++nodes_count;
-    new_position(); // current_position() is now refering to a new position
-    Position& pos = current_position();
+    new_position(); // positions.current() is now refering to a new position
+    Position& pos = positions.current();
 
     // Update halfmove counter
     if (t == PAWN || m.is_capture()) {
@@ -300,10 +300,10 @@ void Game::undo_move(Move m)
 
     // Restore captured piece
     if (m.is_capture()) {
-        Piece capture = current_position().capture();
+        Piece capture = positions.current().capture();
         Square s = dest;
         if (m.is_en_passant()) {
-            const Color c = current_position().side();
+            const Color c = positions.current().side();
             s = static_cast<Square>(dest + PAWN_PUSH_DIRS[c]);
             board[dest] = Piece();
         }
@@ -316,7 +316,7 @@ void Game::undo_move(Move m)
         return;
     }
     if (m.is_castle()) {
-        const Color c = current_position().side();
+        const Color c = positions.current().side();
         Square rook_orig;
         Square rook_dest;
         switch (m.castle_side()) {
@@ -364,7 +364,7 @@ bool Game::is_legal(Move m)
     const Color c = p.color();
 
     // The piece cannot be one of the opponent
-    if (c != current_position().side()) {
+    if (c != positions.current().side()) {
         return false;
     }
 
@@ -394,7 +394,7 @@ bool Game::is_legal(Move m)
             if (t != PAWN) { // It must be a pawn
                 return false;
             }
-            Square ep = current_position().en_passant();
+            Square ep = positions.current().en_passant();
             if (to != ep) { // After a double push
                 return false;
             }

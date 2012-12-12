@@ -36,7 +36,7 @@ void Game::add_piece(Color c, PieceType t, Square s)
     pieces.inc_nb_pieces(c, t);
 
     // Update Zobrist hash
-    Position& pos = current_position();
+    Position& pos = positions.current();
     zobrist.update_piece(pos.hash(), c, t, s);
 
     // Hack: for the material hash, the position is irrelevant but each piece
@@ -62,7 +62,7 @@ void Game::del_piece(Color c, PieceType t, int i)
         board[s] = Piece(c, t, i);                   // Update board
     }
     // Update Zobrist hash
-    Position& pos = current_position();
+    Position& pos = positions.current();
     zobrist.update_piece(pos.hash(), c, t, emptied);
 
     // Same hack here for the material hash than in add_piece()
@@ -76,7 +76,7 @@ void Game::new_position()
     positions.clone_current();
 
     // Remove the previous en passant square from the Zobrist hash
-    Position& pos = current_position();
+    Position& pos = positions.current();
     zobrist.update_en_passant(pos.hash(), pos.en_passant());
 
     // Prepare the position for a new move

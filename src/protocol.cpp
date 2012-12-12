@@ -65,7 +65,7 @@ Move Protocol::parse_move(std::string move)
     if (game.board.is_out(from) || game.board.is_out(to)) {
         return Move();
     }
-    Color c = game.current_position().side();
+    Color c = game.positions.current().side();
     MoveType t = QUIET_MOVE;
 
     if (move.size() == 5) { // Promotion
@@ -148,7 +148,7 @@ std::string Protocol::search_move(bool use_san_notation)
 {
     Move m = game.root(depth + 1);
     if (m.is_null()) {
-        if (game.is_check(game.current_position().side())) {
+        if (game.is_check(game.positions.current().side())) {
             return "LOST";
         }
         return "DRAW";
@@ -156,7 +156,7 @@ std::string Protocol::search_move(bool use_san_notation)
         if (use_san_notation) {
             std::string res = game.output_move(m);
             play_move(m.to_string());
-            if (game.is_check(game.current_position().side())) {
+            if (game.is_check(game.positions.current().side())) {
                 res += "+";
             }
             undo_move();

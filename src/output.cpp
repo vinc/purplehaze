@@ -50,7 +50,7 @@ void Game::print_thinking(int depth, int score, Move m)
               << std::setw(WIDE - 3) << " ";
     const int ply = positions.ply();
 
-    if (current_position().side() == BLACK) {
+    if (positions.current().side() == BLACK) {
         std::cout << " " << 1 + (ply / 2) << ". ...";
     }
 
@@ -68,7 +68,7 @@ std::string Game::output_pv(int depth, int score, Move m)
     std::ostringstream stream;
     stream << " ";
     const int ply = positions.ply();
-    if (current_position().side() == WHITE) {
+    if (positions.current().side() == WHITE) {
         stream << 1 + (ply / 2) << ". ";
     }
     stream << output_move(m);
@@ -76,11 +76,11 @@ std::string Game::output_pv(int depth, int score, Move m)
     make_move(m); // Update nodes_count
     --nodes_count;
 
-    bool is_in_check = is_check(current_position().side());
+    bool is_in_check = is_check(positions.current().side());
 
     // Find next move in TT
     bool is_empty;
-    Transposition trans = tt.lookup(current_position().hash(), &is_empty);
+    Transposition trans = tt.lookup(positions.current().hash(), &is_empty);
     Move move = trans.best_move();
     if (depth > 0 && is_legal(move) && trans.bound() < 3) {
         if (is_in_check) {
@@ -255,13 +255,13 @@ void Game::print_tt_stats()
 std::string Game::debug_move(Move m)
 {
     std::ostringstream stream;
-    Color c = current_position().side();
+    Color c = positions.current().side();
     stream << std::endl << board << std::endl
            << (c == WHITE ? "White" : "Black") << " to move" << std::endl
            << "m = " << output_move(m) << " (" << m << ")" << std::endl
            << "m is en passant: " << m.is_en_passant() << std::endl
            << "m is promotion: " << m.is_promotion() << std::endl
            << "m is legal: " << is_legal(m) << std::endl
-           << std::hex << current_position().hash();
+           << std::hex << positions.current().hash();
     return stream.str();
 }

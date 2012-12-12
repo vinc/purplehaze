@@ -110,12 +110,12 @@ void Game::fen(std::string record)
     // Set the side to move
     char side;
     iss >> side;
-    assert(current_position().side() == WHITE);
+    assert(positions.current().side() == WHITE);
     switch(side) {
     case 'w':
         break;
     case 'b':
-        current_position().change_side();
+        positions.current().change_side();
         break;
     default:
         assert(false);
@@ -127,16 +127,16 @@ void Game::fen(std::string record)
     for (auto it = castling.begin(); it != castling.end(); ++it) {
         switch(*it) {
         case 'K':
-            current_position().set_castle_right(WHITE, KING);
+            positions.current().set_castle_right(WHITE, KING);
             break;
         case 'Q':
-            current_position().set_castle_right(WHITE, QUEEN);
+            positions.current().set_castle_right(WHITE, QUEEN);
             break;
         case 'k':
-            current_position().set_castle_right(BLACK, KING);
+            positions.current().set_castle_right(BLACK, KING);
             break;
         case 'q':
-            current_position().set_castle_right(BLACK, QUEEN);
+            positions.current().set_castle_right(BLACK, QUEEN);
             break;
         case '-':
             break;
@@ -150,17 +150,17 @@ void Game::fen(std::string record)
         char rank = ep.at(1);
         s = Square((rank - '1') * 16 + file - 'a');
         assert(!board.is_out(s));
-        current_position().set_en_passant(s);
+        positions.current().set_en_passant(s);
     }
 
     int halfmove = 0;
     iss >> halfmove;
-    current_position().set_halfmove(halfmove);
+    positions.current().set_halfmove(halfmove);
 
     int fullmove = 1;
     iss >> fullmove;
     int ply = 2 * (fullmove - 1);
-    if (current_position().side() == BLACK) {
+    if (positions.current().side() == BLACK) {
         ++ply;
     }
     positions.set_ply(ply);
@@ -169,7 +169,7 @@ void Game::fen(std::string record)
 std::string Game::fen()
 {
     std::ostringstream record;
-    const Position &pos = current_position();
+    const Position &pos = positions.current();
 
     for (int i = 0; i < 8; ++i) {
         if (i) {

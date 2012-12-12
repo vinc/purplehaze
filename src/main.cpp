@@ -182,10 +182,10 @@ int main(int argc, char *argv[])
             std::cout << std::endl;
             Game game(tt_size, mt_size);
             game.fen(init_fen);
-            Color c = game.current_position().side();
+            Color c = game.positions.current().side();
             unsigned int nodes_count = 0;
             unsigned int moves_count = 0;
-            Moves moves(game.board, game.pieces, game.current_position(),
+            Moves moves(game.board, game.pieces, game.positions.current(),
                         game.search_moves);
             Move move;
             while (!(move = moves.next()).is_null()) {

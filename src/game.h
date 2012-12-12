@@ -66,9 +66,6 @@ class Game
 
         void new_position();
         void del_position();
-        Position& current_position() {
-            return positions.current();
-        };
 
         std::string fen(); // Get FEN record of position
         void fen(std::string record); // Set position from FEN record
