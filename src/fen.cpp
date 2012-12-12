@@ -34,13 +34,13 @@ void Game::fen(std::string record)
     // Initialize objects
     board = Board();
     pieces = Pieces();
-    tree = Tree();
+    positions = Positions();
 
     // Parse board positions
     Square s = A8;
-    std::string positions;
-    iss >> positions;
-    for (auto it = positions.begin(); it != positions.end(); ++it) {
+    std::string placement;
+    iss >> placement;
+    for (auto it = placement.begin(); it != placement.end(); ++it) {
         char sq = *it;
         if (sq == '/') {
             s = Square(s + DOWN + 8 * LEFT); // New rank
@@ -163,7 +163,7 @@ void Game::fen(std::string record)
     if (current_position().side() == BLACK) {
         ++ply;
     }
-    tree.set_ply(ply);
+    positions.set_ply(ply);
 }
 
 std::string Game::fen()
@@ -233,6 +233,6 @@ std::string Game::fen()
     }
 
     record << ' ' << static_cast<int>(pos.halfmove())
-           << ' ' << (1 + tree.ply() / 2);
+           << ' ' << (1 + positions.ply() / 2);
     return record.str();
 }

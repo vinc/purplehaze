@@ -25,7 +25,7 @@
 #include "tt.h"
 #include "hashtable.h"
 #include "time.h"
-#include "tree.h"
+#include "positions.h"
 #include "zobrist.h"
 #include "search.h"
 
@@ -43,7 +43,7 @@ class Game
         unsigned int nodes_count; // Used in search
         Pieces pieces;
         Board board;
-        Tree tree;
+        Positions positions;
         Time time;
         Transpositions tt;
         MoveList search_moves;
@@ -67,7 +67,7 @@ class Game
         void new_position();
         void del_position();
         Position& current_position() {
-            return tree.top();
+            return positions.current();
         };
 
         std::string fen(); // Get FEN record of position

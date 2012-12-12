@@ -14,38 +14,23 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TREE_H
-#define TREE_H
+#include "positions.h"
 
-#include "position.h"
-
-static const unsigned int MAX_TREE = 1024;
-
-class Tree
+bool Positions::is_draw()
 {
-    private:
-        Position tree[MAX_TREE];
-        int offset;
-        int size;
-    public:
-        Tree() : offset(0), size(0) {}
-        void push() {
-            tree[size + 1] = tree[size];
-            ++size;
-        };
-        void pop() {
-            --size;
-        };
-        Position& top() {
-            return tree[size];
-        };
-        int ply() const {
-            return offset + size;
-        };
-        void set_ply(int o) {
-            offset = o;
-        };
-        bool has_repetition_draw();
-};
+    const int hm = stack[size].halfmove();
 
-#endif /* !TREE_H */
+    // Fifty-move rule
+    if (hm >= 100) {
+        return true;
+    }
+
+    // Threefold repetition
+    for (int i = size - 2, n = std::max(size - hm, 0); i >= n; i -= 2) {
+        if (stack[i].hash() == stack[size].hash()) {
+            return true; // Second repetition
+        }
+    }
+
+    return false;
+}

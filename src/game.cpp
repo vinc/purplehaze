@@ -73,7 +73,7 @@ void Game::del_piece(Color c, PieceType t, int i)
 void Game::new_position()
 {
     // Save the state of the current position
-    tree.push();
+    positions.clone_current();
 
     // Remove the previous en passant square from the Zobrist hash
     Position& pos = current_position();
@@ -87,7 +87,7 @@ void Game::new_position()
 void Game::del_position()
 {
     // Revert back to previous position
-    tree.pop();
+    positions.delete_current();
 }
 
 /*

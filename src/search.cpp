@@ -145,7 +145,7 @@ int Game::search(int alpha, int beta, int depth, const int ply)
     if (depth <= 0) {
         return quiescence(alpha, beta, 0, ply + 1); // Quiescence
     }
-    if (tree.has_repetition_draw()) {
+    if (positions.is_draw()) {
         return 0; // Repetition draw rules
     }
 
@@ -382,7 +382,7 @@ Move Game::root(int max_depth)
 
     nodes_count = 0;
     search_moves.clear();
-    time.start_thinking(tree.ply());
+    time.start_thinking(positions.ply());
     print_thinking_header();
 
     int best_score = 0;

@@ -48,7 +48,7 @@ void Game::print_thinking(int depth, int score, Move m)
               << std::setw(WIDE) << time.elapsed()
               << std::setw(WIDE + 3) << nodes_count
               << std::setw(WIDE - 3) << " ";
-    const int ply = tree.ply();
+    const int ply = positions.ply();
 
     if (current_position().side() == BLACK) {
         std::cout << " " << 1 + (ply / 2) << ". ...";
@@ -67,7 +67,7 @@ std::string Game::output_pv(int depth, int score, Move m)
 {
     std::ostringstream stream;
     stream << " ";
-    const int ply = tree.ply();
+    const int ply = positions.ply();
     if (current_position().side() == WHITE) {
         stream << 1 + (ply / 2) << ". ";
     }
