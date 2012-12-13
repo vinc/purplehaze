@@ -48,7 +48,20 @@ class HashTable
             delete [] entries;
             entries = NULL;
         };
+#ifndef NDEBUG
         T lookup(Hash h, bool* is_empty);
+#else
+        T lookup(Hash h, bool* is_empty) {
+            Entry entry = entries[h & (SIZE - 1)];
+            if (entry.hash == h) {
+                *is_empty = false;
+                return entry.value;
+            } else {
+                *is_empty = true;
+                return T();
+            }
+        }
+#endif
         void save(Hash h, T v) {
             entries[h & (SIZE - 1)].hash = h;
             entries[h & (SIZE - 1)].value = v;

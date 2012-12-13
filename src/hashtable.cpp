@@ -17,6 +17,7 @@
 #include "hashtable.h"
 #include "tt.h"
 
+#ifndef NDEBUG
 template <class T>
 T HashTable<T>::lookup(Hash h, bool* is_empty)
 {
@@ -25,21 +26,16 @@ T HashTable<T>::lookup(Hash h, bool* is_empty)
         // FIXME 'entry.hash' is initialized to '0'
         // Problem when 'h == 0' and 'entry.value' is empty.
         *is_empty = false;
-#ifndef NDEBUG
         ++hits;
-#endif
         return entry.value;
-#ifndef NDEBUG
     } else if (entry.hash != 0) {
         ++collisions;
-#endif
     }
     *is_empty = true;
-#ifndef NDEBUG
     ++misses;
-#endif
     return T();
 }
+#endif
 
 template <class T>
 void HashTable<T>::clear()
