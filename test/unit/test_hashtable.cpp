@@ -7,15 +7,15 @@ typedef uint64_t Value;
 
 class HashTableTest : public testing::Test
 {
-    protected:
-        static const int HT_SIZE = 1024;
-        HashTable<Value> ht;
+protected:
+    static const int HT_SIZE = 1024;
+    HashTable<Value> ht;
 
-        HashTableTest() : ht(HT_SIZE) {}
+    HashTableTest() : ht(HT_SIZE) {}
 
-        Hash hash_from_index(int i) const {
-            return static_cast<Hash>(i & (ht.size() - 1));
-        }
+    Hash hash_from_index(int i) const {
+        return static_cast<Hash>(i & (ht.size() - 1));
+    }
 };
 
 TEST_F(HashTableTest, Size)
@@ -87,7 +87,9 @@ TEST_F(HashTableTest, Lookup)
     }
     for (int i = -1; i < n; ++i) {
         for (int s = SHRT_MIN; s <= SHRT_MAX; s += 1000) {
-            if (++i >= n) break;
+            if (++i >= n) {
+                break;
+            }
 
             Value v = static_cast<Value>(s + i);
             Hash h = hash_from_index(i);
@@ -101,7 +103,9 @@ TEST_F(HashTableTest, Lookup)
     }
     for (int i = -1; i < n; ++i) {
         for (int s = SHRT_MIN; s <= SHRT_MAX; s += 1000) {
-            if (++i >= n) break;
+            if (++i >= n) {
+                break;
+            }
 
             Value v = static_cast<Value>(s + i);
             Hash h = hash_from_index(i);

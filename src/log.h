@@ -30,16 +30,13 @@ private:
 
         LogStream() :
             stream(),
-            state(false)
-            {}
-        LogStream(std::streambuf *sb) :
+            state(false) {}
+        LogStream(std::streambuf* sb) :
             stream(sb),
-            state(true)
-            {}
+            state(true) {}
         LogStream(std::string filename) :
             stream(filename, std::ios::app),
-            state(true)
-            {}
+            state(true) {}
     };
     LogStream<std::ostream> cout;
     LogStream<std::ofstream> file;
@@ -51,22 +48,20 @@ public:
     Log() :
         std::ostream(std::cout.rdbuf()),
         cout(std::cout.rdbuf()),
-        file()
-        {}
+        file() {}
 
     Log(std::string filename) :
         std::ostream(std::cout.rdbuf()),
         cout(std::cout.rdbuf()),
-        file(filename)
-        {}
+        file(filename) {}
 
     void open(std::string filename) {
         file.stream.open(filename, std::ios::app);
         file.state = true;
-    };
+    }
 
     template <typename T>
-    Log& operator<<(const T &val) {
+    Log& operator<<(const T& val) {
         if (cout.state) {
             cout.stream << val;
         }
@@ -86,7 +81,7 @@ public:
         return *this;
     }
 
-    Log& operator<<(const LogDirection &dir);
+    Log& operator<<(const LogDirection& dir);
     Log& to(Stream s);
 };
 #endif /* !LOG_H*/

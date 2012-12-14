@@ -52,17 +52,16 @@ public:
         material_table(mt_size),
         output_thinking(false),
         nodes_count(0),
-        tt(tt_size)
-        {
-            init_eval(); // PST
-            Moves::init_mvv_lva_scores();
-        }
+        tt(tt_size) {
+        init_eval(); // PST
+        Moves::init_mvv_lva_scores();
+    }
 
     void add_piece(Color c, PieceType t, Square s);
     void del_piece(Color c, PieceType t, int i);
     void del_piece(Piece p) {
         del_piece(p.color(), p.type(), p.index());
-    };
+    }
 
     void new_position();
     void del_position();
@@ -92,19 +91,14 @@ public:
 
     // Killer Moves
     void clear_killers();
-    /*
-    Move killer(int depth, int index) {
-        return killer_moves[depth][index];
-    };
-    */
     Move (&killers(const int depth))[MAX_KILLERS] {
         return killer_moves[depth];
-    };
+    }
     void set_killer(const Move move, const int depth);
     bool is_killer(const Move move, const int depth) {
         return (move == killer_moves[depth][0] ||
                 move == killer_moves[depth][1]);
-    };
+    }
 
     // Position's evaluation
     void init_eval();
@@ -119,12 +113,12 @@ public:
     std::string output_move(Move m);
     std::string output_square(Square s) {
         return output_square(board.file(s), board.rank(s));
-    };
+    }
     std::string output_square(File f, Rank r);
     std::string debug_move(Move m);
 
     template <class T>
-    std::string output_hashtable_stats(const HashTable<T> &table);
+    std::string output_hashtable_stats(const HashTable<T>& table);
 
     std::string output_mt_stats() {
         return output_hashtable_stats(material_table);

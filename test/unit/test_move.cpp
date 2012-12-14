@@ -64,11 +64,15 @@ TEST(MoveTest, Constructor)
     EXPECT_TRUE(null_move.is_null());
     EXPECT_TRUE(Move().is_null());
 
-    for (const Square &o : SQUARES) {
-        if (o == OUT) continue;
-        for (const Square &d : SQUARES) {
-            if (d == OUT || d == o) continue;
-            for (const MoveType &t : MOVES) {
+    for (const Square& o : SQUARES) {
+        if (o == OUT) {
+            continue;
+        }
+        for (const Square& d : SQUARES) {
+            if (d == OUT || d == o) {
+                continue;
+            }
+            for (const MoveType& t : MOVES) {
                 Move m(o, d, t);
                 EXPECT_EQ(o, m.orig());
                 EXPECT_EQ(d, m.dest());
@@ -81,11 +85,11 @@ TEST(MoveTest, Constructor)
 
                 /*
                 // FIXME: Takes too long, too much moves
-                for (const Square &o2 : SQUARES) {
+                for (const Square& o2 : SQUARES) {
                     if (o2 == OUT) continue;
-                    for (const Square &d2 : SQUARES) {
+                    for (const Square& d2 : SQUARES) {
                         if (d2 == OUT || d2 == o2) continue;
-                        for (const MoveType &t2 : MOVES) {
+                        for (const MoveType& t2 : MOVES) {
                             Move m2(o2, d2, t2);
                             if (o == o2 && d == d2 && t == t2) {
                                 EXPECT_EQ(m2, m);
@@ -103,7 +107,7 @@ TEST(MoveTest, Constructor)
 
 TEST(MoveTest, Type)
 {
-    for (const MoveType &t : MOVES) {
+    for (const MoveType& t : MOVES) {
         // Define move types
         bool is_null = t == NULL_MOVE;
         bool is_en_passant = t == EN_PASSANT;
@@ -114,11 +118,11 @@ TEST(MoveTest, Type)
         bool is_promotion =
             std::binary_search(PROMOTIONS, PROMOTIONS + NB_PROMOTIONS, t);
 
-        for (const Square &o : SQUARES) {
+        for (const Square& o : SQUARES) {
             if (o == OUT) {
                 continue;
             }
-            for (const Square &d : SQUARES) {
+            for (const Square& d : SQUARES) {
                 if (d == OUT || d == o) {
                     continue;
                 }
@@ -174,15 +178,15 @@ TEST(ExtendedMoveTest, Constructor)
     EXPECT_EQ(Move(), ExtendedMove());
     EXPECT_EQ(0, ExtendedMove().value());
 
-    for (const Square &o : SQUARES) {
+    for (const Square& o : SQUARES) {
         if (o == OUT) {
             continue;
         }
-        for (const Square &d : SQUARES) {
+        for (const Square& d : SQUARES) {
             if (d == OUT || d == o) {
                 continue;
             }
-            for (const MoveType &t : MOVES) {
+            for (const MoveType& t : MOVES) {
                 Move m(o, d, t);
                 ExtendedMove em1(m);
                 ExtendedMove em2(m, 0);

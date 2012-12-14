@@ -45,7 +45,7 @@ bool Board::is_attacked_by(const Color c, const Square s,
     }
 
     // Specific code for pawns
-    for (const Direction &d : PAWN_CAPTURE_DIRS[!c]) {
+    for (const Direction& d : PAWN_CAPTURE_DIRS[!c]) {
         const Square from = static_cast<Square>(s + d);
         if (board[from].is(c, PAWN)) {
             return true;

@@ -45,27 +45,26 @@ public:
     Time(const int moves = 40, const int time = 5 * 60 * 100) :
         level(moves, time),
         clock(1, time),
-        abort_search(false)
-        {}
+        abort_search(false) {}
 
     void set_polling_interval(const unsigned int nodes) {
         polling.interval = nodes;
-    };
+    }
     void set_remaining(const unsigned int time) {
         clock.time = time;
-    };
+    }
     unsigned int allocated() const {
         assert(level.moves >= clock.moves);
         const unsigned int moves = level.moves - clock.moves + 1;
         return clock.time / moves;
-    };
+    }
     unsigned long long int elapsed() const {
         const unsigned long long int clocks = std::clock() - start;
         return 100 * clocks / CLOCKS_PER_SEC;
-    };
+    }
     void abort() {
         abort_search = true;
-    };
+    }
     void start_thinking(const unsigned int ply);
     bool poll(const unsigned int node_count);
 };

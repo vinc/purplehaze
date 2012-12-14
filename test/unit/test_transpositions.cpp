@@ -27,7 +27,7 @@ TEST(TranspositionTest, Constructor)
 
     for (int v = SHRT_MIN; v <= SHRT_MAX; v += 1000) {
         for (int d = 0; d <= UCHAR_MAX; ++d) {
-            for (const Bound &b : BOUNDS) {
+            for (const Bound& b : BOUNDS) {
                 Move m(E2, E3, QUIET_MOVE);
                 Transposition t2(v, b, d, m);
                 EXPECT_FALSE(t2.is_empty());
@@ -35,7 +35,7 @@ TEST(TranspositionTest, Constructor)
                 EXPECT_EQ(d, t2.depth());
                 EXPECT_EQ(m, t2.best_move());
                 EXPECT_EQ(b, t2.bound());
-                
+
                 Transposition t3(v, b, d, m);
                 Transposition t4(v + 1, b, d, m);
                 Transposition t5(v, UNDEF_BOUND, d, m);
@@ -43,10 +43,10 @@ TEST(TranspositionTest, Constructor)
                 Transposition t7(v, b, d, Move(F2, F3, QUIET_MOVE));
 
                 EXPECT_EQ(t3, t2);
-                EXPECT_NE(t4, t2);    
-                EXPECT_NE(t5, t2);    
-                EXPECT_NE(t6, t2);    
-                EXPECT_NE(t7, t2);    
+                EXPECT_NE(t4, t2);
+                EXPECT_NE(t5, t2);
+                EXPECT_NE(t6, t2);
+                EXPECT_NE(t7, t2);
             }
         }
     }
@@ -54,12 +54,12 @@ TEST(TranspositionTest, Constructor)
 
 class TranspositionsTest : public testing::Test
 {
-    protected:
-        Transpositions tt;
+protected:
+    Transpositions tt;
 
-        Hash hash_from_index(int i) const {
-            return static_cast<Hash>(i & (tt.size() - 1));
-        }
+    Hash hash_from_index(int i) const {
+        return static_cast<Hash>(i & (tt.size() - 1));
+    }
 };
 
 TEST_F(TranspositionsTest, Size)
@@ -73,7 +73,7 @@ TEST_F(TranspositionsTest, Size)
 
     // TODO Internal array size should not be a power of two?
     //EXPECT_NE(0, TT_SIZE & (TT_SIZE - 1));
-    
+
     // 'size' must be a power of two for Transpositions::lookup()
     EXPECT_EQ(0, size & (size - 1));
 
@@ -118,8 +118,10 @@ TEST_F(TranspositionsTest, Lookup)
     for (int i = -1; i < n; ++i) {
         for (int s = SHRT_MIN; s <= SHRT_MAX; s += 1000) {
             for (int d = 0; d <= UCHAR_MAX; ++d) {
-                for (const Bound &b : BOUNDS) {
-                    if (++i >= n) break;
+                for (const Bound& b : BOUNDS) {
+                    if (++i >= n) {
+                        break;
+                    }
                     // Create transposition
                     Move m(E2, E4, QUIET_MOVE);
                     int v = s + i;
@@ -140,8 +142,10 @@ TEST_F(TranspositionsTest, Lookup)
     for (int i = -1; i < n; ++i) {
         for (int s = SHRT_MIN; s <= SHRT_MAX; s += 1000) {
             for (int d = 0; d <= UCHAR_MAX; ++d) {
-                for (const Bound &b : BOUNDS) {
-                    if (++i >= n) break;
+                for (const Bound& b : BOUNDS) {
+                    if (++i >= n) {
+                        break;
+                    }
                     // Create transposition
                     Move m(E2, E4, QUIET_MOVE);
                     int v = s + i;
@@ -177,7 +181,7 @@ TEST(TTTest, LookupAfterSearch)
     EXPECT_EQ("Kg7", game.output_move(m1)); // BM at depth >= 13
 
     bool is_empty;
-    Position &pos = game.positions.current();
+    Position& pos = game.positions.current();
     Move m2 = game.tt.lookup(pos.hash(), &is_empty).best_move();
     EXPECT_EQ(m1, m2);
 }

@@ -169,7 +169,7 @@ void Game::fen(std::string record)
 std::string Game::fen()
 {
     std::ostringstream record;
-    const Position &pos = positions.current();
+    const Position& pos = positions.current();
 
     for (int i = 0; i < 8; ++i) {
         if (i) {
@@ -208,8 +208,8 @@ std::string Game::fen()
 
     const PieceType sides[] = { KING, QUEEN };
     bool found_castle = false;
-    for (const Color &c : COLORS) {
-        for (const PieceType &t : sides) {
+    for (const Color& c : COLORS) {
+        for (const PieceType& t : sides) {
             if (pos.can_castle(c, t)) {
                 record << Piece(c, t).to_string();
                 found_castle = true;

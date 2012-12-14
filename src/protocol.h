@@ -35,8 +35,7 @@ public:
     Protocol(const int tt_size = TT_SIZE, const int mt_size = MT_SIZE) :
         game(tt_size, mt_size),
         depth(MAX_PLY - 1),
-        verbosity(0)
-        {}
+        verbosity(0) {}
 
     void new_game();
 
@@ -58,15 +57,15 @@ public:
 
     void set_depth(int d) {
         depth = d;
-    };
+    }
 
     void set_verbosity(int v = 0) {
         verbosity = v;
-    };
+    }
 
     int get_verbosity() {
         return verbosity;
-    };
+    }
 };
 
 #endif /* !PROTOCOL_H */

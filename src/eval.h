@@ -29,12 +29,12 @@ static const int BREAKING_CASTLE_MALUS = -32;
 static const int NO_PAWNS_MALUS        = -64;
 
 static const int PIECE_VALUE[] = {
-        0, // Empty piece
-      100, // Pawn
-      325, // Knight
-      325, // Bishop
-      500, // Rook
-      965, // Queen (Rook + Minor + Pawn + Bishop Pair)
+    0, // Empty piece
+    100, // Pawn
+    325, // Knight
+    325, // Bishop
+    500, // Rook
+    965, // Queen (Rook + Minor + Pawn + Bishop Pair)
     10000, // King
 };
 
@@ -62,10 +62,10 @@ static const int PHASE_COEF[] = { 0, 1, 2, 2, 4, 8, 0 };
 
 // Opening number
 static const int PHASE_MAX = 16 * PHASE_COEF[PAWN] +
-                              4 * PHASE_COEF[KNIGHT] +
-                              4 * PHASE_COEF[BISHOP] +
-                              4 * PHASE_COEF[ROOK] +
-                              2 * PHASE_COEF[QUEEN]; // == 64
+                             4 * PHASE_COEF[KNIGHT] +
+                             4 * PHASE_COEF[BISHOP] +
+                             4 * PHASE_COEF[ROOK] +
+                             2 * PHASE_COEF[QUEEN]; // == 64
 
 // PST parameters
 static const int BORDER_MALUS = -5;
@@ -85,7 +85,7 @@ static const int OPENING_RANKS_BONUS[][8] = {
     {  0, -15, -40, -40, -40, -40, -40, -40,}  // King
 };
 
-inline static bool has_bishop_pair(const Color c, const Pieces &pieces)
+inline static bool has_bishop_pair(const Color c, const Pieces& pieces)
 {
     assert(pieces.count(c, BISHOP) == 2);
     const Square fb = pieces.position(c, BISHOP, 0);

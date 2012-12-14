@@ -25,17 +25,17 @@ Board::Board() : board(), dir_array()
 {
 
     // Initialize attack and direction arrays
-    for (const Square &from : SQUARES) {
+    for (const Square& from : SQUARES) {
         if (from == OUT) {
             break;
         }
-        for (const Square &to : SQUARES) {
+        for (const Square& to : SQUARES) {
             if (to == OUT) {
                 break;
             }
             int diff = 0x77 + from - to;
             for (const PieceType& t : NOT_PAWN_TYPES) {
-                for (const Direction &d : PIECES_DIRS[t]) {
+                for (const Direction& d : PIECES_DIRS[t]) {
                     if (d == NO_DIR) {
                         break;
                     }

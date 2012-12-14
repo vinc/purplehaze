@@ -162,27 +162,34 @@ enum MoveType : unsigned char {
 // Used in movegen.cpp and attack.cpp
 static const int NB_DIRS[] = { 0, 0, 8, 4, 4, 8, 8 };
 static const Direction PIECES_DIRS[][8] = {
-    { // Empty
-         NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR
-    },
-    { // Pawns
+    {
+        // Empty
         NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR
     },
-    { // Knights
+    {
+        // Pawns
+        NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR, NO_DIR
+    },
+    {
+        // Knights
         UP_UP_RIGHT, RIGHT_UP_RIGHT, RIGHT_DOWN_RIGHT, DOWN_DOWN_RIGHT,
         DOWN_DOWN_LEFT, LEFT_DOWN_LEFT, LEFT_UP_LEFT, UP_UP_LEFT
     },
-    { // Bishops
+    {
+        // Bishops
         UP_RIGHT, DOWN_RIGHT, DOWN_LEFT, UP_LEFT,
         NO_DIR, NO_DIR, NO_DIR, NO_DIR
     },
-    { // Rooks
+    {
+        // Rooks
         UP, RIGHT, DOWN, LEFT, NO_DIR, NO_DIR, NO_DIR, NO_DIR
     },
-    { // Queens
+    {
+        // Queens
         UP, UP_RIGHT, RIGHT, DOWN_RIGHT, DOWN, DOWN_LEFT, LEFT, UP_LEFT
     },
-    { // Kings
+    {
+        // Kings
         UP, UP_RIGHT, RIGHT, DOWN_RIGHT, DOWN, DOWN_LEFT, LEFT, UP_LEFT
     }
 };
@@ -313,8 +320,8 @@ inline int operator+(MoveType a, MoveType b)
 }
 
 // ANSI Color
-static const std::string color_red = "\x1b[31m";
-static const std::string color_green = "\x1b[32m";
+static const std::string RED = "\x1b[31m";
+static const std::string GREEN = "\x1b[32m";
 static const std::string color_reset = "\x1b[0m";
 
 #endif /* !COMMON_H */

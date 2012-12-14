@@ -42,12 +42,11 @@ private:
 public:
     Xboard(const int tt_size = TT_SIZE, const int mt_size = MT_SIZE) :
         Protocol(tt_size, mt_size),
-        force_mode(true)
-        {}
+        force_mode(true) {}
 
     void debug(std::string logfile) {
         log.open(logfile);
-    };
+    }
 
     void loop();
     void think();

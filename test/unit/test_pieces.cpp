@@ -5,9 +5,9 @@
 TEST(PiecesTest, Constructor)
 {
     Pieces pieces;
-    for (const Color &c : COLORS) {
+    for (const Color& c : COLORS) {
         EXPECT_EQ(0, pieces.count(c));
-        for (const PieceType &t : PIECE_TYPES) {
+        for (const PieceType& t : PIECE_TYPES) {
             EXPECT_EQ(0, pieces.count(c, t));
             for (int i = 0; i < 9; ++i) {
                 Piece p(c, t, i);
@@ -21,10 +21,10 @@ TEST(PiecesTest, Constructor)
 TEST(PiecesTest, Positions)
 {
     Pieces pieces;
-    for (const Color &c : COLORS) {
-        for (const PieceType &t : PIECE_TYPES) {
+    for (const Color& c : COLORS) {
+        for (const PieceType& t : PIECE_TYPES) {
             for (int i = 0; i < 9; ++i) {
-                for (const Square &s : SQUARES) {
+                for (const Square& s : SQUARES) {
                     Piece p(c, t, i);
 
                     // Test getters and setters
@@ -47,8 +47,8 @@ TEST(PiecesTest, Positions)
 TEST(PiecesTest, Count)
 {
     Pieces pieces;
-    for (const Color &c : COLORS) {
-        for (const PieceType &t : PIECE_TYPES) {
+    for (const Color& c : COLORS) {
+        for (const PieceType& t : PIECE_TYPES) {
             EXPECT_EQ(0, pieces.count(c));
             EXPECT_EQ(0, pieces.count(c, t));
             for (int i = 0; i < 9; ++i) {

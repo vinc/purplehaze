@@ -45,16 +45,16 @@ public:
 
     void inc_ply() {
         ++ply;
-    };
+    }
     void dec_ply() {
         --ply;
-    };
+    }
     void clear() {
         ply = 0;
-    };
+    }
     ExtendedMove& operator[] (unsigned char i) {
         return list[ply][i];
-    };
+    }
 
     // Only used in unit tests
     int cur_ply() const {
@@ -84,10 +84,9 @@ public:
         cur(0), end(0),
         size(),
         generation_state(BEST),
-        use_lazy_generation(lg)
-        {
-            moves.inc_ply(); // Increment move list internal counter
-        }
+        use_lazy_generation(lg) {
+        moves.inc_ply(); // Increment move list internal counter
+    }
 
     ~Moves() {
         moves.dec_ply(); // Decrement move list internal counter
@@ -99,7 +98,7 @@ public:
     ExtendedMove next();
     MovesState state() const {
         return generation_state;
-    };
+    }
 
     static void init_mvv_lva_scores();
     Score mvv_lva_score(Move m);

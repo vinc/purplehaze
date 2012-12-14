@@ -42,7 +42,7 @@ static const int FUTILITY_DEPTH = 3; // depth <= FUTILITY_DEPTH
 
 // Array of pruning margin values indexed by depth (idea from Crafty)
 static const int FUTILITY_MARGINS[] = {
-     0 * PIECE_VALUE[PAWN],
+    0 * PIECE_VALUE[PAWN],
     13 * PIECE_VALUE[PAWN], // FIXME: Margins found after 200k+ games, but
     10 * PIECE_VALUE[PAWN], // those results are in contradiction with the
     10 * PIECE_VALUE[PAWN]  // theory.

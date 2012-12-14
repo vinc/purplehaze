@@ -30,47 +30,44 @@ private:
     unsigned char total[2];
 
 public:
-    Pieces() :
-        nb_pieces(),
-        total()
-        {
-            std::fill(&positions[0][0][0],
-                      &positions[0][0][0] + sizeof(positions),
-                      OUT);
-        }
+    Pieces() : nb_pieces(), total() {
+        std::fill(&positions[0][0][0],
+                  &positions[0][0][0] + sizeof(positions),
+                  OUT);
+    }
 
     Square position(Piece p) const {
         assert(0 <= p.index() && p.index() < 9);
         return positions[p.color()][p.type()][p.index()];
-    };
+    }
     Square position(Color c, PieceType t, int i) const {
         assert(0 <= i && i < 9);
         return positions[c][t][i];
-    };
+    }
     void set_position(Piece p, Square s) {
         assert(0 <= p.index() && p.index() < 9);
         positions[p.color()][p.type()][p.index()] = s;
-    };
+    }
     void set_position(Color c, PieceType t, int i, Square s) {
         assert(0 <= i && i < 9);
         positions[c][t][i] = s;
-    };
+    }
     unsigned char count(Color c, PieceType t) const {
         return nb_pieces[c][t];
-    };
+    }
     unsigned char count(Color c) const {
         return total[c];
-    };
+    }
 
     // FIXME? No warning if nb < 0 or nb > 9
     void inc_nb_pieces(Color c, PieceType t) {
         ++nb_pieces[c][t];
         ++total[c];
-    };
+    }
     void dec_nb_pieces(Color c, PieceType t) {
         --nb_pieces[c][t];
         --total[c];
-    };
+    }
 };
 
 #endif /* !PIECESL_H */

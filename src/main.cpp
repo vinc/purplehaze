@@ -73,7 +73,8 @@ static const std::string FLAGS[][2] = {
     { "-t <size>",  "set transposition table size to <size> megabytes" }
 };
 
-void print_usage() {
+void print_usage()
+{
     std::cout << "Usage: purplehaze [options]" << std::endl
               << std::endl
               << "Options:" << std::endl;
@@ -102,7 +103,7 @@ static std::string prompt()
     return cmd;
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     std::string logfile = "";
     bool option_color = false;
@@ -274,13 +275,13 @@ int main(int argc, char *argv[])
 
                 if (is_found) {
                     if (option_color) {
-                        std::cout << color_green;
+                        std::cout << GREEN;
                     }
                     std::cout << " OK";
                     ++res;
                 } else {
                     if (option_color) {
-                        std::cout << color_red;
+                        std::cout << RED;
                     }
                     std::cout << " KO";
                 }
@@ -323,8 +324,7 @@ int main(int argc, char *argv[])
                         unsigned int expected;
                         std::istringstream(sub) >> expected;
                         if (option_color) {
-                            std::cout << (moves == expected ? color_green
-                                                            : color_red);
+                            std::cout << (moves == expected ? GREEN : RED);
                         }
                         std::cout << (moves == expected ? "." : "x")
                                   << (option_color ? color_reset : "")

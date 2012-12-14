@@ -54,13 +54,13 @@ private:
         code |= (d >> 4) << DR_SHIFT;
         code |= static_cast<uint16_t>(t);
         return code;
-    };
+    }
 
     uint16_t code;
 
     bool is_set(int i) const {
         return code & ( 1 << i);
-    };
+    }
 
 public:
     Move() : code(NULL_MOVE) {}
@@ -69,44 +69,44 @@ public:
 
     File orig_file() const {
         return File((code >> OF_SHIFT) & OF_MASK);
-    };
+    }
     Rank orig_rank() const {
         return Rank((code >> OR_SHIFT) & OR_MASK);
-    };
+    }
     File dest_file() const {
         return File((code >> DF_SHIFT) & DF_MASK);
-    };
+    }
     Rank dest_rank() const {
         return Rank((code >> DR_SHIFT) & DR_MASK);
-    };
+    }
     Square orig() const {
         return Square(16 * orig_rank() + orig_file());
-    };
+    }
     Square dest() const {
         return Square(16 * dest_rank() + dest_file());
-    };
+    }
     MoveType type() const {
         return static_cast<MoveType>((code >> MT_SHIFT) & MT_MASK);
-    };
+    }
 
     bool is_capture() const {
         return is_set(2) && !is_null();
-    };
+    }
     bool is_castle() const {
         return !is_set(3) && !is_set(2) && is_set(1);
-    };
+    }
     bool is_promotion() const {
         return is_set(3);
-    };
+    }
     bool is_double_pawn_push() const {
         return type() == DOUBLE_PAWN_PUSH;
-    };
+    }
     bool is_en_passant() const {
         return type() == EN_PASSANT;
-    };
+    }
     bool is_null() const {
         return type() == NULL_MOVE;
-    };
+    }
     PieceType promotion_type() const;
     PieceType castle_side() const;
 
@@ -132,7 +132,7 @@ public:
 
     int8_t value() const {
         return val;
-    };
+    }
     bool operator<(const ExtendedMove& other) const {
         return this->val > other.val;
     }

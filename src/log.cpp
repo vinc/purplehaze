@@ -48,7 +48,7 @@ Log& Log::to(Stream s)
     return *this;
 }
 
-Log& Log::operator<<(const LogDirection &dir)
+Log& Log::operator<<(const LogDirection& dir)
 {
     if (file.state && file.stream.is_open()) {
         switch (dir) {

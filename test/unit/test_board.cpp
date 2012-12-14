@@ -14,18 +14,18 @@ TEST(BoardTest, Constructor)
     }
 
     // Test attack and direction arrays
-    for (const Square &from : SQUARES) {
+    for (const Square& from : SQUARES) {
         if (from == OUT) {
             break;
         }
-        for (const Square &to : SQUARES) {
+        for (const Square& to : SQUARES) {
             if (to == OUT) {
                 break;
             }
             Direction dir = NO_DIR;
             for (const PieceType& t : NOT_PAWN_TYPES) {
                 bool can_attack = false;
-                for (const Direction &d : PIECES_DIRS[t]) {
+                for (const Direction& d : PIECES_DIRS[t]) {
                     if (d == NO_DIR) {
                         break;
                     }
@@ -67,7 +67,7 @@ TEST(BoardTest, Square)
         BOARD[i] = s;
     }
     i = 0;
-    for (const Square &s : SQUARES) {
+    for (const Square& s : SQUARES) {
         if (s == OUT) {
             continue;
         }

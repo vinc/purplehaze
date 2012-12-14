@@ -167,7 +167,7 @@ std::string Game::output_square(File f, Rank r)
 }
 
 template <class T>
-std::string Game::output_hashtable_stats(const HashTable<T> &table)
+std::string Game::output_hashtable_stats(const HashTable<T>& table)
 {
     static const std::string names[] = {
         "Size",
@@ -187,7 +187,7 @@ std::string Game::output_hashtable_stats(const HashTable<T> &table)
     };
 
     int width = 0;
-    for (const std::string &name : names) {
+    for (const std::string& name : names) {
         width = std::max(width, static_cast<int>(name.length()) + 2);
     }
     std::ostringstream stream;

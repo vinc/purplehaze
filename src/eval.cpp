@@ -29,8 +29,8 @@ static int PST[2][2][NB_PIECE_TYPES][BOARD_SIZE] = { { { { 0 } } } };
 
 void Game::init_eval()
 {
-    for (const Square &s : SQUARES) {
-        for (const PieceType &t : PIECE_TYPES) {
+    for (const Square& s : SQUARES) {
+        for (const PieceType& t : PIECE_TYPES) {
             int opening_score = 0;
             int ending_score = 0;
 
@@ -83,10 +83,10 @@ void Game::init_eval()
     PST[OPENING][WHITE][PAWN][H3]  += 3;
 
     // Flip scores according to black's side
-    for (const Phase &p : PHASES) {
-        for (const Square &ws : SQUARES) {
+    for (const Phase& p : PHASES) {
+        for (const Square& ws : SQUARES) {
             const Square bs = Board::flip(ws);
-            for (const PieceType &t : PIECE_TYPES) {
+            for (const PieceType& t : PIECE_TYPES) {
                 PST[p][BLACK][t][bs] = PST[p][WHITE][t][ws];
             }
         }
@@ -130,7 +130,7 @@ int Game::eval(int alpha, int beta)
 
 int Game::material_eval()
 {
-    Position &pos = positions.current();
+    Position& pos = positions.current();
 
     // Lookup position in material hash table
     bool is_empty = true;
@@ -141,10 +141,10 @@ int Game::material_eval()
 
     int scores[2] = { 0 };
     int bonuses[2] = { 0 };
-    for (const Color &c : COLORS) {
+    for (const Color& c : COLORS) {
         int nb_pawns = 0;
         int nb_minors = 0;
-        for (const PieceType &t : PIECE_TYPES) {
+        for (const PieceType& t : PIECE_TYPES) {
             const int n = pieces.count(c, t);
             // Standard pieces values
             scores[c] += n * PIECE_VALUE[t];
@@ -212,7 +212,7 @@ int Game::material_eval()
     const int P = PIECE_VALUE[PAWN];
     const int N = PIECE_VALUE[KNIGHT];
     const int B = PIECE_VALUE[BISHOP];
-    for (const Color &c : COLORS) {
+    for (const Color& c : COLORS) {
         is_draw = true;
         // FIDE rules for draw
         if (scores[c] == K) {
@@ -248,13 +248,13 @@ int Game::material_eval()
     return score;
 }
 
-static int castling_score(const Position &pos, Color c)
+static int castling_score(const Position& pos, Color c)
 {
     int score = 0;
     if (pos.has_castled(c)) {
         score += CASTLE_BONUS;
     } else {
-        for (const PieceType &t : SIDE_TYPES) { // for QUEEN and KING side
+        for (const PieceType& t : SIDE_TYPES) { // for QUEEN and KING side
             if (!pos.can_castle(c, t)) {
                 score += BREAKING_CASTLE_MALUS;
             }
@@ -268,9 +268,9 @@ int Game::position_eval()
     int phase = 0;
     int pos_scores[2][2] = { { 0 } };
     int pawns_files[2][8] = { { 0 } };
-    const Position &pos = positions.current();
-    for (const Color &c : COLORS) {
-        for (const PieceType &t : PIECE_TYPES) {
+    const Position& pos = positions.current();
+    for (const Color& c : COLORS) {
+        for (const PieceType& t : PIECE_TYPES) {
             const int n = pieces.count(c, t);
             phase += n * PHASE_COEF[t];
             for (int i = 0; i < n; ++i) {

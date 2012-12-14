@@ -3,20 +3,20 @@
 
 class SearchMoveTest : public testing::Test
 {
-    protected:
-        Protocol proto;
-        std::string fen;
+protected:
+    Protocol proto;
+    std::string fen;
 
-        virtual void SetUp() {
-            proto.new_game();
-            proto.set_output_thinking(true);
-        }
+    virtual void SetUp() {
+        proto.new_game();
+        proto.set_output_thinking(true);
+    }
 
-        std::string search(int time = 20) {
-            proto.set_board(fen);
-            proto.set_time(1, time);
-            return proto.search_move(true);
-        }
+    std::string search(int time = 20) {
+        proto.set_board(fen);
+        proto.set_time(1, time);
+        return proto.search_move(true);
+    }
 };
 
 TEST_F(SearchMoveTest, Fine70Position)

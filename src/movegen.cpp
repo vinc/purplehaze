@@ -21,7 +21,7 @@
 
 static bool king_castle_allowed(const Color c,
                                 const Square from, const Square to,
-                                const Board &board, const Pieces &pieces)
+                                const Board& board, const Pieces& pieces)
 {
     assert(from == Board::flip(E1, c));
     assert(to == Board::flip(G1, c));
@@ -37,7 +37,7 @@ static bool king_castle_allowed(const Color c,
 
 static bool queen_castle_allowed(const Color c,
                                  const Square from, const Square to,
-                                 const Board &board, const Pieces &pieces)
+                                 const Board& board, const Pieces& pieces)
 {
     assert(from == Board::flip(E1, c));
     assert(to == Board::flip(C1, c));
@@ -56,7 +56,7 @@ void Moves::generate_pieces(Color c, PieceType t, MoveType mt)
 {
     for (int i = 0, n = pieces.count(c, t); i < n; ++i) {
         const Square from = pieces.position(c, t, i);
-        for (const Direction &dir : PIECES_DIRS[t]) {
+        for (const Direction& dir : PIECES_DIRS[t]) {
             Square to = static_cast<Square>(from + dir);
             while (!board.is_out(to)) {
                 if (!board.is_empty(to)) {
@@ -89,7 +89,7 @@ void Moves::generate(MoveType mt)
 
         // Pawn captures
         if (mt != QUIET_MOVE) {
-            for (const Direction &dir : PAWN_CAPTURE_DIRS[c]) {
+            for (const Direction& dir : PAWN_CAPTURE_DIRS[c]) {
                 const Square to = static_cast<Square>(from + dir);
                 if (board.is_out(to)) {
                     continue;

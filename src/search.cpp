@@ -248,7 +248,7 @@ int Game::search(int alpha, int beta, int depth, const int ply)
     // Killer moves need pseudo legality checking before we can use them,
     // but they can cause a cut-off and dispense to generate quiet moves
     // so it's worth it.
-    for (const Move &killer_move : killers(depth)) {
+    for (const Move& killer_move : killers(depth)) {
         if (is_legal(killer_move)) {
             moves.add(killer_move, KILLERS);
         }
@@ -367,7 +367,7 @@ transposition:
     if (depth >= trans.depth() /*&& !is_null_move*/) {
         const int value = best_score;
         const Bound bound = (best_score >= beta ? LOWER :
-                                (best_score <= old_alpha ? UPPER : EXACT));
+                             (best_score <= old_alpha ? UPPER : EXACT));
         if (bound == UPPER) {
             best_move = Move(); // Don't store best move
         }

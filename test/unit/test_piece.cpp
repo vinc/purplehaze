@@ -3,8 +3,8 @@
 
 TEST(PieceTest, Constructor)
 {
-    for (const Color &c : COLORS) {
-        for (const PieceType &t : PIECE_TYPES) {
+    for (const Color& c : COLORS) {
+        for (const PieceType& t : PIECE_TYPES) {
             for (int i = 0; i < 9; ++i) {
                 Piece p(c, t, i);
 
@@ -21,8 +21,8 @@ TEST(PieceTest, Constructor)
                 EXPECT_FALSE(p.is(!c, t));
 
                 // Test comparison operators
-                for (const Color &c2 : COLORS) {
-                    for (const PieceType &t2 : PIECE_TYPES) {
+                for (const Color& c2 : COLORS) {
+                    for (const PieceType& t2 : PIECE_TYPES) {
                         for (int j = 0; j < 9; ++j) {
                             Piece p2(c2, t2, j);
                             if (c == c2 && t == t2 && i == j) {

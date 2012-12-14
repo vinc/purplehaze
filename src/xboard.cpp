@@ -39,7 +39,7 @@ static Tokens tokenize(const std::string line)
     return tokens;
 }
 
-static std::string read_line(Log &log)
+static std::string read_line(Log& log)
 {
     std::string line;
     getline(std::cin, line);

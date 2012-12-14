@@ -52,13 +52,13 @@ public:
 
     Color color() const {
         return static_cast<Color>((code >> C_SHIFT) & C_MASK);
-    };
+    }
     PieceType type() const {
         return static_cast<PieceType>((code >> T_SHIFT) & T_MASK);
-    };
+    }
     int index() const {
         return (code >> I_SHIFT) & I_MASK;
-    };
+    }
     /*
     void set_index(int i) {
         code &= I_MASK;

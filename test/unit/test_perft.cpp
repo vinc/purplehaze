@@ -4,9 +4,9 @@
 
 class PerftTest : public testing::Test
 {
-    protected:
-        Game game;
-        std::string fen;
+protected:
+    Game game;
+    std::string fen;
 };
 
 TEST_F(PerftTest, StartPosition)

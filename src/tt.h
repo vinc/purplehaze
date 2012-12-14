@@ -39,23 +39,23 @@ public:
 
     int value() const {
         return value_;
-    };
+    }
     int depth() const {
         return depth_;
-    };
+    }
     Bound bound() const {
         return bound_;
-    };
+    }
     Move best_move() const {
         return best_move_;
-    };
+    }
 
     bool is_empty() const {
         return value_ == 0 &&
                depth_ == 0 &&
                bound_ == UNDEF_BOUND &&
                best_move_.is_null();
-    };
+    }
 
     bool operator==(const Transposition& other) const {
         return this->value_ == other.value_ &&
@@ -80,7 +80,7 @@ public:
 
     void save(Hash h, int v, Bound b, int d, Move bm) {
         HashTable<Transposition>::save(h, Transposition(v, b, d, bm));
-    };
+    }
 };
 
 #endif /* !TT_H */

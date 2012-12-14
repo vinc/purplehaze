@@ -28,15 +28,15 @@ protected:
     int size;
 public:
     Stack() : size(0) {}
-    void push(T &t) {
+    void push(T& t) {
         stack[++size] = t;
-    };
+    }
     void pop() {
         --size;
-    };
+    }
     T& top() {
         return stack[size];
-    };
+    }
 };
 
 class Positions : public Stack<Position>
@@ -60,10 +60,10 @@ public:
     // Specific methods
     int ply() const {
         return offset + size;
-    };
+    }
     void set_ply(int o) {
         offset = o;
-    };
+    }
     bool is_draw();
 };
 
