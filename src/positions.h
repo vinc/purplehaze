@@ -22,49 +22,49 @@
 template <class T>
 class Stack
 {
-    protected:
-        static const int MAX = 1024;
-        T stack[MAX];
-        int size;
-    public:
-        Stack() : size(0) {}
-        void push(T &t) {
-            stack[++size] = t;
-        };
-        void pop() {
-            --size;
-        };
-        T& top() {
-            return stack[size];
-        };
+protected:
+    static const int MAX = 1024;
+    T stack[MAX];
+    int size;
+public:
+    Stack() : size(0) {}
+    void push(T &t) {
+        stack[++size] = t;
+    };
+    void pop() {
+        --size;
+    };
+    T& top() {
+        return stack[size];
+    };
 };
 
 class Positions : public Stack<Position>
 {
-    private:
-        int offset;
-    public:
-        Positions() : Stack<Position>(), offset(0) {}
+private:
+    int offset;
+public:
+    Positions() : Stack<Position>(), offset(0) {}
 
-        // Renamed stack methods
-        Position& current() {
-            return top();
-        }
-        void clone_current() {
-            push(top());
-        }
-        void delete_current() {
-            pop();
-        }
+    // Renamed stack methods
+    Position& current() {
+        return top();
+    }
+    void clone_current() {
+        push(top());
+    }
+    void delete_current() {
+        pop();
+    }
 
-        // Specific methods
-        int ply() const {
-            return offset + size;
-        };
-        void set_ply(int o) {
-            offset = o;
-        };
-        bool is_draw();
+    // Specific methods
+    int ply() const {
+        return offset + size;
+    };
+    void set_ply(int o) {
+        offset = o;
+    };
+    bool is_draw();
 };
 
 #endif /* !POSITIONS_H */

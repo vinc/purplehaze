@@ -34,23 +34,23 @@ static const std::string XBOARD_FEATURES[][2] = {
 
 class Xboard : public Protocol
 {
-    private:
-        std::thread thinker;
-        Log log;
-        bool force_mode;
+private:
+    std::thread thinker;
+    Log log;
+    bool force_mode;
 
-    public:
-        Xboard(const int tt_size = TT_SIZE, const int mt_size = MT_SIZE) :
-            Protocol(tt_size, mt_size),
-            force_mode(true)
-            {}
+public:
+    Xboard(const int tt_size = TT_SIZE, const int mt_size = MT_SIZE) :
+        Protocol(tt_size, mt_size),
+        force_mode(true)
+        {}
 
-        void debug(std::string logfile) {
-            log.open(logfile);
-        };
+    void debug(std::string logfile) {
+        log.open(logfile);
+    };
 
-        void loop();
-        void think();
+    void loop();
+    void think();
 };
 
 #endif /* !XBOARD_H */

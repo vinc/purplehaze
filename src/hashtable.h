@@ -23,65 +23,65 @@
 template <class T>
 class HashTable
 {
-    protected:
-        const int SIZE;
-        struct Entry {
-            Hash hash;
-            T value;
+protected:
+    const int SIZE;
+    struct Entry {
+        Hash hash;
+        T value;
 
-            Entry() : hash(0), value() {}
-        };
-        Entry* entries;
+        Entry() : hash(0), value() {}
+    };
+    Entry* entries;
 
-    public:
-        struct Stats {
-            long hits;
-            long collisions;
-            long misses;
-            Stats() : hits(0), collisions(0), misses(0) {}
-        } stats;
+public:
+    struct Stats {
+        long hits;
+        long collisions;
+        long misses;
+        Stats() : hits(0), collisions(0), misses(0) {}
+    } stats;
 
-        HashTable(int used_space = MT_SIZE) :
-            SIZE(used_space / sizeof(Entry)),
-            entries(new Entry[SIZE])
-            {}
-        ~HashTable() {
-            delete [] entries;
-            entries = NULL;
-        };
+    HashTable(int used_space = MT_SIZE) :
+        SIZE(used_space / sizeof(Entry)),
+        entries(new Entry[SIZE])
+        {}
+    ~HashTable() {
+        delete [] entries;
+        entries = NULL;
+    };
 #ifndef NDEBUG
-        T lookup(Hash h, bool* is_empty);
+    T lookup(Hash h, bool* is_empty);
 #else
-        T lookup(Hash h, bool* is_empty) {
-            Entry entry = entries[h & (SIZE - 1)];
-            if (entry.hash == h) {
-                *is_empty = false;
-                return entry.value;
-            } else {
-                *is_empty = true;
-                return T();
-            }
+    T lookup(Hash h, bool* is_empty) {
+        Entry entry = entries[h & (SIZE - 1)];
+        if (entry.hash == h) {
+            *is_empty = false;
+            return entry.value;
+        } else {
+            *is_empty = true;
+            return T();
         }
+    }
 #endif
-        void save(Hash h, T v) {
-            entries[h & (SIZE - 1)].hash = h;
-            entries[h & (SIZE - 1)].value = v;
-        };
-        void clear();
+    void save(Hash h, T v) {
+        entries[h & (SIZE - 1)].hash = h;
+        entries[h & (SIZE - 1)].value = v;
+    };
+    void clear();
 
-        // Used to print stats
-        int size() const {
-            return SIZE;
-        };
+    // Used to print stats
+    int size() const {
+        return SIZE;
+    };
 
-        T value_at(int i) const {
-            return entries[i].value;
-        };
-        Hash hash_at(int i) const {
-            return entries[i].hash;
-        };
+    T value_at(int i) const {
+        return entries[i].value;
+    };
+    Hash hash_at(int i) const {
+        return entries[i].hash;
+    };
 
-        int usage() const;
+    int usage() const;
 };
 
 #endif /* !HASH_TABLE_H */

@@ -25,48 +25,48 @@
 
 class Protocol
 {
-    protected:
-        Game game;
-        int depth;
-        std::stack<Move> history;
-        unsigned short verbosity;
+protected:
+    Game game;
+    int depth;
+    std::stack<Move> history;
+    unsigned short verbosity;
 
-    public:
-        Protocol(const int tt_size = TT_SIZE, const int mt_size = MT_SIZE) :
-            game(tt_size, mt_size),
-            depth(MAX_PLY - 1),
-            verbosity(0)
-            {}
+public:
+    Protocol(const int tt_size = TT_SIZE, const int mt_size = MT_SIZE) :
+        game(tt_size, mt_size),
+        depth(MAX_PLY - 1),
+        verbosity(0)
+        {}
 
-        void new_game();
+    void new_game();
 
-        bool set_output_thinking(bool ot = true);
+    bool set_output_thinking(bool ot = true);
 
-        bool set_board(std::string fen);
+    bool set_board(std::string fen);
 
-        bool set_time(int moves, int time);
+    bool set_time(int moves, int time);
 
-        bool set_remaining(int time);
+    bool set_remaining(int time);
 
-        bool play_move(std::string move);
+    bool play_move(std::string move);
 
-        bool undo_move();
+    bool undo_move();
 
-        std::string search_move(bool use_san_notation = false);
+    std::string search_move(bool use_san_notation = false);
 
-        Move parse_move(std::string move);
+    Move parse_move(std::string move);
 
-        void set_depth(int d) {
-            depth = d;
-        };
+    void set_depth(int d) {
+        depth = d;
+    };
 
-        void set_verbosity(int v = 0) {
-            verbosity = v;
-        };
+    void set_verbosity(int v = 0) {
+        verbosity = v;
+    };
 
-        int get_verbosity() {
-            return verbosity;
-        };
+    int get_verbosity() {
+        return verbosity;
+    };
 };
 
 #endif /* !PROTOCOL_H */

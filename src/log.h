@@ -22,71 +22,71 @@
 
 class Log : public std::ostream
 {
-    private:
-        template <class T>
-        struct LogStream {
-            T stream;
-            bool state;
+private:
+    template <class T>
+    struct LogStream {
+        T stream;
+        bool state;
 
-            LogStream() :
-                stream(),
-                state(false)
-                {}
-            LogStream(std::streambuf *sb) :
-                stream(sb),
-                state(true)
-                {}
-            LogStream(std::string filename) :
-                stream(filename, std::ios::app),
-                state(true)
-                {}
-        };
-        LogStream<std::ostream> cout;
-        LogStream<std::ofstream> file;
-
-    public:
-        enum Stream { COUT, FILE, BOTH };
-        enum LogDirection { IN, OUT, DEBUG };
-
-        Log() :
-            std::ostream(std::cout.rdbuf()),
-            cout(std::cout.rdbuf()),
-            file()
+        LogStream() :
+            stream(),
+            state(false)
             {}
-
-        Log(std::string filename) :
-            std::ostream(std::cout.rdbuf()),
-            cout(std::cout.rdbuf()),
-            file(filename)
+        LogStream(std::streambuf *sb) :
+            stream(sb),
+            state(true)
             {}
+        LogStream(std::string filename) :
+            stream(filename, std::ios::app),
+            state(true)
+            {}
+    };
+    LogStream<std::ostream> cout;
+    LogStream<std::ofstream> file;
 
-        void open(std::string filename) {
-            file.stream.open(filename, std::ios::app);
-            file.state = true;
-        };
+public:
+    enum Stream { COUT, FILE, BOTH };
+    enum LogDirection { IN, OUT, DEBUG };
 
-        template <typename T>
-        Log& operator<<(const T &val) {
-            if (cout.state) {
-                cout.stream << val;
-            }
-            if (file.state && file.stream.is_open()) {
-                file.stream << val;
-            }
-            return *this;
+    Log() :
+        std::ostream(std::cout.rdbuf()),
+        cout(std::cout.rdbuf()),
+        file()
+        {}
+
+    Log(std::string filename) :
+        std::ostream(std::cout.rdbuf()),
+        cout(std::cout.rdbuf()),
+        file(filename)
+        {}
+
+    void open(std::string filename) {
+        file.stream.open(filename, std::ios::app);
+        file.state = true;
+    };
+
+    template <typename T>
+    Log& operator<<(const T &val) {
+        if (cout.state) {
+            cout.stream << val;
         }
-
-        Log& operator<<(std::ostream& (*manip)(std::ostream&)) {
-            if (cout.state) {
-                cout.stream << manip;
-            }
-            if (file.state && file.stream.is_open()) {
-                file.stream << manip;
-            }
-            return *this;
+        if (file.state && file.stream.is_open()) {
+            file.stream << val;
         }
+        return *this;
+    }
 
-        Log& operator<<(const LogDirection &dir);
-        Log& to(Stream s);
+    Log& operator<<(std::ostream& (*manip)(std::ostream&)) {
+        if (cout.state) {
+            cout.stream << manip;
+        }
+        if (file.state && file.stream.is_open()) {
+            file.stream << manip;
+        }
+        return *this;
+    }
+
+    Log& operator<<(const LogDirection &dir);
+    Log& to(Stream s);
 };
 #endif /* !LOG_H*/

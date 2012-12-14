@@ -26,29 +26,29 @@ typedef uint64_t Hash;
 
 class Zobrist
 {
-    private:
-        Hash gen_hash();
-        Hash pieces_positions[2][7][BOARD_SIZE];
-        Hash side_to_move;
-        Hash castle_rights[4];
-        Hash en_passants[BOARD_SIZE];
-        std::mt19937_64 generator;
+private:
+    Hash gen_hash();
+    Hash pieces_positions[2][7][BOARD_SIZE];
+    Hash side_to_move;
+    Hash castle_rights[4];
+    Hash en_passants[BOARD_SIZE];
+    std::mt19937_64 generator;
 
-    public:
-        Zobrist();
-        void change_side(Hash& h) {
-            h ^= side_to_move;
-        };
-        void update_piece(Hash& h, Color c, PieceType t, Square s) {
-            h ^= pieces_positions[c][t][s];
-        };
-        void update_castle_right(Hash& h, Color c, PieceType t) {
-            h ^= castle_rights[2 * c + t - QUEEN];
-        };
-        void update_en_passant(Hash& h, Square s) {
-            h ^= en_passants[s];
-        };
-        friend std::ostream& operator<<(std::ostream& out, const Zobrist& zobrist);
+public:
+    Zobrist();
+    void change_side(Hash& h) {
+        h ^= side_to_move;
+    };
+    void update_piece(Hash& h, Color c, PieceType t, Square s) {
+        h ^= pieces_positions[c][t][s];
+    };
+    void update_castle_right(Hash& h, Color c, PieceType t) {
+        h ^= castle_rights[2 * c + t - QUEEN];
+    };
+    void update_en_passant(Hash& h, Square s) {
+        h ^= en_passants[s];
+    };
+    friend std::ostream& operator<<(std::ostream& out, const Zobrist& zobrist);
 };
 
 #endif /* !ZOBRIST_H */
