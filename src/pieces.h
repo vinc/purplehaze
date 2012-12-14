@@ -31,9 +31,8 @@ private:
 
 public:
     Pieces() : nb_pieces(), total() {
-        std::fill(&positions[0][0][0],
-                  &positions[0][0][0] + sizeof(positions),
-                  OUT);
+        Square* p = &positions[0][0][0];
+        std::fill(p, p + sizeof(positions), OUT);
     }
 
     Square position(Piece p) const {
