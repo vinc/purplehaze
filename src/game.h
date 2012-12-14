@@ -121,8 +121,17 @@ class Game
             return output_square(board.file(s), board.rank(s));
         };
         std::string output_square(File f, Rank r);
-        void print_tt_stats();
         std::string debug_move(Move m);
+
+        template <class T>
+        std::string output_hashtable_stats(const HashTable<T> &table);
+
+        std::string output_mt_stats() {
+            return output_hashtable_stats(material_table);
+        }
+        std::string output_tt_stats() {
+            return output_hashtable_stats(tt);
+        }
 };
 
 #endif /* !GAME_H */

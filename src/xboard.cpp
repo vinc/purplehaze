@@ -89,10 +89,17 @@ void Xboard::think()
                           << " second" << (allocated != 1.0f ? "s" : "")
                           << " used to play" << std::endl;
 
-        if (get_verbosity() > 1) {
-            log << std::endl;
-            game.print_tt_stats();
-        }
+#ifndef NDEBUG
+        log.to(Log::FILE) << Log::DEBUG
+                          << "Transposition table usage:" << std::endl
+                          << game.output_tt_stats()
+                          << std::endl;
+        log.to(Log::FILE) << Log::DEBUG
+                          << "Material table usage:" << std::endl
+                          << game.output_mt_stats()
+                          << std::endl;
+#endif
+
         output = "move " + move;
     }
     log.to(Log::BOTH) << Log::OUT << output << std::endl;

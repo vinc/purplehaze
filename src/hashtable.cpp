@@ -26,13 +26,13 @@ T HashTable<T>::lookup(Hash h, bool* is_empty)
         // FIXME 'entry.hash' is initialized to '0'
         // Problem when 'h == 0' and 'entry.value' is empty.
         *is_empty = false;
-        ++hits;
+        stats.hits++;
         return entry.value;
     } else if (entry.hash != 0) {
-        ++collisions;
+        stats.collisions++;
     }
     *is_empty = true;
-    ++misses;
+    stats.misses++;
     return T();
 }
 #endif
@@ -41,8 +41,7 @@ template <class T>
 void HashTable<T>::clear()
 {
     std::fill(entries, entries + SIZE, Entry());
-    hits = 0;
-    misses = 0;
+    stats = Stats();
 }
 
 template <class T>

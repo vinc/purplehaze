@@ -24,9 +24,6 @@ template <class T>
 class HashTable
 {
     protected:
-        long hits;
-        long collisions;
-        long misses;
         const int SIZE;
         struct Entry {
             Hash hash;
@@ -37,10 +34,14 @@ class HashTable
         Entry* entries;
 
     public:
+        struct Stats {
+            long hits;
+            long collisions;
+            long misses;
+            Stats() : hits(0), collisions(0), misses(0) {}
+        } stats;
+
         HashTable(int used_space = MT_SIZE) :
-            hits(0),
-            collisions(0),
-            misses(0),
             SIZE(used_space / sizeof(Entry)),
             entries(new Entry[SIZE])
             {}
@@ -81,18 +82,6 @@ class HashTable
         };
 
         int usage() const;
-        long nb_lookups() const {
-            return hits + misses;
-        };
-        long nb_hits() const {
-            return hits;
-        };
-        long nb_collisions() const {
-            return collisions;
-        };
-        long nb_misses() const {
-            return misses;
-        };
 };
 
 #endif /* !HASH_TABLE_H */

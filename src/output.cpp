@@ -166,90 +166,44 @@ std::string Game::output_square(File f, Rank r)
     return stream.str();
 }
 
-std::string get_stat(std::string title, double value, std::string unit = "")
-{
-    std::ostringstream stream;
-    stream << std::left << "    " << std::setw(20) << title;
-    int precision = (unit == "%" ? 2 : 0);
-    stream << std::fixed << std::setprecision(precision) << value << unit;
-    return stream.str();
-}
-
-std::string get_meta(double value, std::string unit)
-{
-    std::ostringstream stream;
-    stream << " ("
-           << std::fixed << std::setprecision(2) << value << unit
-           << ")";
-    return stream.str();
-}
-
-static double get_percent(double a, double b)
-{
-    return 100 * a / b;
-}
-
 template <class T>
-std::string print_table_stats(const HashTable<T>& table, int table_size)
+std::string Game::output_hashtable_stats(const HashTable<T> &table)
 {
-    long zeros = 0;
-    long ones = 0;
-    for (int i = 0; i < table.size(); ++i) {
-        Hash h = table.hash_at(i);
-        if (!h) {
-            continue;
-        }
-        std::bitset<64> b = h;
-        int z = b.count();
-        zeros += 64 - z;
-        ones += z;
+    static const std::string names[] = {
+        "Size",
+        "Usage",
+        "Lookups",
+        "Hits",
+        "Misses",
+        "Collisions"
+    };
+    const long stats[] = {
+        table.size(),
+        table.usage(),
+        table.stats.hits + table.stats.misses,
+        table.stats.hits,
+        table.stats.misses,
+        table.stats.collisions
+    };
+
+    int width = 0;
+    for (const std::string &name : names) {
+        width = std::max(width, static_cast<int>(name.length()) + 2);
     }
-
     std::ostringstream stream;
-    stream << get_stat("Table Size", table_size / 1024 / 1024, "Mb");
-    stream << std::endl;
-
-    stream << get_stat("Entries", table.size());
-    stream << std::endl;
-
-    stream << get_stat("Usage", table.usage());
-    stream << get_meta(get_percent(table.usage(), table.size()), "%");
-    stream << std::endl;
-
-    stream << get_stat("0's", get_percent(zeros, 64 * table.usage()), "%");
-    stream << std::endl;
-
-    stream << get_stat("1's", get_percent(ones, 64 * table.usage()), "%");
-    stream << std::endl;
-
-    stream << get_stat("Lookups", table.nb_lookups());
-    stream << std::endl;
-
-    stream << get_stat("Hits", table.nb_hits());
-    stream << get_meta(get_percent(table.nb_hits(),
-                                   table.nb_lookups()), "%");
-    stream << std::endl;
-
-    stream << get_stat("Collisions", table.nb_collisions());
-    stream << get_meta(get_percent(table.nb_collisions(),
-                                   table.nb_lookups()), "%");
-    stream << std::endl;
-
-    stream << get_stat("Misses", table.nb_misses());
-    stream << get_meta(get_percent(table.nb_misses(),
-                                   table.nb_lookups()), "%");
-    stream << std::endl;
-
+    for (int i = 0; i < 6; ++i) {
+        stream << std::left << "   " << std::setw(width) << names[i]
+               << std::fixed << std::setprecision(2) << stats[i];
+        if (names[i] == "Usage" || i > 2) {
+            const long n = (i > 2 ? stats[2] : table.size());
+            const double v = 100.0 * stats[i] / n;
+            stream << " (" << std::fixed << std::setprecision(2) << v << "%)";
+        }
+        if (i < 5) {
+            stream << std::endl;
+        }
+    }
     return stream.str();
-}
-
-void Game::print_tt_stats()
-{
-    std::cout << "Transposition Table usage:" << std::endl;
-    std::cout << print_table_stats(tt, TT_SIZE) << std::endl;
-
-    std::cout << "Material Table usage:" << std::endl;
-    std::cout << print_table_stats(material_table, MT_SIZE) << std::endl;
 }
 
 std::string Game::debug_move(Move m)
@@ -265,3 +219,7 @@ std::string Game::debug_move(Move m)
            << std::hex << positions.current().hash();
     return stream.str();
 }
+
+// Define types used by template to avoid linker errors
+template std::string Game::output_hashtable_stats(HashTable<Transposition> const&);
+template std::string Game::output_hashtable_stats(HashTable<Material> const&);
