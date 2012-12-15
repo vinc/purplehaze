@@ -7,6 +7,7 @@ optimize = yes
 debug = no
 
 # Search options
+use_insertion_sort = no
 use_check_extension = yes
 use_null_move_pruning = yes
 use_internal_iterative_deepening = yes
@@ -45,6 +46,9 @@ ifeq ($(use_profiler),yes)
 endif
 ifeq ($(debug),no)
     CXXFLAGS += -DNDEBUG
+endif
+ifeq ($(use_insertion_sort),no)
+    CXXFLAGS += -DNIS
 endif
 ifeq ($(use_check_extension),no)
     CXXFLAGS += -DNCE

@@ -84,6 +84,7 @@ ExtendedMove Moves::next()
     // If we are here, next() should return a capture
     assert(state() == GOOD_CAPTURES || state() == BAD_CAPTURES);
 
+#ifdef NIS
     // Find the best remaining capture by selection sort
     int max = cur;
     for (int i = cur + 1; i < end; ++i) {
@@ -98,6 +99,7 @@ ExtendedMove Moves::next()
         moves[cur] = std::move(moves[max]);
         moves[max] = std::move(tmp);
     }
+#endif
 
     // Return it
     return moves[cur++];
@@ -115,8 +117,7 @@ void Moves::add(Move move, MovesState mt)
     }
 
     // Don't add again best and killer moves
-    const int n = size[BEST] + size[KILLERS];
-    for (int i = 0; i < n; ++i) {
+    for (int i = 0, n = size[BEST] + size[KILLERS]; i < n; ++i) {
         if (moves[i] == move) {
             return;
         }
@@ -138,24 +139,39 @@ void Moves::add(Move move, MovesState mt)
         //size[generation_state]++; // If move is a capture or a quiet move
         break;
     }
+
+    bool sort = false;
     switch (generation_state) {
     case GOOD_CAPTURES:
     case BAD_CAPTURES:
         score = mvv_lva_score(move);
         size[generation_state]++;
+#ifndef NIS
+        sort = true;
+#endif
         break;
     case QUIET_MOVES:
         score = -BEST_SCORE;
         size[generation_state]++;
         break;
     default:
-        //assert(mt < GOOD_CAPTURES);
-        //size[mt]++; // If move is a best or killer move
         break;
     }
 
+    // Last position in the moves list
+    int i = end++;
+
+    // Sort moves by insertion sort
+    if (sort) {
+        const int n = end - size[generation_state];
+        while (i > n && moves[i - 1].value() < score) {
+            moves[i] = moves[i - 1];
+            --i;
+        }
+    }
+
     // Add the move and its score to moves list
-    moves[end++] = ExtendedMove(move, score);
+    moves[i] = ExtendedMove(move, score);
 }
 
 Score Moves::mvv_lva_scores[][NB_PIECE_TYPES] = { { 0 } };
