@@ -86,9 +86,10 @@ TEST(PiecesTest, CountBoard)
 
 TEST(PiecesTest, Size)
 {
-    int size = (sizeof(Square) * 2 * 7 * 9) +
-               (sizeof(unsigned char) * 2 * 7) +
-               (sizeof(unsigned char) * 2);
-    EXPECT_EQ(size, 142); // Square is unsigned char (1 byte)
+    EXPECT_EQ(sizeof(Square), sizeof(uint8_t));
+    int size =
+        sizeof(Square) * 2 * 7 * 9 +    // 126 bytes
+        sizeof(uint8_t) * 2 * 7 +       // 14 bytes
+        sizeof(uint8_t) * 2;            // 2 bytes
     EXPECT_EQ(size, sizeof(Pieces));
 }

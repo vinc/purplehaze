@@ -32,7 +32,7 @@ private:
     std::bitset<4> castle_rights;
     std::bitset<2> castled;
     Square en_passant_square;
-    unsigned char halfmove_counter;
+    uint8_t halfmove_counter;
     bool null_move_right;
     Color side_to_move;
 
@@ -55,10 +55,10 @@ public:
     void change_side() {
         side_to_move = !side_to_move;
     }
-    unsigned char halfmove() const {
+    uint8_t halfmove() const {
         return halfmove_counter;
     }
-    void set_halfmove(unsigned char i) {
+    void set_halfmove(uint8_t i) {
         halfmove_counter = i;
     }
     void inc_halfmove() {

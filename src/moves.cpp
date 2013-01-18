@@ -86,8 +86,8 @@ ExtendedMove Moves::next()
 
 #ifdef NIS
     // Find the best remaining capture by selection sort
-    int max = cur;
-    for (int i = cur + 1; i < end; ++i) {
+    unsigned int max = cur;
+    for (unsigned int i = cur + 1; i < end; ++i) {
         if (moves[i].value() > moves[max].value()) {
             max = i;
         }

@@ -34,7 +34,7 @@ static const int MT_SIZE     = 1 << 20; // 1 MB
 static const std::string DEFAULT_FEN =
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-enum Square : unsigned char {
+enum Square : uint8_t {
     A1=0x00, B1, C1, D1, E1, F1, G1, H1,
     A2=0x10, B2, C2, D2, E2, F2, G2, H2,
     A3=0x20, B3, C3, D3, E3, F3, G3, H3,
@@ -58,7 +58,7 @@ static const Square SQUARES[] = {
     OUT
 };
 
-enum File : unsigned char {
+enum File : uint8_t {
     FILE_A,
     FILE_B,
     FILE_C,
@@ -69,7 +69,7 @@ enum File : unsigned char {
     FILE_H
 };
 
-enum Rank : unsigned char {
+enum Rank : uint8_t {
     RANK_1,
     RANK_2,
     RANK_3,
@@ -101,7 +101,7 @@ enum Direction {
 };
 
 #ifdef __INTEL_COMPILER
-enum Color : unsigned char {
+enum Color : uint8_t {
 #else
 enum Color : bool {
 #endif
@@ -114,7 +114,7 @@ inline Color operator!(Color c)
     return static_cast<Color>(!static_cast<bool>(c));
 }
 
-enum PieceType : unsigned char {
+enum PieceType : uint8_t {
     EMPTY,
     PAWN,
     KNIGHT,
@@ -141,7 +141,7 @@ static const PieceType MAJOR_TYPES[] = {
     ROOK, QUEEN
 };
 
-enum MoveType : unsigned char {
+enum MoveType : uint8_t {
     QUIET_MOVE,
     DOUBLE_PAWN_PUSH,
     KING_CASTLE,
@@ -206,7 +206,7 @@ static const Direction PAWN_CAPTURE_DIRS[][2] = {
 };
 
 // Used in tt.h
-enum Bound : unsigned char { EXACT, LOWER, UPPER, UNDEF_BOUND };
+enum Bound : uint8_t { EXACT, LOWER, UPPER, UNDEF_BOUND };
 
 // Used in game.h, hashtable.cpp
 // NOTE: sizeof(Material) + sizeof(Hash) must be a power of two
@@ -216,6 +216,7 @@ typedef uint64_t Material;
 // Used for debugging
 #define assert_msg(x) !(std::cerr << "Assertion failed: " << x << std::endl)
 
+/*
 // Overload operators to solve ambiguous errors with Clang < 3.1
 // TODO Find out if this could be better done
 inline bool operator==(int i, Rank r)
@@ -318,6 +319,7 @@ inline int operator+(MoveType a, MoveType b)
 {
     return static_cast<MoveType>(static_cast<int>(a) + static_cast<int>(b));
 }
+*/
 
 // ANSI Color
 static const std::string RED = "\x1b[31m";

@@ -5,14 +5,13 @@
 
 TEST(MoveListTest, Size)
 {
-    int list_size = (MAX_PLY * MAX_MOVES) * sizeof(ExtendedMove);
-    int size = list_size + sizeof(unsigned int);
+    int size =
+        sizeof(ExtendedMove) * (MAX_PLY * MAX_MOVES) +
+        sizeof(unsigned int);
 
     // MoveList's internal array's size should not be a power of two
     //EXPECT_NE(0, list_size & (list_size - 1));
 
-    EXPECT_EQ(128 * 256 * 4, list_size);
-    EXPECT_EQ(list_size + 4, size);
     EXPECT_EQ(size, sizeof(MoveList));
 }
 
@@ -67,21 +66,21 @@ TEST(MoveListTest, Assignement)
 TEST(MovesTest, Size)
 {
     EXPECT_EQ(1, sizeof(MovesState));
-    EXPECT_EQ(5, MOVES_STATE_SIZE * sizeof(unsigned char));
+    EXPECT_EQ(5, sizeof(uint8_t) * MOVES_STATE_SIZE);
     int size =
         sizeof(MoveList*) +                        // 4-8 bytes
         sizeof(Position*) +                        // 4-8 bytes
         sizeof(Board*) +                           // 4-8 bytes
         sizeof(Pieces*) +                          // 4-8 bytes
-        sizeof(int) +                              // 4 bytes
-        sizeof(int) +                              // 4 bytes
-        MOVES_STATE_SIZE * sizeof(unsigned char) + // 5 bytes
-        1 +                                        // 1 byte (padding)
+        sizeof(unsigned int) +                     // 4-8 bytes
+        sizeof(unsigned int) +                     // 4-8 bytes
+        sizeof(uint8_t) * MOVES_STATE_SIZE +       // 5 bytes
+        1 +
         sizeof(MovesState) +                       // 1 byte
         sizeof(bool);                              // 1 byte
 
 #ifdef __x86_64__
-    EXPECT_EQ(48, size);
+    EXPECT_EQ(56, size);
 #elif __i386__
     EXPECT_EQ(32, size);
 #endif

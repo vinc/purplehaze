@@ -26,8 +26,8 @@ class Pieces
 {
 private:
     Square positions[2][7][9];
-    unsigned char nb_pieces[2][7];
-    unsigned char total[2];
+    uint8_t nb_pieces[2][7];
+    uint8_t total[2];
 
 public:
     Pieces() : nb_pieces(), total() {
@@ -51,10 +51,10 @@ public:
         assert(0 <= i && i < 9);
         positions[c][t][i] = s;
     }
-    unsigned char count(Color c, PieceType t) const {
+    uint8_t count(Color c, PieceType t) const {
         return nb_pieces[c][t];
     }
-    unsigned char count(Color c) const {
+    uint8_t count(Color c) const {
         return total[c];
     }
 

@@ -10,7 +10,7 @@ TEST(TranspositionTest, Size)
 {
     int size = sizeof(int16_t) +        // 2 bytes
                sizeof(Move) +           // 2 bytes
-               sizeof(unsigned char) +  // 1 byte
+               sizeof(uint8_t) +        // 1 byte
                sizeof(Bound);           // 1 byte
     EXPECT_EQ(6, size);
     EXPECT_EQ(size, sizeof(Transposition));

@@ -54,7 +54,7 @@ static const int MULTI_PAWNS_MALUS[] = { // Pawns on the same file
 };
 
 // Game phase used in tapered evaluation
-enum Phase : unsigned char { OPENING, ENDING };
+enum Phase : uint8_t { OPENING, ENDING };
 static const Phase PHASES[] = { OPENING, ENDING };
 
 // Coefficient of each type of piece to determine the game phase

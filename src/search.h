@@ -26,7 +26,7 @@ static const bool debug = false;
 static const bool debug = true;
 #endif
 
-enum NodeType : unsigned char { PV, CUT, ALL };
+enum NodeType : uint8_t { PV, CUT, ALL };
 
 // Adaptive Null-Move Pruning (Heinz 1999)
 inline static int R_ADAPT(int d, int n)

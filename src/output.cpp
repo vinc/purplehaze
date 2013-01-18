@@ -123,7 +123,7 @@ std::string Game::output_move(Move m)
     if (t != PAWN) {
         Color c = p.color();
         Square to = m.dest();
-        for (int i = 0; i < pieces.count(c, t); ++i) {
+        for (unsigned int i = 0; i < pieces.count(c, t); ++i) {
             Piece other(c, t, i);
             if (other == p) {
                 continue;

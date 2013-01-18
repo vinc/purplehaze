@@ -28,7 +28,7 @@ class Transposition
 private:
     int16_t value_;       // 2 bytes / 16 bits used
     Move best_move_;      // 2 bytes / 16 bits used
-    unsigned char depth_; // 1 byte  /  8 bits used (depth < 256)
+    uint8_t depth_;       // 1 byte  /  8 bits used (depth < 256)
     Bound bound_;         // 1 byte  /  2 bits used
 
 public:

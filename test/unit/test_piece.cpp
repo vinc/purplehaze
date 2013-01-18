@@ -40,5 +40,5 @@ TEST(PieceTest, Constructor)
 
 TEST(PieceTest, Size)
 {
-    EXPECT_EQ(sizeof(unsigned char), sizeof(Piece));
+    EXPECT_EQ(sizeof(uint8_t), sizeof(Piece));
 }

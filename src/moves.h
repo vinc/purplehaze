@@ -24,13 +24,13 @@ class Board;
 class Pieces;
 class Position;
 
-typedef char Score;
+typedef int8_t Score;
 
 const Score BEST_SCORE = 127;
 const Score KILLERS_SCORE = 0;
 
 const int MOVES_STATE_SIZE = 5;
-enum MovesState : unsigned char {
+enum MovesState : uint8_t {
     BEST, GOOD_CAPTURES, KILLERS, BAD_CAPTURES, QUIET_MOVES, UNDEF_MOVES
 };
 
@@ -52,12 +52,12 @@ public:
     void clear() {
         ply = 0;
     }
-    ExtendedMove& operator[] (unsigned char i) {
+    ExtendedMove& operator[] (unsigned int i) {
         return list[ply][i];
     }
 
     // Only used in unit tests
-    int cur_ply() const {
+    unsigned int cur_ply() const {
         return ply;
     }
 };
@@ -71,16 +71,17 @@ private:
     const Position& current_position;
     const Board& board;
     const Pieces& pieces;
-    int cur;
-    int end;
-    unsigned char size[MOVES_STATE_SIZE]; // Moves types counters
+    unsigned int cur;
+    unsigned int end;
+    uint8_t size[MOVES_STATE_SIZE]; // Moves types counters
     MovesState generation_state;
     bool use_lazy_generation;
 
 public:
-    Moves(const Board& b, const Pieces& ps, const Position& cn,
-          MoveList& ml, bool lg = true) :
-        moves(ml), current_position(cn), board(b), pieces(ps),
+    Moves(const Board& b, const Pieces& ps, const Position& cn, MoveList& ml,
+          const bool lg = true) :
+        moves(ml),
+        current_position(cn), board(b), pieces(ps),
         cur(0), end(0),
         size(),
         generation_state(BEST),
@@ -104,7 +105,7 @@ public:
     Score mvv_lva_score(Move m);
 
     // Only used in unit tests
-    int count(MovesState mt) const {
+    unsigned int count(MovesState mt) const {
         return size[mt];
     }
 

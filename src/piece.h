@@ -39,7 +39,7 @@ private:
     static const int T_SHIFT = 1;
     static const int I_SHIFT = 4;
 
-    unsigned char code;
+    uint8_t code;
 
 public:
     Piece() : code(EMPTY) {}

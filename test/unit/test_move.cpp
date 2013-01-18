@@ -168,7 +168,7 @@ TEST(MoveTest, Type)
 
 TEST(ExtendedMoveTest, Size)
 {
-    int size = sizeof(uint16_t) + sizeof(char) + 1; // 1 byte of padding
+    int size = sizeof(uint16_t) + sizeof(int8_t) + 1; // 1 byte of padding
     EXPECT_EQ(4, size);
     EXPECT_EQ(size, sizeof(ExtendedMove));
 }
