@@ -43,9 +43,9 @@ void Game::fen(std::string record)
     for (auto it = placement.begin(); it != placement.end(); ++it) {
         char sq = *it;
         if (sq == '/') {
-            s = Square(s + DOWN + 8 * LEFT); // New rank
+            s = static_cast<Square>(s + DOWN + 8 * LEFT); // New rank
         } else if ('1' <= sq && sq <= '8') { // Empty squares
-            s = Square(s + sq - '1' + 1); // Next square
+            s = static_cast<Square>(s + sq - '1' + 1); // Next square
         } else { // Non empty square
             Color c = WHITE;
             PieceType t = EMPTY;
@@ -102,10 +102,10 @@ void Game::fen(std::string record)
                 assert(false);
             }
             add_piece(c, t, s);
-            s = Square(s + RIGHT); // Next square
+            s = static_cast<Square>(s + RIGHT); // Next square
         }
     }
-    assert(s == Square(H1 + RIGHT));
+    assert(s == static_cast<Square>(H1 + RIGHT));
 
     // Set the side to move
     char side;
@@ -146,9 +146,9 @@ void Game::fen(std::string record)
     std::string ep;
     iss >> ep;
     if (ep != "-") {
-        char file = ep.at(0);
-        char rank = ep.at(1);
-        s = Square((rank - '1') * 16 + file - 'a');
+        const char f = ep.at(0);
+        const char r = ep.at(1);
+        s = static_cast<Square>((r - '1') * 16 + f - 'a');
         assert(!board.is_out(s));
         positions.current().set_en_passant(s);
     }

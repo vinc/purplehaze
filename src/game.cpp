@@ -39,12 +39,13 @@ void Game::add_piece(Color c, PieceType t, Square s)
     Position& pos = positions.current();
     zobrist.update_piece(pos.hash(), c, t, s);
 
+    Hash& h = pos.material_hash();
     // Hack: for the material hash, the position is irrelevant but each piece
-    // needs a unique hash so we are using Square(i) in place of the position.
+    // needs a unique hash so we are using the index 'i' instead of a Square.
     // Remove the previous total
-    zobrist.update_piece(pos.material_hash(), c, t, Square(i));
+    zobrist.update_piece(h, c, t, static_cast<Square>(i));
     // Add the new total
-    zobrist.update_piece(pos.material_hash(), c, t, Square(i + 1));
+    zobrist.update_piece(h, c, t, static_cast<Square>(i + 1));
 }
 
 void Game::del_piece(Color c, PieceType t, int i)
@@ -65,9 +66,10 @@ void Game::del_piece(Color c, PieceType t, int i)
     Position& pos = positions.current();
     zobrist.update_piece(pos.hash(), c, t, emptied);
 
-    // Same hack here for the material hash than in add_piece()
-    zobrist.update_piece(pos.material_hash(), c, t, Square(j + 1));
-    zobrist.update_piece(pos.material_hash(), c, t, Square(j));
+    // Same hack here for the material hash than in Game::add_piece()
+    Hash& h = pos.material_hash();
+    zobrist.update_piece(h, c, t, static_cast<Square>(j + 1));
+    zobrist.update_piece(h, c, t, static_cast<Square>(j));
 }
 
 void Game::new_position()

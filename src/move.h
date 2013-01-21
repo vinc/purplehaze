@@ -68,22 +68,22 @@ public:
     Move(Square o, Square d, MoveType t) : code(encode(o, d, t)) {}
 
     File orig_file() const {
-        return File((code >> OF_SHIFT) & OF_MASK);
+        return static_cast<File>((code >> OF_SHIFT) & OF_MASK);
     }
     Rank orig_rank() const {
-        return Rank((code >> OR_SHIFT) & OR_MASK);
+        return static_cast<Rank>((code >> OR_SHIFT) & OR_MASK);
     }
     File dest_file() const {
-        return File((code >> DF_SHIFT) & DF_MASK);
+        return static_cast<File>((code >> DF_SHIFT) & DF_MASK);
     }
     Rank dest_rank() const {
-        return Rank((code >> DR_SHIFT) & DR_MASK);
+        return static_cast<Rank>((code >> DR_SHIFT) & DR_MASK);
     }
     Square orig() const {
-        return Square(16 * orig_rank() + orig_file());
+        return static_cast<Square>(16 * orig_rank() + orig_file());
     }
     Square dest() const {
-        return Square(16 * dest_rank() + dest_file());
+        return static_cast<Square>(16 * dest_rank() + dest_file());
     }
     MoveType type() const {
         return static_cast<MoveType>((code >> MT_SHIFT) & MT_MASK);
